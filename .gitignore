@@ -1,0 +1,7 @@
+# Created by .ignore support plugin (hsz.mobi)
+### ignore files template
+test.py
+V 0.2.1
+old
+__pycache__
+.idea

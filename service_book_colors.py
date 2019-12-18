@@ -6,6 +6,14 @@
 #    Dec 13, 2019 12:08:06 AM EET  platform: Windows NT
 
 """
+
+Αρχεία 1. add_customers  == >> Παράθυρο προσθήκης πελάτη
+V 0.2.1 Προσθήκη πελάτη σε νέο παράθυρο ====================================================== Εγινε 18/12/2019
+
+Αρχεία 1. edid_service_windows  == >> Παράθυρο επεξεργασίας ιστορικού φωτοτυπικού
+V 0.1.1 Προσθήκη επεξεργασία ιστορικού φωτοτυπικού ============================================ Εγινε 18/12/2019
+
+todo να αλλάξω χρώμα στο μετρητής έναρξης και έναρξη αφου αφορούν το φωτοτυπικό ===============  Εγινε   18/12/2019
 1) Το φωτοτυπικό χρειάζεται πάντα Πελάτη_ID
 2) Το Service χρειάζεται πάντα Copier_ID
 
@@ -15,10 +23,12 @@ v 0.0.1 Ενας πελάτης με πολλά φωτοτυπικά το κάθ
         Η ημερομηνία εναρξης - Μετρητής εναρξης είναι πεδία του φωτοτυπικού γιατί πάνε με το φωτοτυπικό
 """
 
-import sys
-import sqlite3
+
 import service_book_colors_support
-from tkinter import StringVar
+from edit_service_window import *  # Δημιουργία παραθύρου επεξεργασίας ιστορικού επισκευής
+import add_customers  # Δημιουργία παραθύρου προσθήκης πελάτη
+from tkinter import StringVar, TclError
+
 try:
     import Tkinter as tk
 except ImportError:
@@ -51,11 +61,10 @@ def get_tables():
     for name in table_name:
         if name[0] not in dont_used_tables:
             tables.append(name[0])
-            # print("TABLE ", name[0], " ========added to tables line 118")
 
         else:
             continue
-    # print("Γραμμη 47: Πίνακες που βρέθηκαν -->>", tables)
+
     return tables
 
 
@@ -83,9 +92,11 @@ def destroy_Toplevel1():
     w = None
 
 class Toplevel1:
+
     def __init__(self, top=None):
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
+
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
         _fgcolor = '#000000'  # X11 color: 'black'
         _compcolor = '#d9d9d9' # X11 color: 'gray85'
@@ -97,6 +108,7 @@ class Toplevel1:
         self.copier_table = "Φωτοτυπικά"
         self.selected_customer_id = ""
         self.selected_copier_id = ""
+
         self.customers_headers = []
         self.copiers_headers = []
         self.service_headers = []
@@ -104,7 +116,7 @@ class Toplevel1:
 
         self.style = ttk.Style()
         if sys.platform == "win32":
-            self.style.theme_use('vista')
+            self.style.theme_use('winnative')
         self.style.configure('.',background=_bgcolor)
         self.style.configure('.',foreground=_fgcolor)
         self.style.configure('.',font="Calibri")
@@ -113,26 +125,54 @@ class Toplevel1:
 
         top.geometry("1024x538+150+178")
         top.minsize(120, 1)
-        top.maxsize(1604, 881)
+        top.maxsize(1980, 1980)
         top.resizable(1, 1)
-        top.title("Βιβλίο Επισκευών")
-        top.configure(background="#408080")
+        top.title("Βιβλίο Επισκευών V0.1.1")
+        top.configure(background="#006291")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
+        top.bind('<F1>', self.add_customer_event)
+
+        # ---------------------------------------Menu-----------------------------------------
+        self.menubar = tk.Menu(top, font="TkMenuFont", bg=_bgcolor, fg=_fgcolor)
+        # --------------------------------------   MENU   -----------------------------------------
+        self.filemenu = tk.Menu(self.menubar, tearoff=0)
+        self.filemenu.add_command(label="Προσθήκη πελάτη", command=self.add_customer)
+
+        # self.filemenu.add_command(label="Προσθήκη --> F1", command=self.add_to)
+        # self.filemenu.add_command(label="Επεξεργασία --> F3", command=self.edit)
+        self.filemenu.add_separator()
+        # self.filemenu.add_command(label="Διαγραφή", command=self.del_from_tree)
+        self.filemenu.add_command(label="Εξωδος --> Esc", command=top.quit)
+        self.menubar.add_cascade(label="Πελάτες", menu=self.filemenu)
+
+        # self.backup_menu = tk.Menu(self.menubar, tearoff=0)
+        # self.menubar.add_cascade(label="Αντίγραφο ασφαλείας", menu=self.backup_menu)
+        # self.backup_menu.add_command(label="Δημιουργία αντίγραφο ασφαλείας!", command=self.backup)
+        #
+        # self.table_menu = tk.Menu(self.menubar, tearoff=0)
+        # self.menubar.add_cascade(label="Πίνακες", menu=self.table_menu)
+        # self.table_menu.add_command(label="Δημιουργία νέου πίνακα", command=make_new_table)
+        #
+        # self.info_menu = tk.Menu(self.menubar, tearoff=0)
+        # self.menubar.add_cascade(label="Info", menu=self.info_menu)
+        # self.info_menu.add_command(label="Πληροφορίες", command=get_info)
+
+        top.configure(menu=self.menubar)
 
         # # # Modify the font of the body
-        self.style.theme_create("mystyle.Treeview", parent="vista")
-        # self.style.configure("mystyle.Treeview.Heading", background="gray", foreground="white", relief="flat")
+        self.style.theme_create("mystyle.Treeview", parent="winnative")
+        self.style.configure("mystyle.Treeview.Heading", background="gray5", foreground="#006291", relief="groove")
         self.style.map('mystyle.Treeview', foreground=self.fixed_map('foreground'),
                        background=self.fixed_map('background'))
 
         # ==================================== Εμφάνηση δεδομένων ==============================================
         self.style.configure("mystyle.Treeview", highlightthickness=1, font=('Calibri', "10"))
-        self.style.configure("mystyle.Treeview.Heading", font=('Calibri', 10, 'bold'), background="#657b83",
-                             foreground="black",
-                             relief=[('active', 'groove'), ('pressed', 'sunken')])  # Modify the font of the headings
+        self.style.configure("mystyle.Treeview.Heading", font=('Calibri', 11, 'bold'), background="gray90",
+                             foreground="black", relief="groove", )
+        #                     relief=[('active', 'groove'), ('pressed', 'sunken')])  # Modify the font of the headings
         self.style.layout("mystyle.Treeview", [('mystyle.Treeview.treearea', {'sticky': 'nswe'})])  # Remove the borders
-        self.style.configure("mystyle.Treeview", background="white", rowheight=20)
+        self.style.configure("mystyle.Treeview", background="white", rowheight=30)
 
         self.company_label = tk.Label(top)
         self.company_label.place(relx=0.221, rely=0.037, height=20, width=144)
@@ -147,10 +187,10 @@ class Toplevel1:
         self.company_label.configure(text="Επωνυμία Επιχείρησης")
 
         self.company_name_entry = tk.Entry(top)
-        self.company_name_entry.place(relx=0.386, rely=0.037, height=20
-                , relwidth=0.2)
+        self.company_name_entry.place(relx=0.386, rely=0.037, height=20, relwidth=0.200)
         self.company_name_entry.configure(background="white")
         self.company_name_entry.configure(disabledforeground="#a3a3a3")
+
         self.company_name_entry.configure(font="Calibri")
         self.company_name_entry.configure(foreground="#000000")
         self.company_name_entry.configure(highlightbackground="#d9d9d9")
@@ -184,7 +224,7 @@ class Toplevel1:
         self.Label3.configure(text='''Ονοματεπώνυμο''')
 
         self.fax_entry = tk.Entry(top)
-        self.fax_entry.place(relx=0.701, rely=0.26,height=20, relwidth=0.15)
+        self.fax_entry.place(relx=0.717, rely=0.26, height=20, relwidth=0.15)
         self.fax_entry.configure(background="white")
         self.fax_entry.configure(disabledforeground="#a3a3a3")
         self.fax_entry.configure(font="Calibri")
@@ -196,7 +236,7 @@ class Toplevel1:
         self.fax_entry.configure(selectforeground="black")
 
         self.Label4 = tk.Label(top)
-        self.Label4.place(relx=0.607, rely=0.037, height=21, width=77)
+        self.Label4.place(relx=0.607, rely=0.037, height=21, width=100)
         self.Label4.configure(activebackground="#f9f9f9")
         self.Label4.configure(activeforeground="black")
         self.Label4.configure(background="#84f29c")
@@ -208,7 +248,7 @@ class Toplevel1:
         self.Label4.configure(text='''Πόλη''')
 
         self.Label5 = tk.Label(top)
-        self.Label5.place(relx=0.607, rely=0.149, height=21, width=78)
+        self.Label5.place(relx=0.607, rely=0.149, height=21, width=100)
         self.Label5.configure(activebackground="#f9f9f9")
         self.Label5.configure(activeforeground="black")
         self.Label5.configure(background="#84f29c")
@@ -220,7 +260,7 @@ class Toplevel1:
         self.Label5.configure(text='''Ταχ. Κώδικας''')
 
         self.Label6 = tk.Label(top)
-        self.Label6.place(relx=0.607, rely=0.093, height=21, width=77)
+        self.Label6.place(relx=0.607, rely=0.093, height=21, width=100)
         self.Label6.configure(activebackground="#f9f9f9")
         self.Label6.configure(activeforeground="black")
         self.Label6.configure(background="#84f29c")
@@ -256,7 +296,7 @@ class Toplevel1:
         self.mobile_entry.configure(selectforeground="black")
 
         self.email_entry = tk.Entry(top)
-        self.email_entry.place(relx=0.701, rely=0.204,height=20, relwidth=0.15)
+        self.email_entry.place(relx=0.717, rely=0.204, height=20, relwidth=0.15)
         self.email_entry.configure(background="white")
         self.email_entry.configure(disabledforeground="#a3a3a3")
         self.email_entry.configure(font="Calibri")
@@ -268,7 +308,7 @@ class Toplevel1:
         self.email_entry.configure(selectforeground="black")
 
         self.city_entry = tk.Entry(top)
-        self.city_entry.place(relx=0.701, rely=0.037,height=20, relwidth=0.15)
+        self.city_entry.place(relx=0.717, rely=0.037, height=20, relwidth=0.15)
         self.city_entry.configure(background="white")
         self.city_entry.configure(disabledforeground="#a3a3a3")
         self.city_entry.configure(font="Calibri")
@@ -301,10 +341,56 @@ class Toplevel1:
         self.Label8.configure(highlightbackground="#d9d9d9")
         self.Label8.configure(highlightcolor="black")
         self.Label8.configure(relief="groove")
-        self.Label8.configure(text='''Κινητό''')
+        self.Label8.configure(text="Κινητό")
+        # Σελίδες Πακέτου
+        self.Label13 = tk.Label(top)
+        self.Label13.place(relx=0.221, rely=0.310, height=20, width=144)
+        self.Label13.configure(activebackground="#f9f9f9")
+        self.Label13.configure(activeforeground="black")
+        self.Label13.configure(background="#2f42f0")
+        self.Label13.configure(disabledforeground="#a3a3a3")
+        self.Label13.configure(foreground="#ffffff")
+        self.Label13.configure(highlightbackground="#d9d9d9")
+        self.Label13.configure(highlightcolor="black")
+        self.Label13.configure(relief="groove")
+        self.Label13.configure(text='''Σελίδες Πακέτου''')
+        self.page_package_entry = tk.Entry(top)
+        self.page_package_entry.place(relx=0.386, rely=0.310, height=20, relwidth=0.2)
+        self.page_package_entry.configure(background="white")
+        self.page_package_entry.configure(disabledforeground="#a3a3a3")
+        self.page_package_entry.configure(font="Calibri")
+        self.page_package_entry.configure(foreground="#000000")
+        self.page_package_entry.configure(highlightbackground="#d9d9d9")
+        self.page_package_entry.configure(highlightcolor="black")
+        self.page_package_entry.configure(insertbackground="black")
+        self.page_package_entry.configure(selectbackground="#c4c4c4")
+        self.page_package_entry.configure(selectforeground="black")
+
+        self.Label14 = tk.Label(top)
+        self.Label14.place(relx=0.607, rely=0.310, height=20, width=100)
+        self.Label14.configure(activebackground="#f9f9f9")
+        self.Label14.configure(activeforeground="black")
+        self.Label14.configure(background="#2f42f0")
+        self.Label14.configure(disabledforeground="#a3a3a3")
+        self.Label14.configure(foreground="#ffffff")
+        self.Label14.configure(highlightbackground="#d9d9d9")
+        self.Label14.configure(highlightcolor="black")
+        self.Label14.configure(relief="groove")
+        self.Label14.configure(text='''Κόστος Πακέτου''')
+        self.package_cost_entry = tk.Entry(top)
+        self.package_cost_entry.place(relx=0.717, rely=0.310, height=20, relwidth=0.15)
+        self.package_cost_entry.configure(background="white")
+        self.package_cost_entry.configure(disabledforeground="#a3a3a3")
+        self.package_cost_entry.configure(font="Calibri")
+        self.package_cost_entry.configure(foreground="#000000")
+        self.package_cost_entry.configure(highlightbackground="#d9d9d9")
+        self.package_cost_entry.configure(highlightcolor="black")
+        self.package_cost_entry.configure(insertbackground="black")
+        self.package_cost_entry.configure(selectbackground="#c4c4c4")
+        self.package_cost_entry.configure(selectforeground="black")
 
         self.Label9 = tk.Label(top)
-        self.Label9.place(relx=0.607, rely=0.26, height=21, width=77)
+        self.Label9.place(relx=0.607, rely=0.26, height=21, width=100)
         self.Label9.configure(activebackground="#f9f9f9")
         self.Label9.configure(activeforeground="black")
         self.Label9.configure(background="#84f29c")
@@ -316,7 +402,7 @@ class Toplevel1:
         self.Label9.configure(text='''Φαξ''')
 
         self.Label10 = tk.Label(top)
-        self.Label10.place(relx=0.607, rely=0.204, height=21, width=77)
+        self.Label10.place(relx=0.607, rely=0.204, height=21, width=100)
         self.Label10.configure(activebackground="#f9f9f9")
         self.Label10.configure(activeforeground="black")
         self.Label10.configure(background="#84f29c")
@@ -353,7 +439,7 @@ class Toplevel1:
         self.phone_entry.configure(selectforeground="black")
 
         self.post_code_entry = tk.Entry(top)
-        self.post_code_entry.place(relx=0.701, rely=0.149, height=20, relwidth=0.15)
+        self.post_code_entry.place(relx=0.717, rely=0.149, height=20, relwidth=0.15)
         self.post_code_entry.configure(background="white")
         self.post_code_entry.configure(disabledforeground="#a3a3a3")
         self.post_code_entry.configure(font="Calibri")
@@ -365,7 +451,7 @@ class Toplevel1:
         self.post_code_entry.configure(selectforeground="black")
 
         self.place_entry = tk.Entry(top)
-        self.place_entry.place(relx=0.701, rely=0.093,height=20, relwidth=0.15)
+        self.place_entry.place(relx=0.717, rely=0.093, height=20, relwidth=0.15)
         self.place_entry.configure(background="white")
         self.place_entry.configure(disabledforeground="#a3a3a3")
         self.place_entry.configure(font="Calibri")
@@ -375,58 +461,43 @@ class Toplevel1:
         self.place_entry.configure(insertbackground="black")
         self.place_entry.configure(selectbackground="#c4c4c4")
         self.place_entry.configure(selectforeground="black")
-
-        self.Label11 = tk.Label(top)
-        self.Label11.place(relx=0.607, rely=0.316, height=21, width=77)
-        self.Label11.configure(activebackground="#f9f9f9")
-        self.Label11.configure(activeforeground="black")
-        self.Label11.configure(background="#2f42f0")
-        self.Label11.configure(disabledforeground="#a3a3a3")
-        self.Label11.configure(foreground="#ffffff")
-        self.Label11.configure(highlightbackground="#d9d9d9")
-        self.Label11.configure(highlightcolor="black")
-        self.Label11.configure(relief="groove")
-        self.Label11.configure(text='''Εναρξη''')
-
+        # Serial Number
+        self.serial_label = tk.Label(top)
+        self.serial_label.place(relx=0.221, rely=0.356, height=21, width=144)
+        self.serial_label.configure(activebackground="#f9f9f9")
+        self.serial_label.configure(activeforeground="black")
+        self.serial_label.configure(background="#808000")
+        self.serial_label.configure(disabledforeground="#a3a3a3")
+        self.serial_label.configure(foreground="#ffffff")
+        self.serial_label.configure(highlightbackground="#d9d9d9")
+        self.serial_label.configure(highlightcolor="black")
+        self.serial_label.configure(relief="groove")
+        self.serial_label.configure(text="Σειριακός αριθμός")
+        self.serial_entry = tk.Entry(top)
+        self.serial_entry.place(relx=0.386, rely=0.356, height=20, relwidth=0.2)
+        self.serial_entry.configure(background="white")
+        self.serial_entry.configure(disabledforeground="#a3a3a3")
+        self.serial_entry.configure(font="Calibri")
+        self.serial_entry.configure(foreground="#000000")
+        self.serial_entry.configure(highlightbackground="#d9d9d9")
+        self.serial_entry.configure(highlightcolor="black")
+        self.serial_entry.configure(insertbackground="black")
+        self.serial_entry.configure(selectbackground="#c4c4c4")
+        self.serial_entry.configure(selectforeground="black")
+        # Μετρητής Εναρξης
         self.Label12 = tk.Label(top)
-        self.Label12.place(relx=0.221, rely=0.316, height=21, width=144)
-        self.Label12.configure(activebackground="#f9f9f9")
+        self.Label12.place(relx=0.221, rely=0.456, height=21, width=144)
+        self.Label12.configure(activebackground="#808000")
         self.Label12.configure(activeforeground="black")
-        self.Label12.configure(background="#2f42f0")
+        self.Label12.configure(background="#808000")
         self.Label12.configure(disabledforeground="#a3a3a3")
         self.Label12.configure(foreground="#ffffff")
         self.Label12.configure(highlightbackground="#d9d9d9")
         self.Label12.configure(highlightcolor="black")
         self.Label12.configure(relief="groove")
-        self.Label12.configure(text='''Μετρητής Εναρξης''')
-
-        self.Label13 = tk.Label(top)
-        self.Label13.place(relx=0.861, rely=0.037, height=21, width=100)
-        self.Label13.configure(activebackground="#f9f9f9")
-        self.Label13.configure(activeforeground="black")
-        self.Label13.configure(background="#2f42f0")
-        self.Label13.configure(disabledforeground="#a3a3a3")
-        self.Label13.configure(foreground="#ffffff")
-        self.Label13.configure(highlightbackground="#d9d9d9")
-        self.Label13.configure(highlightcolor="black")
-        self.Label13.configure(relief="groove")
-        self.Label13.configure(text='''Σελίδες Πακέτου''')
-
-        self.Label14 = tk.Label(top)
-        self.Label14.place(relx=0.861, rely=0.204, height=21, width=100)
-        self.Label14.configure(activebackground="#f9f9f9")
-        self.Label14.configure(activeforeground="black")
-        self.Label14.configure(background="#2f42f0")
-        self.Label14.configure(disabledforeground="#a3a3a3")
-        self.Label14.configure(foreground="#ffffff")
-        self.Label14.configure(highlightbackground="#d9d9d9")
-        self.Label14.configure(highlightcolor="black")
-        self.Label14.configure(relief="groove")
-        self.Label14.configure(text='''Κόστος Πακέτου''')
-
+        self.Label12.configure(text="Μετρητής Εναρξης")
         self.start_counter_entry = tk.Entry(top)
-        self.start_counter_entry.place(relx=0.386, rely=0.316, height=20
-                , relwidth=0.2)
+        self.start_counter_entry.place(relx=0.386, rely=0.456, height=20, relwidth=0.2)
         self.start_counter_entry.configure(background="white")
         self.start_counter_entry.configure(disabledforeground="#a3a3a3")
         self.start_counter_entry.configure(font="Calibri")
@@ -436,9 +507,20 @@ class Toplevel1:
         self.start_counter_entry.configure(insertbackground="black")
         self.start_counter_entry.configure(selectbackground="#c4c4c4")
         self.start_counter_entry.configure(selectforeground="black")
-
+        # Εναρξη
+        self.Label11 = tk.Label(top)
+        self.Label11.place(relx=0.221, rely=0.406, height=21, width=144)
+        self.Label11.configure(activebackground="#f9f9f9")
+        self.Label11.configure(activeforeground="black")
+        self.Label11.configure(background="#808000")
+        self.Label11.configure(disabledforeground="#a3a3a3")
+        self.Label11.configure(foreground="#ffffff")
+        self.Label11.configure(highlightbackground="#d9d9d9")
+        self.Label11.configure(highlightcolor="black")
+        self.Label11.configure(relief="groove")
+        self.Label11.configure(text="Εναρξη")
         self.start_entry = tk.Entry(top)
-        self.start_entry.place(relx=0.701, rely=0.316,height=20, relwidth=0.15)
+        self.start_entry.place(relx=0.386, rely=0.406, height=20, relwidth=0.2)
         self.start_entry.configure(background="white")
         self.start_entry.configure(disabledforeground="#a3a3a3")
         self.start_entry.configure(font="Calibri")
@@ -449,34 +531,8 @@ class Toplevel1:
         self.start_entry.configure(selectbackground="#c4c4c4")
         self.start_entry.configure(selectforeground="black")
 
-        self.page_package_entry = tk.Entry(top)
-        self.page_package_entry.place(relx=0.861, rely=0.093, height=20
-                , relwidth=0.11)
-        self.page_package_entry.configure(background="white")
-        self.page_package_entry.configure(disabledforeground="#a3a3a3")
-        self.page_package_entry.configure(font="Calibri")
-        self.page_package_entry.configure(foreground="#000000")
-        self.page_package_entry.configure(highlightbackground="#d9d9d9")
-        self.page_package_entry.configure(highlightcolor="black")
-        self.page_package_entry.configure(insertbackground="black")
-        self.page_package_entry.configure(selectbackground="#c4c4c4")
-        self.page_package_entry.configure(selectforeground="black")
-
-        self.package_cost_entry = tk.Entry(top)
-        self.package_cost_entry.place(relx=0.861, rely=0.26, height=20
-                , relwidth=0.11)
-        self.package_cost_entry.configure(background="white")
-        self.package_cost_entry.configure(disabledforeground="#a3a3a3")
-        self.package_cost_entry.configure(font="Calibri")
-        self.package_cost_entry.configure(foreground="#000000")
-        self.package_cost_entry.configure(highlightbackground="#d9d9d9")
-        self.package_cost_entry.configure(highlightcolor="black")
-        self.package_cost_entry.configure(insertbackground="black")
-        self.package_cost_entry.configure(selectbackground="#c4c4c4")
-        self.package_cost_entry.configure(selectforeground="black")
-
         self.Button1 = tk.Button(top)
-        self.Button1.place(relx=0.861, rely=0.316, height=24, width=100)
+        self.Button1.place(relx=0.607, rely=0.386, height=24, width=100)
         self.Button1.configure(activebackground="#ececec")
         self.Button1.configure(activeforeground="#000000")
         self.Button1.configure(background="#f5010a")
@@ -489,21 +545,21 @@ class Toplevel1:
 
         self.Label15 = tk.Label(top)
         self.Label15.place(relx=0.022, rely=0.037, height=21, width=170)
-        self.Label15.configure(background="#808000")
+        self.Label15.configure(background="brown")
         self.Label15.configure(disabledforeground="#a3a3a3")
-        self.Label15.configure(foreground="#ffffff")
+        self.Label15.configure(foreground="white")
         self.Label15.configure(relief="groove")
-        self.Label15.configure(text='''Πελάτες''')
+        self.Label15.configure(text="Πελάτες")
 
         # Πίνακας πελατών
         self.customers_treeview = ScrolledTreeView(top)
         # build_treeview_support starting.
-        self.customers_treeview["columns"] = ["Id", "Επωνυμία_Επιχείρησης"]
+        self.customers_treeview["columns"] = ["ID", "Επωνυμία_Επιχείρησης"]
         self.customers_treeview.heading("Επωνυμία_Επιχείρησης", text="Πελάτης", anchor="center")
         # self.customers_treeview.column("#0",width="60")
         self.customers_treeview.column("Επωνυμία_Επιχείρησης", anchor="w")
-        self.customers_treeview.heading("Id", text="Id", anchor="w", )
-        self.customers_treeview.column("Id", anchor="w", width="1")
+        self.customers_treeview.heading("ID", text="ID", anchor="w", )
+        self.customers_treeview.column("ID", anchor="w", width=1)
         self.customers_treeview.configure(show="headings", style="mystyle.Treeview")
         self.customers_treeview.bind("<Double-1>", self.view_copiers)
 
@@ -529,9 +585,9 @@ class Toplevel1:
                 , width=170)
         self.customer_search_btn.configure(activebackground="#ececec")
         self.customer_search_btn.configure(activeforeground="#000000")
-        self.customer_search_btn.configure(background="#00ff40")
+        self.customer_search_btn.configure(background="brown")
         self.customer_search_btn.configure(disabledforeground="#a3a3a3")
-        self.customer_search_btn.configure(foreground="#000000")
+        self.customer_search_btn.configure(foreground="white")
         self.customer_search_btn.configure(highlightbackground="#d9d9d9")
         self.customer_search_btn.configure(highlightcolor="black")
         self.customer_search_btn.configure(pady="0")
@@ -539,7 +595,7 @@ class Toplevel1:
         self.customer_search_btn.configure(text="Αναζήτηση πελάτη")
 
         self.Label15_1 = tk.Label(top)
-        self.Label15_1.place(relx=0.022, rely=0.693, height=21, width=170)
+        self.Label15_1.place(relx=0.022, rely=0.693, height=21, width=188)
         self.Label15_1.configure(activebackground="#f9f9f9")
         self.Label15_1.configure(activeforeground="black")
         self.Label15_1.configure(background="#808000")
@@ -555,12 +611,12 @@ class Toplevel1:
         self.copiers_treeview = ScrolledTreeView(top)
         self.copiers_treeview.place(relx=0.022, rely=0.739, relheight=0.159
                 , relwidth=0.188)
-        self.copiers_treeview["columns"] = ["Id", "Φωτοτυπικά"]
+        self.copiers_treeview["columns"] = ["ID", "Φωτοτυπικά"]
         self.copiers_treeview.heading("Φωτοτυπικά", text="Φωτοτυπικά", anchor="center")
         # self.customers_treeview.column("#0",width="60")
         self.copiers_treeview.column("Φωτοτυπικά", anchor="w")
-        self.copiers_treeview.heading("Id", text="Id", anchor="w", )
-        self.copiers_treeview.column("Id", anchor="w", width="1")
+        self.copiers_treeview.heading("ID", text="ID", anchor="w", )
+        self.copiers_treeview.column("ID", anchor="w", width="1")
         self.copiers_treeview.configure(show="headings", style="mystyle.Treeview")
         self.copiers_treeview.bind("<Double-1>", self.service_click)
 
@@ -581,23 +637,25 @@ class Toplevel1:
 
         self.copier_search_btn.configure(activebackground="#ececec")
         self.copier_search_btn.configure(activeforeground="#000000")
-        self.copier_search_btn.configure(background="#00ff40")
+        self.copier_search_btn.configure(background="#808000")
         self.copier_search_btn.configure(disabledforeground="#a3a3a3")
-        self.copier_search_btn.configure(foreground="#000000")
+        self.copier_search_btn.configure(foreground="white")
         self.copier_search_btn.configure(highlightbackground="#d9d9d9")
         self.copier_search_btn.configure(highlightcolor="black")
         self.copier_search_btn.configure(pady="0")
         self.copier_search_btn.configure(command=lambda: self.search_copier(self.search_copier_data))
         self.copier_search_btn.configure(text="Αναζήτηση Φωτοτυπικού")
 
+        # Πίνακας επισκευων
         self.service_treeview = ScrolledTreeView(top)
-        self.service_treeview.place(relx=0.232, rely=0.502, relheight=0.459
-                , relwidth=0.74)
+
+        self.service_treeview.place(relx=0.232, rely=0.602, relheight=0.359, relwidth=0.64)
         self.service_treeview.configure(show="headings", style="mystyle.Treeview")
+        self.service_treeview.bind("<Double-1>", self.edit_service)
 
 
         self.Label16 = tk.Label(top)
-        self.Label16.place(relx=0.475, rely=0.446, height=21, width=214)
+        self.Label16.place(relx=0.425, rely=0.546, height=21, width=214)
         self.Label16.configure(background="#808000")
         self.Label16.configure(disabledforeground="#a3a3a3")
         self.Label16.configure(foreground="#ffffff")
@@ -630,7 +688,7 @@ class Toplevel1:
 
             self.customers_treeview.insert("", "end", values=customers_data[n])
 
-    # Εμφάνησει φωτοτυπικών του επιλεγμένου πελάτη
+    # Εμφάνηση φωτοτυπικών του επιλεγμένου πελάτη
     def view_copiers(self, event):
         #  Αδιάζουμε πρώτα το tree των φωτοτυπικών
         for i in self.copiers_treeview.get_children():
@@ -757,10 +815,13 @@ class Toplevel1:
             # Το selected_item == string
             if int(selected_item) == int(copiers[n][0]):
                 self.selected_copier_id = int(selected_item)
-                var = StringVar(root, value=copiers[n][4])
-                self.start_counter_entry.configure(textvariable=var)
-                var = StringVar(root, value=copiers[n][3])
+                var = StringVar(root, value=copiers[n][2])  # Σειριακός αριθμός
+                self.serial_entry.configure(textvariable=var)
+                var = StringVar(root, value=copiers[n][3])  # Εναρξη
                 self.start_entry.configure(textvariable=var)
+                var = StringVar(root, value=copiers[n][4])  # Μετρητής έναρξης
+                self.start_counter_entry.configure(textvariable=var)
+
             else:
                 continue
         # todo να μπεί και αυτό στο JOIN απο πάνω
@@ -772,15 +833,47 @@ class Toplevel1:
         service_cursor.close()
         service_conn.close()
         columns = []
-        for head in self.service_headers:
+        # το τελευταίο πεδίο είναι το Copier_ID και δεν χρειάζεται να εμφανίζεται
+        for head in self.service_headers[:-1]:
             columns.append(head)
 
         self.service_treeview["columns"] = [head for head in columns]
-        for head in self.service_headers:
+        for head in self.service_headers[:-1]:
+            if head == "ID":
+                platos = 1
+            elif head == "Ημερομηνία":
+                platos = 100
+            elif head == "Σκοπός_Επίσκεψης":
+                platos = 220
+            elif head == "Ενέργειες":
+                platos = 180
+            elif head == "Σημειώσεις":
+                platos = 320
+            elif head == "Μετρητής":
+                platos = 80
+            elif head == "Επ_Service":
+                platos = 110
+            else:
+                platos = 50
             self.service_treeview.heading(head, text=head, anchor="center")
-            self.service_treeview.column(head, width="1" if head == "ID" else "200")
+            self.service_treeview.column(head, width=platos, anchor="center")
         for n in range(len(service_data)):
             self.service_treeview.insert("", "end", values=service_data[n])
+
+    # Επεξεργασία του επιλεγμένου ιστορικού συντηρησης φωτοτυπικού
+    def edit_service(self, event):
+        """ Επεξεργασία του επιλεγμένου ιστορικού συντηρησης φωτοτυπικού
+            Αυτή είναι συνάρτηση αυτής της class του αρχείου service_book_colors
+            αρχικοποιει το επιλεγμένο id του ιστορικού του πίνακα Service
+            και καλει την συνάρτηση create_edit_service_window του αρχείου edit_service_window
+        :param event:
+        :return:
+        """
+
+        selected_service_id = (self.service_treeview.set(self.service_treeview.selection(), "#1"))
+
+        # Αυτή είναι συνάρτηση του αρχείου edi_service_windows
+        create_edit_service_window(root, selected_service_id)
 
     # Αναζήτηση πελάτη
     def search_customer(self, search_data):
@@ -807,7 +900,7 @@ class Toplevel1:
             # search_cursor.execute("SELECT * FROM " + table + " WHERE \
             # ΤΟΝΕΡ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
             # ('%' + str(search_data.get()) + '%', '%' + str(search_data.get()) + '%', '%' + str(search_data.get())...
-
+            # search_headers ==> Πόλη LIKE ? OR ID LIKE ? OR .....
             search_cursor.execute("SELECT * FROM " + self.customer_table + " WHERE " + search_headers, operators)
             fetch = search_cursor.fetchall()
             search_cursor.close()
@@ -853,6 +946,19 @@ class Toplevel1:
             # Κατασκευή tree το up_index -1 == το τελος ("end")
             for n in range(len(fetch)):
                 self.copiers_treeview.insert("", "end", values=fetch[n])
+
+    # Προσθήκη πελάτη
+    def add_customer(self):
+        """Προσθήκη πελάτη
+        καλει την συνάρτηση create_Topelevel1 του αρχείου add_customers
+        :return:
+        """
+        add_customers.create_Toplevel1(root)
+
+    # ------------------------------------Events ---------------------------
+    # Προσθήκη πελάτη event
+    def add_customer_event(self, event):
+        self.add_customer()
 
 
 # The following code is added to facilitate the Scrolled widgets you specified.
