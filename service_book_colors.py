@@ -6,21 +6,24 @@
 #    Dec 13, 2019 12:08:06 AM EET  platform: Windows NT
 
 """
+Αρχεία 1. add_service  == >> Παράθυρο προσθήκης επισκευής
+V 0.3.1 Εισαγωγή επισκευής σε νέο παράθυρο ====================================================== Εγινε 18/12/2019
 
 Αρχεία 1. add_customers  == >> Παράθυρο προσθήκης πελάτη
-V 0.2.1 Προσθήκη πελάτη σε νέο παράθυρο ====================================================== Εγινε 18/12/2019
+V 0.2.1 Προσθήκη πελάτη σε νέο παράθυρο ========================================================= Εγινε 18/12/2019
 
 Αρχεία 1. edid_service_windows  == >> Παράθυρο επεξεργασίας ιστορικού φωτοτυπικού
-V 0.1.1 Προσθήκη επεξεργασία ιστορικού φωτοτυπικού ============================================ Εγινε 18/12/2019
+V 0.1.1 Προσθήκη επεξεργασία ιστορικού φωτοτυπικού ============================================= Εγινε 18/12/2019
 
-todo να αλλάξω χρώμα στο μετρητής έναρξης και έναρξη αφου αφορούν το φωτοτυπικό ===============  Εγινε   18/12/2019
+να αλλάξω χρώμα στο μετρητής έναρξης και έναρξη αφου αφορούν το φωτοτυπικό ================  Εγινε   18/12/2019
+
 1) Το φωτοτυπικό χρειάζεται πάντα Πελάτη_ID
 2) Το Service χρειάζεται πάντα Copier_ID
 
 Επιλέγουμε με διπλό click πρώτα τον πελάτη και στην συνέχεια με διπλό click το φωτοτυπικό
 
 v 0.0.1 Ενας πελάτης με πολλά φωτοτυπικά το κάθε φωτοτυπικό με πολλά Service ------------------------14/12/2019
-        Η ημερομηνία εναρξης - Μετρητής εναρξης είναι πεδία του φωτοτυπικού γιατί πάνε με το φωτοτυπικό
+        Η ημερομηνία εναρξης και Μετρητής εναρξης είναι πεδία του φωτοτυπικού γιατί πάνε με το φωτοτυπικό
 """
 
 
@@ -28,7 +31,7 @@ import service_book_colors_support
 from edit_service_window import *  # Δημιουργία παραθύρου επεξεργασίας ιστορικού επισκευής
 import add_customers  # Δημιουργία παραθύρου προσθήκης πελάτη
 from tkinter import StringVar, TclError
-
+from add_service import *
 try:
     import Tkinter as tk
 except ImportError:
@@ -112,7 +115,7 @@ class Toplevel1:
         self.customers_headers = []
         self.copiers_headers = []
         self.service_headers = []
-
+        self.add_new_service = False
 
         self.style = ttk.Style()
         if sys.platform == "win32":
@@ -646,6 +649,24 @@ class Toplevel1:
         self.copier_search_btn.configure(command=lambda: self.search_copier(self.search_copier_data))
         self.copier_search_btn.configure(text="Αναζήτηση Φωτοτυπικού")
 
+        # Προσθήκη ιστορικού φωτοτυπικού
+        self.add_service_btn = tk.Button(top)
+        self.add_service_btn.place(relx=0.231, rely=0.556, height=21, width=144)
+        self.add_service_btn.configure(activebackground="#808000")
+        self.add_service_btn.configure(activeforeground="#000000")
+        self.add_service_btn.configure(background="#808000")
+        self.add_service_btn.configure(disabledforeground="#a3a3a3")
+
+        self.add_service_btn.configure(foreground="white")
+        self.add_service_btn.configure(highlightbackground="#d9d9d9")
+        self.add_service_btn.configure(highlightcolor="black")
+        self.add_service_btn.configure(pady="0")
+        # self.edit_service(True) είναι για να ορισει το self.add_new_service = True
+        # για διμιουρία νεου ιστορικού και όχι επεξεργασία
+        self.add_service_btn.configure(command=self.add_service)
+        self.add_service_btn.configure(text="Εισαγωγή ιστορικού")
+        self.add_service_btn.configure(state="disabled")
+
         # Πίνακας επισκευων
         self.service_treeview = ScrolledTreeView(top)
 
@@ -653,12 +674,15 @@ class Toplevel1:
         self.service_treeview.configure(show="headings", style="mystyle.Treeview")
         self.service_treeview.bind("<Double-1>", self.edit_service)
 
+        self.TSeparator1 = ttk.Separator(top)
+        self.TSeparator1.place(relx=0.231, rely=0.521, relwidth=0.638)
 
         self.Label16 = tk.Label(top)
-        self.Label16.place(relx=0.425, rely=0.546, height=21, width=214)
-        self.Label16.configure(background="#808000")
+        self.Label16.place(relx=0.425, rely=0.556, height=21, width=314)
+        self.Label16.configure(background="#006291")
         self.Label16.configure(disabledforeground="#a3a3a3")
         self.Label16.configure(foreground="#ffffff")
+        self.Label16.configure(relief="groove")
         self.Label16.configure(text='''Ιστορικό''')
 
         # ---------------------Fix -Of- Style------------------------------------
@@ -690,6 +714,8 @@ class Toplevel1:
 
     # Εμφάνηση φωτοτυπικών του επιλεγμένου πελάτη
     def view_copiers(self, event):
+        # Απενεργοποιηση του κουμπιου προσθήκης ιστορικού
+        self.add_service_btn.configure(state="disabled")
         #  Αδιάζουμε πρώτα το tree των φωτοτυπικών
         for i in self.copiers_treeview.get_children():
             self.copiers_treeview.delete(i)
@@ -760,6 +786,10 @@ class Toplevel1:
         :param event:
         :return:
         """
+        # Ενεργοποιηση του κουμπιου προσθήκης ιστορικού
+        self.add_service_btn.configure(state="active")
+        self.add_service_btn.configure(activebackground="#808000")
+        self.add_service_btn.configure(activeforeground="white")
         # αδιάζουμε πρώτα το tree του ιστορικού
         for i in self.service_treeview.get_children():
             self.service_treeview.delete(i)
@@ -824,7 +854,7 @@ class Toplevel1:
 
             else:
                 continue
-        # todo να μπεί και αυτό στο JOIN απο πάνω
+        # todo να μπεί και αυτό στο JOIN απο πάνω το WHERE ID = ? ειναι ιδιο με το Copier_ID
         # εμάνιση των εγγραφών συντήρησεις του επιλεγμένου φωτοτυπικού
         service_cursor.execute("SELECT * FROM " + self.service_table + " WHERE Copier_ID = ?", (selected_item[0][-1]))
         service_data = service_cursor.fetchall()
@@ -873,7 +903,11 @@ class Toplevel1:
         selected_service_id = (self.service_treeview.set(self.service_treeview.selection(), "#1"))
 
         # Αυτή είναι συνάρτηση του αρχείου edi_service_windows
-        create_edit_service_window(root, selected_service_id)
+        create_edit_service_window(root, selected_service_id, False)
+
+    def add_service(self):
+        selecteted_copier_id = (self.copiers_treeview.set(self.copiers_treeview.selection(), "#1"))
+        create_add_service_window(root, selecteted_copier_id)
 
     # Αναζήτηση πελάτη
     def search_customer(self, search_data):
@@ -882,32 +916,32 @@ class Toplevel1:
         :param search_data:
         :return:
         """
-        if search_data != "":  # Αν έχουμε γράψει κάτι διαφορετικά δεν κάνει τιποτα
-            # αδειάζουμε το tree πρώτα για να εμφανίσουμε μόνο τα δεδομένα αναζήτησεις
-            self.customers_treeview.delete(*self.customers_treeview.get_children())
-            search_conn = sqlite3.connect(dbase)
-            search_cursor = search_conn.cursor()
-            search_headers = []
-            no_neded_headers = ["id", "ID", "Id"]
-            operators = []  # operators ==> '%' + str(κωστας) + '%'
-            for header in self.customers_headers:
-                if header not in no_neded_headers:
-                    search_headers.append(header + " LIKE ?")
-                    operators.append('%' + str(search_data.get()) + '%')
-            search_headers = " OR ".join(search_headers)
-            # ΕΤΑΙΡΕΙΑ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
 
-            # search_cursor.execute("SELECT * FROM " + table + " WHERE \
-            # ΤΟΝΕΡ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
-            # ('%' + str(search_data.get()) + '%', '%' + str(search_data.get()) + '%', '%' + str(search_data.get())...
-            # search_headers ==> Πόλη LIKE ? OR ID LIKE ? OR .....
-            search_cursor.execute("SELECT * FROM " + self.customer_table + " WHERE " + search_headers, operators)
-            fetch = search_cursor.fetchall()
-            search_cursor.close()
-            search_conn.close()
-            # Κατασκευή tree το up_index -1 == το τελος ("end")
-            for n in range(len(fetch)):
-                self.customers_treeview.insert("", "end", values=fetch[n])
+        # αδειάζουμε το tree πρώτα για να εμφανίσουμε μόνο τα δεδομένα αναζήτησεις
+        self.customers_treeview.delete(*self.customers_treeview.get_children())
+        search_conn = sqlite3.connect(dbase)
+        search_cursor = search_conn.cursor()
+        search_headers = []
+        no_neded_headers = ["id", "ID", "Id"]
+        operators = []  # operators ==> '%' + str(κωστας) + '%'
+        for header in self.customers_headers:
+            if header not in no_neded_headers:
+                search_headers.append(header + " LIKE ?")
+                operators.append('%' + str(search_data.get()) + '%')
+        search_headers = " OR ".join(search_headers)
+        # ΕΤΑΙΡΕΙΑ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
+
+        # search_cursor.execute("SELECT * FROM " + table + " WHERE \
+        # ΤΟΝΕΡ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
+        # ('%' + str(search_data.get()) + '%', '%' + str(search_data.get()) + '%', '%' + str(search_data.get())...
+        # search_headers ==> Πόλη LIKE ? OR ID LIKE ? OR .....
+        search_cursor.execute("SELECT * FROM " + self.customer_table + " WHERE " + search_headers, operators)
+        fetch = search_cursor.fetchall()
+        search_cursor.close()
+        search_conn.close()
+        # Κατασκευή tree το up_index -1 == το τελος ("end")
+        for n in range(len(fetch)):
+            self.customers_treeview.insert("", "end", values=fetch[n])
 
     # Αναζήτηση φωτοτυπικού
     def search_copier(self, search_data):
@@ -916,36 +950,36 @@ class Toplevel1:
         :param search_data:
         :return:
         """
-        if search_data != "":  # Αν έχουμε γράψει κάτι διαφορετικά δεν κάνει τιποτα
-            # αδειάζουμε το tree πρώτα για να εμφανίσουμε μόνο τα δεδομένα αναζήτησεις
-            self.copiers_treeview.delete(*self.copiers_treeview.get_children())
-            search_conn = sqlite3.connect(dbase)
-            search_cursor = search_conn.cursor()
-            # πρώτα να πάρουμε τις κεφαλίδες του πίνακα φωτοτυπικά
-            search_cursor.execute("SELECT * FROM " + self.copier_table + ";")
-            self.copiers_headers = list(map(lambda x: x[0], search_cursor.description))
-            search_headers = []
-            no_neded_headers = ["id", "ID", "Id"]
-            operators = []  # operators ==> '%' + str(κωστας) + '%'
 
-            for header in self.copiers_headers:
-                if header not in no_neded_headers:
-                    search_headers.append(header + " LIKE ?")
-                    operators.append('%' + str(search_data.get()) + '%')
-            search_headers = " OR ".join(search_headers)
-            # ΕΤΑΙΡΕΙΑ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
+        # αδειάζουμε το tree πρώτα για να εμφανίσουμε μόνο τα δεδομένα αναζήτησεις
+        self.copiers_treeview.delete(*self.copiers_treeview.get_children())
+        search_conn = sqlite3.connect(dbase)
+        search_cursor = search_conn.cursor()
+        # πρώτα να πάρουμε τις κεφαλίδες του πίνακα φωτοτυπικά
+        search_cursor.execute("SELECT * FROM " + self.copier_table + ";")
+        self.copiers_headers = list(map(lambda x: x[0], search_cursor.description))
+        search_headers = []
+        no_neded_headers = ["id", "ID", "Id"]
+        operators = []  # operators ==> '%' + str(κωστας) + '%'
 
-            # search_cursor.execute("SELECT * FROM " + table + " WHERE \
-            # ΤΟΝΕΡ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
-            # ('%' + str(search_data.get()) + '%', '%' + str(search_data.get()) + '%', '%' + str(search_data.get())...
+        for header in self.copiers_headers:
+            if header not in no_neded_headers:
+                search_headers.append(header + " LIKE ?")
+                operators.append('%' + str(search_data.get()) + '%')
+        search_headers = " OR ".join(search_headers)
+        # ΕΤΑΙΡΕΙΑ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
 
-            search_cursor.execute("SELECT * FROM " + self.copier_table + " WHERE " + search_headers, operators)
-            fetch = search_cursor.fetchall()
-            search_cursor.close()
-            search_conn.close()
-            # Κατασκευή tree το up_index -1 == το τελος ("end")
-            for n in range(len(fetch)):
-                self.copiers_treeview.insert("", "end", values=fetch[n])
+        # search_cursor.execute("SELECT * FROM " + table + " WHERE \
+        # ΤΟΝΕΡ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
+        # ('%' + str(search_data.get()) + '%', '%' + str(search_data.get()) + '%', '%' + str(search_data.get())...
+
+        search_cursor.execute("SELECT * FROM " + self.copier_table + " WHERE " + search_headers, operators)
+        fetch = search_cursor.fetchall()
+        search_cursor.close()
+        search_conn.close()
+        # Κατασκευή tree το up_index -1 == το τελος ("end")
+        for n in range(len(fetch)):
+            self.copiers_treeview.insert("", "end", values=fetch[n])
 
     # Προσθήκη πελάτη
     def add_customer(self):
