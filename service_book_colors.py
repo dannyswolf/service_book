@@ -6,6 +6,9 @@
 #    Dec 13, 2019 12:08:06 AM EET  platform: Windows NT
 
 """
+Αρχεία 1 add_service  == >> Παράθυρο προσθήκης επισκευής
+V0.3.2 V0.3.2 Προσθήκη αυτόματης ημερωμηνίας στην προσθήκη ιστορικού επισκευών ========================20/12/2019
+
 Αρχεία 1. add_service  == >> Παράθυρο προσθήκης επισκευής
 V 0.3.1 Εισαγωγή επισκευής σε νέο παράθυρο ====================================================== Εγινε 18/12/2019
 
@@ -135,6 +138,7 @@ class Toplevel1:
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
         top.bind('<F1>', self.add_customer_event)
+        top.bind('<Escape>', self.quit)
 
         # ---------------------------------------Menu-----------------------------------------
         self.menubar = tk.Menu(top, font="TkMenuFont", bg=_bgcolor, fg=_fgcolor)
@@ -546,13 +550,27 @@ class Toplevel1:
         self.Button1.configure(pady="0")
         self.Button1.configure(text='''Ενημέρωση''')
 
-        self.Label15 = tk.Label(top)
-        self.Label15.place(relx=0.022, rely=0.037, height=21, width=170)
-        self.Label15.configure(background="brown")
-        self.Label15.configure(disabledforeground="#a3a3a3")
-        self.Label15.configure(foreground="white")
-        self.Label15.configure(relief="groove")
-        self.Label15.configure(text="Πελάτες")
+        # self.Label15 = tk.Label(top)
+        # self.Label15.place(relx=0.022, rely=0.037, height=21, width=170)
+        # self.Label15.configure(background="brown")
+        # self.Label15.configure(disabledforeground="#a3a3a3")
+        # self.Label15.configure(foreground="white")
+        # self.Label15.configure(relief="groove")
+        # self.Label15.configure(text="Πελάτες")
+
+        self.customer_search_btn = tk.Button(top)
+        self.customer_search_btn.place(relx=0.022, rely=0.037, height=24
+                                       , relwidth=0.188)
+        self.customer_search_btn.configure(activebackground="#ececec")
+        self.customer_search_btn.configure(activeforeground="#000000")
+        self.customer_search_btn.configure(background="brown")
+        self.customer_search_btn.configure(disabledforeground="#a3a3a3")
+        self.customer_search_btn.configure(foreground="white")
+        self.customer_search_btn.configure(highlightbackground="#d9d9d9")
+        self.customer_search_btn.configure(highlightcolor="black")
+        self.customer_search_btn.configure(pady="0")
+        self.customer_search_btn.configure(command=lambda: self.search_customer(self.search_data))
+        self.customer_search_btn.configure(text="Αναζήτηση πελάτη")
 
         # Πίνακας πελατών
         self.customers_treeview = ScrolledTreeView(top)
@@ -567,14 +585,14 @@ class Toplevel1:
         self.customers_treeview.bind("<Double-1>", self.view_copiers)
 
         self.get_customers()
-        self.customers_treeview.place(relx=0.022, rely=0.093, relheight=0.457, relwidth=0.188)
+        self.customers_treeview.place(relx=0.022, rely=0.143, relheight=0.457, relwidth=0.188)
 
         # Αναζήτηση πελάτη
         self.search_data = StringVar()
 
         self.customer_search_entry = tk.Entry(top, textvariable=self.search_data)
-        self.customer_search_entry.place(relx=0.022, rely=0.566, height=20
-                , relwidth=0.188)
+        self.customer_search_entry.place(relx=0.022, rely=0.095, height=19
+                                         , relwidth=0.188)
         self.customer_search_entry.configure(background="white")
         self.customer_search_entry.configure(cursor="fleur")
         self.customer_search_entry.configure(disabledforeground="#a3a3a3")
@@ -583,37 +601,23 @@ class Toplevel1:
         self.customer_search_entry.configure(insertbackground="black")
         self.customer_search_entry.bind('<Return>', self.search_customer(self.search_data))
 
-        self.customer_search_btn = tk.Button(top)
-        self.customer_search_btn.place(relx=0.022, rely=0.62, height=24
-                , width=170)
-        self.customer_search_btn.configure(activebackground="#ececec")
-        self.customer_search_btn.configure(activeforeground="#000000")
-        self.customer_search_btn.configure(background="brown")
-        self.customer_search_btn.configure(disabledforeground="#a3a3a3")
-        self.customer_search_btn.configure(foreground="white")
-        self.customer_search_btn.configure(highlightbackground="#d9d9d9")
-        self.customer_search_btn.configure(highlightcolor="black")
-        self.customer_search_btn.configure(pady="0")
-        self.customer_search_btn.configure(command=lambda: self.search_customer(self.search_data))
-        self.customer_search_btn.configure(text="Αναζήτηση πελάτη")
-
-        self.Label15_1 = tk.Label(top)
-        self.Label15_1.place(relx=0.022, rely=0.693, height=21, width=188)
-        self.Label15_1.configure(activebackground="#f9f9f9")
-        self.Label15_1.configure(activeforeground="black")
-        self.Label15_1.configure(background="#808000")
-        self.Label15_1.configure(cursor="fleur")
-        self.Label15_1.configure(disabledforeground="#a3a3a3")
-        self.Label15_1.configure(foreground="#ffffff")
-        self.Label15_1.configure(highlightbackground="#d9d9d9")
-        self.Label15_1.configure(highlightcolor="black")
-        self.Label15_1.configure(relief="groove")
-        self.Label15_1.configure(text='''Φωτοτυπικά''')
+        self.copier_search_btn = tk.Button(top)
+        self.copier_search_btn.place(relx=0.022, rely=0.620, height=24, relwidth=0.188)
+        self.copier_search_btn.configure(activebackground="#ececec")
+        self.copier_search_btn.configure(activeforeground="#000000")
+        self.copier_search_btn.configure(background="#808000")
+        self.copier_search_btn.configure(disabledforeground="#a3a3a3")
+        self.copier_search_btn.configure(foreground="white")
+        self.copier_search_btn.configure(highlightbackground="#d9d9d9")
+        self.copier_search_btn.configure(highlightcolor="black")
+        self.copier_search_btn.configure(pady="0")
+        self.copier_search_btn.configure(command=lambda: self.search_copier(self.search_copier_data))
+        self.copier_search_btn.configure(text="Αναζήτηση Φωτοτυπικού")
 
         # Πίνακας φωτοτυπικών
         self.copiers_treeview = ScrolledTreeView(top)
-        self.copiers_treeview.place(relx=0.022, rely=0.739, relheight=0.159
-                , relwidth=0.188)
+        self.copiers_treeview.place(relx=0.022, rely=0.720, relheight=0.259
+                                    , relwidth=0.188)
         self.copiers_treeview["columns"] = ["ID", "Φωτοτυπικά"]
         self.copiers_treeview.heading("Φωτοτυπικά", text="Φωτοτυπικά", anchor="center")
         # self.customers_treeview.column("#0",width="60")
@@ -626,8 +630,8 @@ class Toplevel1:
         # Αναζήτηση φωτοτυπικού
         self.search_copier_data = StringVar()
         self.copier_search_entry = tk.Entry(top, textvariable=self.search_copier_data)
-        self.copier_search_entry.place(relx=0.022, rely=0.904, height=20
-                , relwidth=0.188)
+        self.copier_search_entry.place(relx=0.022, rely=0.675, height=20
+                                       , relwidth=0.188)
         self.copier_search_entry.configure(background="white")
         self.copier_search_entry.configure(disabledforeground="#a3a3a3")
         self.copier_search_entry.configure(font="Calibri")
@@ -635,19 +639,7 @@ class Toplevel1:
         self.copier_search_entry.configure(insertbackground="black")
         self.copier_search_entry.bind('<Return>', self.search_copier(self.search_copier_data))
 
-        self.copier_search_btn = tk.Button(top)
-        self.copier_search_btn.place(relx=0.022, rely=0.942, height=24, width=170)
 
-        self.copier_search_btn.configure(activebackground="#ececec")
-        self.copier_search_btn.configure(activeforeground="#000000")
-        self.copier_search_btn.configure(background="#808000")
-        self.copier_search_btn.configure(disabledforeground="#a3a3a3")
-        self.copier_search_btn.configure(foreground="white")
-        self.copier_search_btn.configure(highlightbackground="#d9d9d9")
-        self.copier_search_btn.configure(highlightcolor="black")
-        self.copier_search_btn.configure(pady="0")
-        self.copier_search_btn.configure(command=lambda: self.search_copier(self.search_copier_data))
-        self.copier_search_btn.configure(text="Αναζήτηση Φωτοτυπικού")
 
         # Προσθήκη ιστορικού φωτοτυπικού
         self.add_service_btn = tk.Button(top)
@@ -684,6 +676,10 @@ class Toplevel1:
         self.Label16.configure(foreground="#ffffff")
         self.Label16.configure(relief="groove")
         self.Label16.configure(text='''Ιστορικό''')
+
+    def quit(self, event):
+
+        root.destroy()
 
         # ---------------------Fix -Of- Style------------------------------------
     def fixed_map(self, option):
