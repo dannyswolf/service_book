@@ -182,7 +182,7 @@ class Toplevel1:
         self.style.configure("mystyle.Treeview", background="white", rowheight=30)
 
         self.company_label = tk.Label(top)
-        self.company_label.place(relx=0.221, rely=0.037, height=20, width=144)
+        self.company_label.place(relx=0.221, rely=0.037, height=20, relwidth=0.144)
         self.company_label.configure(activebackground="#f9f9f9")
         self.company_label.configure(activeforeground="black")
         self.company_label.configure(background="#84f29c")
@@ -198,7 +198,7 @@ class Toplevel1:
         self.company_name_entry.configure(background="white")
         self.company_name_entry.configure(disabledforeground="#a3a3a3")
 
-        self.company_name_entry.configure(font="Calibri")
+        self.company_name_entry.configure(font=("Calibri", 10))
         self.company_name_entry.configure(foreground="#000000")
         self.company_name_entry.configure(highlightbackground="#d9d9d9")
         self.company_name_entry.configure(highlightcolor="black")
@@ -207,7 +207,7 @@ class Toplevel1:
         self.company_name_entry.configure(selectforeground="black")
 
         self.address_label = tk.Label(top)
-        self.address_label.place(relx=0.221, rely=0.149, height=20, width=144)
+        self.address_label.place(relx=0.221, rely=0.149, height=20, relwidth=0.144)
         self.address_label.configure(activebackground="#f9f9f9")
         self.address_label.configure(activeforeground="black")
         self.address_label.configure(background="#84f29c")
@@ -219,7 +219,7 @@ class Toplevel1:
         self.address_label.configure(text="Διεύθυνση")
 
         self.Label3 = tk.Label(top)
-        self.Label3.place(relx=0.221, rely=0.093, height=20, width=144)
+        self.Label3.place(relx=0.221, rely=0.093, height=20, relwidth=0.144)
         self.Label3.configure(activebackground="#f9f9f9")
         self.Label3.configure(activeforeground="black")
         self.Label3.configure(background="#84f29c")
@@ -234,7 +234,7 @@ class Toplevel1:
         self.fax_entry.place(relx=0.717, rely=0.26, height=20, relwidth=0.15)
         self.fax_entry.configure(background="white")
         self.fax_entry.configure(disabledforeground="#a3a3a3")
-        self.fax_entry.configure(font="Calibri")
+        self.fax_entry.configure(font=("Calibri", 10))
         self.fax_entry.configure(foreground="#000000")
         self.fax_entry.configure(highlightbackground="#d9d9d9")
         self.fax_entry.configure(highlightcolor="black")
@@ -243,7 +243,7 @@ class Toplevel1:
         self.fax_entry.configure(selectforeground="black")
 
         self.Label4 = tk.Label(top)
-        self.Label4.place(relx=0.607, rely=0.037, height=21, width=100)
+        self.Label4.place(relx=0.607, rely=0.037, height=21, relwidth=0.100)
         self.Label4.configure(activebackground="#f9f9f9")
         self.Label4.configure(activeforeground="black")
         self.Label4.configure(background="#84f29c")
@@ -255,7 +255,7 @@ class Toplevel1:
         self.Label4.configure(text='''Πόλη''')
 
         self.Label5 = tk.Label(top)
-        self.Label5.place(relx=0.607, rely=0.149, height=21, width=100)
+        self.Label5.place(relx=0.607, rely=0.149, height=21, relwidth=0.100)
         self.Label5.configure(activebackground="#f9f9f9")
         self.Label5.configure(activeforeground="black")
         self.Label5.configure(background="#84f29c")
@@ -267,7 +267,7 @@ class Toplevel1:
         self.Label5.configure(text='''Ταχ. Κώδικας''')
 
         self.Label6 = tk.Label(top)
-        self.Label6.place(relx=0.607, rely=0.093, height=21, width=100)
+        self.Label6.place(relx=0.607, rely=0.093, height=21, relwidth=0.100)
         self.Label6.configure(activebackground="#f9f9f9")
         self.Label6.configure(activeforeground="black")
         self.Label6.configure(background="#84f29c")
@@ -282,7 +282,7 @@ class Toplevel1:
         self.name_entry.place(relx=0.386, rely=0.093,height=20, relwidth=0.2)
         self.name_entry.configure(background="white")
         self.name_entry.configure(disabledforeground="#a3a3a3")
-        self.name_entry.configure(font="Calibri")
+        self.name_entry.configure(font=("Calibri", 10))
         self.name_entry.configure(foreground="#000000")
         self.name_entry.configure(highlightbackground="#d9d9d9")
         self.name_entry.configure(highlightcolor="black")
@@ -294,7 +294,7 @@ class Toplevel1:
         self.mobile_entry.place(relx=0.386, rely=0.26,height=20, relwidth=0.2)
         self.mobile_entry.configure(background="white")
         self.mobile_entry.configure(disabledforeground="#a3a3a3")
-        self.mobile_entry.configure(font="Calibri")
+        self.mobile_entry.configure(font=("Calibri", 10))
         self.mobile_entry.configure(foreground="#000000")
         self.mobile_entry.configure(highlightbackground="#d9d9d9")
         self.mobile_entry.configure(highlightcolor="black")
@@ -306,7 +306,7 @@ class Toplevel1:
         self.email_entry.place(relx=0.717, rely=0.204, height=20, relwidth=0.15)
         self.email_entry.configure(background="white")
         self.email_entry.configure(disabledforeground="#a3a3a3")
-        self.email_entry.configure(font="Calibri")
+        self.email_entry.configure(font=("Calibri", 10))
         self.email_entry.configure(foreground="#000000")
         self.email_entry.configure(highlightbackground="#d9d9d9")
         self.email_entry.configure(highlightcolor="black")
@@ -318,7 +318,7 @@ class Toplevel1:
         self.city_entry.place(relx=0.717, rely=0.037, height=20, relwidth=0.15)
         self.city_entry.configure(background="white")
         self.city_entry.configure(disabledforeground="#a3a3a3")
-        self.city_entry.configure(font="Calibri")
+        self.city_entry.configure(font=("Calibri", 10))
         self.city_entry.configure(foreground="#000000")
         self.city_entry.configure(highlightbackground="#d9d9d9")
         self.city_entry.configure(highlightcolor="black")
@@ -327,7 +327,7 @@ class Toplevel1:
         self.city_entry.configure(selectforeground="black")
 
         self.Label7 = tk.Label(top)
-        self.Label7.place(relx=0.221, rely=0.204, height=20, width=144)
+        self.Label7.place(relx=0.221, rely=0.204, height=20, relwidth=0.144)
         self.Label7.configure(activebackground="#f9f9f9")
         self.Label7.configure(activeforeground="black")
         self.Label7.configure(background="#84f29c")
@@ -339,7 +339,7 @@ class Toplevel1:
         self.Label7.configure(text='''Τηλέφωνο''')
 
         self.Label8 = tk.Label(top)
-        self.Label8.place(relx=0.221, rely=0.26, height=20, width=144)
+        self.Label8.place(relx=0.221, rely=0.26, height=20, relwidth=0.144)
         self.Label8.configure(activebackground="#f9f9f9")
         self.Label8.configure(activeforeground="black")
         self.Label8.configure(background="#84f29c")
@@ -351,7 +351,7 @@ class Toplevel1:
         self.Label8.configure(text="Κινητό")
         # Σελίδες Πακέτου
         self.Label13 = tk.Label(top)
-        self.Label13.place(relx=0.221, rely=0.310, height=20, width=144)
+        self.Label13.place(relx=0.221, rely=0.310, height=20, relwidth=0.144)
         self.Label13.configure(activebackground="#f9f9f9")
         self.Label13.configure(activeforeground="black")
         self.Label13.configure(background="#2f42f0")
@@ -365,7 +365,7 @@ class Toplevel1:
         self.page_package_entry.place(relx=0.386, rely=0.310, height=20, relwidth=0.2)
         self.page_package_entry.configure(background="white")
         self.page_package_entry.configure(disabledforeground="#a3a3a3")
-        self.page_package_entry.configure(font="Calibri")
+        self.page_package_entry.configure(font=("Calibri", 10))
         self.page_package_entry.configure(foreground="#000000")
         self.page_package_entry.configure(highlightbackground="#d9d9d9")
         self.page_package_entry.configure(highlightcolor="black")
@@ -374,7 +374,7 @@ class Toplevel1:
         self.page_package_entry.configure(selectforeground="black")
 
         self.Label14 = tk.Label(top)
-        self.Label14.place(relx=0.607, rely=0.310, height=20, width=100)
+        self.Label14.place(relx=0.607, rely=0.310, height=20, relwidth=0.100)
         self.Label14.configure(activebackground="#f9f9f9")
         self.Label14.configure(activeforeground="black")
         self.Label14.configure(background="#2f42f0")
@@ -388,7 +388,7 @@ class Toplevel1:
         self.package_cost_entry.place(relx=0.717, rely=0.310, height=20, relwidth=0.15)
         self.package_cost_entry.configure(background="white")
         self.package_cost_entry.configure(disabledforeground="#a3a3a3")
-        self.package_cost_entry.configure(font="Calibri")
+        self.package_cost_entry.configure(font=("Calibri", 10))
         self.package_cost_entry.configure(foreground="#000000")
         self.package_cost_entry.configure(highlightbackground="#d9d9d9")
         self.package_cost_entry.configure(highlightcolor="black")
@@ -397,7 +397,7 @@ class Toplevel1:
         self.package_cost_entry.configure(selectforeground="black")
 
         self.Label9 = tk.Label(top)
-        self.Label9.place(relx=0.607, rely=0.26, height=21, width=100)
+        self.Label9.place(relx=0.607, rely=0.26, height=21, relwidth=0.100)
         self.Label9.configure(activebackground="#f9f9f9")
         self.Label9.configure(activeforeground="black")
         self.Label9.configure(background="#84f29c")
@@ -409,7 +409,7 @@ class Toplevel1:
         self.Label9.configure(text='''Φαξ''')
 
         self.Label10 = tk.Label(top)
-        self.Label10.place(relx=0.607, rely=0.204, height=21, width=100)
+        self.Label10.place(relx=0.607, rely=0.204, height=21, relwidth=0.100)
         self.Label10.configure(activebackground="#f9f9f9")
         self.Label10.configure(activeforeground="black")
         self.Label10.configure(background="#84f29c")
@@ -425,7 +425,7 @@ class Toplevel1:
 
         self.address_entry.configure(background="white")
         self.address_entry.configure(disabledforeground="#a3a3a3")
-        self.address_entry.configure(font="Calibri")
+        self.address_entry.configure(font=("Calibri", 10))
         self.address_entry.configure(foreground="#000000")
         self.address_entry.configure(highlightbackground="#d9d9d9")
         self.address_entry.configure(highlightcolor="black")
@@ -437,7 +437,7 @@ class Toplevel1:
         self.phone_entry.place(relx=0.386, rely=0.204,height=20, relwidth=0.2)
         self.phone_entry.configure(background="white")
         self.phone_entry.configure(disabledforeground="#a3a3a3")
-        self.phone_entry.configure(font="Calibri")
+        self.phone_entry.configure(font=("Calibri", 10))
         self.phone_entry.configure(foreground="#000000")
         self.phone_entry.configure(highlightbackground="#d9d9d9")
         self.phone_entry.configure(highlightcolor="black")
@@ -449,7 +449,7 @@ class Toplevel1:
         self.post_code_entry.place(relx=0.717, rely=0.149, height=20, relwidth=0.15)
         self.post_code_entry.configure(background="white")
         self.post_code_entry.configure(disabledforeground="#a3a3a3")
-        self.post_code_entry.configure(font="Calibri")
+        self.post_code_entry.configure(font=("Calibri", 10))
         self.post_code_entry.configure(foreground="#000000")
         self.post_code_entry.configure(highlightbackground="#d9d9d9")
         self.post_code_entry.configure(highlightcolor="black")
@@ -461,7 +461,7 @@ class Toplevel1:
         self.place_entry.place(relx=0.717, rely=0.093, height=20, relwidth=0.15)
         self.place_entry.configure(background="white")
         self.place_entry.configure(disabledforeground="#a3a3a3")
-        self.place_entry.configure(font="Calibri")
+        self.place_entry.configure(font=("Calibri", 10))
         self.place_entry.configure(foreground="#000000")
         self.place_entry.configure(highlightbackground="#d9d9d9")
         self.place_entry.configure(highlightcolor="black")
@@ -470,7 +470,7 @@ class Toplevel1:
         self.place_entry.configure(selectforeground="black")
         # Serial Number
         self.serial_label = tk.Label(top)
-        self.serial_label.place(relx=0.221, rely=0.356, height=21, width=144)
+        self.serial_label.place(relx=0.221, rely=0.356, height=21, relwidth=0.144)
         self.serial_label.configure(activebackground="#f9f9f9")
         self.serial_label.configure(activeforeground="black")
         self.serial_label.configure(background="#808000")
@@ -484,7 +484,7 @@ class Toplevel1:
         self.serial_entry.place(relx=0.386, rely=0.356, height=20, relwidth=0.2)
         self.serial_entry.configure(background="white")
         self.serial_entry.configure(disabledforeground="#a3a3a3")
-        self.serial_entry.configure(font="Calibri")
+        self.serial_entry.configure(font=("Calibri", 10))
         self.serial_entry.configure(foreground="#000000")
         self.serial_entry.configure(highlightbackground="#d9d9d9")
         self.serial_entry.configure(highlightcolor="black")
@@ -493,7 +493,7 @@ class Toplevel1:
         self.serial_entry.configure(selectforeground="black")
         # Μετρητής Εναρξης
         self.Label12 = tk.Label(top)
-        self.Label12.place(relx=0.221, rely=0.456, height=21, width=144)
+        self.Label12.place(relx=0.221, rely=0.456, height=21, relwidth=0.144)
         self.Label12.configure(activebackground="#808000")
         self.Label12.configure(activeforeground="black")
         self.Label12.configure(background="#808000")
@@ -507,7 +507,7 @@ class Toplevel1:
         self.start_counter_entry.place(relx=0.386, rely=0.456, height=20, relwidth=0.2)
         self.start_counter_entry.configure(background="white")
         self.start_counter_entry.configure(disabledforeground="#a3a3a3")
-        self.start_counter_entry.configure(font="Calibri")
+        self.start_counter_entry.configure(font=("Calibri", 10))
         self.start_counter_entry.configure(foreground="#000000")
         self.start_counter_entry.configure(highlightbackground="#d9d9d9")
         self.start_counter_entry.configure(highlightcolor="black")
@@ -516,7 +516,7 @@ class Toplevel1:
         self.start_counter_entry.configure(selectforeground="black")
         # Εναρξη
         self.Label11 = tk.Label(top)
-        self.Label11.place(relx=0.221, rely=0.406, height=21, width=144)
+        self.Label11.place(relx=0.221, rely=0.406, height=21, relwidth=0.144)
         self.Label11.configure(activebackground="#f9f9f9")
         self.Label11.configure(activeforeground="black")
         self.Label11.configure(background="#808000")
@@ -530,7 +530,7 @@ class Toplevel1:
         self.start_entry.place(relx=0.386, rely=0.406, height=20, relwidth=0.2)
         self.start_entry.configure(background="white")
         self.start_entry.configure(disabledforeground="#a3a3a3")
-        self.start_entry.configure(font="Calibri")
+        self.start_entry.configure(font=("Calibri", 10))
         self.start_entry.configure(foreground="#000000")
         self.start_entry.configure(highlightbackground="#d9d9d9")
         self.start_entry.configure(highlightcolor="black")
@@ -539,7 +539,7 @@ class Toplevel1:
         self.start_entry.configure(selectforeground="black")
 
         self.Button1 = tk.Button(top)
-        self.Button1.place(relx=0.607, rely=0.386, height=24, width=100)
+        self.Button1.place(relx=0.607, rely=0.386, height=24, relwidth=0.100)
         self.Button1.configure(activebackground="#ececec")
         self.Button1.configure(activeforeground="#000000")
         self.Button1.configure(background="#f5010a")
@@ -549,14 +549,6 @@ class Toplevel1:
         self.Button1.configure(highlightcolor="black")
         self.Button1.configure(pady="0")
         self.Button1.configure(text='''Ενημέρωση''')
-
-        # self.Label15 = tk.Label(top)
-        # self.Label15.place(relx=0.022, rely=0.037, height=21, width=170)
-        # self.Label15.configure(background="brown")
-        # self.Label15.configure(disabledforeground="#a3a3a3")
-        # self.Label15.configure(foreground="white")
-        # self.Label15.configure(relief="groove")
-        # self.Label15.configure(text="Πελάτες")
 
         self.customer_search_btn = tk.Button(top)
         self.customer_search_btn.place(relx=0.022, rely=0.037, height=24
@@ -594,9 +586,8 @@ class Toplevel1:
         self.customer_search_entry.place(relx=0.022, rely=0.095, height=19
                                          , relwidth=0.188)
         self.customer_search_entry.configure(background="white")
-        self.customer_search_entry.configure(cursor="fleur")
         self.customer_search_entry.configure(disabledforeground="#a3a3a3")
-        self.customer_search_entry.configure(font="Calibri")
+        self.customer_search_entry.configure(font=("Calibri", 10))
         self.customer_search_entry.configure(foreground="#000000")
         self.customer_search_entry.configure(insertbackground="black")
         self.customer_search_entry.bind('<Return>', self.search_customer(self.search_data))
@@ -634,16 +625,14 @@ class Toplevel1:
                                        , relwidth=0.188)
         self.copier_search_entry.configure(background="white")
         self.copier_search_entry.configure(disabledforeground="#a3a3a3")
-        self.copier_search_entry.configure(font="Calibri")
+        self.copier_search_entry.configure(font=("Calibri", 10))
         self.copier_search_entry.configure(foreground="#000000")
         self.copier_search_entry.configure(insertbackground="black")
         self.copier_search_entry.bind('<Return>', self.search_copier(self.search_copier_data))
 
-
-
         # Προσθήκη ιστορικού φωτοτυπικού
         self.add_service_btn = tk.Button(top)
-        self.add_service_btn.place(relx=0.231, rely=0.556, height=21, width=144)
+        self.add_service_btn.place(relx=0.231, rely=0.556, height=21, relwidth=0.144)
         self.add_service_btn.configure(activebackground="#808000")
         self.add_service_btn.configure(activeforeground="#000000")
         self.add_service_btn.configure(background="#808000")
@@ -670,7 +659,7 @@ class Toplevel1:
         self.TSeparator1.place(relx=0.231, rely=0.521, relwidth=0.638)
 
         self.Label16 = tk.Label(top)
-        self.Label16.place(relx=0.425, rely=0.556, height=21, width=314)
+        self.Label16.place(relx=0.425, rely=0.556, height=21, relwidth=0.314)
         self.Label16.configure(background="#006291")
         self.Label16.configure(disabledforeground="#a3a3a3")
         self.Label16.configure(foreground="#ffffff")
@@ -704,6 +693,7 @@ class Toplevel1:
         customers_conn.close()
 
         # Κατασκευή tree το up_index -1 == το τελος ("end")
+        self.customers_treeview.column("ID", anchor="w", width=1)
         for n in range(len(customers_data)):
 
             self.customers_treeview.insert("", "end", values=customers_data[n])
@@ -782,6 +772,7 @@ class Toplevel1:
         :param event:
         :return:
         """
+
         # Ενεργοποιηση του κουμπιου προσθήκης ιστορικού
         self.add_service_btn.configure(state="active")
         self.add_service_btn.configure(activebackground="#808000")
