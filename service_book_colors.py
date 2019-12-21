@@ -6,6 +6,15 @@
 #    Dec 13, 2019 12:08:06 AM EET  platform: Windows NT
 
 """
+V0.4.4 ==============================================================================================22/12/2019
+Αρχεία 1 add_copier
+Δυνατότητα προσθήκης Φωτοτυπικού
+
+V0.3.4 ==============================================================================================21/12/2019
+1. Δυνατότητα προσθήκης Service_data
+2. Icons
+3. Ενημέρωση στοιχείων πελάτη στο κεντρικό παράθυρο
+
 Αρχεία 1 add_service  == >> Παράθυρο προσθήκης επισκευής
 V0.3.2 V0.3.2 Προσθήκη αυτόματης ημερωμηνίας στην προσθήκη ιστορικού επισκευών ========================20/12/2019
 
@@ -34,7 +43,9 @@ import service_book_colors_support
 from edit_service_window import *  # Δημιουργία παραθύρου επεξεργασίας ιστορικού επισκευής
 import add_customers  # Δημιουργία παραθύρου προσθήκης πελάτη
 from tkinter import StringVar, TclError, PhotoImage
+import add_copier
 from add_service import *
+
 try:
     import Tkinter as tk
 except ImportError:
@@ -158,9 +169,9 @@ class Toplevel1:
         # self.menubar.add_cascade(label="Αντίγραφο ασφαλείας", menu=self.backup_menu)
         # self.backup_menu.add_command(label="Δημιουργία αντίγραφο ασφαλείας!", command=self.backup)
         #
-        # self.table_menu = tk.Menu(self.menubar, tearoff=0)
-        # self.menubar.add_cascade(label="Πίνακες", menu=self.table_menu)
-        # self.table_menu.add_command(label="Δημιουργία νέου πίνακα", command=make_new_table)
+        self.copier_menu = tk.Menu(self.menubar, tearoff=0)
+        self.menubar.add_cascade(label="Φωτοτυπικά", menu=self.copier_menu)
+        self.copier_menu.add_command(label="Προσθήκη φωτοτυπικού", command=self.add_copier)
         #
         # self.info_menu = tk.Menu(self.menubar, tearoff=0)
         # self.menubar.add_cascade(label="Info", menu=self.info_menu)
@@ -987,6 +998,16 @@ class Toplevel1:
         :return:
         """
         add_customers.create_Toplevel1(root)
+
+    # Προσθήκη Φωτοτυπικού
+    def add_copier(self):
+        """ Προσθήκη φωτοτυπικού
+        Καλει την συνάρτηση create_Topelevel1 του αρχείου add_copier
+
+        :return:
+        """
+        add_copier.create_add_copier_window(root)
+
 
     # ------------------------------------Events ---------------------------
     # Προσθήκη πελάτη event
