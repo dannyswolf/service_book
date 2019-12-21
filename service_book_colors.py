@@ -139,6 +139,7 @@ class Toplevel1:
         top.configure(highlightcolor="black")
         top.bind('<F1>', self.add_customer_event)
         top.bind('<Escape>', self.quit)
+        top.iconbitmap("icons/icon.ico")
 
         # ---------------------------------------Menu-----------------------------------------
         self.menubar = tk.Menu(top, font="TkMenuFont", bg=_bgcolor, fg=_fgcolor)
@@ -542,17 +543,18 @@ class Toplevel1:
         self.start_entry.configure(selectbackground="#c4c4c4")
         self.start_entry.configure(selectforeground="black")
 
-        self.Button1 = tk.Button(top)
-        self.Button1.place(relx=0.607, rely=0.386, height=24, relwidth=0.100)
-        self.Button1.configure(activebackground="#ececec")
-        self.Button1.configure(activeforeground="#000000")
-        self.Button1.configure(background="#f5010a")
-        self.Button1.configure(disabledforeground="#a3a3a3")
-        self.Button1.configure(foreground="#ffffff")
-        self.Button1.configure(highlightbackground="#d9d9d9")
-        self.Button1.configure(highlightcolor="black")
-        self.Button1.configure(pady="0")
-        self.Button1.configure(text='''Ενημέρωση''')
+        self.update_btn = tk.Button(top)
+        self.update_btn.place(relx=0.607, rely=0.386, height=24, relwidth=0.100)
+        self.update_btn.configure(activebackground="#ececec")
+        self.update_btn.configure(activeforeground="#000000")
+        self.update_btn.configure(background="brown")
+        self.update_btn.configure(disabledforeground="#a3a3a3")
+        self.update_btn.configure(foreground="#ffffff")
+        self.update_btn.configure(highlightbackground="#d9d9d9")
+        self.update_btn.configure(highlightcolor="black")
+        self.update_btn.configure(pady="0")
+        self.update_btn.configure(text='''Ενημέρωση''')
+        self.update_btn.configure(command=self.update_customer)
 
         self.customer_search_btn = tk.Button(top)
         self.customer_search_btn.place(relx=0.022, rely=0.037, height=24
@@ -991,7 +993,31 @@ class Toplevel1:
     def add_customer_event(self, event):
         self.add_customer()
 
-
+    def update_customer(self):
+        if self.selected_customer_id == "":
+            messagebox.showwarning("Σφάλμα", "Παρακαλώ πρώτα επιλέξτε πελάτη")
+            return None
+        headers = []
+        for head in self.customers_headers:
+            if head != "ID":
+                headers.append(head + " = ?")
+        culumns = ", ".join(headers)
+        print(culumns)
+        new_data = [self.company_name_entry.get(), self.name_entry.get(), self.address_entry.get(),
+                    self.city_entry.get(),
+                    self.post_code_entry.get(), self.place_entry.get(), self.phone_entry.get(), self.mobile_entry.get(),
+                    self.fax_entry.get(), self.email_entry.get(), self.page_package_entry.get(),
+                    self.package_cost_entry.get(), self.selected_customer_id]
+        print(new_data)
+        up_conn = sqlite3.connect(dbase)
+        up_cursor = up_conn.cursor()
+        # sqlite_update_query = """Update new_developers set salary = ?, email = ? where id = ?
+        sql = "UPDATE Πελάτες SET " + culumns + "WHERE ID = ? "
+        up_cursor.execute(sql, tuple(new_data), )
+        up_conn.commit()
+        up_cursor.close()
+        up_conn.close()
+        messagebox.showinfo("Info", f"Τα στοιχεία του {self.company_name_entry.get()} ενημερώθηκαν επιτυχώς")
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):
     '''Configure the scrollbars for a widget.'''

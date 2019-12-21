@@ -37,10 +37,11 @@ def get_service_data():
     cursor.close()
     conn.close()
     for n in range(len(service_data)):
-        if service_data[n][0] != "":
+        if service_data[n][1] != "" and service_data[n][1] is not None:
             purpose_list.append(service_data[n][1])
-        actions_list.append(service_data[n][2])
-    return purpose_list, actions_list
+        if service_data[n][2] != "" and service_data[n][2] is not None:
+            actions_list.append(service_data[n][2])
+    return sorted(purpose_list), sorted(actions_list)
 
 
 def vp_start_gui():
@@ -299,7 +300,6 @@ class edit_service_window():
                 if culumn != "ID":
                     edited_culumns.append(culumn + "=?")
             edited_culumns = ",".join(edited_culumns)
-            print(edited_culumns)
             data_to_add = [date.get(), self.purpose_combobox.get(), self.actions_combobox.get(),
                            self.notes_scrolledtext.get("1.0", "end-1c"), counter.get(), next_service.get(), copier_id,
                            self.selected_service_id]

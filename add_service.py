@@ -47,7 +47,7 @@ def get_service_data():
             purpose_list.append(service_data[n][1])
         if service_data[n][2] != "" and service_data[n][2] is not None:
             actions_list.append(service_data[n][2])
-    return purpose_list, actions_list
+    return sorted(purpose_list), sorted(actions_list)
 
 
 def vp_start_gui():
@@ -320,7 +320,6 @@ class add_service_window():
                 messagebox.showinfo("Info", "Σκοπός προστέθηκε επιτυχώς")
 
         elif column == "Ενέργειες":
-            print(type(self.actions_combobox.get()))
             if self.actions_combobox.get() != "" and self.actions_combobox.get() in self.actions_list:
                 messagebox.showinfo("Προσοχή", f"Το {self.actions_combobox.get()} υπάρχει στην λίστα")
                 return None

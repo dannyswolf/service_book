@@ -446,7 +446,7 @@ class Toplevel1:
         conn.commit()
         conn.close()
         messagebox.showinfo("Info", f"Ο πελάτης {self.company_name.get()} προστέθηκε επιτυχώς")
-        w.quit()
+        return None
 
 
 if __name__ == '__main__':
