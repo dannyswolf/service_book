@@ -271,7 +271,7 @@ class edit_service_window():
     def edit(self):
         edit_conn = sqlite3.connect(dbase)
         edit_corsor = edit_conn.cursor()
-        edit_corsor.execute("SELECT * FROM Service WHERE ID = ?", self.selected_service_id)
+        edit_corsor.execute("SELECT * FROM Service WHERE ID = ?", (self.selected_service_id,))
         self.culumns = list(map(lambda x: x[0], edit_corsor.description))
 
         data = edit_corsor.fetchall()

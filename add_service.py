@@ -10,7 +10,7 @@ V0.3.2 Προσθήκη αυτόματης ημερωμηνίας
 """
 import sys
 import sqlite3
-from tkinter import StringVar, messagebox
+from tkinter import StringVar, messagebox, PhotoImage
 import add_service_window_support
 import platform
 from datetime import datetime
@@ -43,9 +43,10 @@ def get_service_data():
     cursor.close()
     conn.close()
     for n in range(len(service_data)):
-        if service_data[n][0] != "":
+        if service_data[n][1] != "" and service_data[n][1] is not None:
             purpose_list.append(service_data[n][1])
-        actions_list.append(service_data[n][2])
+        if service_data[n][2] != "" and service_data[n][2] is not None:
+            actions_list.append(service_data[n][2])
     return purpose_list, actions_list
 
 
@@ -166,7 +167,7 @@ class add_service_window():
         self.actions_label.configure(text='''Ενέργειες''')
 
         self.notes_label = tk.Label(top)
-        self.notes_label.place(relx=0.025, rely=0.550, height=31, relwidth=0.250)
+        self.notes_label.place(relx=0.300, rely=0.550, height=31, relwidth=0.350)
         self.notes_label.configure(activebackground="#f9f9f9")
         self.notes_label.configure(activeforeground="black")
         self.notes_label.configure(background="#6b6b6b")
@@ -205,7 +206,7 @@ class add_service_window():
         self.next_service_label.configure(text='''Επόμενο Service''')
 
         self.TSeparator1 = ttk.Separator(top)
-        self.TSeparator1.place(relx=0.025, rely=0.500, relwidth=0.938)
+        self.TSeparator1.place(relx=0.025, rely=0.520, relwidth=0.938)
 
 
         self.date_entry = tk.Entry(top)
@@ -256,18 +257,31 @@ class add_service_window():
         self.notes_scrolledtext.configure(wrap="none")
 
         self.purpose_combobox = ttk.Combobox(top)
-        self.purpose_combobox.place(relx=0.29, rely=0.394, relheight=0.043, relwidth=0.6)
+        self.purpose_combobox.place(relx=0.29, rely=0.394, relheight=0.043, relwidth=0.500)
 
         self.purpose_combobox.configure(values=self.purpose_list)
         # self.purpose_combobox.configure(textvariable=edit_service_window_support.combobox)
         self.purpose_combobox.configure(takefocus="")
 
-        self.actions_combobox = ttk.Combobox(top)
-        self.actions_combobox.place(relx=0.29, rely=0.444, relheight=0.043, relwidth=0.6)
+        self.add_to_service_data_btn1 = tk.Button(top)
+        self.add_to_service_data_btn1.place(relx=0.810, rely=0.394, height=30, relwidth=0.060)
+        self.add_to_service_data_btn1.configure(background="#006291")
+        self.add_to_service_data_img1 = PhotoImage(file="icons/add_to_service_data1.png")
+        self.add_to_service_data_btn1.configure(image=self.add_to_service_data_img1)
+        self.add_to_service_data_btn1.configure(command=lambda: (self.add_to_service_data("Σκοπός")))
 
+        self.actions_combobox = ttk.Combobox(top)
+        self.actions_combobox.place(relx=0.29, rely=0.444, relheight=0.043, relwidth=0.500)
         self.actions_combobox.configure(values=self.actions_list)
         # self.actions_combobox.configure(textvariable=edit_service_window_support.combobox)
         self.actions_combobox.configure(takefocus="")
+
+        self.add_to_service_data_btn2 = tk.Button(top)
+        self.add_to_service_data_btn2.place(relx=0.810, rely=0.444, height=30, relwidth=0.060)
+        self.add_to_service_data_btn2.configure(background="#006291")
+        self.add_to_service_data_img2 = PhotoImage(file="icons/add_to_service_data2.png")
+        self.add_to_service_data_btn2.configure(image=self.add_to_service_data_img2)
+        self.add_to_service_data_btn2.configure(command=lambda: (self.add_to_service_data("Ενέργειες")))
 
         self.Label2 = tk.Label(top)
         self.Label2.place(relx=0.025, rely=0.020, height=31, relwidth=0.938)
@@ -279,8 +293,48 @@ class add_service_window():
         self.Label2.configure(text='''Προσθήκη ιστορικού''')
         self.edit()
 
+
     def quit(self, event):
         w.destroy()
+
+    def add_to_service_data(self, column):
+        global w
+        # self.purpose_list, self.actions_list
+        # self.purpose_combobox.get(), self.actions_combobox.get()
+        if column == "Σκοπός":
+            if self.purpose_combobox.get() != "" and self.purpose_combobox.get() in self.purpose_list:
+                w.focus()
+                messagebox.showinfo("Προσοχή", f"Το {self.purpose_combobox.get()} υπάρχει στην λίστα")
+
+                return None
+            elif self.purpose_combobox.get() != "":
+                conn = sqlite3.connect(dbase)
+                cursor = conn.cursor()
+                # "INSERT INTO  " + table + "(" + culumns + ")" + "VALUES(NULL, ?, ?, ?, ?, ?, ?, ?);"
+                # INSERT INTO artists (name)VALUES('Bud Powell');
+                sql = "INSERT INTO Service_data (Σκοπός)VALUES(?);"
+                cursor.execute(sql, (self.purpose_combobox.get(),))
+                conn.commit()
+                cursor.close()
+                conn.close()
+                messagebox.showinfo("Info", "Σκοπός προστέθηκε επιτυχώς")
+
+        elif column == "Ενέργειες":
+            print(type(self.actions_combobox.get()))
+            if self.actions_combobox.get() != "" and self.actions_combobox.get() in self.actions_list:
+                messagebox.showinfo("Προσοχή", f"Το {self.actions_combobox.get()} υπάρχει στην λίστα")
+                return None
+            elif self.actions_combobox.get() != "":
+                conn = sqlite3.connect(dbase)
+                cursor = conn.cursor()
+                sql = "INSERT INTO Service_data(Ενέργειες)VALUES(?);"
+                cursor.execute(sql, (self.actions_combobox.get(),))
+                conn.commit()
+                cursor.close()
+                conn.close()
+                messagebox.showinfo("Info", "Ενέργεια Προστέθηκε επιτυχώς")
+
+
     # επεξεργασία δεδομένων
     def edit(self):
         # Εμφάνηση πελάτη
@@ -288,14 +342,14 @@ class add_service_window():
         # Δευτερον το όνομα φωτοτυπικού ==> Εταιρεία (στην βαση)
         conn = sqlite3.connect(dbase)
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM Φωτοτυπικά WHERE ID = ?", self.selected_copier_id)
+        cursor.execute("SELECT * FROM Φωτοτυπικά WHERE ID = ?", (self.selected_copier_id,))
         selected_copier_data = cursor.fetchall()
         cursor.close()
         conn.close()
         customer_id = selected_copier_data[0][5]
         conn = sqlite3.connect(dbase)
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM Πελάτες WHERE ID = ?", customer_id)
+        cursor.execute("SELECT * FROM Πελάτες WHERE ID = ?", (customer_id,))
         curtomer_data = cursor.fetchall()
         cursor.close()
         conn.close()

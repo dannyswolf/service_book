@@ -7,8 +7,7 @@
 
 import sys
 import sqlite3
-from tkinter import StringVar
-
+from tkinter import StringVar, messagebox
 try:
     import Tkinter as tk
 except ImportError:
@@ -16,15 +15,12 @@ except ImportError:
 
 try:
     import ttk
-
     py3 = False
 except ImportError:
     import tkinter.ttk as ttk
-
     py3 = True
 
 import add_customers_support
-
 
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
@@ -39,7 +35,6 @@ def vp_start_gui():
 dbase = "Service_book.db"
 w = None
 
-
 def create_Toplevel1(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
     global w, w_win, rt
@@ -50,12 +45,10 @@ def create_Toplevel1(root, *args, **kwargs):
     add_customers_support.init(w, top, *args, **kwargs)
     return (w, top)
 
-
 def destroy_Toplevel1():
     global w
     w.destroy()
     w = None
-
 
 class Toplevel1:
     def __init__(self, top=None):
@@ -85,7 +78,7 @@ class Toplevel1:
         top.configure(highlightcolor="black")
 
         self.Label1 = tk.Label(top)
-        self.Label1.place(relx=0.017, rely=0.146, height=20, width=144)
+        self.Label1.place(relx=0.017, rely=0.146, height=20, relwidth=0.244)
         self.Label1.configure(activebackground="#f9f9f9")
         self.Label1.configure(activeforeground="black")
         self.Label1.configure(background="#84f29c")
@@ -112,7 +105,7 @@ class Toplevel1:
         self.company_name_entry.configure(selectforeground="black")
 
         self.Label2 = tk.Label(top)
-        self.Label2.place(relx=0.017, rely=0.322, height=20, width=144)
+        self.Label2.place(relx=0.017, rely=0.322, height=20, relwidth=0.244)
         self.Label2.configure(activebackground="#f9f9f9")
         self.Label2.configure(activeforeground="black")
         self.Label2.configure(background="#84f29c")
@@ -124,7 +117,7 @@ class Toplevel1:
         self.Label2.configure(text='''Διεύθυνση''')
 
         self.Label3 = tk.Label(top)
-        self.Label3.place(relx=0.017, rely=0.234, height=20, width=144)
+        self.Label3.place(relx=0.017, rely=0.234, height=20, relwidth=0.244)
         self.Label3.configure(activebackground="#f9f9f9")
         self.Label3.configure(activeforeground="black")
         self.Label3.configure(background="#84f29c")
@@ -150,7 +143,7 @@ class Toplevel1:
         self.fax_entry.configure(selectforeground="black")
 
         self.Label4 = tk.Label(top)
-        self.Label4.place(relx=0.568, rely=0.146, height=21, width=100)
+        self.Label4.place(relx=0.568, rely=0.146, height=21, relwidth=0.170)
         self.Label4.configure(activebackground="#f9f9f9")
         self.Label4.configure(activeforeground="black")
         self.Label4.configure(background="#84f29c")
@@ -162,7 +155,7 @@ class Toplevel1:
         self.Label4.configure(text='''Πόλη''')
 
         self.Label5 = tk.Label(top)
-        self.Label5.place(relx=0.568, rely=0.322, height=21, width=100)
+        self.Label5.place(relx=0.568, rely=0.322, height=21, relwidth=0.170)
         self.Label5.configure(activebackground="#f9f9f9")
         self.Label5.configure(activeforeground="black")
         self.Label5.configure(background="#84f29c")
@@ -174,7 +167,7 @@ class Toplevel1:
         self.Label5.configure(text='''Ταχ. Κώδικας''')
 
         self.Label6 = tk.Label(top)
-        self.Label6.place(relx=0.568, rely=0.234, height=21, width=100)
+        self.Label6.place(relx=0.568, rely=0.234, height=21, relwidth=0.170)
         self.Label6.configure(activebackground="#f9f9f9")
         self.Label6.configure(activeforeground="black")
         self.Label6.configure(background="#84f29c")
@@ -242,7 +235,7 @@ class Toplevel1:
         self.city_entry.configure(selectforeground="black")
 
         self.Label7 = tk.Label(top)
-        self.Label7.place(relx=0.017, rely=0.409, height=20, width=144)
+        self.Label7.place(relx=0.017, rely=0.409, height=20, relwidth=0.244)
         self.Label7.configure(activebackground="#f9f9f9")
         self.Label7.configure(activeforeground="black")
         self.Label7.configure(background="#84f29c")
@@ -254,7 +247,7 @@ class Toplevel1:
         self.Label7.configure(text='''Τηλέφωνο''')
 
         self.Label8 = tk.Label(top)
-        self.Label8.place(relx=0.017, rely=0.497, height=20, width=144)
+        self.Label8.place(relx=0.017, rely=0.497, height=20, relwidth=0.244)
         self.Label8.configure(activebackground="#f9f9f9")
         self.Label8.configure(activeforeground="black")
         self.Label8.configure(background="#84f29c")
@@ -266,7 +259,7 @@ class Toplevel1:
         self.Label8.configure(text='''Κινητό''')
 
         self.Label9 = tk.Label(top)
-        self.Label9.place(relx=0.568, rely=0.497, height=21, width=100)
+        self.Label9.place(relx=0.568, rely=0.497, height=21, relwidth=0.170)
         self.Label9.configure(activebackground="#f9f9f9")
         self.Label9.configure(activeforeground="black")
         self.Label9.configure(background="#84f29c")
@@ -278,7 +271,7 @@ class Toplevel1:
         self.Label9.configure(text='''Φαξ''')
 
         self.Label10 = tk.Label(top)
-        self.Label10.place(relx=0.568, rely=0.409, height=21, width=100)
+        self.Label10.place(relx=0.568, rely=0.409, height=21, relwidth=0.170)
         self.Label10.configure(activebackground="#f9f9f9")
         self.Label10.configure(activeforeground="black")
         self.Label10.configure(background="#84f29c")
@@ -347,7 +340,7 @@ class Toplevel1:
         self.place_entry.configure(selectforeground="black")
 
         self.Label13 = tk.Label(top)
-        self.Label13.place(relx=0.017, rely=0.614, height=21, width=144)
+        self.Label13.place(relx=0.017, rely=0.614, height=21, relwidth=0.244)
         self.Label13.configure(activebackground="#f9f9f9")
         self.Label13.configure(activeforeground="black")
         self.Label13.configure(background="#2f42f0")
@@ -359,7 +352,7 @@ class Toplevel1:
         self.Label13.configure(text='''Σελίδες Πακέτου''')
 
         self.Label14 = tk.Label(top)
-        self.Label14.place(relx=0.568, rely=0.614, height=21, width=100)
+        self.Label14.place(relx=0.568, rely=0.614, height=21, relwidth=0.170)
         self.Label14.configure(activebackground="#f9f9f9")
         self.Label14.configure(activeforeground="black")
         self.Label14.configure(background="#2f42f0")
@@ -401,7 +394,7 @@ class Toplevel1:
         self.package_cost_entry.configure(selectforeground="black")
 
         self.add_btn = tk.Button(top)
-        self.add_btn.place(relx=0.344, rely=0.750, height=34, width=194)
+        self.add_btn.place(relx=0.344, rely=0.750, height=34, relwidth=0.194)
         self.add_btn.configure(activebackground="#ececec")
         self.add_btn.configure(activeforeground="#000000")
         self.add_btn.configure(background="#800000")
@@ -418,7 +411,7 @@ class Toplevel1:
         self.TSeparator1.place(relx=0.017, rely=0.585, relwidth=0.955)
 
         self.Label11 = tk.Label(top)
-        self.Label11.place(relx=0.017, rely=0.058, height=21, width=558)
+        self.Label11.place(relx=0.017, rely=0.058, height=21, relwidth=0.558)
         self.Label11.configure(background="#2b6895")
         self.Label11.configure(disabledforeground="#a3a3a3")
         self.Label11.configure(foreground="#ffffff")
@@ -452,6 +445,8 @@ class Toplevel1:
         cursor.execute(sql_insert, tuple(data))
         conn.commit()
         conn.close()
+        messagebox.showinfo("Info", f"Ο πελάτης {self.company_name.get()} προστέθηκε επιτυχώς")
+        w.quit()
 
 
 if __name__ == '__main__':

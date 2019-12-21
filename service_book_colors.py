@@ -33,7 +33,7 @@ v 0.0.1 Ενας πελάτης με πολλά φωτοτυπικά το κάθ
 import service_book_colors_support
 from edit_service_window import *  # Δημιουργία παραθύρου επεξεργασίας ιστορικού επισκευής
 import add_customers  # Δημιουργία παραθύρου προσθήκης πελάτη
-from tkinter import StringVar, TclError
+from tkinter import StringVar, TclError, PhotoImage
 from add_service import *
 try:
     import Tkinter as tk
@@ -468,9 +468,13 @@ class Toplevel1:
         self.place_entry.configure(insertbackground="black")
         self.place_entry.configure(selectbackground="#c4c4c4")
         self.place_entry.configure(selectforeground="black")
+
+        self.TSeparator1 = ttk.Separator(top)
+        self.TSeparator1.place(relx=0.221, rely=0.355, relwidth=0.647)
+
         # Serial Number
         self.serial_label = tk.Label(top)
-        self.serial_label.place(relx=0.221, rely=0.356, height=21, relwidth=0.144)
+        self.serial_label.place(relx=0.221, rely=0.366, height=21, relwidth=0.144)
         self.serial_label.configure(activebackground="#f9f9f9")
         self.serial_label.configure(activeforeground="black")
         self.serial_label.configure(background="#808000")
@@ -481,7 +485,7 @@ class Toplevel1:
         self.serial_label.configure(relief="groove")
         self.serial_label.configure(text="Σειριακός αριθμός")
         self.serial_entry = tk.Entry(top)
-        self.serial_entry.place(relx=0.386, rely=0.356, height=20, relwidth=0.2)
+        self.serial_entry.place(relx=0.386, rely=0.366, height=20, relwidth=0.2)
         self.serial_entry.configure(background="white")
         self.serial_entry.configure(disabledforeground="#a3a3a3")
         self.serial_entry.configure(font=("Calibri", 10))
@@ -493,7 +497,7 @@ class Toplevel1:
         self.serial_entry.configure(selectforeground="black")
         # Μετρητής Εναρξης
         self.Label12 = tk.Label(top)
-        self.Label12.place(relx=0.221, rely=0.456, height=21, relwidth=0.144)
+        self.Label12.place(relx=0.221, rely=0.466, height=21, relwidth=0.144)
         self.Label12.configure(activebackground="#808000")
         self.Label12.configure(activeforeground="black")
         self.Label12.configure(background="#808000")
@@ -504,7 +508,7 @@ class Toplevel1:
         self.Label12.configure(relief="groove")
         self.Label12.configure(text="Μετρητής Εναρξης")
         self.start_counter_entry = tk.Entry(top)
-        self.start_counter_entry.place(relx=0.386, rely=0.456, height=20, relwidth=0.2)
+        self.start_counter_entry.place(relx=0.386, rely=0.466, height=20, relwidth=0.2)
         self.start_counter_entry.configure(background="white")
         self.start_counter_entry.configure(disabledforeground="#a3a3a3")
         self.start_counter_entry.configure(font=("Calibri", 10))
@@ -516,7 +520,7 @@ class Toplevel1:
         self.start_counter_entry.configure(selectforeground="black")
         # Εναρξη
         self.Label11 = tk.Label(top)
-        self.Label11.place(relx=0.221, rely=0.406, height=21, relwidth=0.144)
+        self.Label11.place(relx=0.221, rely=0.416, height=21, relwidth=0.144)
         self.Label11.configure(activebackground="#f9f9f9")
         self.Label11.configure(activeforeground="black")
         self.Label11.configure(background="#808000")
@@ -527,7 +531,7 @@ class Toplevel1:
         self.Label11.configure(relief="groove")
         self.Label11.configure(text="Εναρξη")
         self.start_entry = tk.Entry(top)
-        self.start_entry.place(relx=0.386, rely=0.406, height=20, relwidth=0.2)
+        self.start_entry.place(relx=0.386, rely=0.416, height=20, relwidth=0.2)
         self.start_entry.configure(background="white")
         self.start_entry.configure(disabledforeground="#a3a3a3")
         self.start_entry.configure(font=("Calibri", 10))
@@ -632,7 +636,7 @@ class Toplevel1:
 
         # Προσθήκη ιστορικού φωτοτυπικού
         self.add_service_btn = tk.Button(top)
-        self.add_service_btn.place(relx=0.231, rely=0.556, height=21, relwidth=0.144)
+        self.add_service_btn.place(relx=0.221, rely=0.556, height=21, relwidth=0.144)
         self.add_service_btn.configure(activebackground="#808000")
         self.add_service_btn.configure(activeforeground="#000000")
         self.add_service_btn.configure(background="#808000")
@@ -642,21 +646,25 @@ class Toplevel1:
         self.add_service_btn.configure(highlightbackground="#d9d9d9")
         self.add_service_btn.configure(highlightcolor="black")
         self.add_service_btn.configure(pady="0")
-        # self.edit_service(True) είναι για να ορισει το self.add_new_service = True
-        # για διμιουρία νεου ιστορικού και όχι επεξεργασία
         self.add_service_btn.configure(command=self.add_service)
         self.add_service_btn.configure(text="Εισαγωγή ιστορικού")
         self.add_service_btn.configure(state="disabled")
 
+        self.refresh_btn = tk.Button(top)
+        self.refresh_btn.place(relx=0.381, rely=0.550, height=30, relwidth=0.030)
+        self.refresh_btn.configure(background="#006291")
+        self.refresh_img = PhotoImage(file="icons/refresh.png")
+        self.refresh_btn.configure(image=self.refresh_img)
+        self.refresh_btn.configure(command=lambda: (self.service_click(event=None)))
         # Πίνακας επισκευων
         self.service_treeview = ScrolledTreeView(top)
 
-        self.service_treeview.place(relx=0.232, rely=0.602, relheight=0.359, relwidth=0.64)
+        self.service_treeview.place(relx=0.221, rely=0.602, relheight=0.359, relwidth=0.647)
         self.service_treeview.configure(show="headings", style="mystyle.Treeview")
         self.service_treeview.bind("<Double-1>", self.edit_service)
 
         self.TSeparator1 = ttk.Separator(top)
-        self.TSeparator1.place(relx=0.231, rely=0.521, relwidth=0.638)
+        self.TSeparator1.place(relx=0.221, rely=0.521, relwidth=0.647)
 
         self.Label16 = tk.Label(top)
         self.Label16.place(relx=0.425, rely=0.556, height=21, relwidth=0.314)
@@ -765,6 +773,7 @@ class Toplevel1:
         var = StringVar(root, value=customers_data[0][12])
         self.package_cost_entry.configure(textvariable=var)
 
+
     # Εμφάνισει ιστορικού επισκευών επιλεγμένου φωτοτυπικού
     def service_click(self, event):
         """
@@ -774,7 +783,8 @@ class Toplevel1:
         """
 
         # Ενεργοποιηση του κουμπιου προσθήκης ιστορικού
-        self.add_service_btn.configure(state="active")
+        if event:
+            self.add_service_btn.configure(state="active")
         self.add_service_btn.configure(activebackground="#808000")
         self.add_service_btn.configure(activeforeground="white")
         # αδιάζουμε πρώτα το tree του ιστορικού
@@ -890,7 +900,7 @@ class Toplevel1:
         selected_service_id = (self.service_treeview.set(self.service_treeview.selection(), "#1"))
 
         # Αυτή είναι συνάρτηση του αρχείου edi_service_windows
-        create_edit_service_window(root, selected_service_id, False)
+        create_edit_service_window(root, selected_service_id)
 
     def add_service(self):
         selecteted_copier_id = (self.copiers_treeview.set(self.copiers_treeview.selection(), "#1"))
