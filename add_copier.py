@@ -201,9 +201,10 @@ class add_copier_window:
         self.TSeparator1 = ttk.Separator(top)
         self.TSeparator1.place(relx=0.025, rely=0.553, relwidth=0.938)
 
+        self.serial = StringVar()
         self.selial_entry = tk.Entry(top)
-        self.selial_entry.place(relx=0.27, rely=0.248, height=30
-                                , relwidth=0.593)
+        self.selial_entry.place(relx=0.27, rely=0.248, height=30, relwidth=0.593)
+        self.selial_entry.configure(textvariable=self.serial)
         self.selial_entry.configure(background="white")
         self.selial_entry.configure(disabledforeground="#a3a3a3")
         self.selial_entry.configure(font="TkFixedFont")
@@ -214,9 +215,10 @@ class add_copier_window:
         self.selial_entry.configure(selectbackground="#c4c4c4")
         self.selial_entry.configure(selectforeground="black")
 
+        self.notes = StringVar()
         self.notes_scrolledtext = ScrolledText(top)
-        self.notes_scrolledtext.place(relx=0.025, rely=0.649, relheight=0.25
-                                      , relwidth=0.941)
+        self.notes_scrolledtext.place(relx=0.025, rely=0.649, relheight=0.25, relwidth=0.941)
+        self.notes_scrolledtext.insert('1.0', self.notes.get())
         self.notes_scrolledtext.configure(background="white")
         self.notes_scrolledtext.configure(font="TkTextFont")
         self.notes_scrolledtext.configure(foreground="black")
@@ -228,6 +230,7 @@ class add_copier_window:
         self.notes_scrolledtext.configure(selectforeground="black")
         self.notes_scrolledtext.configure(wrap="none")
 
+        self.customer = StringVar()
         self.customer_combobox = ttk.Combobox(top)
         self.customer_combobox.place(relx=0.27, rely=0.477, relheight=0.057, relwidth=0.593)
         self.customer_combobox.configure(values=self.customers_list)
@@ -250,7 +253,7 @@ class add_copier_window:
         self.save_btn.configure(command=self.add_copier)
 
         self.Label2 = tk.Label(top)
-        self.Label2.place(relx=0.025, rely=0.019, height=31, width=384)
+        self.Label2.place(relx=0.025, rely=0.019, height=31, relwidth=0.938)
         self.Label2.configure(activebackground="#f9f9f9")
         self.Label2.configure(activeforeground="black")
         self.Label2.configure(background="#006291")
@@ -262,16 +265,20 @@ class add_copier_window:
         self.Label2.configure(relief="groove")
         self.Label2.configure(text='''Προσθήκη Φωτοτυπικού''')
 
+        self.start = StringVar()
         self.start_entry = tk.Entry(top)
         self.start_entry.place(relx=0.27, rely=0.324, height=30, relwidth=0.593)
+        self.start_entry.configure(textvariable=self.start)
         self.start_entry.configure(background="white")
         self.start_entry.configure(disabledforeground="#a3a3a3")
         self.start_entry.configure(font="TkFixedFont")
         self.start_entry.configure(foreground="#000000")
         self.start_entry.configure(insertbackground="black")
 
+        self.start_counter = StringVar()
         self.start_counter_entry = tk.Entry(top)
         self.start_counter_entry.place(relx=0.27, rely=0.401, height=30, relwidth=0.593)
+        self.start_counter_entry.configure(textvariable=self.start_counter)
         self.start_counter_entry.configure(background="white")
         self.start_counter_entry.configure(disabledforeground="#a3a3a3")
         self.start_counter_entry.configure(font="TkFixedFont")
@@ -308,7 +315,34 @@ class add_copier_window:
         pass
 
     def add_copier(self):
-        pass
+
+        # πρέπει πρώτα να πάρουμε το  ID του πελάτη για να το ορίσουμε στο φωτοτυπικό
+        conn = sqlite3.connect(dbase)
+        cursor = conn.cursor()
+        cursor.execute("SELECT ID FROM Πελάτες WHERE Επωνυμία_Επιχείρησης =?", (self.customer_combobox.get(),))
+        customer_id = cursor.fetchall()
+        # Δημιουργία culumns για τα φωτοτυπικά
+        cursor.execute("SELECT * FROM Φωτοτυπικά")
+        headers = list(map(lambda x: x[0], cursor.description))
+        culumns = ", ".join(headers)
+        values = []
+        for head in headers:
+            if head == "ID":
+                values.append("Null")
+            else:
+                values.append("?")
+        values = ", ".join(values)
+        print(values)
+
+        data = [self.company_combobox.get() + " " + self.model_combobox.get(), self.serial.get(), self.start.get(),
+                self.start_counter.get(), customer_id[0][0], self.notes_scrolledtext.get('1.0', 'end-1c')]
+        print(data)
+        sql_insert = "INSERT INTO Φωτοτυπικά (" + culumns + ")" + "VALUES(" + values + ");"
+        cursor.execute(sql_insert, tuple(data))
+        conn.commit()
+        conn.close()
+        messagebox.showinfo("Info", f"Το  {data[0]} προστέθηκε επιτυχώς στον πελάτη {self.customer_combobox.get()}")
+        return None
 
 
 # The following code is added to facilitate the Scrolled widgets you specified.

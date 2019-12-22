@@ -411,8 +411,8 @@ class Toplevel1:
         self.TSeparator1.place(relx=0.017, rely=0.585, relwidth=0.955)
 
         self.Label11 = tk.Label(top)
-        self.Label11.place(relx=0.017, rely=0.058, height=21, relwidth=0.558)
-        self.Label11.configure(background="#2b6895")
+        self.Label11.place(relx=0.017, rely=0.058, height=21, relwidth=0.955)
+        self.Label11.configure(background="brown")
         self.Label11.configure(disabledforeground="#a3a3a3")
         self.Label11.configure(foreground="#ffffff")
         self.Label11.configure(relief="ridge")
