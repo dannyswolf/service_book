@@ -6,7 +6,10 @@
 #    Dec 13, 2019 12:08:06 AM EET  platform: Windows NT
 
 """
-todo Εμφάνηση serial στην επεξεργασία ιστορικού
+V0.5.5 ==============================================================================================23/12/2019
+Αρχεία 1 change_customer
+Δυνατότητα μεταφοράς Φωτοτυπικού
+
 V0.4.4 ==============================================================================================22/12/2019
 Αρχεία 1 add_copier
 Δυνατότητα προσθήκης Φωτοτυπικού
@@ -44,7 +47,8 @@ import service_book_colors_support
 from edit_service_window import *  # Δημιουργία παραθύρου επεξεργασίας ιστορικού επισκευής
 import add_customers  # Δημιουργία παραθύρου προσθήκης πελάτη
 from tkinter import StringVar, TclError, PhotoImage
-import add_copier
+import add_copier  # Προσθήκη Φωτοτυπικού
+import change_customer
 from add_service import *
 
 try:
@@ -173,6 +177,7 @@ class Toplevel1:
         self.copier_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Φωτοτυπικά", menu=self.copier_menu)
         self.copier_menu.add_command(label="Προσθήκη φωτοτυπικού", command=self.add_copier)
+        self.copier_menu.add_command(label="Μεταφορά φωτοτυπικού", command=self.change_copier)
         #
         # self.info_menu = tk.Menu(self.menubar, tearoff=0)
         # self.menubar.add_cascade(label="Info", menu=self.info_menu)
@@ -572,7 +577,7 @@ class Toplevel1:
         self.start_entry.configure(selectforeground="black")
 
         self.update_btn = tk.Button(top)
-        self.update_btn.place(relx=0.870, rely=0.185, height=24, relwidth=0.100)
+        self.update_btn.place(relx=0.870, rely=0.045, height=220, relwidth=0.030)
         self.update_btn.configure(activebackground="#ececec")
         self.update_btn.configure(activeforeground="#000000")
         self.update_btn.configure(background="brown")
@@ -581,7 +586,8 @@ class Toplevel1:
         self.update_btn.configure(highlightbackground="#d9d9d9")
         self.update_btn.configure(highlightcolor="black")
         self.update_btn.configure(pady="0")
-        self.update_btn.configure(text='''Ενημέρωση''')
+        self.update_btn.configure(font=("Calibri", 12, "bold"))
+        self.update_btn.configure(text='''Ε\nν\nη\nμ\nέ\nρ\nω\nσ\nη''')
         self.update_btn.configure(command=self.update_customer)
 
         # Σημειώσεις
@@ -833,7 +839,6 @@ class Toplevel1:
         :return:
         """
 
-
         # Ενεργοποιηση του κουμπιου προσθήκης ιστορικού
         if event:
             self.add_service_btn.configure(state="active")
@@ -1050,6 +1055,11 @@ class Toplevel1:
         :return:
         """
         add_copier.create_add_copier_window(root)
+
+    # Μεταφορά φωτοτυπικού
+    def change_copier(self):
+
+        change_customer.create_add_copier_window(root)
 
 
     # ------------------------------------Events ---------------------------

@@ -111,6 +111,7 @@ class add_copier_window:
         top.configure(background="#006291")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
+        top.focus()
 
         self.company_label = tk.Label(top)
         self.company_label.place(relx=0.025, rely=0.095, height=31, relwidth=0.230)
