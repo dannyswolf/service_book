@@ -5,6 +5,8 @@
 #  in conjunction with Tcl version 8.6
 #    Dec 22, 2019 12:31:44 AM EET  platform: Windows NT
 
+
+
 import sys
 from tkinter import PhotoImage, messagebox, StringVar
 import sqlite3
@@ -102,7 +104,7 @@ class add_copier_window:
         [('selected', _compcolor), ('active', _ana2color)])
 
         self.company_list, self.model_list, self.customers_list = get_copiers_data()
-
+        self.top = top
         top.geometry("505x524+444+228")
         top.minsize(120, 1)
         top.maxsize(1604, 881)
@@ -111,6 +113,7 @@ class add_copier_window:
         top.configure(background="#006291")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
+        top.bind('<Escape>', self.quit)
         top.focus()
 
         self.company_label = tk.Label(top)
@@ -312,8 +315,46 @@ class add_copier_window:
         self.add_model_btn.configure(image=self.add_model_img)
         self.add_model_btn.configure(command=lambda: (self.add_company("Μοντέλο")))
 
+    def quit(self, event):
+        self.top.destroy()
+
     def add_company(self, company):
-        pass
+        if company == "Eταιρεία":
+            if self.company_combobox.get() != "" and self.company_combobox.get() in self.company_list:
+                messagebox.showinfo("Προσοχή", f"Το {self.company_combobox.get()} υπάρχει στην λίστα")
+                self.top.focus()
+                return None
+            elif self.company_combobox.get() != "":
+                self.company_list.append(self.company_combobox.get())
+                self.company_combobox.configure(values=self.company_list)
+                conn = sqlite3.connect(dbase)
+                cursor = conn.cursor()
+                # "INSERT INTO  " + table + "(" + culumns + ")" + "VALUES(NULL, ?, ?, ?, ?, ?, ?, ?);"
+                # INSERT INTO artists (name)VALUES('Bud Powell');
+                sql = "INSERT INTO Companies (Εταιρεία)VALUES(?);"
+                cursor.execute(sql, (self.company_combobox.get(),))
+                conn.commit()
+                cursor.close()
+                conn.close()
+                messagebox.showinfo("Info", f"H εταιρεία {self.company_combobox.get()} προστέθηκε επιτυχώς")
+                self.top.focus()
+        elif company == "Μοντέλο":
+            if self.model_combobox.get() != "" and self.model_combobox.get() in self.model_list:
+                messagebox.showinfo("Προσοχή", f"Το {self.model_combobox.get()} υπάρχει στην λίστα")
+                self.top.focus()
+                return None
+            elif self.model_combobox.get() != "":
+                self.model_list.append(self.model_combobox.get())
+                self.model_combobox.configure(values=self.model_list)
+                conn = sqlite3.connect(dbase)
+                cursor = conn.cursor()
+                sql = "INSERT INTO Companies(Μοντέλο)VALUES(?);"
+                cursor.execute(sql, (self.model_combobox.get(),))
+                conn.commit()
+                cursor.close()
+                conn.close()
+                messagebox.showinfo("Info", f"Το μοντέλο {self.model_combobox.get()} Προστέθηκε επιτυχώς")
+                self.top.focus()
 
     def add_copier(self):
 

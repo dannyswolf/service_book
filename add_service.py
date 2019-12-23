@@ -115,7 +115,7 @@ class add_service_window():
         self.style.configure('.', foreground=_fgcolor)
         self.style.configure('.', font="TkDefaultFont")
         self.style.map('.', background=[('selected', _compcolor), ('active', _ana2color)])
-
+        self.top = top
         top.geometry("655x650+443+54")
         top.minsize(120, 1)
         top.maxsize(1604, 881)
@@ -298,16 +298,17 @@ class add_service_window():
         w.destroy()
 
     def add_to_service_data(self, column):
-        global w
         # self.purpose_list, self.actions_list
         # self.purpose_combobox.get(), self.actions_combobox.get()
         if column == "Σκοπός":
             if self.purpose_combobox.get() != "" and self.purpose_combobox.get() in self.purpose_list:
                 w.focus()
                 messagebox.showinfo("Προσοχή", f"Το {self.purpose_combobox.get()} υπάρχει στην λίστα")
-
+                self.top.focus()
                 return None
             elif self.purpose_combobox.get() != "":
+                self.purpose_list.append(self.purpose_combobox.get())
+                self.purpose_combobox.configure(values=self.purpose_list)
                 conn = sqlite3.connect(dbase)
                 cursor = conn.cursor()
                 # "INSERT INTO  " + table + "(" + culumns + ")" + "VALUES(NULL, ?, ?, ?, ?, ?, ?, ?);"
@@ -317,13 +318,16 @@ class add_service_window():
                 conn.commit()
                 cursor.close()
                 conn.close()
-                messagebox.showinfo("Info", "Σκοπός προστέθηκε επιτυχώς")
-
+                messagebox.showinfo("Info", f"Ο σκοπός {self.purpose_combobox.get()} προστέθηκε επιτυχώς")
+                self.top.focus()
         elif column == "Ενέργειες":
             if self.actions_combobox.get() != "" and self.actions_combobox.get() in self.actions_list:
                 messagebox.showinfo("Προσοχή", f"Το {self.actions_combobox.get()} υπάρχει στην λίστα")
+                self.top.focus()
                 return None
             elif self.actions_combobox.get() != "":
+                self.actions_list.append(self.actions_combobox.get())
+                self.actions_combobox.configure(values=self.actions_list)
                 conn = sqlite3.connect(dbase)
                 cursor = conn.cursor()
                 sql = "INSERT INTO Service_data(Ενέργειες)VALUES(?);"
@@ -331,8 +335,8 @@ class add_service_window():
                 conn.commit()
                 cursor.close()
                 conn.close()
-                messagebox.showinfo("Info", "Ενέργεια Προστέθηκε επιτυχώς")
-
+                messagebox.showinfo("Info", f"H ενέργεια {self.actions_combobox.get()} Προστέθηκε επιτυχώς")
+                self.top.focus()
 
     # επεξεργασία δεδομένων
     def edit(self):
