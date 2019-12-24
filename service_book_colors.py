@@ -655,7 +655,7 @@ class Toplevel1:
         self.customer_search_entry.configure(font=("Calibri", 10))
         self.customer_search_entry.configure(foreground="#000000")
         self.customer_search_entry.configure(insertbackground="black")
-        self.customer_search_entry.bind('<Return>', self.search_customer(self.search_data))
+        self.customer_search_entry.bind('<Return>', self.search_customer)
 
         self.copier_search_btn = tk.Button(top)
         self.copier_search_btn.place(relx=0.022, rely=0.575, height=24, relwidth=0.188)
@@ -690,7 +690,7 @@ class Toplevel1:
         self.copier_search_entry.configure(font=("Calibri", 10))
         self.copier_search_entry.configure(foreground="#000000")
         self.copier_search_entry.configure(insertbackground="black")
-        self.copier_search_entry.bind('<Return>', self.search_copier(self.search_copier_data))
+        self.copier_search_entry.bind('<Return>', self.search_copier)
 
         # Προσθήκη ιστορικού φωτοτυπικού
         self.add_service_btn = tk.Button(top)
@@ -723,7 +723,7 @@ class Toplevel1:
         self.search_error_entry.configure(font=("Calibri", 10))
         self.search_error_entry.configure(foreground="#000000")
         self.search_error_entry.configure(insertbackground="black")
-        self.search_error_entry.bind('<Return>', self.search_error(self.search_errors_data))
+        self.search_error_entry.bind('<Return>', self.search_error)
         self.search_errors_btn = tk.Button(top)
         self.search_errors_btn.place(relx=0.660, rely=0.620, height=30, relwidth=0.030)
         self.search_errors_btn.configure(background="#006291")
@@ -749,7 +749,7 @@ class Toplevel1:
         self.Label16.configure(text='''Ιστορικό''')
 
     # Αναζήτηση σφαλμάτων
-    def search_error(self, data):
+    def search_error(self, event=None):
 
         if self.search_errors_data.get() != "":  # Αν έχουμε γράψει κάτι στην αναζήτηση στο search_errors_entry
 
@@ -973,7 +973,7 @@ class Toplevel1:
         # και επιλέγουμε μόνο το φωτοτυπικό που έχει επιλεξει ο χρηστης απο το ID του φωτοτυπικού ==> selected_item
         try:
             service_cursor.execute("SELECT * FROM " + self.customer_table + " CUSTOMERS INNER JOIN " +
-                                   self.copier_table +" COPIER ON CUSTOMERS.ID = COPIER.Πελάτη_ID WHERE COPIER.ID = "
+                                   self.copier_table + " COPIER ON CUSTOMERS.ID = COPIER.Πελάτη_ID WHERE COPIER.ID = "
                                    + selected_item)
         except sqlite3.OperationalError as error:
             messagebox.showwarning("Προσοχή", "Παρακαλω επιλέξτε πρώτα φωτοτυπικό για εμφάνιση ιστορικών")
@@ -1110,10 +1110,10 @@ class Toplevel1:
         create_add_service_window(root, selecteted_copier_id)
 
     # Αναζήτηση πελάτη
-    def search_customer(self, search_data):
+    def search_customer(self, event=None):
         """
             Αναζήτηση πελατών
-        :param search_data:
+        :param event:
         :return:
         """
 
@@ -1127,7 +1127,7 @@ class Toplevel1:
         for header in self.customers_headers:
             if header not in no_neded_headers:
                 search_headers.append(header + " LIKE ?")
-                operators.append('%' + str(search_data.get()) + '%')
+                operators.append('%' + str(self.search_data.get()) + '%')
         search_headers = " OR ".join(search_headers)
         # ΕΤΑΙΡΕΙΑ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
 
@@ -1145,10 +1145,10 @@ class Toplevel1:
             self.customers_treeview.insert("", "end", values=fetch[n])
 
     # Αναζήτηση φωτοτυπικού
-    def search_copier(self, search_data):
+    def search_copier(self, event=None):
         """
             Αναζήτηση φωτοτυπικού
-        :param search_data:
+        :param event:
         :return:
         """
 
@@ -1166,7 +1166,7 @@ class Toplevel1:
         for header in self.copiers_headers:
             if header not in no_neded_headers:
                 search_headers.append(header + " LIKE ?")
-                operators.append('%' + str(search_data.get()) + '%')
+                operators.append('%' + str(self.search_copier_data.get()) + '%')
         search_headers = " OR ".join(search_headers)
         # ΕΤΑΙΡΕΙΑ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
 

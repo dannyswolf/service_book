@@ -112,6 +112,7 @@ class edit_service_window():
         self.style.configure('.', font="-family {Calibri} -size 10 -weight bold")
         self.style.map('.', background=[('selected', _compcolor), ('active', _ana2color)])
 
+        self.top = top
         top.geometry("455x479+443+234")
         top.minsize(120, 1)
         top.maxsize(1604, 881)
@@ -120,6 +121,8 @@ class edit_service_window():
         top.configure(background="#006291")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
+        top.bind('<Escape>', self.quit)
+        top.focus()
 
         # Εμφάνιση πελάτη
         self.customer_label = tk.Label(w)
@@ -133,7 +136,7 @@ class edit_service_window():
 
         # Εμφάνιση Φωτοτυπικού
         self.selected_copier_label = tk.Label(w)
-        self.selected_copier_label.place(relx=0.025, rely=0.150, height=25, relwidth=0.938)
+        self.selected_copier_label.place(relx=0.025, rely=0.160, height=25, relwidth=0.938)
         self.selected_copier_label.configure(activebackground="#f9f9f9")
         self.selected_copier_label.configure(background="#808000")
         self.selected_copier_label.configure(font="-family {Calibri} -size 10 -weight bold")
@@ -341,6 +344,9 @@ class edit_service_window():
         self.save_btn.configure(pady="2")
         self.save_btn.configure(text="Αποθήκευση")
         self.save_btn.configure(command=add_to_db)
+
+    def quit(self, event):
+        self.top.destroy()
 
 
 # The following code is added to facilitate the Scrolled widgets you specified.

@@ -429,7 +429,7 @@ class add_service_window():
                 selected_copier_data[0][1], curtomer_data[0][1]))
 
         self.save_btn = tk.Button(w)
-        self.save_btn.place(relx=0.296, rely=0.934, height=34, width=147)
+        self.save_btn.place(relx=0.396, rely=0.934, height=34, width=147)
         self.save_btn.configure(activebackground="#ececec")
         self.save_btn.configure(activeforeground="#000000")
         self.save_btn.configure(background="#808000")
