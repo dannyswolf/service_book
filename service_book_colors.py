@@ -149,7 +149,7 @@ class Toplevel1:
         top.minsize(120, 1)
         top.maxsize(1980, 1980)
         top.resizable(1, 1)
-        top.title("Βιβλίο Επισκευών V0.3.2")
+        top.title("Βιβλίο Επισκευών V0.5.6")
         top.configure(background="#006291")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
@@ -693,7 +693,7 @@ class Toplevel1:
 
         # Προσθήκη ιστορικού φωτοτυπικού
         self.add_service_btn = tk.Button(top)
-        self.add_service_btn.place(relx=0.221, rely=0.620, height=21, relwidth=0.144)
+        self.add_service_btn.place(relx=0.221, rely=0.620, height=30, relwidth=0.144)
         self.add_service_btn.configure(activebackground="#808000")
         self.add_service_btn.configure(activeforeground="#000000")
         self.add_service_btn.configure(background="#6b6b6b")
@@ -708,10 +708,27 @@ class Toplevel1:
 
         self.refresh_btn = tk.Button(top)
         self.refresh_btn.place(relx=0.381, rely=0.620, height=30, relwidth=0.030)
-        self.refresh_btn.configure(background="#6b6b6b")
+        self.refresh_btn.configure(background="#006291")
         self.refresh_img = PhotoImage(file="icons/refresh.png")
         self.refresh_btn.configure(image=self.refresh_img)
         self.refresh_btn.configure(command=lambda: (self.service_click(event=None)))
+
+        # Αναζήτηση σφαλμάτων
+        self.search_errors_data = StringVar()
+        self.search_error_entry = tk.Entry(top, textvariable=self.search_errors_data)
+        self.search_error_entry.place(relx=0.450, rely=0.620, height=30, relwidth=0.200)
+        self.search_error_entry.configure(background="white")
+        self.search_error_entry.configure(disabledforeground="#a3a3a3")
+        self.search_error_entry.configure(font=("Calibri", 10))
+        self.search_error_entry.configure(foreground="#000000")
+        self.search_error_entry.configure(insertbackground="black")
+        self.search_error_entry.bind('<Return>', self.search_error(self.search_errors_data))
+        self.search_errors_btn = tk.Button(top)
+        self.search_errors_btn.place(relx=0.660, rely=0.620, height=30, relwidth=0.030)
+        self.search_errors_btn.configure(background="#006291")
+        self.search_errors_img = PhotoImage(file="icons/search.png")
+        self.search_errors_btn.configure(image=self.search_errors_img)
+        self.search_errors_btn.configure(command=lambda: (self.search_error(self.search_errors_data)))
 
         # Πίνακας επισκευων
         self.service_treeview = ScrolledTreeView(top)
@@ -730,11 +747,87 @@ class Toplevel1:
         self.Label16.configure(relief="groove")
         self.Label16.configure(text='''Ιστορικό''')
 
+    # Αναζήτηση σφαλμάτων
+    def search_error(self, data):
+
+        if self.search_errors_data.get() != "":  # Αν έχουμε γράψει κάτι στην αναζήτηση στο search_errors_entry
+
+            # Αδειάζουμε το tree  δλδ το self.Scrolledtreeview
+            self.service_treeview.delete(*self.service_treeview.get_children())
+            # Σύνδεση με βάση
+            search_conn = sqlite3.connect(dbase)
+            search_cursor = search_conn.cursor()
+            # idea = SELECT * FROM tablename WHERE name or email or address or designation = 'λεξη αναζήτησεις';
+            # Να πάρουμε πρώτα κεφαλίδες
+            search_cursor.execute("SELECT * FROM Service")
+            headers = list(map(lambda x: x[0], search_cursor.description))
+
+            search_headers = []
+            no_neded_headers = ["id", "ID", "Id"]
+            operators = []
+            for header in headers:
+                if header not in no_neded_headers:
+                    search_headers.append(header + " LIKE ?")
+                    operators.append('%' + str(self.search_errors_data.get()) + '%')
+            search_headers = " OR ".join(search_headers)
+            # ΕΤΑΙΡΕΙΑ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
+
+            # search_cursor.execute("SELECT * FROM " + table + " WHERE \
+            # ΤΟΝΕΡ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
+            # ('%' + str(search_data.get()) + '%', '%' + str(search_data.get()) + '%', '%' + str(search_data.get())...
+
+            search_cursor.execute("SELECT * FROM Service WHERE " + search_headers, operators)
+            fetch = search_cursor.fetchall()
+
+            copiers_id = []
+            copiers = []
+            for n in range(len(fetch)):
+                copiers_id.append(fetch[n][-1])
+
+                search_cursor.execute("SELECT Εταιρεία FROM Φωτοτυπικά WHERE ID=?", (fetch[n][-1],))
+                copiers.append(search_cursor.fetchall())
+            print(copiers_id)
+            print(copiers)
+            self.service_treeview["columns"] = ["ID", "Ημερομηνία", "Φωτοτυπικό", "Σκοπός_Επίσκεψης", "Ενέργειες", "Σημειώσεις"]
+            headers = ["ID", "Ημερομηνία", "Φωτοτυπικό", "Σκοπός_Επίσκεψης", "Ενέργειες", "Σημειώσεις"]
+            for head in headers:
+                if head == "ID":
+                    platos = 1
+                elif head == "Ημερομηνία":
+                    platos = 100
+                elif head == "Σκοπός_Επίσκεψης":
+                    platos = 220
+                elif head == "Ενέργειες":
+                    platos = 180
+                elif head == "Σημειώσεις":
+                    platos = 320
+                elif head == "Φωτοτυπικό":
+                    platos = 200
+                elif head == "Επ_Service":
+                    platos = 110
+                else:
+                    platos = 50
+                self.service_treeview.heading(head, text=head, anchor="center")
+                self.service_treeview.column(head, width=platos, anchor="center")
+            data = []
+            for n in range(len(fetch)):
+                data.append(fetch[n][0])  # ID
+                data.append(fetch[n][1])  # Ημερωμηνία
+                data.append(str(copiers[n][0]))   # Φωτοτυπικό
+                data.append(fetch[n][2])  # Σκοπός
+                data.append(fetch[n][3])  # Ενέργειες
+                data.append(fetch[n][4])  # Σημειώσεις
+                self.service_treeview.insert("", "end", values=tuple(data))
+                data = []  # Αδιασμα του data για να εισάγουμε τα νέα δεδομένα
+
+            return None
+
     def quit(self, event):
 
         root.destroy()
 
         # ---------------------Fix -Of- Style------------------------------------
+
     def fixed_map(self, option):
         # Fix for setting text colour for Tkinter 8.6.9
         # From: https://core.tcl.tk/tk/info/509cafafae
@@ -830,7 +923,6 @@ class Toplevel1:
         var = StringVar(root, value=customers_data[0][12])
         self.package_cost_entry.configure(textvariable=var)
 
-
     # Εμφάνισει ιστορικού επισκευών επιλεγμένου φωτοτυπικού
     def service_click(self, event):
         """
@@ -842,8 +934,8 @@ class Toplevel1:
         # Ενεργοποιηση του κουμπιου προσθήκης ιστορικού
         if event:
             self.add_service_btn.configure(state="active")
-        self.add_service_btn.configure(activebackground="#808000")
-        self.add_service_btn.configure(activeforeground="white")
+            self.add_service_btn.configure(activebackground="#808000")
+            self.add_service_btn.configure(activeforeground="white")
         # αδιάζουμε πρώτα το tree του ιστορικού
         for i in self.service_treeview.get_children():
             self.service_treeview.delete(i)
@@ -855,8 +947,13 @@ class Toplevel1:
         # Απο τον πίνακα πελατών συνδέουμε τον πελάτι οπου το ID του πελάτη
         # είναι ιδιο με το  Πελάτη_ID του πίνακα φωτοτυπικά
         # και επιλέγουμε μόνο το φωτοτυπικό που έχει επιλεξει ο χρηστης απο το ID του φωτοτυπικού ==> selected_item
-        service_cursor.execute("SELECT * FROM " + self.customer_table + " CUSTOMERS INNER JOIN " + self.copier_table +
-                                 " COPIER ON CUSTOMERS.ID = COPIER.Πελάτη_ID WHERE COPIER.ID = " + selected_item)
+        try:
+            service_cursor.execute("SELECT * FROM " + self.customer_table + " CUSTOMERS INNER JOIN " +
+                                   self.copier_table +" COPIER ON CUSTOMERS.ID = COPIER.Πελάτη_ID WHERE COPIER.ID = "
+                                   + selected_item)
+        except sqlite3.OperationalError as error:
+            messagebox.showwarning("Προσοχή", "Παρακαλω επιλέξτε πρώτα φωτοτυπικό για εμφάνιση ιστορικών")
+            return None
         customers_data = service_cursor.fetchall()
         # εμφάνιση δεδομένων πελάτη στα entry δεξιά
         # todo πρέπει να γίνει σε for loop και να μπούν σε λίστα
@@ -1067,6 +1164,7 @@ class Toplevel1:
     def add_customer_event(self, event):
         self.add_customer()
 
+    # Ενημέρωση στοιχείων πελάτη
     def update_customer(self):
         if self.selected_customer_id == "":
             messagebox.showwarning("Σφάλμα", "Παρακαλώ πρώτα επιλέξτε πελάτη")
@@ -1092,6 +1190,7 @@ class Toplevel1:
         up_cursor.close()
         up_conn.close()
         messagebox.showinfo("Info", f"Τα στοιχεία του {self.company_name_entry.get()} ενημερώθηκαν επιτυχώς")
+
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):
     '''Configure the scrollbars for a widget.'''

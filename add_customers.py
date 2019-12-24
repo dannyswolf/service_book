@@ -67,7 +67,7 @@ class Toplevel1:
         self.style.configure('.', font="TkDefaultFont")
         self.style.map('.', background=
         [('selected', _compcolor), ('active', _ana2color)])
-
+        self.top = top
         top.geometry("581x400+480+276")
         top.minsize(120, 1)
         top.maxsize(1604, 881)
@@ -76,6 +76,8 @@ class Toplevel1:
         top.configure(background="#2b6895")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
+        top.bind('<Escape>', self.quit)
+        top.focus()
 
         self.Label1 = tk.Label(top)
         self.Label1.place(relx=0.017, rely=0.146, height=20, relwidth=0.244)
@@ -417,6 +419,9 @@ class Toplevel1:
         self.Label11.configure(foreground="#ffffff")
         self.Label11.configure(relief="ridge")
         self.Label11.configure(text='''Προσθήκη πελάτη''')
+
+    def quit(self, event):
+        self.top.destroy()
 
     def add_to_db(self):
         data = [self.company_name.get(), self.name.get(), self.address.get(), self.city.get(), self.post.get(),

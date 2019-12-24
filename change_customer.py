@@ -98,6 +98,7 @@ class add_copier_window:
 
         self.copiers, self.customers_list = get_copiers_data()
 
+        self.top = top
         top.geometry("505x524+444+228")
         top.minsize(120, 1)
         top.maxsize(1604, 881)
@@ -106,6 +107,7 @@ class add_copier_window:
         top.configure(background="#006291")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
+        top.bind('<Escape>', self.quit)
         top.focus()
 
         self.old_customer_label = tk.Label(top)
@@ -124,7 +126,7 @@ class add_copier_window:
         self.get_copiers_btn = tk.Button(top)
         self.get_copiers_btn.place(relx=0.885, rely=0.095, height=30, relwidth=0.060)
         self.get_copiers_btn.configure(background="#006291")
-        self.get_copiers_btn_btn_img1 = PhotoImage(file="icons/add_to_service_data1.png")
+        self.get_copiers_btn_btn_img1 = PhotoImage(file="icons/reload.png")
         self.get_copiers_btn.configure(image=self.get_copiers_btn_btn_img1)
         self.get_copiers_btn.configure(command=self.get_copier)
 
@@ -309,6 +311,9 @@ class add_copier_window:
         # self.add_model_btn.configure(image=self.add_model_img)
         # self.add_model_btn.configure(command=lambda: (self.add_company("Μοντέλο")))
 
+    def quit(self, event):
+        self.top.destroy()
+
     def get_copier(self):
         # να πάρουμε το id του πελάτη απο το ονομα του
         old_customer = self.customer_combobox.get()
@@ -323,6 +328,7 @@ class add_copier_window:
         copiers = cursor.fetchall()
         for n in range(len(copiers)):
             self.copiers.append(copiers[n][1])
+
         self.copiers_combobox.configure(values=copiers)
         con.close()
 
