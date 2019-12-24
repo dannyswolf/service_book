@@ -12,6 +12,8 @@ import edit_service_window_support
 
 dbase = "Service_book.db"
 selected_service_id = None
+selected_copier = None
+selected_customer = None
 try:
     import Tkinter as tk
 except ImportError:
@@ -59,8 +61,13 @@ w = None
 
 def create_edit_service_window(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
-    global w, w_win, rt, selected_service_id
-    selected_service_id = args[0]  # εδώ περνουμε το selected_service_id απο το service_book_colors.py
+    global w, w_win, rt, selected_service_id, selected_copier, selected_customer
+    selected_service_id = args[0]  # Επιλεγμένο Service  περνουμε το selected_service_id απο το service_book_colors.py
+    try:
+        selected_copier = args[1]      # Επιλεγμένο Φωτοτυπικό περνουμε το selected_copier απο το service_book_colors.py
+        selected_customer = args[2]    # Επιλεγμένο πελάτης περνουμε το selected_customer απο το service_book_colors.py
+    except IndexError as error:
+        pass
     rt = root
     w = tk.Toplevel(root)
     edit_service_window_support.set_Tk_var()
@@ -82,6 +89,8 @@ class edit_service_window():
            top is the toplevel containing window.'''
         # Αρχικοποιηση του selected_service_id σαν self.selected_service_id
         self.selected_service_id = selected_service_id
+        self.selected_copier = selected_copier
+        self.selecter_customer = selected_customer
         self.purpose_list, self.actions_list = get_service_data()
         self.culumns = None
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -100,10 +109,10 @@ class edit_service_window():
             self.style.theme_use('winnative')
         self.style.configure('.', background=_bgcolor)
         self.style.configure('.', foreground=_fgcolor)
-        self.style.configure('.', font="TkDefaultFont")
+        self.style.configure('.', font="-family {Calibri} -size 10 -weight bold")
         self.style.map('.', background=[('selected', _compcolor), ('active', _ana2color)])
 
-        top.geometry("405x479+443+234")
+        top.geometry("455x479+443+234")
         top.minsize(120, 1)
         top.maxsize(1604, 881)
         top.resizable(1, 1)
@@ -112,8 +121,28 @@ class edit_service_window():
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
 
+        # Εμφάνιση πελάτη
+        self.customer_label = tk.Label(w)
+        self.customer_label.place(relx=0.025, rely=0.100, height=25, relwidth=0.938)
+        self.customer_label.configure(activebackground="#f9f9f9")
+        self.customer_label.configure(background="brown")
+        self.customer_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.customer_label.configure(foreground="#ffffff")
+        self.customer_label.configure(relief="groove")
+        self.customer_label.configure(text=self.selecter_customer)
+
+        # Εμφάνιση Φωτοτυπικού
+        self.selected_copier_label = tk.Label(w)
+        self.selected_copier_label.place(relx=0.025, rely=0.150, height=25, relwidth=0.938)
+        self.selected_copier_label.configure(activebackground="#f9f9f9")
+        self.selected_copier_label.configure(background="#808000")
+        self.selected_copier_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.selected_copier_label.configure(foreground="#ffffff")
+        self.selected_copier_label.configure(relief="groove")
+        self.selected_copier_label.configure(text=self.selected_copier)
+        # Ημερωμηνία
         self.date_label = tk.Label(top)
-        self.date_label.place(relx=0.025, rely=0.104, height=31, width=131)
+        self.date_label.place(relx=0.025, rely=0.230, height=25, relwidth=0.331)
         self.date_label.configure(activebackground="#f9f9f9")
         self.date_label.configure(activeforeground="black")
         self.date_label.configure(background="#6b6b6b")
@@ -124,48 +153,16 @@ class edit_service_window():
         self.date_label.configure(highlightcolor="black")
         self.date_label.configure(relief="groove")
         self.date_label.configure(text='''Ημερομηνία''')
-
-        self.purpose_label = tk.Label(top)
-        self.purpose_label.place(relx=0.025, rely=0.251, height=31, width=131)
-        self.purpose_label.configure(activebackground="#f9f9f9")
-        self.purpose_label.configure(activeforeground="black")
-        self.purpose_label.configure(background="#6b6b6b")
-        self.purpose_label.configure(disabledforeground="#a3a3a3")
-        self.purpose_label.configure(font="-family {Calibri} -size 10 -weight bold")
-        self.purpose_label.configure(foreground="#ffffff")
-        self.purpose_label.configure(highlightbackground="#d9d9d9")
-        self.purpose_label.configure(highlightcolor="black")
-        self.purpose_label.configure(relief="groove")
-        self.purpose_label.configure(text='''Σκοπός επίσκεψης''')
-
-        self.actions_label = tk.Label(top)
-        self.actions_label.place(relx=0.025, rely=0.324, height=31, width=131)
-        self.actions_label.configure(activebackground="#f9f9f9")
-        self.actions_label.configure(activeforeground="black")
-        self.actions_label.configure(background="#6b6b6b")
-        self.actions_label.configure(disabledforeground="#a3a3a3")
-        self.actions_label.configure(font="-family {Calibri} -size 10 -weight bold")
-        self.actions_label.configure(foreground="#ffffff")
-        self.actions_label.configure(highlightbackground="#d9d9d9")
-        self.actions_label.configure(highlightcolor="black")
-        self.actions_label.configure(relief="groove")
-        self.actions_label.configure(text='''Ενέργειες''')
-
-        self.notes_label = tk.Label(top)
-        self.notes_label.place(relx=0.025, rely=0.522, height=31, width=131)
-        self.notes_label.configure(activebackground="#f9f9f9")
-        self.notes_label.configure(activeforeground="black")
-        self.notes_label.configure(background="#6b6b6b")
-        self.notes_label.configure(disabledforeground="#a3a3a3")
-        self.notes_label.configure(font=font11)
-        self.notes_label.configure(foreground="#ffffff")
-        self.notes_label.configure(highlightbackground="#d9d9d9")
-        self.notes_label.configure(highlightcolor="black")
-        self.notes_label.configure(relief="groove")
-        self.notes_label.configure(text='''Σημειώσεις''')
-
+        self.date_entry = tk.Entry(top)
+        self.date_entry.place(relx=0.37, rely=0.230, height=25, relwidth=0.331)
+        self.date_entry.configure(background="white")
+        self.date_entry.configure(disabledforeground="#a3a3a3")
+        self.date_entry.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.date_entry.configure(foreground="#000000")
+        self.date_entry.configure(insertbackground="black")
+        # Counter
         self.counter_label = tk.Label(top)
-        self.counter_label.place(relx=0.025, rely=0.18, height=31, width=131)
+        self.counter_label.place(relx=0.025, rely=0.310, height=25, relwidth=0.331)
         self.counter_label.configure(activebackground="#f9f9f9")
         self.counter_label.configure(activeforeground="black")
         self.counter_label.configure(background="#6b6b6b")
@@ -176,10 +173,58 @@ class edit_service_window():
         self.counter_label.configure(highlightcolor="black")
         self.counter_label.configure(relief="groove")
         self.counter_label.configure(text='''Μετρητής''')
+        self.counter_entry = tk.Entry(top)
+        self.counter_entry.place(relx=0.37, rely=0.310, height=25, relwidth=0.331)
+        self.counter_entry.configure(background="white")
+        self.counter_entry.configure(disabledforeground="#a3a3a3")
+        self.counter_entry.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.counter_entry.configure(foreground="#000000")
+        self.counter_entry.configure(highlightbackground="#d9d9d9")
+        self.counter_entry.configure(highlightcolor="black")
+        self.counter_entry.configure(insertbackground="black")
+        self.counter_entry.configure(selectbackground="#c4c4c4")
+        self.counter_entry.configure(selectforeground="black")
+        # Σκοπός
+        self.purpose_label = tk.Label(top)
+        self.purpose_label.place(relx=0.025, rely=0.390, height=25, relwidth=0.331)
+        self.purpose_label.configure(activebackground="#f9f9f9")
+        self.purpose_label.configure(activeforeground="black")
+        self.purpose_label.configure(background="#6b6b6b")
+        self.purpose_label.configure(disabledforeground="#a3a3a3")
+        self.purpose_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.purpose_label.configure(foreground="#ffffff")
+        self.purpose_label.configure(highlightbackground="#d9d9d9")
+        self.purpose_label.configure(highlightcolor="black")
+        self.purpose_label.configure(relief="groove")
+        self.purpose_label.configure(text='''Σκοπός επίσκεψης''')
+        self.purpose_combobox = ttk.Combobox(top)
+        self.purpose_combobox.place(relx=0.37, rely=0.390, relheight=0.053, relwidth=0.6)
+        self.purpose_combobox.configure(values=self.purpose_list)
+        # self.purpose_combobox.configure(textvariable=edit_service_window_support.combobox)
+        self.purpose_combobox.configure(takefocus="")
 
+        #Ενέργειες
+        self.actions_label = tk.Label(top)
+        self.actions_label.place(relx=0.025, rely=0.470, height=25, relwidth=0.331)
+        self.actions_label.configure(activebackground="#f9f9f9")
+        self.actions_label.configure(activeforeground="black")
+        self.actions_label.configure(background="#6b6b6b")
+        self.actions_label.configure(disabledforeground="#a3a3a3")
+        self.actions_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.actions_label.configure(foreground="#ffffff")
+        self.actions_label.configure(highlightbackground="#d9d9d9")
+        self.actions_label.configure(highlightcolor="black")
+        self.actions_label.configure(relief="groove")
+        self.actions_label.configure(text='''Ενέργειες''')
+        self.actions_combobox = ttk.Combobox(top)
+        self.actions_combobox.place(relx=0.37, rely=0.470, relheight=0.053, relwidth=0.6)
+        self.actions_combobox.configure(values=self.actions_list)
+        # self.actions_combobox.configure(textvariable=edit_service_window_support.combobox)
+        self.actions_combobox.configure(takefocus="")
+
+        # Επόμενο Service
         self.next_service_label = tk.Label(top)
-        self.next_service_label.place(relx=0.025, rely=0.397, height=31
-                                      , width=131)
+        self.next_service_label.place(relx=0.025, rely=0.550, height=25, relwidth=0.331)
         self.next_service_label.configure(activebackground="#f9f9f9")
         self.next_service_label.configure(activeforeground="black")
         self.next_service_label.configure(background="#6b6b6b")
@@ -190,34 +235,8 @@ class edit_service_window():
         self.next_service_label.configure(highlightcolor="black")
         self.next_service_label.configure(relief="groove")
         self.next_service_label.configure(text='''Επόμενο Service''')
-
-        self.TSeparator1 = ttk.Separator(top)
-        self.TSeparator1.place(relx=0.025, rely=0.501, relwidth=0.938)
-
-        self.date_entry = tk.Entry(top)
-        self.date_entry.place(relx=0.37, rely=0.104, height=30, relwidth=0.331)
-        self.date_entry.configure(background="white")
-        self.date_entry.configure(disabledforeground="#a3a3a3")
-        self.date_entry.configure(font="TkFixedFont")
-        self.date_entry.configure(foreground="#000000")
-        self.date_entry.configure(insertbackground="black")
-
-        self.counter_entry = tk.Entry(top)
-        self.counter_entry.place(relx=0.37, rely=0.177, height=30
-                                 , relwidth=0.331)
-        self.counter_entry.configure(background="white")
-        self.counter_entry.configure(disabledforeground="#a3a3a3")
-        self.counter_entry.configure(font="TkFixedFont")
-        self.counter_entry.configure(foreground="#000000")
-        self.counter_entry.configure(highlightbackground="#d9d9d9")
-        self.counter_entry.configure(highlightcolor="black")
-        self.counter_entry.configure(insertbackground="black")
-        self.counter_entry.configure(selectbackground="#c4c4c4")
-        self.counter_entry.configure(selectforeground="black")
-
         self.next_service_entry = tk.Entry(top)
-        self.next_service_entry.place(relx=0.37, rely=0.397, height=30
-                                      , relwidth=0.331)
+        self.next_service_entry.place(relx=0.37, rely=0.550, height=25, relwidth=0.331)
         self.next_service_entry.configure(background="white")
         self.next_service_entry.configure(disabledforeground="#a3a3a3")
         self.next_service_entry.configure(font="TkFixedFont")
@@ -228,9 +247,23 @@ class edit_service_window():
         self.next_service_entry.configure(selectbackground="#c4c4c4")
         self.next_service_entry.configure(selectforeground="black")
 
+        self.TSeparator1 = ttk.Separator(top)
+        self.TSeparator1.place(relx=0.025, rely=0.620, relwidth=0.938)
+        # Σημειώσεις
+        self.notes_label = tk.Label(top)
+        self.notes_label.place(relx=0.025, rely=0.650, height=20, relwidth=0.331)
+        self.notes_label.configure(activebackground="#f9f9f9")
+        self.notes_label.configure(activeforeground="black")
+        self.notes_label.configure(background="#6b6b6b")
+        self.notes_label.configure(disabledforeground="#a3a3a3")
+        self.notes_label.configure(font=font11)
+        self.notes_label.configure(foreground="#ffffff")
+        self.notes_label.configure(highlightbackground="#d9d9d9")
+        self.notes_label.configure(highlightcolor="black")
+        self.notes_label.configure(relief="groove")
+        self.notes_label.configure(text='''Σημειώσεις''')
         self.notes_scrolledtext = ScrolledText(top)
-        self.notes_scrolledtext.place(relx=0.025, rely=0.626, relheight=0.273
-                                      , relwidth=0.941)
+        self.notes_scrolledtext.place(relx=0.025, rely=0.700, relheight=0.200, relwidth=0.941)
         self.notes_scrolledtext.configure(background="white")
         self.notes_scrolledtext.configure(font="TkTextFont")
         self.notes_scrolledtext.configure(foreground="black")
@@ -242,30 +275,15 @@ class edit_service_window():
         self.notes_scrolledtext.configure(selectforeground="black")
         self.notes_scrolledtext.configure(wrap="none")
 
-        self.purpose_combobox = ttk.Combobox(top)
-        self.purpose_combobox.place(relx=0.37, rely=0.251, relheight=0.063
-                                    , relwidth=0.6)
-
-        self.purpose_combobox.configure(values=self.purpose_list)
-        # self.purpose_combobox.configure(textvariable=edit_service_window_support.combobox)
-        self.purpose_combobox.configure(takefocus="")
-
-        self.actions_combobox = ttk.Combobox(top)
-        self.actions_combobox.place(relx=0.37, rely=0.328, relheight=0.063
-                                    , relwidth=0.6)
-
-        self.actions_combobox.configure(values=self.actions_list)
-        # self.actions_combobox.configure(textvariable=edit_service_window_support.combobox)
-        self.actions_combobox.configure(takefocus="")
-
         self.Label2 = tk.Label(top)
-        self.Label2.place(relx=0.025, rely=0.021, height=31, width=384)
+        self.Label2.place(relx=0.025, rely=0.021, height=31, relwidth=0.938)
         self.Label2.configure(background="#006291")
         self.Label2.configure(disabledforeground="#a3a3a3")
         self.Label2.configure(font=font9)
         self.Label2.configure(foreground="#ffffff")
         self.Label2.configure(relief="groove")
         self.Label2.configure(text='''Επεξεργασία ιστορικού''')
+
         self.edit()
 
     # επεξεργασία δεδομένων
@@ -311,7 +329,7 @@ class edit_service_window():
             w.destroy()
 
         self.save_btn = tk.Button(w)
-        self.save_btn.place(relx=0.296, rely=0.914, height=34, width=147)
+        self.save_btn.place(relx=0.350, rely=0.914, height=34, width=147)
         self.save_btn.configure(activebackground="#ececec")
         self.save_btn.configure(activeforeground="#000000")
         self.save_btn.configure(background="#808000")

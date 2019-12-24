@@ -130,11 +130,12 @@ class Toplevel1:
         self.copier_table = "Φωτοτυπικά"
         self.selected_customer_id = ""
         self.selected_copier_id = ""
+        self.selected_customer = ""
+        self.selected_copier = ""
 
         self.customers_headers = []
         self.copiers_headers = []
         self.service_headers = []
-        self.add_new_service = False
 
         self.style = ttk.Style()
         if sys.platform == "win32":
@@ -639,7 +640,7 @@ class Toplevel1:
         self.customers_treeview.heading("ID", text="ID", anchor="w", )
         self.customers_treeview.column("ID", anchor="w", width=1)
         self.customers_treeview.configure(show="headings", style="mystyle.Treeview")
-        self.customers_treeview.bind("<Double-1>", self.view_copiers)
+        self.customers_treeview.bind("<<TreeviewSelect>>", self.view_copiers)
 
         self.get_customers()
         self.customers_treeview.place(relx=0.022, rely=0.090, relheight=0.457, relwidth=0.188)
@@ -678,7 +679,7 @@ class Toplevel1:
         self.copiers_treeview.heading("ID", text="ID", anchor="w", )
         self.copiers_treeview.column("ID", anchor="w", width="1")
         self.copiers_treeview.configure(show="headings", style="mystyle.Treeview")
-        self.copiers_treeview.bind("<Double-1>", self.service_click)
+        self.copiers_treeview.bind("<<TreeviewSelect>>", self.service_click)
 
         # Αναζήτηση φωτοτυπικού
         self.search_copier_data = StringVar()
@@ -734,7 +735,7 @@ class Toplevel1:
         self.service_treeview = ScrolledTreeView(top)
         self.service_treeview.place(relx=0.221, rely=0.675, relheight=0.300, relwidth=0.647)
         self.service_treeview.configure(show="headings", style="mystyle.Treeview")
-        self.service_treeview.bind("<Double-1>", self.edit_service)
+        self.service_treeview.bind("<<TreeviewSelect>>", self.edit_service)
 
         self.TSeparator1 = ttk.Separator(top)
         self.TSeparator1.place(relx=0.022, rely=0.565, relwidth=0.845)
@@ -777,19 +778,30 @@ class Toplevel1:
             # ('%' + str(search_data.get()) + '%', '%' + str(search_data.get()) + '%', '%' + str(search_data.get())...
 
             search_cursor.execute("SELECT * FROM Service WHERE " + search_headers, operators)
-            fetch = search_cursor.fetchall()
+            fetch = search_cursor.fetchall()  # Δεδομένα απο Service
 
             copiers_id = []
             copiers = []
+            customers_id = []
+            customers = []
             for n in range(len(fetch)):
                 copiers_id.append(fetch[n][-1])
 
                 search_cursor.execute("SELECT Εταιρεία FROM Φωτοτυπικά WHERE ID=?", (fetch[n][-1],))
-                copiers.append(search_cursor.fetchall())
-            print(copiers_id)
-            print(copiers)
-            self.service_treeview["columns"] = ["ID", "Ημερομηνία", "Φωτοτυπικό", "Σκοπός_Επίσκεψης", "Ενέργειες", "Σημειώσεις"]
-            headers = ["ID", "Ημερομηνία", "Φωτοτυπικό", "Σκοπός_Επίσκεψης", "Ενέργειες", "Σημειώσεις"]
+
+                copiers.append(search_cursor.fetchall())  # Πέρνουμε το Φωτοτυπικό
+
+                search_cursor.execute("SELECT Πελάτη_ID FROM Φωτοτυπικά WHERE ID=?", (copiers_id[n],))
+                customers_id.append(search_cursor.fetchall())  # Πέρνουμε τα ID των πελατών
+
+                search_cursor.execute("SELECT Επωνυμία_Επιχείρησης FROM Πελάτες WHERE ID=?", (customers_id[n][0][0],))
+                customers.append(search_cursor.fetchall())  # Πέρνουμε απο τον πελάτη το Επωνυμία_Επιχείρησης
+
+            search_cursor.close()
+            search_conn.close()
+            self.service_treeview["columns"] = ["ID", "Ημερομηνία", "Φωτοτυπικό", "Πελάτης", "Σκοπός_Επίσκεψης",
+                                                "Ενέργειες", "Σημειώσεις"]
+            headers = ["ID", "Ημερομηνία", "Φωτοτυπικό", "Πελάτης", "Σκοπός_Επίσκεψης", "Ενέργειες", "Σημειώσεις"]
             for head in headers:
                 if head == "ID":
                     platos = 1
@@ -805,6 +817,8 @@ class Toplevel1:
                     platos = 200
                 elif head == "Επ_Service":
                     platos = 110
+                elif head == "Πελάτης":
+                    platos = 200
                 else:
                     platos = 50
                 self.service_treeview.heading(head, text=head, anchor="center")
@@ -813,7 +827,8 @@ class Toplevel1:
             for n in range(len(fetch)):
                 data.append(fetch[n][0])  # ID
                 data.append(fetch[n][1])  # Ημερωμηνία
-                data.append(str(copiers[n][0]))   # Φωτοτυπικό
+                data.append(str(copiers[n][0][0]))   # Φωτοτυπικό
+                data.append(str(customers[n][0][0]))                   # Πελάτης
                 data.append(fetch[n][2])  # Σκοπός
                 data.append(fetch[n][3])  # Ενέργειες
                 data.append(fetch[n][4])  # Σημειώσεις
@@ -821,6 +836,8 @@ class Toplevel1:
                 data = []  # Αδιασμα του data για να εισάγουμε τα νέα δεδομένα
 
             return None
+        else:
+            return
 
     def quit(self, event):
 
@@ -860,6 +877,9 @@ class Toplevel1:
     def view_copiers(self, event):
         # Απενεργοποιηση του κουμπιου προσθήκης ιστορικού
         self.add_service_btn.configure(state="disabled")
+        self.add_service_btn.configure(background="#6b6b6b")
+        self.add_service_btn.configure(activebackground="#808000")
+        self.add_service_btn.configure(activeforeground="#000000")
         #  Αδιάζουμε πρώτα το tree των φωτοτυπικών
         for i in self.copiers_treeview.get_children():
             self.copiers_treeview.delete(i)
@@ -882,6 +902,8 @@ class Toplevel1:
         customers_cursor.execute("SELECT * FROM " + self.customer_table + " WHERE ID = ?", (selected_item,))
 
         customers_data = customers_cursor.fetchall()
+        # Οριζμός πελάτη
+        self.selected_customer = customers_data[0][1]
 
         # Ανάκτηση φωτοτυπικών απο τον επιλεγμένο πελάτη
         # τα φωτοτυπικά είναι το τελευταίο πεδίο του πίνακα πελάτη
@@ -933,9 +955,11 @@ class Toplevel1:
 
         # Ενεργοποιηση του κουμπιου προσθήκης ιστορικού
         if event:
-            self.add_service_btn.configure(state="active")
             self.add_service_btn.configure(activebackground="#808000")
             self.add_service_btn.configure(activeforeground="white")
+            self.add_service_btn.configure(state="active")
+            self.add_service_btn.configure(background="#808000")
+
         # αδιάζουμε πρώτα το tree του ιστορικού
         for i in self.service_treeview.get_children():
             self.service_treeview.delete(i)
@@ -957,6 +981,7 @@ class Toplevel1:
         customers_data = service_cursor.fetchall()
         # εμφάνιση δεδομένων πελάτη στα entry δεξιά
         # todo πρέπει να γίνει σε for loop και να μπούν σε λίστα
+        self.selected_customer = customers_data[0][1] # ορισμός πελάτη
         var = StringVar(root, value=customers_data[0][1])
         self.company_name_entry.configure(textvariable=var)
         var = StringVar(root, value=customers_data[0][2])
@@ -1053,11 +1078,32 @@ class Toplevel1:
         :param event:
         :return:
         """
+        # έλεγχος αν η λέξι Φωτοτυπικό υπάρχει στις κεφαλίδες τότε το tree εχει δημιουργιθεί απο την αναζήτηση
+        # των σφαλμάτων (search_error(self)) και στέλνουμε το Φωτοτυπικό και τον πελάτη απο το tree
+        # "#1" => id Service  "#3" -> Φωτοτυπικό "#4" -> Πελάτης
+        # Διαφορετικά στέλνουμε μόνο το selected_service_id
+        try:
+            heading = self.service_treeview.heading("#3", "text")
+        except TclError as error:
+            messagebox.showwarning("Προσοχή", "Παρακαλώ επιλεξτε πρώτα φωτοτυπικό")
+            return
 
         selected_service_id = (self.service_treeview.set(self.service_treeview.selection(), "#1"))
+        if heading == "Φωτοτυπικό":
+            selected_copier = (self.service_treeview.set(self.service_treeview.selection(), "#3"))
+            selected_customer = (self.service_treeview.set(self.service_treeview.selection(), "#4"))
+            # Αυτή είναι συνάρτηση του αρχείου edi_service_windows
+            create_edit_service_window(root, selected_service_id, selected_copier, selected_customer)
+        else:
+            if self.selected_copier_id:  # Αν ο χρήστης έχει επιλέξει φωτοτυπικό για να δεί το ιστορικό
+                con = sqlite3.connect(dbase)
+                cursor = con.cursor()
+                cursor.execute("SELECT Εταιρεία FROM Φωτοτυπικά WHERE ID=?", (self.selected_copier_id,))
+                copier = cursor.fetchall()  # Εδώ πέρνουμε το Φωτοτυπικό
+                selected_copier = copier[0][0]
 
-        # Αυτή είναι συνάρτηση του αρχείου edi_service_windows
-        create_edit_service_window(root, selected_service_id)
+                create_edit_service_window(root, selected_service_id, selected_copier, self.selected_customer)
+
 
     def add_service(self):
         selecteted_copier_id = (self.copiers_treeview.set(self.copiers_treeview.selection(), "#1"))
