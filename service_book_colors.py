@@ -766,7 +766,7 @@ class Toplevel1:
 
         # Πίνακας επισκευων
         self.service_treeview = ScrolledTreeView(top)
-        self.service_treeview.place(relx=0.221, rely=0.675, relheight=0.300, relwidth=0.647)
+        self.service_treeview.place(relx=0.221, rely=0.675, relheight=0.300, relwidth=0.760)
         self.service_treeview.configure(show="headings", style="mystyle.Treeview")
         self.service_treeview.bind("<<TreeviewSelect>>", self.edit_service)
 
@@ -812,8 +812,9 @@ class Toplevel1:
         conn.close()# Δεδομένα απο Service
         # Αδειάζουμε πρώτα το tree
         self.service_treeview.delete(*self.service_treeview.get_children())
+        # item[-2] ==> Copier_ID στον πίνακα Service
         for item in fetch:
-            if item[-1] == self.selected_copier_id:
+            if item[-2] == self.selected_copier_id:
                 self.service_treeview.insert("", "end", values=item)
 
     # Προβολή ισορικού μεταφοράς φωτοτυπικών
@@ -857,9 +858,9 @@ class Toplevel1:
             customers_id = []
             customers = []
             for n in range(len(fetch)):
-                copiers_id.append(fetch[n][-1])
+                copiers_id.append(fetch[n][-2])
 
-                search_cursor.execute("SELECT Εταιρεία FROM Φωτοτυπικά WHERE ID=?", (fetch[n][-1],))
+                search_cursor.execute("SELECT Εταιρεία FROM Φωτοτυπικά WHERE ID=?", (fetch[n][-2],))
 
                 copiers.append(search_cursor.fetchall())  # Πέρνουμε το Φωτοτυπικό
 
@@ -872,8 +873,8 @@ class Toplevel1:
             search_cursor.close()
             search_conn.close()
             self.service_treeview["columns"] = ["ID", "Ημερομηνία", "Φωτοτυπικό", "Πελάτης", "Σκοπός_Επίσκεψης",
-                                                "Ενέργειες", "Σημειώσεις"]
-            headers = ["ID", "Ημερομηνία", "Φωτοτυπικό", "Πελάτης", "Σκοπός_Επίσκεψης", "Ενέργειες", "Σημειώσεις"]
+                                                "Ενέργειες", "Σημειώσεις", "ΔΤΕ"]
+            headers = ["ID", "Ημερομηνία", "Φωτοτυπικό", "Πελάτης", "Σκοπός_Επίσκεψης", "Ενέργειες", "Σημειώσεις", "ΔΤΕ"]
             for head in headers:
                 if head == "ID":
                     platos = 1
@@ -884,13 +885,15 @@ class Toplevel1:
                 elif head == "Ενέργειες":
                     platos = 180
                 elif head == "Σημειώσεις":
-                    platos = 320
+                    platos = 275
                 elif head == "Φωτοτυπικό":
                     platos = 200
                 elif head == "Επ_Service":
                     platos = 110
                 elif head == "Πελάτης":
                     platos = 200
+                elif head == "ΔΤΕ":
+                    platos = 80
                 else:
                     platos = 50
                 self.service_treeview.heading(head, text=head, anchor="center")
@@ -904,6 +907,7 @@ class Toplevel1:
                 data.append(fetch[n][2])  # Σκοπός
                 data.append(fetch[n][3])  # Ενέργειες
                 data.append(fetch[n][4])  # Σημειώσεις
+                data.append(fetch[n][8])  # Δελτίο τεχνικής εξυπηρέτησεις
                 self.service_treeview.insert("", "end", values=tuple(data))
                 data = []  # Αδιασμα του data για να εισάγουμε τα νέα δεδομένα
 
@@ -970,6 +974,7 @@ class Toplevel1:
         self.copiers_title_label.configure(text="Στοιχεία φωτοτυπικού")
         self.copier_notes_scrolledtext.delete('1.0', 'end-1c')
         self.search_selected_copier_service_btn.configure(text="")
+        self.selected_copier_id = ""
 
         # το selected_item είναι το ID του πελάτη
         selected_item = (self.customers_treeview.set(self.customers_treeview.selection(), '#1'))
@@ -1133,11 +1138,11 @@ class Toplevel1:
         service_conn.close()
         columns = []
         # το τελευταίο πεδίο είναι το Copier_ID και δεν χρειάζεται να εμφανίζεται
-        for head in self.service_headers[:-1]:
+        for head in self.service_headers:
             columns.append(head)
 
         self.service_treeview["columns"] = [head for head in columns]
-        for head in self.service_headers[:-1]:
+        for head in self.service_headers:
             if head == "ID":
                 platos = 1
             elif head == "Ημερομηνία":
@@ -1147,11 +1152,13 @@ class Toplevel1:
             elif head == "Ενέργειες":
                 platos = 180
             elif head == "Σημειώσεις":
-                platos = 320
+                platos = 275
             elif head == "Μετρητής":
                 platos = 80
             elif head == "Επ_Service":
                 platos = 110
+            elif head == "ΔΤΕ":
+                platos = 70
             else:
                 platos = 50
             self.service_treeview.heading(head, text=head, anchor="center")
@@ -1272,6 +1279,27 @@ class Toplevel1:
         for n in range(len(fetch)):
             self.copiers_treeview.insert("", "end", values=fetch[n])
 
+        # Αδιάζουμε και Μετρητη έναρξης, έναρξη, σειριακό, σημειώσεις και κουμπί αναζήτησης
+        var = StringVar(root, value="")
+        self.start_counter_entry.configure(textvariable=var)
+        self.start_entry.configure(textvariable=var)
+        self.serial_entry.configure(textvariable=var)
+        self.copiers_title_label.configure(text="Στοιχεία φωτοτυπικού")
+        self.copier_notes_scrolledtext.delete('1.0', 'end-1c')
+        try:
+            self.service_treeview.delete(*self.service_treeview.get_children())
+            self.search_selected_copier_service_btn.configure(text="")
+            # Απενεργοποιηση του κουμπιου προσθήκης ιστορικού
+            self.add_service_btn.configure(state="disabled")
+            self.add_service_btn.configure(background="#6b6b6b")
+            self.add_service_btn.configure(activebackground="#808000")
+            self.add_service_btn.configure(activeforeground="#000000")
+        except AttributeError as error:  # στην πρώτη εκκινηση δεν τα εχει φτιάξει και πετάει error
+            pass
+        self.selected_copier_id = ""
+
+        return
+
 
     # Προσθήκη πελάτη
     def add_customer(self):
@@ -1315,7 +1343,8 @@ class Toplevel1:
                     self.city_entry.get(),
                     self.post_code_entry.get(), self.place_entry.get(), self.phone_entry.get(), self.mobile_entry.get(),
                     self.fax_entry.get(), self.email_entry.get(), self.page_package_entry.get(),
-                    self.package_cost_entry.get() + " €", self.selected_customer_id]
+                    self.package_cost_entry.get() + " €" if " €" not in self.package_cost_entry.get() else
+                    self.package_cost_entry.get(), self.selected_customer_id]
 
         up_conn = sqlite3.connect(dbase)
         up_cursor = up_conn.cursor()

@@ -52,6 +52,7 @@ def get_copiers_data():
     cursor.close()
     conn.close()
 
+
     return sorted(company_list), sorted(model_list), sorted(customers_list)
 
 
@@ -302,6 +303,7 @@ class add_copier_window:
         self.company_combobox.place(relx=0.27, rely=0.095, relheight=0.059, relwidth=0.593)
         self.company_combobox.configure(values=self.company_list)
         self.company_combobox.configure(takefocus="")
+        self.company_combobox.bind('<<ComboboxSelected>>', self.company_callback)
 
         self.model_combobox = ttk.Combobox(top)
         self.model_combobox.place(relx=0.27, rely=0.172, relheight=0.053, relwidth=0.593)
@@ -314,6 +316,10 @@ class add_copier_window:
         self.add_model_img = PhotoImage(file="icons/add_to_service_data2.png")
         self.add_model_btn.configure(image=self.add_model_img)
         self.add_model_btn.configure(command=lambda: (self.add_company("Μοντέλο")))
+
+    def company_callback(self, event=None):
+        print("File add_copier.py Line 323 Επιλεγμένη εταιρεία", self.company_combobox.get())
+
 
     def quit(self, event):
         self.top.destroy()
@@ -374,11 +380,21 @@ class add_copier_window:
             else:
                 values.append("?")
         values = ", ".join(values)
-        print(values)
 
-        data = [self.company_combobox.get() + " " + self.model_combobox.get(), self.serial.get(), self.start.get(),
+        # Ελεγχος αν εχουμε σημπληρώσει τα απαρέτητα πεδία
+        if self.company_combobox.get() == "" or self.model_combobox.get() == "" or self.serial.get() == "":
+            messagebox.showwarning("Προσοχή", "Παρακαλώ Επιλέξτε \n1.Eταιρεία, \n2.Mοντέλο "
+                                              "\n3.Eισάγεται σειριακό αριθμό \n4.Επιλέξτε πελάτη")
+            self.top.focus()
+            return
+        try:
+            data = [self.company_combobox.get() + " " + self.model_combobox.get(), self.serial.get(), self.start.get(),
                 self.start_counter.get(), customer_id[0][0], self.notes_scrolledtext.get('1.0', 'end-1c')]
-        print(data)
+        except IndexError as error:  # βγάζει error το customer_id[0][0] αν δεν επιλεξουμε πελάτη
+            messagebox.showwarning("Προσοχή", "Παρακαλώ \n4.Επιλέξτε πελάτη")
+            self.top.focus()
+            return
+
         sql_insert = "INSERT INTO Φωτοτυπικά (" + culumns + ")" + "VALUES(" + values + ");"
         cursor.execute(sql_insert, tuple(data))
         conn.commit()
