@@ -349,7 +349,12 @@ class add_service_window():
         selected_copier_data = cursor.fetchall()
         cursor.close()
         conn.close()
-        customer_id = selected_copier_data[0][5]
+        try:
+            customer_id = selected_copier_data[0][5]
+        except IndexError as error:
+            self.top.destroy()
+            messagebox.showwarning("Προσοχή", "Παρακαλώ επιλέξτε φωτοτυπικό")
+            return
         conn = sqlite3.connect(dbase)
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM Πελάτες WHERE ID = ?", (customer_id,))

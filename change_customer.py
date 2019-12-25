@@ -282,6 +282,7 @@ class add_copier_window:
         self.customer_combobox.place(relx=0.27, rely=0.095, relheight=0.059, relwidth=0.593)
         self.customer_combobox.configure(values=self.customers_list)
         self.customer_combobox.configure(takefocus="")
+        self.customer_combobox.bind("<<ComboboxSelected>>", self.get_copier)
 
         self.new_customer_combobox = ttk.Combobox(top)
         self.new_customer_combobox.place(relx=0.27, rely=0.324, relheight=0.059, relwidth=0.593)
@@ -333,7 +334,7 @@ class add_copier_window:
     def quit(self, event):
         self.top.destroy()
 
-    def get_copier(self):
+    def get_copier(self, event=None):
         # να πάρουμε το id του πελάτη απο το ονομα του
         old_customer = self.customer_combobox.get()
         old_customer_id = old_customer[0]
@@ -361,7 +362,8 @@ class add_copier_window:
         cursor = con.cursor()
         # ("UPDATE Service  SET " + edited_culumns + " WHERE ID=? ", (tuple(data_to_add)))
         cursor.execute("UPDATE Φωτοτυπικά SET Πελάτη_ID =? WHERE ID=? ", (new_customer_id, copier_id))
-        con.commit()
+
+        # con.commit()
         # Ενημέρωση Copiers_Log στορικού μεταφοράς Φωοτυπικού
         # Δημιουργία culumns για τO Copiers_Log
         cursor.execute("SELECT * FROM Copiers_Log")
@@ -378,10 +380,20 @@ class add_copier_window:
         # self.customer_combobox.get() => παλιός πελάτης
         data = [copier_id, self.copiers_combobox.get(), today, self.customer_combobox.get(),
                 self.new_customer_combobox.get(), self.notes_scrolledtext.get('1.0', 'end-1c')]
-        print("\n\n",data)
+
+
         sql_insert = "INSERT INTO Copiers_Log (" + culumns + ")" + "VALUES(" + values + ");"
         cursor.execute(sql_insert, tuple(data))
+        con.commit()
 
+        # Να πάρουμε τις σημειώσεις για να προσθέσουμε το πότε αλλαξε πελάτη το φωτοτυπικό
+        old_customer = self.customer_combobox.get()
+        notes = self.notes_scrolledtext.get("1.0", "end-1c")
+        cursor.execute("SELECT Σημειώσεις FROM Φωτοτυπικά WHERE ID=?", (copier_id,))
+        old_notes = cursor.fetchall()
+
+        data_for_copiers_notes = old_notes[0][0] + today + " Μεταφορά απο " + old_customer + " στο(ν) " + new_customer + " " + notes
+        cursor.execute("UPDATE Φωτοτυπικά SET  Σημειώσεις =? WHERE ID =?", (data_for_copiers_notes, copier_id))
         con.commit()
         con.close()
         messagebox.showwarning("Επιτυχής μεταφορά", f"To {self.copiers_combobox.get()} μεταφέρθηκε επιτυχώς στον πελάτη"

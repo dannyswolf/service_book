@@ -505,6 +505,7 @@ class Toplevel1:
         self.copiers_title_label.configure(background="#808000")
         self.copiers_title_label.configure(disabledforeground="#a3a3a3")
         self.copiers_title_label.configure(foreground="#ffffff")
+        self.copiers_title_label.configure(font=("Calibri", 11, "bold"))
         self.copiers_title_label.configure(relief="groove")
         self.copiers_title_label.configure(text="Στοιχεία φωτοτυπικού")
 
@@ -732,12 +733,13 @@ class Toplevel1:
         self.search_selected_copier_service_label.configure(activebackground="#f9f9f9")
         self.search_selected_copier_service_label.configure(activeforeground="black")
         self.search_selected_copier_service_label.configure(background="#6b6b6b")
+        self.search_selected_copier_service_label.configure(font=("Calibri", 10, "bold"))
         self.search_selected_copier_service_label.configure(disabledforeground="#a3a3a3")
         self.search_selected_copier_service_label.configure(foreground="#ffffff")
         self.search_selected_copier_service_label.configure(highlightbackground="#d9d9d9")
         self.search_selected_copier_service_label.configure(highlightcolor="black")
         self.search_selected_copier_service_label.configure(relief="groove")
-        self.search_selected_copier_service_label.configure(text="Αναζήτηση ιστορικού επιλεγμένου φωτοτυπικού")
+        # self.search_selected_copier_service_label.configure(text="Αναζήτηση ιστορικού στο  " + self.selected_copier)
         self.search_selected_copier_service_data = StringVar()
         self.search_selected_copier_service_entry = tk.Entry(top, textvariable=self.search_selected_copier_service_data)
         self.search_selected_copier_service_entry.place(relx=0.530, rely=0.630, height=20, relwidth=0.105)
@@ -1050,6 +1052,7 @@ class Toplevel1:
             self.add_service_btn.configure(state="active")
             self.add_service_btn.configure(background="#808000")
 
+
         # αδιάζουμε πρώτα το tree του ιστορικού
         for i in self.service_treeview.get_children():
             self.service_treeview.delete(i)
@@ -1057,6 +1060,10 @@ class Toplevel1:
         selected_item = (self.copiers_treeview.set(self.copiers_treeview.selection(), '#1'))
         # Αρχικοποιήση επιλεγμένου φωτοτυπικού
         self.selected_copier = (self.copiers_treeview.set(self.copiers_treeview.selection(), "#2"))
+
+        # Εμφάνηση επιλεγμένου φωτοτυπικού
+        self.copiers_title_label.configure(text=self.selected_copier)
+        self.search_selected_copier_service_label.configure(text="Αναζήτηση  στο  " + self.selected_copier)
         service_conn = sqlite3.connect(dbase)
         service_cursor = service_conn.cursor()
         # πρώτα να πάρουμε τα δεδομένα του πελάτη
@@ -1128,7 +1135,7 @@ class Toplevel1:
                 continue
         # todo να μπεί και αυτό στο JOIN απο πάνω το WHERE ID = ? ειναι ιδιο με το Copier_ID
         # εμάνιση των εγγραφών συντήρησεις του επιλεγμένου φωτοτυπικού
-        service_cursor.execute("SELECT * FROM " + self.service_table + " WHERE Copier_ID = ?", (selected_item[0][-1]))
+        service_cursor.execute("SELECT * FROM " + self.service_table + " WHERE Copier_ID = ?", (selected_item,))
         service_data = service_cursor.fetchall()
 
         self.service_headers = list(map(lambda x: x[0], service_cursor.description))
@@ -1195,7 +1202,6 @@ class Toplevel1:
                 copier = cursor.fetchall()  # Εδώ πέρνουμε το Φωτοτυπικό
                 selected_copier = copier[0][0]
 
-
                 create_edit_service_window(root, selected_service_id, selected_copier, self.selected_customer)
 
     def add_service(self):
@@ -1237,6 +1243,7 @@ class Toplevel1:
         for n in range(len(fetch)):
             self.customers_treeview.insert("", "end", values=fetch[n])
 
+
     # Αναζήτηση φωτοτυπικού
     def search_copier(self, event=None):
         """
@@ -1274,6 +1281,7 @@ class Toplevel1:
         # Κατασκευή tree το up_index -1 == το τελος ("end")
         for n in range(len(fetch)):
             self.copiers_treeview.insert("", "end", values=fetch[n])
+
 
     # Προσθήκη πελάτη
     def add_customer(self):
@@ -1344,7 +1352,6 @@ class Toplevel1:
             if head not in not_needed_header:
                 headers.append(head + " = ?")
         culumns = ", ".join(headers)
-        print(culumns)
         new_data = [self.serial_entry.get(), self.start_entry.get(), self.start_counter_entry.get(),
                     self.selected_customer_id, self.copier_notes_scrolledtext.get("1.0", "end-1c"),
                     self.selected_copier_id]
