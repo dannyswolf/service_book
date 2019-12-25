@@ -6,6 +6,11 @@
 #    Dec 13, 2019 12:08:06 AM EET  platform: Windows NT
 
 """
+todo αναζήτηση στο copiers_log
+V0.6.4 Προσθήκη copiers_log  ========================================================================25/12/2019
+Αρχεία 1 copiers_log
+Δυνατότητα προβολής μεταφοράς Φωτοτυπικού
+
 V0.6.3 Fixed some bug on search with self.service_treeview ==========================================25/12/2019
 
 V0.6.2 Προσθήκη ΔΤΕ, ελεγχος κατα την εισαγωγη φωτοτυπικού και αλλαγές στην εμφάνηση ================25/12/2019
@@ -54,6 +59,7 @@ from tkinter import StringVar, TclError, PhotoImage
 import add_copier  # Προσθήκη Φωτοτυπικού
 import change_customer
 from add_service import *
+import copiers_log
 
 try:
     import Tkinter as tk
@@ -154,7 +160,7 @@ class Toplevel1:
         top.minsize(120, 1)
         top.maxsize(1980, 1980)
         top.resizable(1, 1)
-        top.title("Βιβλίο Επισκευών V0.5.6")
+        top.title("Βιβλίο Επισκευών V0.6.4")
         top.configure(background="#006291")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
@@ -192,7 +198,7 @@ class Toplevel1:
 
         top.configure(menu=self.menubar)
 
-        # # # Modify the font of the body
+        #  Modify the font of the body
         self.style.theme_create("mystyle.Treeview", parent="winnative")
         self.style.configure("mystyle.Treeview.Heading", background="gray5", foreground="#006291", relief="groove")
         self.style.map('mystyle.Treeview', foreground=self.fixed_map('foreground'),
@@ -802,7 +808,7 @@ class Toplevel1:
         no_neded_headers = ["id", "ID", "Id"]
         operators = []
         for header in self.service_headers:
-            print(header)
+
             if header not in no_neded_headers:
                 search_headers.append(header + " LIKE ?")
                 operators.append('%' + str(data_to_search) + '%')
@@ -849,13 +855,13 @@ class Toplevel1:
             self.service_treeview.column(head, width=platos, anchor="center")
         # item[-2] ==> Copier_ID στον πίνακα Service
         for item in fetch:
-            print(item)
+
             if item[-2] == self.selected_copier_id:
                 self.service_treeview.insert("", "end", values=item)
 
     # Προβολή ισορικού μεταφοράς φωτοτυπικών
     def get_copiers_log(self, event=None):
-        pass
+        copiers_log.create_Toplevel1(root)
 
     # Αναζήτηση σφαλμάτων
     def search_error(self, event=None):
