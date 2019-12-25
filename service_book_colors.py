@@ -6,6 +6,8 @@
 #    Dec 13, 2019 12:08:06 AM EET  platform: Windows NT
 
 """
+V0.6.3 Fixed some bug on search with self.service_treeview ==========================================25/12/2019
+
 V0.6.2 Προσθήκη ΔΤΕ, ελεγχος κατα την εισαγωγη φωτοτυπικού και αλλαγές στην εμφάνηση ================25/12/2019
 
 V0.5.5 ==============================================================================================23/12/2019
@@ -789,18 +791,18 @@ class Toplevel1:
         self.Label16.configure(text='''Ιστορικό''')
 
     def search_selected_copier_service(self, event=None):
-
+        if not self.selected_copier_id:
+            messagebox.showwarning("Προσοχή", "Παρακαλώ επιλεξτε πρώτα φωτοτυπικό")
+            return
+        # Αδειάζουμε πρώτα το tree
+        self.service_treeview.delete(*self.service_treeview.get_children())
         data_to_search = self.search_selected_copier_service_data.get()
-
-        conn = sqlite3.connect(dbase)
-        cusror = conn.cursor()
-        cusror.execute("SELECT * FROM Service")  # Για να πάρουμε τις κεφαλίδες
-        headers = list(map(lambda x: x[0], cusror.description))
 
         search_headers = []
         no_neded_headers = ["id", "ID", "Id"]
         operators = []
-        for header in headers:
+        for header in self.service_headers:
+            print(header)
             if header not in no_neded_headers:
                 search_headers.append(header + " LIKE ?")
                 operators.append('%' + str(data_to_search) + '%')
@@ -814,13 +816,40 @@ class Toplevel1:
         # Αναζήτηση σε ολο το Service και αν το [-1] είναι ισο με το επιλεγμένο φωτοτυπικό δλδ
         # ελεγχουμε να πάρουμε τα δεδομένα του Service μόνο για το επιλεγμένο Φωτοτυπικό
         #
+        conn = sqlite3.connect(dbase)
+        cusror = conn.cursor()
         cusror.execute("SELECT * FROM Service WHERE " + search_headers, operators)
-        fetch = cusror.fetchall()
-        conn.close()# Δεδομένα απο Service
-        # Αδειάζουμε πρώτα το tree
-        self.service_treeview.delete(*self.service_treeview.get_children())
+        fetch = cusror.fetchall()  # Δεδομένα απο Service
+        conn.close()
+        columns = []
+        for head in self.service_headers:
+            columns.append(head)
+
+        self.service_treeview["columns"] = [head for head in columns]
+        for head in self.service_headers:
+            if head == "ID":
+                platos = 1
+            elif head == "Ημερομηνία":
+                platos = 100
+            elif head == "Σκοπός_Επίσκεψης":
+                platos = 220
+            elif head == "Ενέργειες":
+                platos = 180
+            elif head == "Σημειώσεις":
+                platos = 275
+            elif head == "Μετρητής":
+                platos = 80
+            elif head == "Επ_Service":
+                platos = 110
+            elif head == "ΔΤΕ":
+                platos = 70
+            else:
+                platos = 50
+            self.service_treeview.heading(head, text=head, anchor="center")
+            self.service_treeview.column(head, width=platos, anchor="center")
         # item[-2] ==> Copier_ID στον πίνακα Service
         for item in fetch:
+            print(item)
             if item[-2] == self.selected_copier_id:
                 self.service_treeview.insert("", "end", values=item)
 
