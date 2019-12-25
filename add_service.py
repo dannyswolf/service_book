@@ -5,7 +5,7 @@
 #  in conjunction with Tcl version 8.6
 #    Dec 16, 2019 11:26:05 PM EET  platform: Windows NT
 """
-V0.3.2 Προσθήκη αυτόματης ημερωμηνίας
+V0.3.2 Προσθήκη αυτόματης Ημερομηνίας
 
 """
 import sys

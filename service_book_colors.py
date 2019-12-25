@@ -20,7 +20,7 @@ V0.3.4 =========================================================================
 3. Ενημέρωση στοιχείων πελάτη στο κεντρικό παράθυρο
 
 Αρχεία 1 add_service  == >> Παράθυρο προσθήκης επισκευής
-V0.3.2 V0.3.2 Προσθήκη αυτόματης ημερωμηνίας στην προσθήκη ιστορικού επισκευών ========================20/12/2019
+V0.3.2 V0.3.2 Προσθήκη αυτόματης Ημερομηνίας στην προσθήκη ιστορικού επισκευών ========================20/12/2019
 
 Αρχεία 1. add_service  == >> Παράθυρο προσθήκης επισκευής
 V 0.3.1 Εισαγωγή επισκευής σε νέο παράθυρο ====================================================== Εγινε 18/12/2019
@@ -146,7 +146,7 @@ class Toplevel1:
         self.style.map('.',background=
             [('selected', _compcolor), ('active',_ana2color)])
 
-        top.geometry("1024x768+150+50")
+        top.geometry("1324x768+150+50")
         top.minsize(120, 1)
         top.maxsize(1980, 1980)
         top.resizable(1, 1)
@@ -156,6 +156,7 @@ class Toplevel1:
         top.configure(highlightcolor="black")
         top.bind('<F1>', self.add_customer_event)
         top.bind('<Escape>', self.quit)
+        top.bind('<F2>', self.add_copier)
         top.iconbitmap("icons/icon.ico")
 
         # ---------------------------------------Menu-----------------------------------------
@@ -177,8 +178,9 @@ class Toplevel1:
         #
         self.copier_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Φωτοτυπικά", menu=self.copier_menu)
-        self.copier_menu.add_command(label="Προσθήκη φωτοτυπικού", command=self.add_copier)
+        self.copier_menu.add_command(label="Προσθήκη φωτοτυπικού -> F2", command=self.add_copier)
         self.copier_menu.add_command(label="Μεταφορά φωτοτυπικού", command=self.change_copier)
+        self.copier_menu.add_command(label="Ιστορικό Μεταφορών", command=self.get_copiers_log)
         #
         # self.info_menu = tk.Menu(self.menubar, tearoff=0)
         # self.menubar.add_cascade(label="Info", menu=self.info_menu)
@@ -207,7 +209,6 @@ class Toplevel1:
         self.customer_title_label.configure(foreground="#ffffff")
         self.customer_title_label.configure(relief="groove")
         self.customer_title_label.configure(text="Στοιχεία Πελάτη")
-
 
         self.company_label = tk.Label(top)
         self.company_label.place(relx=0.221, rely=0.045, height=20, relwidth=0.144)
@@ -577,19 +578,19 @@ class Toplevel1:
         self.start_entry.configure(selectbackground="#c4c4c4")
         self.start_entry.configure(selectforeground="black")
 
-        self.update_btn = tk.Button(top)
-        self.update_btn.place(relx=0.870, rely=0.045, height=220, relwidth=0.030)
-        self.update_btn.configure(activebackground="#ececec")
-        self.update_btn.configure(activeforeground="#000000")
-        self.update_btn.configure(background="brown")
-        self.update_btn.configure(disabledforeground="#a3a3a3")
-        self.update_btn.configure(foreground="#ffffff")
-        self.update_btn.configure(highlightbackground="#d9d9d9")
-        self.update_btn.configure(highlightcolor="black")
-        self.update_btn.configure(pady="0")
-        self.update_btn.configure(font=("Calibri", 12, "bold"))
-        self.update_btn.configure(text='''Ε\nν\nη\nμ\nέ\nρ\nω\nσ\nη''')
-        self.update_btn.configure(command=self.update_customer)
+        self.update_customer_btn = tk.Button(top)
+        self.update_customer_btn.place(relx=0.870, rely=0.045, height=220, relwidth=0.030)
+        self.update_customer_btn.configure(activebackground="#ececec")
+        self.update_customer_btn.configure(activeforeground="#000000")
+        self.update_customer_btn.configure(background="brown")
+        self.update_customer_btn.configure(disabledforeground="#a3a3a3")
+        self.update_customer_btn.configure(foreground="#ffffff")
+        self.update_customer_btn.configure(highlightbackground="#d9d9d9")
+        self.update_customer_btn.configure(highlightcolor="black")
+        self.update_customer_btn.configure(pady="0")
+        self.update_customer_btn.configure(font=("Calibri", 12, "bold"))
+        self.update_customer_btn.configure(text='''Ε\nν\nη\nμ\nέ\nρ\nω\nσ\nη''')
+        self.update_customer_btn.configure(command=self.update_customer)
 
         # Σημειώσεις
         self.notes_label = tk.Label(top)
@@ -603,19 +604,33 @@ class Toplevel1:
         self.notes_label.configure(highlightcolor="black")
         self.notes_label.configure(relief="groove")
         self.notes_label.configure(text="Σημειώσεις")
-
-        self.notes_scrolledtext = ScrolledText(top)
-        self.notes_scrolledtext.place(relx=0.600, rely=0.446, relheight=0.080, relwidth=0.265)
-        self.notes_scrolledtext.configure(background="white")
-        self.notes_scrolledtext.configure(font="TkTextFont")
-        self.notes_scrolledtext.configure(foreground="black")
-        self.notes_scrolledtext.configure(highlightbackground="#d9d9d9")
-        self.notes_scrolledtext.configure(highlightcolor="black")
-        self.notes_scrolledtext.configure(insertbackground="black")
-        self.notes_scrolledtext.configure(insertborderwidth="3")
-        self.notes_scrolledtext.configure(selectbackground="#c4c4c4")
-        self.notes_scrolledtext.configure(selectforeground="black")
-        self.notes_scrolledtext.configure(wrap="none")
+        # Σημειώσεις Φωτοτυπικού
+        self.copier_notes_scrolledtext = ScrolledText(top)
+        self.copier_notes_scrolledtext.place(relx=0.600, rely=0.446, relheight=0.080, relwidth=0.265)
+        self.copier_notes_scrolledtext.configure(background="white")
+        self.copier_notes_scrolledtext.configure(font="TkTextFont")
+        self.copier_notes_scrolledtext.configure(foreground="black")
+        self.copier_notes_scrolledtext.configure(highlightbackground="#d9d9d9")
+        self.copier_notes_scrolledtext.configure(highlightcolor="black")
+        self.copier_notes_scrolledtext.configure(insertbackground="black")
+        self.copier_notes_scrolledtext.configure(insertborderwidth="3")
+        self.copier_notes_scrolledtext.configure(selectbackground="#c4c4c4")
+        self.copier_notes_scrolledtext.configure(selectforeground="black")
+        self.copier_notes_scrolledtext.configure(wrap="none")
+        # Ενημέρωση φωτοτυπικού
+        self.update_copier_btn = tk.Button(top)
+        self.update_copier_btn.place(relx=0.870, rely=0.355, height=150, relwidth=0.030)
+        self.update_copier_btn.configure(activebackground="#ececec")
+        self.update_copier_btn.configure(activeforeground="#000000")
+        self.update_copier_btn.configure(background="#808000")
+        self.update_copier_btn.configure(disabledforeground="#a3a3a3")
+        self.update_copier_btn.configure(foreground="#ffffff")
+        self.update_copier_btn.configure(highlightbackground="#d9d9d9")
+        self.update_copier_btn.configure(highlightcolor="black")
+        self.update_copier_btn.configure(pady="0")
+        self.update_copier_btn.configure(font=("Calibri", 10, "bold"))
+        self.update_copier_btn.configure(text='''Ε\nν\nη\nμ\nέ\nρ\nω\nσ\nη''')
+        self.update_copier_btn.configure(command=self.update_copier)
 
         self.customer_search_btn = tk.Button(top)
         self.customer_search_btn.place(relx=0.022, rely=0.006, height=24, relwidth=0.188)
@@ -647,7 +662,6 @@ class Toplevel1:
 
         # Αναζήτηση πελάτη
         self.search_data = StringVar()
-
         self.customer_search_entry = tk.Entry(top, textvariable=self.search_data)
         self.customer_search_entry.place(relx=0.022, rely=0.045, height=19, relwidth=0.188)
         self.customer_search_entry.configure(background="white")
@@ -669,7 +683,6 @@ class Toplevel1:
         self.copier_search_btn.configure(pady="0")
         self.copier_search_btn.configure(command=lambda: self.search_copier(self.search_copier_data))
         self.copier_search_btn.configure(text="Αναζήτηση Φωτοτυπικού")
-
         # Πίνακας φωτοτυπικών
         self.copiers_treeview = ScrolledTreeView(top)
         self.copiers_treeview.place(relx=0.022, rely=0.675, relheight=0.300, relwidth=0.188)
@@ -691,7 +704,7 @@ class Toplevel1:
         self.copier_search_entry.configure(foreground="#000000")
         self.copier_search_entry.configure(insertbackground="black")
         self.copier_search_entry.bind('<Return>', self.search_copier)
-
+        self.search_copier()  # Εμφάνιση όλων των φωτοτυπικών κατα την εκκίνηση
         # Προσθήκη ιστορικού φωτοτυπικού
         self.add_service_btn = tk.Button(top)
         self.add_service_btn.place(relx=0.221, rely=0.620, height=30, relwidth=0.144)
@@ -706,18 +719,56 @@ class Toplevel1:
         self.add_service_btn.configure(command=self.add_service)
         self.add_service_btn.configure(text="Εισαγωγή ιστορικού")
         self.add_service_btn.configure(state="disabled")
-
+        # Ανανέωση μετα απο εισαγωγεί ιστορικού
         self.refresh_btn = tk.Button(top)
         self.refresh_btn.place(relx=0.381, rely=0.620, height=30, relwidth=0.030)
         self.refresh_btn.configure(background="#006291")
         self.refresh_img = PhotoImage(file="icons/refresh.png")
         self.refresh_btn.configure(image=self.refresh_img)
         self.refresh_btn.configure(command=lambda: (self.service_click(event=None)))
+        # Αναζήτηση στο επιλεγμένο φωτοτυπικό
+        self.search_selected_copier_service_label = tk.Label(top)
+        self.search_selected_copier_service_label.place(relx=0.430, rely=0.605, height=15, relwidth=0.280)
+        self.search_selected_copier_service_label.configure(activebackground="#f9f9f9")
+        self.search_selected_copier_service_label.configure(activeforeground="black")
+        self.search_selected_copier_service_label.configure(background="#6b6b6b")
+        self.search_selected_copier_service_label.configure(disabledforeground="#a3a3a3")
+        self.search_selected_copier_service_label.configure(foreground="#ffffff")
+        self.search_selected_copier_service_label.configure(highlightbackground="#d9d9d9")
+        self.search_selected_copier_service_label.configure(highlightcolor="black")
+        self.search_selected_copier_service_label.configure(relief="groove")
+        self.search_selected_copier_service_label.configure(text="Αναζήτηση ιστορικού επιλεγμένου φωτοτυπικού")
+        self.search_selected_copier_service_data = StringVar()
+        self.search_selected_copier_service_entry = tk.Entry(top, textvariable=self.search_selected_copier_service_data)
+        self.search_selected_copier_service_entry.place(relx=0.530, rely=0.630, height=20, relwidth=0.105)
+        self.search_selected_copier_service_entry.configure(background="white")
+        self.search_selected_copier_service_entry.configure(disabledforeground="#a3a3a3")
+        self.search_selected_copier_service_entry.configure(font=("Calibri", 10))
+        self.search_selected_copier_service_entry.configure(foreground="#000000")
+        self.search_selected_copier_service_entry.configure(insertbackground="black")
+        self.search_selected_copier_service_entry.bind('<Return>', self.search_selected_copier_service)
+        self.search_selected_copier_service_btn = tk.Button(top)
+        self.search_selected_copier_service_btn.place(relx=0.640, rely=0.630, height=30, relwidth=0.030)
+        self.search_selected_copier_service_btn.configure(background="#006291")
+        self.search_search_selected_copier_service_img = PhotoImage(file="icons/search.png")
+        self.search_selected_copier_service_btn.configure(image=self.search_search_selected_copier_service_img)
+        self.search_selected_copier_service_btn.configure(command=self.search_selected_copier_service)
 
         # Αναζήτηση σφαλμάτων
+        self.search_errors_label = tk.Label(top)
+        self.search_errors_label.place(relx=0.730, rely=0.605, height=15, relwidth=0.140)
+        self.search_errors_label.configure(activebackground="#f9f9f9")
+        self.search_errors_label.configure(activeforeground="black")
+        self.search_errors_label.configure(background="#6b6b6b")
+        self.search_errors_label.configure(disabledforeground="#a3a3a3")
+        self.search_errors_label.configure(foreground="#ffffff")
+        self.search_errors_label.configure(highlightbackground="#d9d9d9")
+        self.search_errors_label.configure(highlightcolor="black")
+        self.search_errors_label.configure(relief="groove")
+        self.search_errors_label.configure(text="Αναζήτηση Ιστορικών")
         self.search_errors_data = StringVar()
         self.search_error_entry = tk.Entry(top, textvariable=self.search_errors_data)
-        self.search_error_entry.place(relx=0.450, rely=0.620, height=30, relwidth=0.200)
+        self.search_error_entry.place(relx=0.730, rely=0.630, height=20, relwidth=0.105)
         self.search_error_entry.configure(background="white")
         self.search_error_entry.configure(disabledforeground="#a3a3a3")
         self.search_error_entry.configure(font=("Calibri", 10))
@@ -725,7 +776,7 @@ class Toplevel1:
         self.search_error_entry.configure(insertbackground="black")
         self.search_error_entry.bind('<Return>', self.search_error)
         self.search_errors_btn = tk.Button(top)
-        self.search_errors_btn.place(relx=0.660, rely=0.620, height=30, relwidth=0.030)
+        self.search_errors_btn.place(relx=0.840, rely=0.630, height=30, relwidth=0.030)
         self.search_errors_btn.configure(background="#006291")
         self.search_errors_img = PhotoImage(file="icons/search.png")
         self.search_errors_btn.configure(image=self.search_errors_img)
@@ -738,7 +789,7 @@ class Toplevel1:
         self.service_treeview.bind("<<TreeviewSelect>>", self.edit_service)
 
         self.TSeparator1 = ttk.Separator(top)
-        self.TSeparator1.place(relx=0.022, rely=0.565, relwidth=0.845)
+        self.TSeparator1.place(relx=0.022, rely=0.555, relwidth=0.845)
 
         self.Label16 = tk.Label(top)
         self.Label16.place(relx=0.221, rely=0.575, height=21, relwidth=0.647)
@@ -748,12 +799,51 @@ class Toplevel1:
         self.Label16.configure(relief="groove")
         self.Label16.configure(text='''Ιστορικό''')
 
+    def search_selected_copier_service(self, event=None):
+
+        data_to_search = self.search_selected_copier_service_data.get()
+
+        conn = sqlite3.connect(dbase)
+        cusror = conn.cursor()
+        cusror.execute("SELECT * FROM Service")  # Για να πάρουμε τις κεφαλίδες
+        headers = list(map(lambda x: x[0], cusror.description))
+
+        search_headers = []
+        no_neded_headers = ["id", "ID", "Id"]
+        operators = []
+        for header in headers:
+            if header not in no_neded_headers:
+                search_headers.append(header + " LIKE ?")
+                operators.append('%' + str(data_to_search) + '%')
+        search_headers = " OR ".join(search_headers)
+        # ΕΤΑΙΡΕΙΑ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
+
+        # search_cursor.execute("SELECT * FROM " + table + " WHERE \
+        # ΤΟΝΕΡ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
+        # ('%' + str(search_data.get()) + '%', '%' + str(search_data.get()) + '%', '%' + str(search_data.get())...
+
+        # Αναζήτηση σε ολο το Service και αν το [-1] είναι ισο με το επιλεγμένο φωτοτυπικό δλδ
+        # ελεγχουμε να πάρουμε τα δεδομένα του Service μόνο για το επιλεγμένο Φωτοτυπικό
+        #
+        cusror.execute("SELECT * FROM Service WHERE " + search_headers, operators)
+        fetch = cusror.fetchall()
+        conn.close()# Δεδομένα απο Service
+        # Αδειάζουμε πρώτα το tree
+        self.service_treeview.delete(*self.service_treeview.get_children())
+        for item in fetch:
+            if item[-1] == self.selected_copier_id:
+                self.service_treeview.insert("", "end", values=item)
+
+    # Προβολή ισορικού μεταφοράς φωτοτυπικών
+    def get_copiers_log(self, event=None):
+        pass
+
     # Αναζήτηση σφαλμάτων
     def search_error(self, event=None):
 
         if self.search_errors_data.get() != "":  # Αν έχουμε γράψει κάτι στην αναζήτηση στο search_errors_entry
 
-            # Αδειάζουμε το tree  δλδ το self.Scrolledtreeview
+            # Αδειάζουμε το tree  δλδ το self.service_treeview
             self.service_treeview.delete(*self.service_treeview.get_children())
             # Σύνδεση με βάση
             search_conn = sqlite3.connect(dbase)
@@ -826,7 +916,7 @@ class Toplevel1:
             data = []
             for n in range(len(fetch)):
                 data.append(fetch[n][0])  # ID
-                data.append(fetch[n][1])  # Ημερωμηνία
+                data.append(fetch[n][1])  # Ημερομηνία
                 data.append(str(copiers[n][0][0]))   # Φωτοτυπικό
                 data.append(str(customers[n][0][0]))                   # Πελάτης
                 data.append(fetch[n][2])  # Σκοπός
@@ -965,6 +1055,8 @@ class Toplevel1:
             self.service_treeview.delete(i)
         # selected_item είναι το ID (Το πρώτο στοιχείο του tree ==>> "#1") του πίνακα
         selected_item = (self.copiers_treeview.set(self.copiers_treeview.selection(), '#1'))
+        # Αρχικοποιήση επιλεγμένου φωτοτυπικού
+        self.selected_copier = (self.copiers_treeview.set(self.copiers_treeview.selection(), "#2"))
         service_conn = sqlite3.connect(dbase)
         service_cursor = service_conn.cursor()
         # πρώτα να πάρουμε τα δεδομένα του πελάτη
@@ -981,7 +1073,8 @@ class Toplevel1:
         customers_data = service_cursor.fetchall()
         # εμφάνιση δεδομένων πελάτη στα entry δεξιά
         # todo πρέπει να γίνει σε for loop και να μπούν σε λίστα
-        self.selected_customer = customers_data[0][1] # ορισμός πελάτη
+        self.selected_customer_id = customers_data[0][0]    # ορισμός ID πελάτη
+        self.selected_customer = customers_data[0][1]       # ορισμός πελάτη
         var = StringVar(root, value=customers_data[0][1])
         self.company_name_entry.configure(textvariable=var)
         var = StringVar(root, value=customers_data[0][2])
@@ -1029,8 +1122,8 @@ class Toplevel1:
                 var = StringVar(root, value=copiers[n][4])  # Μετρητής έναρξης
                 self.start_counter_entry.configure(textvariable=var)
                 var = StringVar(root, value=copiers[n][6])  # Σημειώσεις
-                self.notes_scrolledtext.delete('1.0', 'end-1c')
-                self.notes_scrolledtext.insert("1.0", var.get())
+                self.copier_notes_scrolledtext.delete('1.0', 'end-1c')
+                self.copier_notes_scrolledtext.insert("1.0", var.get())
             else:
                 continue
         # todo να μπεί και αυτό στο JOIN απο πάνω το WHERE ID = ? ειναι ιδιο με το Copier_ID
@@ -1102,8 +1195,8 @@ class Toplevel1:
                 copier = cursor.fetchall()  # Εδώ πέρνουμε το Φωτοτυπικό
                 selected_copier = copier[0][0]
 
-                create_edit_service_window(root, selected_service_id, selected_copier, self.selected_customer)
 
+                create_edit_service_window(root, selected_service_id, selected_copier, self.selected_customer)
 
     def add_service(self):
         selecteted_copier_id = (self.copiers_treeview.set(self.copiers_treeview.selection(), "#1"))
@@ -1191,7 +1284,7 @@ class Toplevel1:
         add_customers.create_Toplevel1(root)
 
     # Προσθήκη Φωτοτυπικού
-    def add_copier(self):
+    def add_copier(self, event=None):
         """ Προσθήκη φωτοτυπικού
         Καλει την συνάρτηση create_Topelevel1 του αρχείου add_copier
 
@@ -1203,7 +1296,6 @@ class Toplevel1:
     def change_copier(self):
 
         change_customer.create_add_copier_window(root)
-
 
     # ------------------------------------Events ---------------------------
     # Προσθήκη πελάτη event
@@ -1220,13 +1312,13 @@ class Toplevel1:
             if head != "ID":
                 headers.append(head + " = ?")
         culumns = ", ".join(headers)
-        print(culumns)
+
         new_data = [self.company_name_entry.get(), self.name_entry.get(), self.address_entry.get(),
                     self.city_entry.get(),
                     self.post_code_entry.get(), self.place_entry.get(), self.phone_entry.get(), self.mobile_entry.get(),
                     self.fax_entry.get(), self.email_entry.get(), self.page_package_entry.get(),
-                    self.package_cost_entry.get(), self.selected_customer_id]
-        print(new_data)
+                    self.package_cost_entry.get() + " €", self.selected_customer_id]
+
         up_conn = sqlite3.connect(dbase)
         up_cursor = up_conn.cursor()
         # sqlite_update_query = """Update new_developers set salary = ?, email = ? where id = ?
@@ -1237,6 +1329,35 @@ class Toplevel1:
         up_conn.close()
         messagebox.showinfo("Info", f"Τα στοιχεία του {self.company_name_entry.get()} ενημερώθηκαν επιτυχώς")
 
+    # Ενημέρωση στοιχείων Φωτοτυπικού
+    def update_copier(self):
+        """
+        Ενημέρωση μώνο των Serial, Εναρξη, Μετρητής εναρξεις και σημειώσεων
+        :return:
+        """
+        if self.selected_copier_id == "":
+            messagebox.showwarning("Σφάλμα", "Παρακαλώ πρώτα επιλέξτε Φωτοτυπικό")
+            return None
+        headers = []
+        not_needed_header = ["Εταιρεία", "ID"]
+        for head in self.copiers_headers:
+            if head not in not_needed_header:
+                headers.append(head + " = ?")
+        culumns = ", ".join(headers)
+        print(culumns)
+        new_data = [self.serial_entry.get(), self.start_entry.get(), self.start_counter_entry.get(),
+                    self.selected_customer_id, self.copier_notes_scrolledtext.get("1.0", "end-1c"),
+                    self.selected_copier_id]
+
+        up_conn = sqlite3.connect(dbase)
+        up_cursor = up_conn.cursor()
+        # sqlite_update_query = """Update new_developers set salary = ?, email = ? where id = ?
+        sql = "UPDATE Φωτοτυπικά SET " + culumns + "WHERE ID = ? "
+        up_cursor.execute(sql, tuple(new_data), )
+        up_conn.commit()
+        up_cursor.close()
+        up_conn.close()
+        messagebox.showinfo("Info", f"Τα στοιχεία του Φωτοτυπικού {self.selected_copier} του πελάτη {self.selected_customer} ενημερώθηκαν επιτυχώς")
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):
     '''Configure the scrollbars for a widget.'''

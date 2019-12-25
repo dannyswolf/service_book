@@ -143,7 +143,7 @@ class edit_service_window():
         self.selected_copier_label.configure(foreground="#ffffff")
         self.selected_copier_label.configure(relief="groove")
         self.selected_copier_label.configure(text=self.selected_copier)
-        # Ημερωμηνία
+        # Ημερομηνία
         self.date_label = tk.Label(top)
         self.date_label.place(relx=0.025, rely=0.230, height=25, relwidth=0.331)
         self.date_label.configure(activebackground="#f9f9f9")

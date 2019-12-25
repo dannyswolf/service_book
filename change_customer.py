@@ -9,6 +9,7 @@ import sys
 from tkinter import PhotoImage, messagebox, StringVar
 import sqlite3
 import change_customer_support
+from datetime import datetime
 
 dbase = "Service_book.db"
 try:
@@ -233,19 +234,7 @@ class add_copier_window:
         self.copiers_combobox.configure(takefocus="")
         # self.copiers_combobox.configure(state="readonly")
 
-        self.save_btn = tk.Button(top)
-        self.save_btn.place(relx=0.296, rely=0.416, height=34, width=147)
-        self.save_btn.configure(activebackground="#ececec")
-        self.save_btn.configure(activeforeground="#000000")
-        self.save_btn.configure(background="#808000")
-        self.save_btn.configure(disabledforeground="#a3a3a3")
-        self.save_btn.configure(font="-family {Calibri} -size 11 -weight bold")
-        self.save_btn.configure(foreground="#ffffff")
-        self.save_btn.configure(highlightbackground="#d9d9d9")
-        self.save_btn.configure(highlightcolor="black")
-        self.save_btn.configure(pady="0")
-        self.save_btn.configure(text='''Αποθήκευση''')
-        self.save_btn.configure(command=self.add_copier)
+
 
         self.Label2 = tk.Label(top)
         self.Label2.place(relx=0.025, rely=0.019, height=31, relwidth=0.938)
@@ -299,17 +288,47 @@ class add_copier_window:
         self.new_customer_combobox.configure(values=self.customers_list)
         self.new_customer_combobox.configure(takefocus="")
 
-        # self.all_copiers_combobox = ttk.Combobox(top)
-        # self.all_copiers_combobox.place(relx=0.27, rely=0.248, relheight=0.053, relwidth=0.593)
-        # self.all_copiers_combobox.configure(values=self.copiers)
-        # self.all_copiers_combobox.configure(takefocus="")
+        self.notes_label = tk.Label(top)
+        self.notes_label.place(relx=0.025, rely=0.430, height=31, relwidth=0.940)
+        self.notes_label.configure(activebackground="#f9f9f9")
+        self.notes_label.configure(activeforeground="black")
+        self.notes_label.configure(background="#6b6b6b")
+        self.notes_label.configure(disabledforeground="#a3a3a3")
+        self.notes_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.notes_label.configure(foreground="#ffffff")
+        self.notes_label.configure(highlightbackground="#d9d9d9")
+        self.notes_label.configure(highlightcolor="black")
+        self.notes_label.configure(relief="groove")
+        self.notes_label.configure(text='''Σημειώσεις''')
 
-        # self.add_model_btn = tk.Button(top)
-        # self.add_model_btn.place(relx=0.885, rely=0.172, height=30, relwidth=0.060)
-        # self.add_model_btn.configure(background="#006291")
-        # self.add_model_img = PhotoImage(file="icons/add_to_service_data2.png")
-        # self.add_model_btn.configure(image=self.add_model_img)
-        # self.add_model_btn.configure(command=lambda: (self.add_company("Μοντέλο")))
+        self.notes = StringVar()
+        self.notes_scrolledtext = ScrolledText(top)
+        self.notes_scrolledtext.place(relx=0.025, rely=0.500, relheight=0.25, relwidth=0.941)
+        self.notes_scrolledtext.insert('1.0', self.notes.get())
+        self.notes_scrolledtext.configure(background="white")
+        self.notes_scrolledtext.configure(font="TkTextFont")
+        self.notes_scrolledtext.configure(foreground="black")
+        self.notes_scrolledtext.configure(highlightbackground="#d9d9d9")
+        self.notes_scrolledtext.configure(highlightcolor="black")
+        self.notes_scrolledtext.configure(insertbackground="black")
+        self.notes_scrolledtext.configure(insertborderwidth="3")
+        self.notes_scrolledtext.configure(selectbackground="#c4c4c4")
+        self.notes_scrolledtext.configure(selectforeground="black")
+        self.notes_scrolledtext.configure(wrap="none")
+
+        self.save_btn = tk.Button(top)
+        self.save_btn.place(relx=0.356, rely=0.800, height=34, width=147)
+        self.save_btn.configure(activebackground="#ececec")
+        self.save_btn.configure(activeforeground="#000000")
+        self.save_btn.configure(background="#808000")
+        self.save_btn.configure(disabledforeground="#a3a3a3")
+        self.save_btn.configure(font="-family {Calibri} -size 11 -weight bold")
+        self.save_btn.configure(foreground="#ffffff")
+        self.save_btn.configure(highlightbackground="#d9d9d9")
+        self.save_btn.configure(highlightcolor="black")
+        self.save_btn.configure(pady="0")
+        self.save_btn.configure(text='''Αποθήκευση''')
+        self.save_btn.configure(command=self.add_copier)
 
     def quit(self, event):
         self.top.destroy()
@@ -333,6 +352,7 @@ class add_copier_window:
         con.close()
 
     def add_copier(self):
+        today = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         copier = self.copiers_combobox.get()
         copier_id = copier[0]
         new_customer = self.new_customer_combobox.get()
@@ -342,9 +362,31 @@ class add_copier_window:
         # ("UPDATE Service  SET " + edited_culumns + " WHERE ID=? ", (tuple(data_to_add)))
         cursor.execute("UPDATE Φωτοτυπικά SET Πελάτη_ID =? WHERE ID=? ", (new_customer_id, copier_id))
         con.commit()
+        # Ενημέρωση Copiers_Log στορικού μεταφοράς Φωοτυπικού
+        # Δημιουργία culumns για τO Copiers_Log
+        cursor.execute("SELECT * FROM Copiers_Log")
+        headers = list(map(lambda x: x[0], cursor.description))
+        culumns = ", ".join(headers)
+        values = []
+        for head in headers:
+            if head == "ID":
+                values.append("Null")
+            else:
+                values.append("?")
+        values = ", ".join(values)
+
+        # self.customer_combobox.get() => παλιός πελάτης
+        data = [copier_id, self.copiers_combobox.get(), today, self.customer_combobox.get(),
+                self.new_customer_combobox.get(), self.notes_scrolledtext.get('1.0', 'end-1c')]
+        print("\n\n",data)
+        sql_insert = "INSERT INTO Copiers_Log (" + culumns + ")" + "VALUES(" + values + ");"
+        cursor.execute(sql_insert, tuple(data))
+
+        con.commit()
         con.close()
         messagebox.showwarning("Επιτυχής μεταφορά", f"To {self.copiers_combobox.get()} μεταφέρθηκε επιτυχώς στον πελάτη"
                                                     f" {self.new_customer_combobox.get()}")
+
 
         return None
 
