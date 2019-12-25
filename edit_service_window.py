@@ -40,9 +40,9 @@ def get_service_data():
     conn.close()
     for n in range(len(service_data)):
         if service_data[n][1] != "" and service_data[n][1] is not None:
-            purpose_list.append(service_data[n][1])
+            purpose_list.append(service_data[n][1])                        # Σκοπός
         if service_data[n][2] != "" and service_data[n][2] is not None:
-            actions_list.append(service_data[n][2])
+            actions_list.append(service_data[n][2])                        # Ενέργειες
     return sorted(purpose_list), sorted(actions_list)
 
 
@@ -205,8 +205,7 @@ class edit_service_window():
         self.purpose_combobox.configure(values=self.purpose_list)
         # self.purpose_combobox.configure(textvariable=edit_service_window_support.combobox)
         self.purpose_combobox.configure(takefocus="")
-
-        #Ενέργειες
+        # Ενέργειες
         self.actions_label = tk.Label(top)
         self.actions_label.place(relx=0.025, rely=0.470, height=25, relwidth=0.331)
         self.actions_label.configure(activebackground="#f9f9f9")
@@ -278,6 +277,31 @@ class edit_service_window():
         self.notes_scrolledtext.configure(selectforeground="black")
         self.notes_scrolledtext.configure(wrap="none")
 
+        # Δελτίο Τεχνικής Εξυπηρέτησης
+        self.dte_label = tk.Label(top)
+        self.dte_label.place(relx=0.380, rely=0.650, height=20, relwidth=0.431)
+        self.dte_label.configure(activebackground="#f9f9f9")
+        self.dte_label.configure(activeforeground="black")
+        self.dte_label.configure(background="#6b6b6b")
+        self.dte_label.configure(disabledforeground="#a3a3a3")
+        self.dte_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.dte_label.configure(foreground="#ffffff")
+        self.dte_label.configure(highlightbackground="#d9d9d9")
+        self.dte_label.configure(highlightcolor="black")
+        self.dte_label.configure(relief="groove")
+        self.dte_label.configure(text='''Δελτίο Τεχνικής Εξυπηρέτησης''')
+        self.dte_entry = tk.Entry(top)
+        self.dte_entry.place(relx=0.830, rely=0.650, height=20, relwidth=0.131)
+        self.dte_entry.configure(background="white")
+        self.dte_entry.configure(disabledforeground="#a3a3a3")
+        self.dte_entry.configure(font="TkFixedFont")
+        self.dte_entry.configure(foreground="#000000")
+        self.dte_entry.configure(highlightbackground="#d9d9d9")
+        self.dte_entry.configure(highlightcolor="black")
+        self.dte_entry.configure(insertbackground="black")
+        self.dte_entry.configure(selectbackground="#c4c4c4")
+        self.dte_entry.configure(selectforeground="black")
+
         self.Label2 = tk.Label(top)
         self.Label2.place(relx=0.025, rely=0.021, height=31, relwidth=0.938)
         self.Label2.configure(background="#006291")
@@ -313,6 +337,8 @@ class edit_service_window():
         self.counter_entry.configure(textvariable=counter)
         next_service = StringVar(w, value=data[0][6])
         self.next_service_entry.configure(textvariable=next_service)
+        dte = StringVar(w, value=data[0][8])
+        self.dte_entry.configure(textvariable=dte)
 
         # Προσθήκη αλλαγών στην βαση δεδομένων
         def add_to_db():
@@ -323,7 +349,7 @@ class edit_service_window():
             edited_culumns = ",".join(edited_culumns)
             data_to_add = [date.get(), self.purpose_combobox.get(), self.actions_combobox.get(),
                            self.notes_scrolledtext.get("1.0", "end-1c"), counter.get(), next_service.get(), copier_id,
-                           self.selected_service_id]
+                           dte.get(), self.selected_service_id]
             add_conn = sqlite3.connect(dbase)
             add_cursor = add_conn.cursor()
             add_cursor.execute("UPDATE Service  SET " + edited_culumns + " WHERE ID=? ", (tuple(data_to_add)))
@@ -337,7 +363,7 @@ class edit_service_window():
         self.save_btn.configure(activeforeground="#000000")
         self.save_btn.configure(background="#808000")
         self.save_btn.configure(disabledforeground="#a3a3a3")
-        self.save_btn.configure(font=("Calibri", 10, "bold"))
+        self.save_btn.configure(font=("Calibri", 12, "bold"))
         self.save_btn.configure(foreground="#ffffff")
         self.save_btn.configure(highlightbackground="#d9d9d9")
         self.save_btn.configure(highlightcolor="black")

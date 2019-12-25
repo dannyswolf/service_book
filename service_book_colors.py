@@ -675,7 +675,7 @@ class Toplevel1:
         self.customer_search_entry.bind('<Return>', self.search_customer)
 
         self.copier_search_btn = tk.Button(top)
-        self.copier_search_btn.place(relx=0.022, rely=0.575, height=24, relwidth=0.188)
+        self.copier_search_btn.place(relx=0.022, rely=0.600, height=24, relwidth=0.188)
         self.copier_search_btn.configure(activebackground="#ececec")
         self.copier_search_btn.configure(activeforeground="#000000")
         self.copier_search_btn.configure(background="#808000")
@@ -684,6 +684,7 @@ class Toplevel1:
         self.copier_search_btn.configure(highlightbackground="#d9d9d9")
         self.copier_search_btn.configure(highlightcolor="black")
         self.copier_search_btn.configure(pady="0")
+        self.copier_search_btn.configure(font=("Calibri", 10, "bold"))
         self.copier_search_btn.configure(command=lambda: self.search_copier(self.search_copier_data))
         self.copier_search_btn.configure(text="Αναζήτηση Φωτοτυπικού")
         # Πίνακας φωτοτυπικών
@@ -700,7 +701,7 @@ class Toplevel1:
         # Αναζήτηση φωτοτυπικού
         self.search_copier_data = StringVar()
         self.copier_search_entry = tk.Entry(top, textvariable=self.search_copier_data)
-        self.copier_search_entry.place(relx=0.022, rely=0.620, height=20, relwidth=0.188)
+        self.copier_search_entry.place(relx=0.022, rely=0.640, height=20, relwidth=0.188)
         self.copier_search_entry.configure(background="white")
         self.copier_search_entry.configure(disabledforeground="#a3a3a3")
         self.copier_search_entry.configure(font=("Calibri", 10))
@@ -760,10 +761,14 @@ class Toplevel1:
         self.search_error_entry.configure(insertbackground="black")
         self.search_error_entry.bind('<Return>', self.search_error)
         self.search_errors_btn = tk.Button(top)
-        self.search_errors_btn.place(relx=0.840, rely=0.640, height=20, relwidth=0.030)
+        self.search_errors_btn.place(relx=0.840, rely=0.640, height=20, relwidth=0.100)
         self.search_errors_btn.configure(background="#006291")
         self.search_errors_img = PhotoImage(file="icons/search.png")
         self.search_errors_btn.configure(image=self.search_errors_img)
+        self.search_errors_btn.configure(compound='left')
+        self.search_errors_btn.configure(font=("Calibri", 10, "bold"))
+        self.search_errors_btn.configure(foreground="white")
+        self.search_errors_btn.configure(text="Αναζήτηση παντού")
         self.search_errors_btn.configure(command=lambda: (self.search_error(self.search_errors_data)))
 
         # Πίνακας επισκευων

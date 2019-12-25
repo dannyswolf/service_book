@@ -128,7 +128,7 @@ class add_service_window():
         top.bind('<Escape>', self.quit)
 
         self.date_label = tk.Label(top)
-        self.date_label.place(relx=0.025, rely=0.290, height=31, relwidth=0.250)
+        self.date_label.place(relx=0.025, rely=0.150, height=31, relwidth=0.260)
         self.date_label.configure(activebackground="#f9f9f9")
         self.date_label.configure(activeforeground="black")
         self.date_label.configure(background="#6b6b6b")
@@ -141,7 +141,7 @@ class add_service_window():
         self.date_label.configure(text='''Ημερομηνία''')
 
         self.purpose_label = tk.Label(top)
-        self.purpose_label.place(relx=0.025, rely=0.394, height=31, relwidth=0.250)
+        self.purpose_label.place(relx=0.025, rely=0.330, height=31, relwidth=0.260)
         self.purpose_label.configure(activebackground="#f9f9f9")
         self.purpose_label.configure(activeforeground="black")
         self.purpose_label.configure(background="#6b6b6b")
@@ -154,7 +154,7 @@ class add_service_window():
         self.purpose_label.configure(text='''Σκοπός επίσκεψης''')
 
         self.actions_label = tk.Label(top)
-        self.actions_label.place(relx=0.025, rely=0.444, height=31, relwidth=0.250)
+        self.actions_label.place(relx=0.025, rely=0.390, height=31, relwidth=0.260)
         self.actions_label.configure(activebackground="#f9f9f9")
         self.actions_label.configure(activeforeground="black")
         self.actions_label.configure(background="#6b6b6b")
@@ -166,8 +166,33 @@ class add_service_window():
         self.actions_label.configure(relief="groove")
         self.actions_label.configure(text='''Ενέργειες''')
 
+        # Δελτίο Τεχνικής Εξυπηρέτησης
+        self.dte_label = tk.Label(top)
+        self.dte_label.place(relx=0.025, rely=0.450, height=31, relwidth=0.260)
+        self.dte_label.configure(activebackground="#f9f9f9")
+        self.dte_label.configure(activeforeground="black")
+        self.dte_label.configure(background="#6b6b6b")
+        self.dte_label.configure(disabledforeground="#a3a3a3")
+        self.dte_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.dte_label.configure(foreground="#ffffff")
+        self.dte_label.configure(highlightbackground="#d9d9d9")
+        self.dte_label.configure(highlightcolor="black")
+        self.dte_label.configure(relief="groove")
+        self.dte_label.configure(text='''Δελτίο Τεχνικής Εξυπηρέτησης''')
+        self.dte_entry = tk.Entry(top)
+        self.dte_entry.place(relx=0.290, rely=0.450, height=31, relwidth=0.131)
+        self.dte_entry.configure(background="white")
+        self.dte_entry.configure(disabledforeground="#a3a3a3")
+        self.dte_entry.configure(font="TkFixedFont")
+        self.dte_entry.configure(foreground="#000000")
+        self.dte_entry.configure(highlightbackground="#d9d9d9")
+        self.dte_entry.configure(highlightcolor="black")
+        self.dte_entry.configure(insertbackground="black")
+        self.dte_entry.configure(selectbackground="#c4c4c4")
+        self.dte_entry.configure(selectforeground="black")
+        # Σημειώσεις
         self.notes_label = tk.Label(top)
-        self.notes_label.place(relx=0.300, rely=0.550, height=31, relwidth=0.350)
+        self.notes_label.place(relx=0.025, rely=0.550, height=31, relwidth=0.250)
         self.notes_label.configure(activebackground="#f9f9f9")
         self.notes_label.configure(activeforeground="black")
         self.notes_label.configure(background="#6b6b6b")
@@ -180,7 +205,7 @@ class add_service_window():
         self.notes_label.configure(text='''Σημειώσεις''')
 
         self.counter_label = tk.Label(top)
-        self.counter_label.place(relx=0.025, rely=0.240, height=31, relwidth=0.250)
+        self.counter_label.place(relx=0.025, rely=0.210, height=31, relwidth=0.260)
         self.counter_label.configure(activebackground="#f9f9f9")
         self.counter_label.configure(activeforeground="black")
         self.counter_label.configure(background="#6b6b6b")
@@ -193,7 +218,7 @@ class add_service_window():
         self.counter_label.configure(text='''Μετρητής''')
 
         self.next_service_label = tk.Label(top)
-        self.next_service_label.place(relx=0.025, rely=0.343, height=31, relwidth=0.250)
+        self.next_service_label.place(relx=0.025, rely=0.270, height=31, relwidth=0.260)
         self.next_service_label.configure(activebackground="#f9f9f9")
         self.next_service_label.configure(activeforeground="black")
         self.next_service_label.configure(background="#6b6b6b")
@@ -208,9 +233,8 @@ class add_service_window():
         self.TSeparator1 = ttk.Separator(top)
         self.TSeparator1.place(relx=0.025, rely=0.520, relwidth=0.938)
 
-
         self.date_entry = tk.Entry(top)
-        self.date_entry.place(relx=0.29, rely=0.290, height=30, relwidth=0.331)
+        self.date_entry.place(relx=0.29, rely=0.150, height=30, relwidth=0.331)
         self.date_entry.configure(background="white")
         self.date_entry.configure(disabledforeground="#a3a3a3")
         self.date_entry.configure(font="TkFixedFont")
@@ -218,8 +242,7 @@ class add_service_window():
         self.date_entry.configure(insertbackground="black")
 
         self.counter_entry = tk.Entry(top)
-        self.counter_entry.place(relx=0.29, rely=0.240, height=30
-                                 , relwidth=0.331)
+        self.counter_entry.place(relx=0.29, rely=0.210, height=30, relwidth=0.331)
         self.counter_entry.configure(background="white")
         self.counter_entry.configure(disabledforeground="#a3a3a3")
         self.counter_entry.configure(font="TkFixedFont")
@@ -231,7 +254,7 @@ class add_service_window():
         self.counter_entry.configure(selectforeground="black")
 
         self.next_service_entry = tk.Entry(top)
-        self.next_service_entry.place(relx=0.29, rely=0.343, height=30, relwidth=0.331)
+        self.next_service_entry.place(relx=0.29, rely=0.270, height=30, relwidth=0.331)
         self.next_service_entry.configure(background="white")
         self.next_service_entry.configure(disabledforeground="#a3a3a3")
         self.next_service_entry.configure(font="TkFixedFont")
@@ -243,8 +266,7 @@ class add_service_window():
         self.next_service_entry.configure(selectforeground="black")
 
         self.notes_scrolledtext = ScrolledText(top)
-        self.notes_scrolledtext.place(relx=0.025, rely=0.626, relheight=0.273
-                                      , relwidth=0.941)
+        self.notes_scrolledtext.place(relx=0.025, rely=0.626, relheight=0.273, relwidth=0.941)
         self.notes_scrolledtext.configure(background="white")
         self.notes_scrolledtext.configure(font="TkTextFont")
         self.notes_scrolledtext.configure(foreground="black")
@@ -257,34 +279,34 @@ class add_service_window():
         self.notes_scrolledtext.configure(wrap="none")
 
         self.purpose_combobox = ttk.Combobox(top)
-        self.purpose_combobox.place(relx=0.29, rely=0.394, relheight=0.043, relwidth=0.500)
+        self.purpose_combobox.place(relx=0.29, rely=0.330, relheight=0.043, relwidth=0.500)
 
         self.purpose_combobox.configure(values=self.purpose_list)
         # self.purpose_combobox.configure(textvariable=edit_service_window_support.combobox)
         self.purpose_combobox.configure(takefocus="")
 
         self.add_to_service_data_btn1 = tk.Button(top)
-        self.add_to_service_data_btn1.place(relx=0.810, rely=0.394, height=30, relwidth=0.060)
+        self.add_to_service_data_btn1.place(relx=0.800, rely=0.330, height=29, relwidth=0.060)
         self.add_to_service_data_btn1.configure(background="#006291")
         self.add_to_service_data_img1 = PhotoImage(file="icons/add_to_service_data1.png")
         self.add_to_service_data_btn1.configure(image=self.add_to_service_data_img1)
         self.add_to_service_data_btn1.configure(command=lambda: (self.add_to_service_data("Σκοπός")))
 
         self.actions_combobox = ttk.Combobox(top)
-        self.actions_combobox.place(relx=0.29, rely=0.444, relheight=0.043, relwidth=0.500)
+        self.actions_combobox.place(relx=0.29, rely=0.390, relheight=0.043, relwidth=0.500)
         self.actions_combobox.configure(values=self.actions_list)
         # self.actions_combobox.configure(textvariable=edit_service_window_support.combobox)
         self.actions_combobox.configure(takefocus="")
 
         self.add_to_service_data_btn2 = tk.Button(top)
-        self.add_to_service_data_btn2.place(relx=0.810, rely=0.444, height=30, relwidth=0.060)
+        self.add_to_service_data_btn2.place(relx=0.800, rely=0.390, height=29, relwidth=0.060)
         self.add_to_service_data_btn2.configure(background="#006291")
         self.add_to_service_data_img2 = PhotoImage(file="icons/add_to_service_data2.png")
         self.add_to_service_data_btn2.configure(image=self.add_to_service_data_img2)
         self.add_to_service_data_btn2.configure(command=lambda: (self.add_to_service_data("Ενέργειες")))
 
         self.Label2 = tk.Label(top)
-        self.Label2.place(relx=0.025, rely=0.020, height=31, relwidth=0.938)
+        self.Label2.place(relx=0.025, rely=0.010, height=31, relwidth=0.938)
         self.Label2.configure(background="#006291")
         self.Label2.configure(disabledforeground="#a3a3a3")
         self.Label2.configure(font=font9)
@@ -363,7 +385,7 @@ class add_service_window():
         conn.close()
         # Εμφάνιση πελάτη
         self.customer_label = tk.Label(w)
-        self.customer_label.place(relx=0.025, rely=0.100, height=25, relwidth=0.938)
+        self.customer_label.place(relx=0.025, rely=0.060, height=25, relwidth=0.938)
         self.customer_label.configure(activebackground="#f9f9f9")
         self.customer_label.configure(background="brown")
         self.customer_label.configure(font="-family {Calibri} -size 10 -weight bold")
@@ -373,7 +395,7 @@ class add_service_window():
 
         # Εμφάνιση Φωτοτυπικού
         self.selected_copier_label = tk.Label(w)
-        self.selected_copier_label.place(relx=0.025, rely=0.150, height=25, relwidth=0.938)
+        self.selected_copier_label.place(relx=0.025, rely=0.100, height=25, relwidth=0.938)
         self.selected_copier_label.configure(activebackground="#f9f9f9")
         self.selected_copier_label.configure(background="#808000")
         self.selected_copier_label.configure(font="-family {Calibri} -size 10 -weight bold")
@@ -401,6 +423,8 @@ class add_service_window():
         self.counter_entry.configure(textvariable=counter)
         next_service = StringVar()
         self.next_service_entry.configure(textvariable=next_service)
+        dte = StringVar()
+        self.dte_entry.configure(textvariable=dte)
 
         # Προσθήκη αλλαγών στην βαση δεδομένων
         def add_to_db():
@@ -415,7 +439,7 @@ class add_service_window():
 
             data_to_add = [date.get(), self.purpose_combobox.get(), self.actions_combobox.get(),
                            self.notes_scrolledtext.get("1.0", "end-1c"), counter.get(), next_service.get(),
-                           self.selected_copier_id]
+                           self.selected_copier_id, dte.get()]
             add_conn = sqlite3.connect(dbase)
             add_cursor = add_conn.cursor()
             # ΒΑΖΟΥΜΕ ΤΟ ΠΡΩΤΟ NULL ΓΙΑ ΝΑ ΠΆΡΕΙ ΜΟΝΟ ΤΟΥ ΤΟ ID = PRIMARY KEY
