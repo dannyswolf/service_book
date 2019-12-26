@@ -6,7 +6,7 @@
 #    Dec 26, 2019 12:38:51 AM EET  platform: Windows NT
 
 import sys
-from tkinter import PhotoImage
+from tkinter import PhotoImage, StringVar
 import sqlite3
 dbase = "Service_book.db"
 try:
@@ -78,15 +78,15 @@ class Toplevel1:
         top.focus()
         top.bind('<Escape>', self.quit)
 
-
-
-        self.Entry1 = tk.Entry(top)
+        self.entry = StringVar()
+        self.Entry1 = tk.Entry(top, textvariable=self.entry)
         self.Entry1.place(relx=0.2, rely=0.267, height=25, relwidth=0.323)
         self.Entry1.configure(background="white")
         self.Entry1.configure(disabledforeground="#a3a3a3")
         self.Entry1.configure(font=("Calibri", 10, "bold"))
         self.Entry1.configure(foreground="#000000")
         self.Entry1.configure(insertbackground="black")
+        self.Entry1.bind('<Return>', self.search)
 
         self.Button1 = tk.Button(top)
         self.Button1.place(relx=0.533, rely=0.267, height=25, width=145)
@@ -103,8 +103,7 @@ class Toplevel1:
         self.search_img = PhotoImage(file="icons/search.png")
         self.Button1.configure(image=self.search_img)
         self.Button1.configure(text='''Αναζήτηση''')
-
-
+        self.Button1.configure(command=self.search)
 
         self.Scrolledtreeview1 = ScrolledTreeView(top)
         self.Scrolledtreeview1.place(relx=0.017, rely=0.367, relheight=0.59, relwidth=0.967)
@@ -155,6 +154,64 @@ class Toplevel1:
         # style.map() returns an empty list for missing options, so this
         # should be future-safe.
         return [elm for elm in self.style.map('Treeview', query_opt=option) if elm[:2] != ('!disabled', '!selected')]
+
+    def search(self, event=None):
+        # Αδειάζουμε πρώτα το tree
+        self.Scrolledtreeview1.delete(*self.Scrolledtreeview1.get_children())
+        data_to_search = self.entry.get()
+        print(data_to_search)
+        search_headers = []
+        no_neded_headers = ["id", "ID", "Id"]
+        operators = []
+        for header in self.headers:
+
+            if header not in no_neded_headers:
+                search_headers.append(header + " LIKE ?")
+                operators.append('%' + str(data_to_search) + '%')
+        search_headers = " OR ".join(search_headers)
+        # ΕΤΑΙΡΕΙΑ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
+
+        # search_cursor.execute("SELECT * FROM " + table + " WHERE \
+        # ΤΟΝΕΡ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
+        # ('%' + str(search_data.get()) + '%', '%' + str(search_data.get()) + '%', '%' + str(search_data.get())...
+
+        # Αναζήτηση σε ολο το Service και αν το [-1] είναι ισο με το επιλεγμένο φωτοτυπικό δλδ
+        # ελεγχουμε να πάρουμε τα δεδομένα του Service μόνο για το επιλεγμένο Φωτοτυπικό
+        #
+        conn = sqlite3.connect(dbase)
+        cusror = conn.cursor()
+        cusror.execute("SELECT * FROM Copiers_Log WHERE " + search_headers, operators)
+        fetch = cusror.fetchall()  # Δεδομένα απο Service
+        conn.close()
+        columns = []
+        # for head in self.headers:
+            # columns.append(head)
+
+        # self.Scrolledtreeview1["columns"] = [head for head in columns]
+        # for head in self.headers:
+        #     if head == "ID":
+        #         platos = 1
+        #     elif head == "Ημερομηνία":
+        #         platos = 100
+        #     elif head == "Σκοπός_Επίσκεψης":
+        #         platos = 220
+        #     elif head == "Ενέργειες":
+        #         platos = 180
+        #     elif head == "Σημειώσεις":
+        #         platos = 275
+        #     elif head == "Μετρητής":
+        #         platos = 80
+        #     elif head == "Επ_Service":
+        #         platos = 110
+        #     elif head == "ΔΤΕ":
+        #         platos = 70
+        #     else:
+        #         platos = 100
+        #     self.Scrolledtreeview1.heading(head, text=head, anchor="center")
+        #     self.Scrolledtreeview1.column(head, width=platos, anchor="center")
+        # item[-2] ==> Copier_ID στον πίνακα Service
+        for item in fetch:
+            self.Scrolledtreeview1.insert("", "end", values=item)
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):

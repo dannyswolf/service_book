@@ -124,12 +124,12 @@ class add_copier_window:
         self.old_customer_label.configure(relief="groove")
         self.old_customer_label.configure(text='''Από πελάτη''')
 
-        self.get_copiers_btn = tk.Button(top)
-        self.get_copiers_btn.place(relx=0.885, rely=0.095, height=30, relwidth=0.060)
-        self.get_copiers_btn.configure(background="#006291")
-        self.get_copiers_btn_btn_img1 = PhotoImage(file="icons/reload.png")
-        self.get_copiers_btn.configure(image=self.get_copiers_btn_btn_img1)
-        self.get_copiers_btn.configure(command=self.get_copier)
+        # self.get_copiers_btn = tk.Button(top)
+        # self.get_copiers_btn.place(relx=0.885, rely=0.095, height=30, relwidth=0.060)
+        # self.get_copiers_btn.configure(background="#006291")
+        # self.get_copiers_btn_btn_img1 = PhotoImage(file="icons/reload.png")
+        # self.get_copiers_btn.configure(image=self.get_copiers_btn_btn_img1)
+        # self.get_copiers_btn.configure(command=self.get_copier)
 
         self.new_customer_label = tk.Label(top)
         self.new_customer_label.place(relx=0.025, rely=0.324, height=31, relwidth=0.230)
@@ -197,7 +197,7 @@ class add_copier_window:
         self.customer_copiers_label.configure(text='''Φωτοτυπικό''')
 
         self.TSeparator1 = ttk.Separator(top)
-        self.TSeparator1.place(relx=0.025, rely=0.400, relwidth=0.938)
+        self.TSeparator1.place(relx=0.025, rely=0.400, relwidth=0.840)
 
         # self.serial = StringVar()
         # self.selial_entry = tk.Entry(top)
@@ -237,7 +237,7 @@ class add_copier_window:
 
 
         self.Label2 = tk.Label(top)
-        self.Label2.place(relx=0.025, rely=0.019, height=31, relwidth=0.938)
+        self.Label2.place(relx=0.025, rely=0.019, height=31, relwidth=0.840)
         self.Label2.configure(activebackground="#f9f9f9")
         self.Label2.configure(activeforeground="black")
         self.Label2.configure(background="#006291")
@@ -290,7 +290,7 @@ class add_copier_window:
         self.new_customer_combobox.configure(takefocus="")
 
         self.notes_label = tk.Label(top)
-        self.notes_label.place(relx=0.025, rely=0.430, height=31, relwidth=0.940)
+        self.notes_label.place(relx=0.025, rely=0.430, height=31, relwidth=0.840)
         self.notes_label.configure(activebackground="#f9f9f9")
         self.notes_label.configure(activeforeground="black")
         self.notes_label.configure(background="#6b6b6b")
@@ -304,7 +304,7 @@ class add_copier_window:
 
         self.notes = StringVar()
         self.notes_scrolledtext = ScrolledText(top)
-        self.notes_scrolledtext.place(relx=0.025, rely=0.500, relheight=0.25, relwidth=0.941)
+        self.notes_scrolledtext.place(relx=0.025, rely=0.500, relheight=0.25, relwidth=0.840)
         self.notes_scrolledtext.insert('1.0', self.notes.get())
         self.notes_scrolledtext.configure(background="white")
         self.notes_scrolledtext.configure(font="TkTextFont")
@@ -318,7 +318,7 @@ class add_copier_window:
         self.notes_scrolledtext.configure(wrap="none")
 
         self.save_btn = tk.Button(top)
-        self.save_btn.place(relx=0.356, rely=0.800, height=34, width=147)
+        self.save_btn.place(relx=0.300, rely=0.800, height=34, width=147)
         self.save_btn.configure(activebackground="#ececec")
         self.save_btn.configure(activeforeground="#000000")
         self.save_btn.configure(background="#808000")
@@ -355,9 +355,14 @@ class add_copier_window:
     def add_copier(self):
         today = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         copier = self.copiers_combobox.get()
-        copier_id = copier[0]
-        new_customer = self.new_customer_combobox.get()
-        new_customer_id = new_customer[0]
+        try:
+            copier_id = copier[0]
+            new_customer = self.new_customer_combobox.get()
+            new_customer_id = new_customer[0]
+        except IndexError as error: # αν δεν επιλεξουμε νεο πελάτη
+            messagebox.showwarning("Προσοχή ", "Παρακαώ \n 1.Επιλεξτε πελάτη \n 2.Φωτοτυπικό \n 3.Νέο πελάτη")
+            self.top.focus()
+            return
         con = sqlite3.connect(dbase)
         cursor = con.cursor()
         # ("UPDATE Service  SET " + edited_culumns + " WHERE ID=? ", (tuple(data_to_add)))
@@ -392,14 +397,14 @@ class add_copier_window:
         cursor.execute("SELECT Σημειώσεις FROM Φωτοτυπικά WHERE ID=?", (copier_id,))
         old_notes = cursor.fetchall()
 
-        data_for_copiers_notes = old_notes[0][0] + today + " Μεταφορά απο " + old_customer + " στο(ν) " + new_customer + " " + notes
+        data_for_copiers_notes = old_notes[0][0] + "\n" + today + " Μεταφορά απο " + old_customer + " στο(ν) " + new_customer + " " + notes
         cursor.execute("UPDATE Φωτοτυπικά SET  Σημειώσεις =? WHERE ID =?", (data_for_copiers_notes, copier_id))
         con.commit()
         con.close()
         messagebox.showwarning("Επιτυχής μεταφορά", f"To {self.copiers_combobox.get()} μεταφέρθηκε επιτυχώς στον πελάτη"
                                                     f" {self.new_customer_combobox.get()}")
 
-
+        self.top.destroy()
         return None
 
 
