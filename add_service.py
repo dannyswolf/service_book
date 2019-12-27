@@ -8,9 +8,10 @@
 V0.3.2 Προσθήκη αυτόματης Ημερομηνίας
 
 """
+import os
 import sys
 import sqlite3
-from tkinter import StringVar, messagebox, PhotoImage
+from tkinter import StringVar, messagebox, PhotoImage, filedialog
 import add_service_window_support
 import platform
 from datetime import datetime
@@ -97,6 +98,7 @@ class add_service_window():
 
         self.purpose_list, self.actions_list = get_service_data()
         self.culumns = None
+
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
         _fgcolor = '#000000'  # X11 color: 'black'
         _compcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -203,6 +205,20 @@ class add_service_window():
         self.notes_label.configure(highlightcolor="black")
         self.notes_label.configure(relief="groove")
         self.notes_label.configure(text='''Σημειώσεις''')
+
+        # Προσθήκη αρχείων
+        self.add_files_btn = tk.Button(top)
+        self.add_files_btn.place(relx=0.525, rely=0.550, height=31, relwidth=0.250)
+        self.add_files_btn.configure(activebackground="#ececec")
+        self.add_files_btn.configure(activeforeground="#000000")
+        self.add_files_btn.configure(background="#6b6b6b")
+        self.add_files_btn.configure(disabledforeground="#a3a3a3")
+        self.add_files_btn.configure(foreground="#ffffff")
+        self.add_files_btn.configure(highlightbackground="#d9d9d9")
+        self.add_files_btn.configure(highlightcolor="black")
+        self.add_files_btn.configure(pady="0")
+        self.add_files_btn.configure(text='''Προσθήκη αρχείων''')
+        self.add_files_btn.configure(command=self.add_files)
 
         self.counter_label = tk.Label(top)
         self.counter_label.place(relx=0.025, rely=0.210, height=31, relwidth=0.260)
@@ -428,6 +444,7 @@ class add_service_window():
 
         # Προσθήκη αλλαγών στην βαση δεδομένων
         def add_to_db():
+            self.add_files_to_db()
             edited_culumns = ",".join(self.culumns)
             values_var = []
             for head in self.culumns:
@@ -471,6 +488,49 @@ class add_service_window():
         self.save_btn.configure(text="Αποθήκευση")
         self.save_btn.configure(command=add_to_db)
 
+    # Προσθήκη αρχείων
+    def add_files(self):
+
+        self.files = filedialog.askopenfilenames(initialdir=os.getcwd(), title="Επιλογή βάσης δεδομένων",
+                                                 filetypes=(("jpg files", "*.jpg"), ("all files", "*.*")))
+
+        if self.files == "":  # αν ο χρήστης επιλεξει ακυρο
+            self.top.focus()
+            return
+
+        self.top.focus()
+
+    def add_files_to_db(self):
+        if self.files == "":
+            return
+        con = sqlite3.connect(dbase)
+        cu = con.cursor()
+        # Να πάρουμε πρώτα το τελευταίο ID απο τον πίνακα sqlite_sequence το πεδία Service
+        # για να προσθέσουμε τις εικόνες στο νέο service
+        # νεο service_ID == τελευταίο ID απο τον πίνακα Service +1
+        cu.execute("SELECT * FROM sqlite_sequence")
+        names = cu.fetchall()
+        print(names)
+        for name in names:
+            if name[0] == "Service":
+                services_ID = name[1]
+                print("services_ID", services_ID, type(services_ID))
+                new_service_ID = int(services_ID) + 1
+                break
+
+        # Εισαγωγη αρχείων
+        for img in self.files:
+            base = os.path.basename(img)
+            filename, ext = os.path.splitext(base)
+            with open(img, 'rb') as f:
+                file = f.read()  # Εισαγωγη αρχείων
+            cu.execute("INSERT INTO Service_images(Service_ID, Filename, Type, File, Copier_ID)VALUES(?,?,?,?,?)",
+                       (new_service_ID, img, ext, sqlite3.Binary(file), self.selected_copier_id))
+
+        con.commit()
+        con.close()
+        messagebox.showinfo("Info", f"Οι εικόνες προστέθηκαν επιτυχώς")
+        self.top.focus()
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):

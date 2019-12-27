@@ -6,6 +6,10 @@
 #    Dec 13, 2019 12:08:06 AM EET  platform: Windows NT
 
 """
+todo sizes to upladed images
+V0.6.6 Προσθήκη Αρχείων  ===========================================================================27/12/2019
+Αρχεία 1 image_viewer
+Δυνατότητα εισαγωγεις αρχείων και προβλολής αυτών
 
 V0.6.5 Προσθήκη Αναζήτησης στο copiers_log ==========================================================26/12/2019
 
@@ -162,7 +166,7 @@ class Toplevel1:
         top.minsize(120, 1)
         top.maxsize(1980, 1980)
         top.resizable(1, 1)
-        top.title("Βιβλίο Επισκευών V0.6.4")
+        top.title("Βιβλίο Επισκευών V0.6.5")
         top.configure(background="#006291")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
@@ -517,7 +521,7 @@ class Toplevel1:
         self.copiers_title_label.configure(background="#808000")
         self.copiers_title_label.configure(disabledforeground="#a3a3a3")
         self.copiers_title_label.configure(foreground="#ffffff")
-        self.copiers_title_label.configure(font=("Calibri", 11, "bold"))
+        self.copiers_title_label.configure(font=("Calibri", 10, "bold"))
         self.copiers_title_label.configure(relief="groove")
         self.copiers_title_label.configure(text="Στοιχεία φωτοτυπικού")
 

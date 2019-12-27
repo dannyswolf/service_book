@@ -159,7 +159,6 @@ class Toplevel1:
         # Αδειάζουμε πρώτα το tree
         self.Scrolledtreeview1.delete(*self.Scrolledtreeview1.get_children())
         data_to_search = self.entry.get()
-        print(data_to_search)
         search_headers = []
         no_neded_headers = ["id", "ID", "Id"]
         operators = []

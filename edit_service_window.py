@@ -9,6 +9,7 @@ import sys
 import sqlite3
 from tkinter import StringVar
 import edit_service_window_support
+import image_viewer
 
 dbase = "Service_book.db"
 selected_service_id = None
@@ -187,6 +188,22 @@ class edit_service_window():
         self.counter_entry.configure(insertbackground="black")
         self.counter_entry.configure(selectbackground="#c4c4c4")
         self.counter_entry.configure(selectforeground="black")
+
+        # Αρχεία
+        self.show_files_btn = tk.Button(top)
+        self.show_files_btn.place(relx=0.725, rely=0.230, height=65, relwidth=0.237)
+        self.show_files_btn.configure(activebackground="#ececec")
+        self.show_files_btn.configure(activeforeground="#000000")
+        self.show_files_btn.configure(background="#6b6b6b")
+        self.show_files_btn.configure(disabledforeground="red")
+        self.show_files_btn.configure(foreground="#ffffff")
+        self.show_files_btn.configure(highlightbackground="#d9d9d9")
+        self.show_files_btn.configure(highlightcolor="black")
+        self.show_files_btn.configure(pady="0")
+        self.show_files_btn.configure(text='''Προβολή \nαρχείων''')
+        self.show_files_btn.configure(command=self.show_files)
+        self.show_files_btn.configure(state="active")
+
         # Σκοπός
         self.purpose_label = tk.Label(top)
         self.purpose_label.place(relx=0.025, rely=0.390, height=25, relwidth=0.331)
@@ -312,6 +329,22 @@ class edit_service_window():
         self.Label2.configure(text='''Επεξεργασία ιστορικού''')
 
         self.edit()
+        self.check_if_files_exists()
+
+    # Ελεγχος αν υπάρχουν αρχεία για προβολή
+    def check_if_files_exists(self):
+        con = sqlite3.connect(dbase)
+        cursor = con.cursor()
+        cursor.execute("SELECT * FROM Service_images WHERE Service_ID =?", (self.selected_service_id,))
+        images = cursor.fetchall()
+        cursor.close()
+        con.close()
+        if images == []:  # αδεια λιστα δλδ δεν υπάρχουν αρχεια και απενεργοποιουμε το κουμπί προβολή αρχείων
+            self.show_files_btn.configure(state="disabled")
+
+    # Προβολή αρχείων
+    def show_files(self):
+        image_viewer.create_Toplevel1(w, self.selected_service_id)
 
     # επεξεργασία δεδομένων
     def edit(self):
