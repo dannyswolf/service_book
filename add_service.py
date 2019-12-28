@@ -211,7 +211,7 @@ class add_service_window():
         self.add_files_btn.place(relx=0.525, rely=0.550, height=31, relwidth=0.250)
         self.add_files_btn.configure(activebackground="#ececec")
         self.add_files_btn.configure(activeforeground="#000000")
-        self.add_files_btn.configure(background="#6b6b6b")
+        self.add_files_btn.configure(background="green")
         self.add_files_btn.configure(disabledforeground="#a3a3a3")
         self.add_files_btn.configure(foreground="#ffffff")
         self.add_files_btn.configure(highlightbackground="#d9d9d9")
@@ -491,7 +491,7 @@ class add_service_window():
     # Προσθήκη αρχείων
     def add_files(self):
 
-        self.files = filedialog.askopenfilenames(initialdir=os.getcwd(), title="Επιλογή βάσης δεδομένων",
+        self.files = filedialog.askopenfilenames(initialdir=os.getcwd(), title="Επιλογή αρχείων για προσθήκη",
                                                  filetypes=(("jpg files", "*.jpg"), ("all files", "*.*")))
 
         if self.files == "":  # αν ο χρήστης επιλεξει ακυρο
