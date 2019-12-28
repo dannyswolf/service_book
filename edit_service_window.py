@@ -7,7 +7,7 @@
 import os
 import sys
 import sqlite3
-from tkinter import StringVar, filedialog, messagebox
+from tkinter import StringVar, filedialog, messagebox, PhotoImage
 import edit_service_window_support
 import image_viewer
 
@@ -206,6 +206,7 @@ class edit_service_window():
         self.show_files_btn.configure(text='''Προβολή \nαρχείων''')
         self.show_files_btn.configure(command=self.show_files)
         self.show_files_btn.configure(state="active")
+
 
         # Σκοπός
         self.purpose_label = tk.Label(top)
@@ -450,7 +451,7 @@ class edit_service_window():
             with open(img, 'rb') as f:
                 file = f.read()  # Εισαγωγη αρχείων
             cu.execute("INSERT INTO Service_images(Service_ID, Filename, Type, File, Copier_ID)VALUES(?,?,?,?,?)",
-                       (self.selected_service_id, img, ext, sqlite3.Binary(file), self.copier_id))
+                       (self.selected_service_id, filename, ext, sqlite3.Binary(file), self.copier_id))
 
         con.commit()
         con.close()

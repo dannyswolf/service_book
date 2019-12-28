@@ -6,12 +6,14 @@
 #    Dec 27, 2019 08:58:37 PM EET  platform: Windows NT
 
 import os
+import subprocess
+
 import PIL.Image
 from PIL import ImageTk
 import sqlite3
 import tkinter as tk
 import tkinter.ttk as ttk
-from tkinter import PhotoImage, messagebox
+from tkinter import PhotoImage, messagebox, filedialog
 import image_viewer_support
 import shutil  # για διαγραφη των φακέλων με τις εικόνες
 
@@ -35,7 +37,7 @@ def create_Toplevel1(root, *args, **kwargs):
     global w, w_win, rt, selected_service_ID, images_path
     selected_service_ID = args[0]
     # Δημιουργία φακέλου για τις εικόνες
-    images_path = "Service images/Service_ID_" + str(selected_service_ID)
+    images_path = "Service images/Service_ID_" + str(selected_service_ID) + "/"
     if not os.path.exists(images_path):
         os.makedirs(images_path)
     rt = root
@@ -55,8 +57,9 @@ def get_images_from_db():
 
     # Δημιουργεία εικόνων
     # images[num][3] ==> Η εικόνα σε sqlite3.Binary
+    # images[num][2 ] =>> Ονομα αρχείου
     for num, i in enumerate(images):
-        with open(images_path + "/image" + str(num) + ".png", 'wb') as image_file:
+        with open(images_path + images[num][1] + images[num][2], 'wb') as image_file:
             image_file.write(images[num][3])
     images = os.listdir(images_path)
 
@@ -73,16 +76,20 @@ class Toplevel1:
     def __init__(self, top=None):
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
+
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
         _fgcolor = '#000000'  # X11 color: 'black'
         _compcolor = '#d9d9d9'  # X11 color: 'gray85'
         _ana1color = '#d9d9d9'  # X11 color: 'gray85'
         _ana2color = '#ececec'  # Closest X11 color: 'gray92'
 
-        self.images_path = images_path
-        self.selected_image = ""  # Εικόνα που προβάλεται
+        self.selected_image = ""  # Εικόνα που προβάλεται PIL instance
         self.selected_service_ID = selected_service_ID
         self.images = get_images_from_db()
+        self.image = ""  # Ονομα αρχείου που προβάλεται "icon_resized.jpg"  "icon.png"
+        self.images_path = images_path
+        self.filenames = os.listdir(self.images_path)
+
         self.index = 0
         self.new_size = (800, 600)
         self.top = top
@@ -127,16 +134,22 @@ class Toplevel1:
         self.image_label.configure(background="#006291")
         self.image_label.configure(disabledforeground="#a3a3a3")
         self.image_label.configure(text="")
-        filename = self.images_path + "/image" + str(self.index) + ".png"
-        self.selected_image = PIL.Image.open(filename)
-        image = self.selected_image.resize(self.new_size)
-        photo = ImageTk.PhotoImage(image)
-        self.image_label.configure(image=photo)
-        self.image_label.image = photo
-        self.index = self.index + 1
+        file = self.images_path + self.filenames[0]
+        if file[-3:] != "pdf":
+            self.image = self.filenames[0][:-4]
+            self.selected_image = PIL.Image.open(file)
+            image = self.selected_image.resize(self.new_size)
+            photo = ImageTk.PhotoImage(image)
+            self.image_label.configure(image=photo)
+            self.image_label.image = photo
 
+
+        else:
+            subprocess.Popen(self.images_path + self.filenames[self.index])
+
+        # Αποθύκευση
         self.save_btn = tk.Button(top)
-        self.save_btn.place(relx=0.046, rely=0.955, height=30, width=98)
+        self.save_btn.place(relx=0.046, rely=0.955, height=30, relwidth=0.200)
         self.save_btn.configure(activebackground="#ececec")
         self.save_btn.configure(activeforeground="#000000")
         self.save_btn.configure(background="#63b057")
@@ -148,21 +161,91 @@ class Toplevel1:
         self.save_btn.configure(text='''Αποθήκευση''')
         self.save_btn.configure(command=self.save_img)
 
+        # Διαγραφή
+        self.save_btn = tk.Button(top)
+        self.save_btn.place(relx=0.750, rely=0.955, height=30, relwidth=0.200)
+        self.save_btn.configure(activebackground="#ececec")
+        self.save_btn.configure(activeforeground="#000000")
+        self.save_btn.configure(background="red")
+        self.save_btn.configure(disabledforeground="#a3a3a3")
+        self.save_btn.configure(foreground="#ffffff")
+        self.save_btn.configure(highlightbackground="#d9d9d9")
+        self.save_btn.configure(highlightcolor="black")
+        self.save_btn.configure(pady="0")
+        self.save_btn.configure(text='''Διαγραφή''')
+        self.save_btn.configure(command=self.del_from_db)
+
+        self.image_name_label = tk.Label(top)
+        self.image_name_label.place(relx=0.046, rely=0.910, height=30, relwidth=0.800)
+        self.image_name_label.configure(background="#006291")
+        self.image_name_label.configure(foreground="white")
+        self.image_name_label.configure(disabledforeground="#a3a3a3")
+        self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index])
+
+
     def quit(self, event=None):
         self.del_files()
         self.top.destroy()
 
     # Αποθήκευση επιλεγμένης εικόνας
-    def save_img(self):
-        self.selected_image.show()
+    def save_img(self, ):
+        ext = self.filenames[self.index][-4:]
+
+        if ext != ".pdf":
+
+            files = [('Εικόνα', ext),
+                     ('All Files', '*.*')]
+
+            im = PIL.Image.open(self.images_path + self.filenames[self.index])
+            file = filedialog.asksaveasfile(mode='wb', filetypes=files, defaultextension=files)
+            if file:
+                im.save(file)
+            self.top.focus()
+            return
+            # Εμφάνιση εικόνας
+            # self.selected_image.show()
+        else:
+            # pdf_file => το αρχείο για save
+            pdf_file = self.images_path + self.filenames[self.index]
+            files = [('Pdf', '*.pdf*')]
+            file = filedialog.asksaveasfile(mode='wb', filetypes=files, defaultextension=files)
+            # get binary from pdf file
+            with open(pdf_file, "rb") as pdf_reader:  # opening for [r]eading as [b]inary
+                data = pdf_reader.read()
+            # file.name =>> αρχείο που επέλεξε ο χρήστης
+            with open(file.name, 'wb') as new_pdf_file:  # Εγραφή στο αρχείο
+                new_pdf_file.write(data)
+            self.top.focus()
+
+
+
+
+
 
     # Εμφάνηση επόμενης
     def show_next(self):
-        filename = self.images_path + "/image" + str(self.index) + ".png"
+        self.index = self.index + 1
+
         try:
-            self.selected_image = PIL.Image.open(filename)
+            file_ext = self.filenames[self.index][-3:]
+
+            if file_ext != "pdf":  # Αν δεν είναι pdf
+                self.selected_image = PIL.Image.open(self.images_path + self.filenames[self.index])
+                self.image = self.filenames[self.index][:-4]
+                self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index])
+
+            else:  # Αν είναι pdf
+                self.selected_image = PIL.Image.open("icons/pdf.png")
+                self.image = self.filenames[self.index][:-4]
+                self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index])
+
+                subprocess.Popen([self.images_path + self.filenames[self.index]], shell=True)
+
+
         except FileNotFoundError:
-            messagebox.showinfo("Προσοχή", "Δεν υπάρχουν αλλες εικόνες")
+            messagebox.showinfo("Προσοχή", "Το αρχείο δεν βρέθηκε")
+        except IndexError:
+            messagebox.showinfo("Προσοχή", " Δεν υπάρχουν αλλα  αρχεία για προβολή")
             self.index -= 1
             self.top.focus()
             return
@@ -170,16 +253,32 @@ class Toplevel1:
         photo = ImageTk.PhotoImage(image)
         self.image_label.configure(image=photo)
         self.image_label.image = photo
-        self.index = self.index + 1
 
     # Εμφάνηση προηγούμενης
     def show_previous(self):
-        self.index = self.index - 1
-        filename = self.images_path + "/image" + str(self.index) + ".png"
         try:
-            self.selected_image = PIL.Image.open(filename)
+            if self.index > 0:
+                self.index = self.index - 1
+            else:
+                raise IndexError
+
+            file_ext = self.filenames[self.index][-3:]
+
+            if file_ext != "pdf":
+                self.selected_image = PIL.Image.open(self.images_path + self.filenames[self.index])
+                self.image = self.filenames[self.index][:-4]
+                self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index])
+            else:
+                self.selected_image = PIL.Image.open("icons/pdf.png")
+                self.image = self.filenames[self.index][:-4]
+                self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index])
+
+                subprocess.Popen([self.images_path + self.filenames[self.index]], shell=True)
+
         except FileNotFoundError:
-            messagebox.showinfo("Προσοχή", "Δεν υπάρχουν αλλες εικόνες")
+            messagebox.showinfo("Προσοχή", "Το αρχείο δεν βρέθηκε")
+        except IndexError:
+            messagebox.showinfo("Προσοχή", " Δεν υπάρχουν αλλα αρχεία για προβολή")
             self.index += 1
             self.top.focus()
             return
@@ -189,10 +288,27 @@ class Toplevel1:
         self.image_label.configure(image=photo)
         self.image_label.image = photo
 
+    # Διαγραφή αρχείων μετά το κλείσημο του παραθύρου
     def del_files(self):
         shutil.rmtree(self.images_path, ignore_errors=True)
         self.top.destroy()
 
+    # Διαγραφή αρχείου απο την βαση
+    def del_from_db(self):
+        con = sqlite3.connect(dbase)
+        cur = con.cursor()
+        cur.execute("DELETE FROM Service_images WHERE Filename =?", (self.image,))
+        con.commit()
+        cur.close()
+        con.close()
+        messagebox.showinfo("Προσοχή", f"Το {self.image} διαγράφηκε")
+
+        os.remove(self.images_path + self.filenames[self.index])
+
+        self.filenames.remove(self.filenames[self.index])
+        self.top.focus()
+        self.show_next()
+        return
 
 if __name__ == '__main__':
     vp_start_gui()
