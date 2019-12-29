@@ -338,41 +338,58 @@ class add_copier_window:
         # να πάρουμε το id του πελάτη απο το ονομα του
         old_customer = self.customer_combobox.get()
         self.copiers_combobox.set(value="")
-        print(old_customer)
+
         con = sqlite3.connect(dbase)
         cursor = con.cursor()
         cursor.execute("SELECT ID FROM Πελάτες WHERE  Επωνυμία_Επιχείρησης =?", (old_customer,))
         old_customer_id = cursor.fetchall()  # ==> [(4,)] αρα θέλουμε το customer_id[0][0]
         old_customer_id = old_customer_id[0][0]
-        print(old_customer_id)
+
         # Εμφάνιση φωτοτυπικών σύμφονα με το customer_id
         cursor.execute("SELECT * FROM Φωτοτυπικά WHERE Πελάτη_ID = ? ", (old_customer_id,))
         copiers = cursor.fetchall()
+        cursor.close()
+        con.close()
         for n in range(len(copiers)):
             self.copiers.append(copiers[n][1])
 
         self.copiers_combobox.configure(values=copiers)
-        con.close()
+
 
     def add_copier(self):
         today = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         copier = self.copiers_combobox.get()
         try:
             copier_id = copier[0]
-            new_customer = self.new_customer_combobox.get()
-            new_customer_id = new_customer[0]
+
         except IndexError as error: # αν δεν επιλεξουμε νεο πελάτη
             messagebox.showwarning("Προσοχή ", "Παρακαώ \n 1.Επιλεξτε πελάτη \n 2.Φωτοτυπικό \n 3.Νέο πελάτη")
             self.top.focus()
             return
+
+        new_customer = self.new_customer_combobox.get()
+
         con = sqlite3.connect(dbase)
         cursor = con.cursor()
-        # ("UPDATE Service  SET " + edited_culumns + " WHERE ID=? ", (tuple(data_to_add)))
-        cursor.execute("UPDATE Φωτοτυπικά SET Πελάτη_ID =? WHERE ID=? ", (new_customer_id, copier_id))
+        # πέρνουμε το ID του νέου πελάτη
+        cursor.execute("SELECT ID FROM Πελάτες WHERE Επωνυμία_Επιχείρησης =?", (new_customer,))
+        new_customer = cursor.fetchall()
+        con.close()
 
-        # con.commit()
+        con = sqlite3.connect(dbase)
+        cursor = con.cursor()
+        new_customer_id = new_customer[0][0]
+
+        # ενημέρωση το πεδίο Πελάτη_ID του φωτοτυπικού με το ID του νέου πελάτη
+        # ("UPDATE Service  SET " + edited_culumns + " WHERE ID=? ", (tuple(data_to_add)))
+        cursor.execute("UPDATE Φωτοτυπικά SET Πελάτη_ID =? WHERE ID=? ", (new_customer_id, copier_id,))
+        con.commit()
+        con.close()
+
         # Ενημέρωση Copiers_Log στορικού μεταφοράς Φωοτυπικού
         # Δημιουργία culumns για τO Copiers_Log
+        con = sqlite3.connect(dbase)
+        cursor = con.cursor()
         cursor.execute("SELECT * FROM Copiers_Log")
         headers = list(map(lambda x: x[0], cursor.description))
         culumns = ", ".join(headers)
@@ -392,14 +409,18 @@ class add_copier_window:
         sql_insert = "INSERT INTO Copiers_Log (" + culumns + ")" + "VALUES(" + values + ");"
         cursor.execute(sql_insert, tuple(data))
         con.commit()
+        con.close()
 
         # Να πάρουμε τις σημειώσεις για να προσθέσουμε το πότε αλλαξε πελάτη το φωτοτυπικό
         old_customer = self.customer_combobox.get()
         notes = self.notes_scrolledtext.get("1.0", "end-1c")
+        con = sqlite3.connect(dbase)
+        cursor = con.cursor()
         cursor.execute("SELECT Σημειώσεις FROM Φωτοτυπικά WHERE ID=?", (copier_id,))
         old_notes = cursor.fetchall()
 
-        data_for_copiers_notes = old_notes[0][0] + "\n" + today + " Μεταφορά απο " + old_customer + " στο(ν) " + new_customer + " " + notes
+        data_for_copiers_notes = old_notes[0][0] + "\n" + today + " Μεταφορά απο " + str(
+            old_customer) + " στο(ν) " + str(new_customer) + " " + notes
         cursor.execute("UPDATE Φωτοτυπικά SET  Σημειώσεις =? WHERE ID =?", (data_for_copiers_notes, copier_id))
         con.commit()
         con.close()

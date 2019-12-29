@@ -1500,7 +1500,7 @@ class Toplevel1:
                     self.post_code_entry.get(), self.place_entry.get(), self.phone_entry.get(), self.mobile_entry.get(),
                     self.fax_entry.get(), self.email_entry.get(), self.page_package_entry.get(),
                     self.package_cost_entry.get() + " €" if " €" not in self.package_cost_entry.get() else
-                    self.package_cost_entry.get(), self.selected_customer_id]
+                    self.package_cost_entry.get(), 1, self.selected_customer_id]  # 1 είναι η κατάσταση
 
         up_conn = sqlite3.connect(dbase)
         up_cursor = up_conn.cursor()
