@@ -6,6 +6,12 @@
 #    Dec 13, 2019 12:08:06 AM EET  platform: Windows NT
 
 """
+V0.6.9 Δυνατότηα Απενεργοποιησεις πελατών και φωτοτυπικών ==========================================29/12/2019
+
+V0.6.8 Προβολή και αποθήκευση αρχείων pdf ==========================================================28/12/2019
+
+V0.6.7 Δυνατότητα προσθήκης αρχείων και στην επεξεργασία service ===================================28/12/2019
+
 todo sizes to upladed images
 V0.6.6 Προσθήκη Αρχείων  ===========================================================================27/12/2019
 Αρχεία 1 image_viewer
@@ -225,6 +231,24 @@ class Toplevel1:
         self.customer_title_label.configure(foreground="#ffffff")
         self.customer_title_label.configure(relief="groove")
         self.customer_title_label.configure(text="Στοιχεία Πελάτη")
+
+        # Διαγραφή πελάτη
+        self.del_customer_btn = tk.Button(top)
+        self.del_customer_btn.place(relx=0.870, rely=0.005, height=30, relwidth=0.030)
+        self.del_customer_btn.configure(activebackground="#808000")
+        self.del_customer_btn.configure(activeforeground="#000000")
+        self.del_customer_btn.configure(background="#006291")
+        self.del_customer_btn.configure(disabledforeground="#a3a3a3")
+        self.del_customer_btn.configure(foreground="white")
+        self.del_customer_btn.configure(highlightbackground="#d9d9d9")
+        self.del_customer_btn.configure(highlightcolor="black")
+        self.del_customer_btn.configure(pady="0")
+        self.del_customer_btn.configure(command=self.del_customer)
+        # self.del_customer_btn.configure(text="Εισαγωγή ιστορικού")
+        self.del_customer_btn_img = PhotoImage(file="icons/delete_customer.png")
+        self.del_customer_btn.configure(image=self.del_customer_btn_img)
+        self.del_customer_btn.configure(compound="left")
+
 
         self.company_label = tk.Label(top)
         self.company_label.place(relx=0.221, rely=0.045, height=20, relwidth=0.144)
@@ -621,6 +645,23 @@ class Toplevel1:
         self.notes_label.configure(highlightcolor="black")
         self.notes_label.configure(relief="groove")
         self.notes_label.configure(text="Σημειώσεις")
+
+        # Διαγραφή Φωτοτυπικού
+        self.del_copier_btn = tk.Button(top)
+        self.del_copier_btn.place(relx=0.870, rely=0.370, height=30, relwidth=0.030)
+        self.del_copier_btn.configure(activebackground="#808000")
+        self.del_copier_btn.configure(activeforeground="#000000")
+        self.del_copier_btn.configure(background="#006291")
+        self.del_copier_btn.configure(disabledforeground="#a3a3a3")
+        self.del_copier_btn.configure(foreground="white")
+        self.del_copier_btn.configure(highlightbackground="#d9d9d9")
+        self.del_copier_btn.configure(highlightcolor="black")
+        self.del_copier_btn.configure(pady="0")
+        self.del_copier_btn.configure(command=self.del_copier)
+        # self.del_customer_btn.configure(text="Εισαγωγή ιστορικού")
+        self.del_copier_btn_img = PhotoImage(file="icons/Delete_copier.png")
+        self.del_copier_btn.configure(image=self.del_copier_btn_img)
+        self.del_copier_btn.configure(compound="left")
         # Σημειώσεις Φωτοτυπικού
         self.copier_notes_scrolledtext = ScrolledText(top)
         self.copier_notes_scrolledtext.place(relx=0.600, rely=0.446, relheight=0.080, relwidth=0.265)
@@ -636,7 +677,7 @@ class Toplevel1:
         self.copier_notes_scrolledtext.configure(wrap="none")
         # Ενημέρωση φωτοτυπικού
         self.update_copier_btn = tk.Button(top)
-        self.update_copier_btn.place(relx=0.870, rely=0.355, height=150, relwidth=0.030)
+        self.update_copier_btn.place(relx=0.870, rely=0.415, height=145, relwidth=0.030)
         self.update_copier_btn.configure(activebackground="#ececec")
         self.update_copier_btn.configure(activeforeground="#000000")
         self.update_copier_btn.configure(background="#808000")
@@ -968,7 +1009,6 @@ class Toplevel1:
         root.destroy()
 
         # ---------------------Fix -Of- Style------------------------------------
-
     def fixed_map(self, option):
         # Fix for setting text colour for Tkinter 8.6.9
         # From: https://core.tcl.tk/tk/info/509cafafae
@@ -984,7 +1024,8 @@ class Toplevel1:
     def get_customers(self):
         customers_conn = sqlite3.connect(dbase)
         customers_cursor = customers_conn.cursor()
-        customers_cursor.execute("SELECT * FROM " + self.customer_table + " ORDER BY Επωνυμία_Επιχείρησης ASC")
+        customers_cursor.execute("SELECT * FROM " + self.customer_table +
+                                 " WHERE Κατάσταση = 1 ORDER BY Επωνυμία_Επιχείρησης ASC")
         self.customers_headers = list(map(lambda x: x[0], customers_cursor.description))
         customers_data = customers_cursor.fetchall()
         customers_data.sort(key=lambda x: x[1], reverse=False)  # Ταξινόμηση με Επωνυμία_Επιχείρησης
@@ -998,7 +1039,7 @@ class Toplevel1:
             self.customers_treeview.insert("", "end", values=customers_data[n])
 
     # Εμφάνηση φωτοτυπικών του επιλεγμένου πελάτη
-    def view_copiers(self, event):
+    def view_copiers(self, event=None):
         # Απενεργοποιηση του κουμπιου προσθήκης ιστορικού
         self.add_service_btn.configure(state="disabled")
         self.add_service_btn.configure(background="#6b6b6b")
@@ -1030,17 +1071,20 @@ class Toplevel1:
         customers_conn = sqlite3.connect(dbase)
         customers_cursor = customers_conn.cursor()
         # Διαβάζουμε τα δεδομένα του επιλεγμένου πελάτη και συμπληρώνουμε τα entry
-        customers_cursor.execute("SELECT * FROM " + self.customer_table + " WHERE ID = ?", (selected_item,))
+        customers_cursor.execute("SELECT * FROM " + self.customer_table + " WHERE ID = ? AND Κατάσταση =1",
+                                 (selected_item,))
 
         customers_data = customers_cursor.fetchall()
         # Οριζμός πελάτη
+
         self.selected_customer = customers_data[0][1]
 
         # Ανάκτηση φωτοτυπικών απο τον επιλεγμένο πελάτη
         # τα φωτοτυπικά είναι το τελευταίο πεδίο του πίνακα πελάτη
         # Το κάθε φωτοτυπικό ανηκει σε έναν μόνον πελάτη ==> Πελάτη_ID
         # ο πελάτης μπορεί να έχει πολλά φωτοτυπικά
-        customers_cursor.execute("SELECT * FROM " + self.copier_table + " WHERE Πελάτη_ID = ?", (selected_item,))
+        customers_cursor.execute("SELECT * FROM " + self.copier_table + " WHERE Πελάτη_ID = ? AND Κατάσταση =1",
+                                 (selected_item,))
         copiers = customers_cursor.fetchall()
 
         # εμφάνιση φωτοτυπικών στο tree των φωτοτυπικών
@@ -1286,7 +1330,9 @@ class Toplevel1:
         search_conn.close()
         # Κατασκευή tree το up_index -1 == το τελος ("end")
         for n in range(len(fetch)):
-            self.customers_treeview.insert("", "end", values=fetch[n])
+            # fetch[n][-1] => Κατάσταση πελάτη 1=Ενεργός 0=Ανενεργός
+            if fetch[n][-1]:  # Αν η κατάσταση του πελάτη είναι 1 επιστρεφει true και τον εμφανίζει ποιο κάτω
+                self.customers_treeview.insert("", "end", values=fetch[n])
 
 
     # Αναζήτηση φωτοτυπικού
@@ -1321,11 +1367,13 @@ class Toplevel1:
 
         search_cursor.execute("SELECT * FROM " + self.copier_table + " WHERE " + search_headers, operators)
         fetch = search_cursor.fetchall()
+
         search_cursor.close()
         search_conn.close()
         # Κατασκευή tree το up_index -1 == το τελος ("end")
         for n in range(len(fetch)):
-            self.copiers_treeview.insert("", "end", values=fetch[n])
+            if fetch[n][-1]:  # Επιστρέφει True αν η κατάτσταση του φωτοτυπικού ειναι 1
+                self.copiers_treeview.insert("", "end", values=fetch[n])
 
         # Αδιάζουμε και Μετρητη έναρξης, έναρξη, σειριακό, σημειώσεις και κουμπί αναζήτησης
         var = StringVar(root, value="")
@@ -1357,6 +1405,21 @@ class Toplevel1:
         """
         add_customers.create_Toplevel1(root)
 
+    # Διαγραφή πελάτη
+    def del_customer(self):
+        if self.selected_customer_id:
+            con = sqlite3.connect(dbase)
+            cu = con.cursor()
+            cu.execute("UPDATE " + self.customer_table + " SET Κατάσταση = 0 WHERE  ID=?", (self.selected_customer_id,))
+            con.commit()
+            cu.close()
+            con.close()
+            self.customers_treeview.delete(*self.customers_treeview.get_children())
+            self.get_customers()
+        else:
+            messagebox.showinfo("Προσοχή", "Παρακαλώ επιλέξτε πελάτη για διαγραφή")
+            return
+
     # Προσθήκη Φωτοτυπικού
     def add_copier(self, event=None):
         """ Προσθήκη φωτοτυπικού
@@ -1370,6 +1433,21 @@ class Toplevel1:
     def change_copier(self):
 
         change_customer.create_add_copier_window(root)
+
+    # Διαγραφή Φωτοτυπικού
+    def del_copier(self):
+        if self.selected_copier_id:
+            con = sqlite3.connect(dbase)
+            cu = con.cursor()
+            cu.execute("UPDATE " + self.copier_table + " SET Κατάσταση = 0 WHERE  ID=?", (self.selected_copier_id,))
+            con.commit()
+            cu.close()
+            con.close()
+            self.copiers_treeview.delete(*self.copiers_treeview.get_children())
+            self.search_copier()
+        else:
+            messagebox.showinfo("Προσοχή", "Παρακαλώ επιλέξτε φωτοτυπικό για διαγραφή")
+            return
 
     # ------------------------------------Events ---------------------------
     # Προσθήκη πελάτη event
