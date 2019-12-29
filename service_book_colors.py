@@ -6,6 +6,12 @@
 #    Dec 13, 2019 12:08:06 AM EET  platform: Windows NT
 
 """
+V0.7.1 Δυνατότηα ενεργοποιησεις πελατών  ===========================================================29/12/2019
+Αρχεία 1 enable_customers
+
+
+V0.7.0 Ελεγχος δυπλής επωνυμίας και σειριακού αριθμού  =============================================29/12/2019
+
 V0.6.9 Δυνατότηα Απενεργοποιησεις πελατών και φωτοτυπικών ==========================================29/12/2019
 
 V0.6.8 Προβολή και αποθήκευση αρχείων pdf ==========================================================28/12/2019
@@ -72,6 +78,7 @@ import add_copier  # Προσθήκη Φωτοτυπικού
 import change_customer
 from add_service import *
 import copiers_log
+import enable_customers
 
 try:
     import Tkinter as tk
@@ -186,6 +193,7 @@ class Toplevel1:
         # --------------------------------------   MENU   -----------------------------------------
         self.filemenu = tk.Menu(self.menubar, tearoff=0)
         self.filemenu.add_command(label="Προσθήκη πελάτη --> F1", command=self.add_customer)
+        self.filemenu.add_command(label="Ενεργοποίηση πελάτων", command=self.enable_customers)
 
         # self.filemenu.add_command(label="Προσθήκη --> F1", command=self.add_to)
         # self.filemenu.add_command(label="Επεξεργασία --> F3", command=self.edit)
@@ -1334,7 +1342,6 @@ class Toplevel1:
             if fetch[n][-1]:  # Αν η κατάσταση του πελάτη είναι 1 επιστρεφει true και τον εμφανίζει ποιο κάτω
                 self.customers_treeview.insert("", "end", values=fetch[n])
 
-
     # Αναζήτηση φωτοτυπικού
     def search_copier(self, event=None):
         """
@@ -1396,7 +1403,6 @@ class Toplevel1:
 
         return
 
-
     # Προσθήκη πελάτη
     def add_customer(self):
         """Προσθήκη πελάτη
@@ -1419,6 +1425,10 @@ class Toplevel1:
         else:
             messagebox.showinfo("Προσοχή", "Παρακαλώ επιλέξτε πελάτη για διαγραφή")
             return
+
+    # Ενεργοποιήση πελατών
+    def enable_customers(self):
+        enable_customers.create_Toplevel1(root)
 
     # Προσθήκη Φωτοτυπικού
     def add_copier(self, event=None):

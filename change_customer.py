@@ -31,21 +31,21 @@ except ImportError:
 def get_copiers_data():
     copiers = []
     customers_list = []
+
     conn = sqlite3.connect(dbase)
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM Φωτοτυπικά")
+    cursor.execute("SELECT * FROM Φωτοτυπικά WHERE Κατάσταση =1")
     copiers_data = cursor.fetchall()
     for n in range(len(copiers_data)):
         copiers.append(copiers_data[n][1:3])
 
-    cursor.execute("SELECT * FROM Πελάτες")
+    cursor.execute("SELECT * FROM Πελάτες WHERE Κατάσταση =1")
     customers = cursor.fetchall()
     for n in range(len(customers)):
         if customers[n][1] != "" and customers[n][1] is not None:
-            customers_list.append(customers[n][0:2])
+            customers_list.append(customers[n][1])
     cursor.close()
     conn.close()
-
     return sorted(copiers), sorted(customers_list)
 
 
@@ -337,12 +337,14 @@ class add_copier_window:
     def get_copier(self, event=None):
         # να πάρουμε το id του πελάτη απο το ονομα του
         old_customer = self.customer_combobox.get()
-        old_customer_id = old_customer[0]
+        self.copiers_combobox.set(value="")
+        print(old_customer)
         con = sqlite3.connect(dbase)
         cursor = con.cursor()
-        # cursor.execute("SELECT ID FROM Πελάτες WHERE ID =?", (old_customer_id,))
-        # customer_id = cursor.fetchall()  # ==> [(4,)] αρα θέλουμε το customer_id[0][0]
-
+        cursor.execute("SELECT ID FROM Πελάτες WHERE  Επωνυμία_Επιχείρησης =?", (old_customer,))
+        old_customer_id = cursor.fetchall()  # ==> [(4,)] αρα θέλουμε το customer_id[0][0]
+        old_customer_id = old_customer_id[0][0]
+        print(old_customer_id)
         # Εμφάνιση φωτοτυπικών σύμφονα με το customer_id
         cursor.execute("SELECT * FROM Φωτοτυπικά WHERE Πελάτη_ID = ? ", (old_customer_id,))
         copiers = cursor.fetchall()
