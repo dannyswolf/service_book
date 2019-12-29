@@ -23,7 +23,7 @@ except ImportError:
 
     py3 = True
 
-import add_customers_support
+import enable_customers_support
 
 dbase = "Service_book.db"
 
@@ -32,9 +32,9 @@ def vp_start_gui():
     '''Starting point when module is the main routine.'''
     global val, w, root
     root = tk.Tk()
-    add_customers_support.set_Tk_var()
+    enable_customers_support.set_Tk_var()
     top = Toplevel1(root)
-    add_customers_support.init(root, top)
+    enable_customers_support.init(root, top)
     root.mainloop()
 
 
@@ -62,9 +62,9 @@ def create_Toplevel1(root, *args, **kwargs):
     global w, w_win, rt
     rt = root
     w = tk.Toplevel(root)
-    add_customers_support.set_Tk_var()
+    enable_customers_support.set_Tk_var()
     top = Toplevel1(w)
-    add_customers_support.init(w, top, *args, **kwargs)
+    enable_customers_support.init(w, top, *args, **kwargs)
     return (w, top)
 
 

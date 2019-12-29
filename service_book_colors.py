@@ -6,6 +6,9 @@
 #    Dec 13, 2019 12:08:06 AM EET  platform: Windows NT
 
 """
+V0.7.2 Δυνατότηα ενεργοποιησεις φωτοτυπικών  =======================================================29/12/2019
+Αρχεία 1 enable_copiers
+
 V0.7.1 Δυνατότηα ενεργοποιησεις πελατών  ===========================================================29/12/2019
 Αρχεία 1 enable_customers
 
@@ -79,6 +82,7 @@ import change_customer
 from add_service import *
 import copiers_log
 import enable_customers
+import enable_copiers
 
 try:
     import Tkinter as tk
@@ -210,6 +214,7 @@ class Toplevel1:
         self.menubar.add_cascade(label="Φωτοτυπικά", menu=self.copier_menu)
         self.copier_menu.add_command(label="Προσθήκη φωτοτυπικού -> F2", command=self.add_copier)
         self.copier_menu.add_command(label="Μεταφορά φωτοτυπικού", command=self.change_copier)
+        self.copier_menu.add_command(label="Ενεργοποίηση φωτοτυπικού", command=self.enable_copiers)
         self.copier_menu.add_command(label="Ιστορικό Μεταφορών", command=self.get_copiers_log)
         #
         # self.info_menu = tk.Menu(self.menubar, tearoff=0)
@@ -1414,6 +1419,10 @@ class Toplevel1:
     # Διαγραφή πελάτη
     def del_customer(self):
         if self.selected_customer_id:
+            answer = messagebox.askokcancel("Προσοχή", f"Εχετε επιλέξει για απενεργοποιήση τον πελάτη "
+                                                       f"{self.selected_customer}. \nΘέλετε να συνεχίσεται;")
+            if not answer:
+                return
             con = sqlite3.connect(dbase)
             cu = con.cursor()
             cu.execute("UPDATE " + self.customer_table + " SET Κατάσταση = 0 WHERE  ID=?", (self.selected_customer_id,))
@@ -1429,6 +1438,7 @@ class Toplevel1:
     # Ενεργοποιήση πελατών
     def enable_customers(self):
         enable_customers.create_Toplevel1(root)
+        self.search_customer("")
 
     # Προσθήκη Φωτοτυπικού
     def add_copier(self, event=None):
@@ -1447,6 +1457,12 @@ class Toplevel1:
     # Διαγραφή Φωτοτυπικού
     def del_copier(self):
         if self.selected_copier_id:
+
+            answer = messagebox.askokcancel("Προσοχή", f"Εχετε επιλέξει για απενεργοποιήση το φωτοτυπικό\n"
+                                                       f"{self.selected_copier} του πελάτη {self.selected_customer}"
+                                                       f"\nΘέλετε να συνεχίσεται;")
+            if not answer:
+                return
             con = sqlite3.connect(dbase)
             cu = con.cursor()
             cu.execute("UPDATE " + self.copier_table + " SET Κατάσταση = 0 WHERE  ID=?", (self.selected_copier_id,))
@@ -1458,6 +1474,10 @@ class Toplevel1:
         else:
             messagebox.showinfo("Προσοχή", "Παρακαλώ επιλέξτε φωτοτυπικό για διαγραφή")
             return
+
+    # Ενεργοποιήση φωτοτυπικού
+    def enable_copiers(self):
+        enable_copiers.create_enable_copiers_window(root)
 
     # ------------------------------------Events ---------------------------
     # Προσθήκη πελάτη event
