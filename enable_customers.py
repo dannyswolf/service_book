@@ -531,6 +531,7 @@ class Toplevel1:
         conn.commit()
         conn.close()
         messagebox.showinfo("Info", f"Ο πελάτης {self.company_name.get()} ενεργοποιήθηκε επιτυχώς")
+        self.top.destroy()
         return None
 
 

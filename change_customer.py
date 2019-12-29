@@ -362,22 +362,22 @@ class add_copier_window:
         try:
             copier_id = copier[0]
 
+
         except IndexError as error: # αν δεν επιλεξουμε νεο πελάτη
             messagebox.showwarning("Προσοχή ", "Παρακαώ \n 1.Επιλεξτε πελάτη \n 2.Φωτοτυπικό \n 3.Νέο πελάτη")
             self.top.focus()
             return
 
-        new_customer = self.new_customer_combobox.get()
+        new_customer_name = self.new_customer_combobox.get()
 
+        if not new_customer_name:
+            messagebox.showwarning("Προσοχή", "Παρακαλώ επιλέξτε νέο πελάτη")
+            self.top.focus()
+            return
         con = sqlite3.connect(dbase)
         cursor = con.cursor()
-        # πέρνουμε το ID του νέου πελάτη
-        cursor.execute("SELECT ID FROM Πελάτες WHERE Επωνυμία_Επιχείρησης =?", (new_customer,))
+        cursor.execute("SELECT ID FROM Πελάτες WHERE Επωνυμία_Επιχείρησης =?", (new_customer_name,))
         new_customer = cursor.fetchall()
-        con.close()
-
-        con = sqlite3.connect(dbase)
-        cursor = con.cursor()
         new_customer_id = new_customer[0][0]
 
         # ενημέρωση το πεδίο Πελάτη_ID του φωτοτυπικού με το ID του νέου πελάτη
@@ -405,7 +405,6 @@ class add_copier_window:
         data = [copier_id, self.copiers_combobox.get(), today, self.customer_combobox.get(),
                 self.new_customer_combobox.get(), self.notes_scrolledtext.get('1.0', 'end-1c')]
 
-
         sql_insert = "INSERT INTO Copiers_Log (" + culumns + ")" + "VALUES(" + values + ");"
         cursor.execute(sql_insert, tuple(data))
         con.commit()
@@ -420,7 +419,7 @@ class add_copier_window:
         old_notes = cursor.fetchall()
 
         data_for_copiers_notes = old_notes[0][0] + "\n" + today + " Μεταφορά απο " + str(
-            old_customer) + " στο(ν) " + str(new_customer) + " " + notes
+            old_customer) + " στο(ν) " + new_customer_name + " " + notes
         cursor.execute("UPDATE Φωτοτυπικά SET  Σημειώσεις =? WHERE ID =?", (data_for_copiers_notes, copier_id))
         con.commit()
         con.close()

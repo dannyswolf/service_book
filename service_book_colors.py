@@ -6,6 +6,8 @@
 #    Dec 13, 2019 12:08:06 AM EET  platform: Windows NT
 
 """
+V0.7.3 Fix some bugs ===============================================================================29/12/2019
+
 V0.7.2 Δυνατότηα ενεργοποιησεις φωτοτυπικών  =======================================================29/12/2019
 Αρχεία 1 enable_copiers
 
@@ -183,7 +185,7 @@ class Toplevel1:
         top.minsize(120, 1)
         top.maxsize(1980, 1980)
         top.resizable(1, 1)
-        top.title("Βιβλίο Επισκευών V0.6.5")
+        top.title("Βιβλίο Επισκευών V0.7.3")
         top.configure(background="#006291")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
@@ -1438,7 +1440,8 @@ class Toplevel1:
     # Ενεργοποιήση πελατών
     def enable_customers(self):
         enable_customers.create_Toplevel1(root)
-        self.search_customer("")
+        self.customers_treeview.delete(*self.customers_treeview.get_children())
+        self.get_customers()
 
     # Προσθήκη Φωτοτυπικού
     def add_copier(self, event=None):
@@ -1528,7 +1531,8 @@ class Toplevel1:
                 headers.append(head + " = ?")
         culumns = ", ".join(headers)
         new_data = [self.serial_entry.get(), self.start_entry.get(), self.start_counter_entry.get(),
-                    self.selected_customer_id, self.copier_notes_scrolledtext.get("1.0", "end-1c"),
+                    self.selected_customer_id, self.copier_notes_scrolledtext.get("1.0", "end-1c"), 1,
+                    # 1 => ενεργό φωτοτυπικό
                     self.selected_copier_id]
 
         up_conn = sqlite3.connect(dbase)
