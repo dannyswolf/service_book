@@ -510,11 +510,11 @@ class add_service_window():
         # νεο service_ID == τελευταίο ID απο τον πίνακα Service +1
         cu.execute("SELECT * FROM sqlite_sequence")
         names = cu.fetchall()
-        print(names)
+
         for name in names:
             if name[0] == "Service":
                 services_ID = name[1]
-                print("services_ID", services_ID, type(services_ID))
+
                 new_service_ID = int(services_ID) + 1
                 break
 
@@ -522,10 +522,11 @@ class add_service_window():
         for img in self.files:
             base = os.path.basename(img)
             filename, ext = os.path.splitext(base)
+
             with open(img, 'rb') as f:
                 file = f.read()  # Εισαγωγη αρχείων
             cu.execute("INSERT INTO Service_images(Service_ID, Filename, Type, File, Copier_ID)VALUES(?,?,?,?,?)",
-                       (new_service_ID, img, ext, sqlite3.Binary(file), self.selected_copier_id))
+                       (new_service_ID, filename, ext, sqlite3.Binary(file), self.selected_copier_id))
 
         con.commit()
         con.close()

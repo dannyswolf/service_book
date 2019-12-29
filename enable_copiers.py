@@ -291,13 +291,14 @@ class enable_copiers_window:
         c.execute("SELECT * FROM Φωτοτυπικά WHERE Serial = ?", (self.selected_serial,))
         copier_data = c.fetchall()
 
+
         start_counter_var = StringVar(value=copier_data[0][4])
         self.start_counter_entry.configure(textvariable=start_counter_var, state="readonly")
 
         start_entry_var = StringVar(value=copier_data[0][3])
         self.start_entry.configure(textvariable=start_entry_var, state="readonly")
 
-        customer_id = copier_data[0][0]
+        customer_id = copier_data[0][5]
 
         c.execute("SELECT Επωνυμία_Επιχείρησης FROM Πελάτες WHERE ID =?", (customer_id,))
         customer_name = c.fetchall()
