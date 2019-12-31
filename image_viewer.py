@@ -9,7 +9,7 @@ import os
 import subprocess
 
 import PIL.Image
-from PIL import ImageTk
+from PIL import ImageTk, Image
 import sqlite3
 import tkinter as tk
 import tkinter.ttk as ttk
@@ -145,7 +145,7 @@ class Toplevel1:
 
 
         else:
-            subprocess.Popen(self.images_path + self.filenames[self.index])
+            subprocess.Popen(self.images_path + self.filenames[self.index], shell=True)
 
         # Αποθύκευση
         self.save_btn = tk.Button(top)

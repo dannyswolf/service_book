@@ -34,11 +34,6 @@ def get_copiers_data():
 
     conn = sqlite3.connect(dbase)
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM Φωτοτυπικά WHERE Κατάσταση =1")
-    copiers_data = cursor.fetchall()
-    for n in range(len(copiers_data)):
-        copiers.append(copiers_data[n][1:3])
-
     cursor.execute("SELECT * FROM Πελάτες WHERE Κατάσταση =1")
     customers = cursor.fetchall()
     for n in range(len(customers)):
@@ -46,7 +41,7 @@ def get_copiers_data():
             customers_list.append(customers[n][1])
     cursor.close()
     conn.close()
-    return sorted(copiers), sorted(customers_list)
+    return sorted(customers_list)
 
 
 def vp_start_gui():
@@ -97,8 +92,8 @@ class add_copier_window:
         self.style.map('.', background=
         [('selected', _compcolor), ('active', _ana2color)])
 
-        self.copiers, self.customers_list = get_copiers_data()
-
+        self.customers_list = get_copiers_data()
+        self.copiers = []
         self.top = top
         top.geometry("505x524+444+228")
         top.minsize(120, 1)
@@ -346,21 +341,27 @@ class add_copier_window:
         old_customer_id = old_customer_id[0][0]
 
         # Εμφάνιση φωτοτυπικών σύμφονα με το customer_id
-        cursor.execute("SELECT * FROM Φωτοτυπικά WHERE Πελάτη_ID = ? ", (old_customer_id,))
+        cursor.execute("SELECT * FROM Φωτοτυπικά WHERE Πελάτη_ID = ? AND Κατάσταση = 1 ", (old_customer_id,))
         copiers = cursor.fetchall()
+        for copier in copiers:
+            self.copiers.append(copier)
         cursor.close()
         con.close()
-        for n in range(len(copiers)):
-            self.copiers.append(copiers[n][1])
+
 
         self.copiers_combobox.configure(values=copiers)
 
 
     def add_copier(self):
         today = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        copier = self.copiers_combobox.get()
+        selected_copier_index = self.copiers_combobox.current()
+        print("selected_copier_index", selected_copier_index)
+        print("self.copiers", self.copiers)
+        print("selected copier = ", self.copiers[selected_copier_index])
+        print("selected copier_id = ", self.copiers[selected_copier_index][0])
         try:
-            copier_id = copier[0]
+            copier_id = self.copiers[selected_copier_index][0]
+
 
 
         except IndexError as error: # αν δεν επιλεξουμε νεο πελάτη
@@ -383,6 +384,7 @@ class add_copier_window:
         # ενημέρωση το πεδίο Πελάτη_ID του φωτοτυπικού με το ID του νέου πελάτη
         # ("UPDATE Service  SET " + edited_culumns + " WHERE ID=? ", (tuple(data_to_add)))
         cursor.execute("UPDATE Φωτοτυπικά SET Πελάτη_ID =? WHERE ID=? ", (new_customer_id, copier_id,))
+        print("new_customer_id", new_customer_id)
         con.commit()
         con.close()
 

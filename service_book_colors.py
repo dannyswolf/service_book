@@ -6,6 +6,8 @@
 #    Dec 13, 2019 12:08:06 AM EET  platform: Windows NT
 
 """
+V0.7.5 Fix  bug μεταφορά φωτοτυπικού ===============================================================31/12/2019
+
 V0.7.4 Fix some bugs ===============================================================================29/12/2019
 
 V0.7.3 Fix some bugs ===============================================================================29/12/2019
@@ -694,7 +696,7 @@ class Toplevel1:
         self.copier_notes_scrolledtext.configure(wrap="none")
         # Ενημέρωση φωτοτυπικού
         self.update_copier_btn = tk.Button(top)
-        self.update_copier_btn.place(relx=0.870, rely=0.415, height=145, relwidth=0.030)
+        self.update_copier_btn.place(relx=0.870, rely=0.415, height=135, relwidth=0.030)
         self.update_copier_btn.configure(activebackground="#ececec")
         self.update_copier_btn.configure(activeforeground="#000000")
         self.update_copier_btn.configure(background="#808000")
@@ -703,7 +705,7 @@ class Toplevel1:
         self.update_copier_btn.configure(highlightbackground="#d9d9d9")
         self.update_copier_btn.configure(highlightcolor="black")
         self.update_copier_btn.configure(pady="0")
-        self.update_copier_btn.configure(font=("Calibri", 10, "bold"))
+        self.update_copier_btn.configure(font=("Calibri", 9, "bold"))
         self.update_copier_btn.configure(text='''Ε\nν\nη\nμ\nέ\nρ\nω\nσ\nη''')
         self.update_copier_btn.configure(command=self.update_copier)
 
@@ -783,7 +785,7 @@ class Toplevel1:
         self.search_copier()  # Εμφάνιση όλων των φωτοτυπικών κατα την εκκίνηση
         # Προσθήκη ιστορικού φωτοτυπικού
         self.add_service_btn = tk.Button(top)
-        self.add_service_btn.place(relx=0.221, rely=0.640, height=20, relwidth=0.120)
+        self.add_service_btn.place(relx=0.221, rely=0.600, height=20, relwidth=0.120)
         self.add_service_btn.configure(activebackground="#808000")
         self.add_service_btn.configure(activeforeground="#000000")
         self.add_service_btn.configure(background="#6b6b6b")
@@ -800,7 +802,7 @@ class Toplevel1:
         self.add_service_btn.configure(state="disabled")
         # Ανανέωση μετα απο εισαγωγεί ιστορικού
         self.refresh_btn = tk.Button(top)
-        self.refresh_btn.place(relx=0.345, rely=0.640, height=20, relwidth=0.030)
+        self.refresh_btn.place(relx=0.345, rely=0.600, height=20, relwidth=0.030)
         self.refresh_btn.configure(background="#006291")
         self.refresh_img = PhotoImage(file="icons/refresh.png")
         self.refresh_btn.configure(image=self.refresh_img)
@@ -808,7 +810,7 @@ class Toplevel1:
         # Αναζήτηση στο επιλεγμένο φωτοτυπικό
         self.search_selected_copier_service_data = StringVar()
         self.search_selected_copier_service_entry = tk.Entry(top, textvariable=self.search_selected_copier_service_data)
-        self.search_selected_copier_service_entry.place(relx=0.380, rely=0.640, height=20, relwidth=0.105)
+        self.search_selected_copier_service_entry.place(relx=0.221, rely=0.640, height=20, relwidth=0.120)
         self.search_selected_copier_service_entry.configure(background="white")
         self.search_selected_copier_service_entry.configure(disabledforeground="#a3a3a3")
         self.search_selected_copier_service_entry.configure(font=("Calibri", 10))
@@ -816,7 +818,7 @@ class Toplevel1:
         self.search_selected_copier_service_entry.configure(insertbackground="black")
         self.search_selected_copier_service_entry.bind('<Return>', self.search_selected_copier_service)
         self.search_selected_copier_service_btn = tk.Button(top)
-        self.search_selected_copier_service_btn.place(relx=0.490, rely=0.640, height=20, relwidth=0.030)
+        self.search_selected_copier_service_btn.place(relx=0.345, rely=0.640, height=20, relwidth=0.030)
         self.search_selected_copier_service_btn.configure(background="#006291")
         self.search_search_selected_copier_service_img = PhotoImage(file="icons/search.png")
         self.search_selected_copier_service_btn.configure(image=self.search_search_selected_copier_service_img)
@@ -853,7 +855,7 @@ class Toplevel1:
         self.TSeparator1.place(relx=0.022, rely=0.555, relwidth=0.845)
 
         self.Label16 = tk.Label(top)
-        self.Label16.place(relx=0.221, rely=0.575, height=21, relwidth=0.647)
+        self.Label16.place(relx=0.221, rely=0.565, height=21, relwidth=0.647)
         self.Label16.configure(background="#6b6b6b")
         self.Label16.configure(disabledforeground="#a3a3a3")
         self.Label16.configure(foreground="#ffffff")
@@ -1166,7 +1168,7 @@ class Toplevel1:
         self.search_selected_copier_service_btn.configure(compound='left')
         self.search_selected_copier_service_btn.configure(foreground="white", font=("Calibri", 10, "bold"))
         self.search_selected_copier_service_btn.configure(text=self.selected_copier)
-        self.search_selected_copier_service_btn.place(relx=0.490, rely=0.640, height=20, relwidth=0.193)
+        self.search_selected_copier_service_btn.place(relx=0.345, rely=0.640, height=20, relwidth=0.193)
 
         service_conn = sqlite3.connect(dbase)
         service_cursor = service_conn.cursor()
