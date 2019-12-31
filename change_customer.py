@@ -379,7 +379,6 @@ class add_copier_window:
         # ενημέρωση το πεδίο Πελάτη_ID του φωτοτυπικού με το ID του νέου πελάτη
         # ("UPDATE Service  SET " + edited_culumns + " WHERE ID=? ", (tuple(data_to_add)))
         cursor.execute("UPDATE Φωτοτυπικά SET Πελάτη_ID =? WHERE ID=? ", (new_customer_id, copier_id,))
-        print("new_customer_id", new_customer_id)
         con.commit()
         con.close()
 
