@@ -354,18 +354,13 @@ class add_copier_window:
 
     def add_copier(self):
         today = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        selected_copier_index = self.copiers_combobox.current()
-        print("selected_copier_index", selected_copier_index)
-        print("self.copiers", self.copiers)
-        print("selected copier = ", self.copiers[selected_copier_index])
-        print("selected copier_id = ", self.copiers[selected_copier_index][0])
+        selected_copier_index = self.copiers_combobox.current()  # index απο την λίστα φωτοτυπικών του πελάτη
+
         try:
             copier_id = self.copiers[selected_copier_index][0]
 
-
-
-        except IndexError as error: # αν δεν επιλεξουμε νεο πελάτη
-            messagebox.showwarning("Προσοχή ", "Παρακαώ \n 1.Επιλεξτε πελάτη \n 2.Φωτοτυπικό \n 3.Νέο πελάτη")
+        except IndexError as error:  # αν δεν επιλεξουμε Φωτοτυπικό
+            messagebox.showwarning("Προσοχή ", "Παρακαλώ \n Επιλεξτε  Φωτοτυπικό")
             self.top.focus()
             return
 
