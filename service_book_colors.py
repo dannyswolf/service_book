@@ -210,7 +210,7 @@ class Toplevel1:
         self.selected_copier_id = ""
         self.selected_customer = ""
         self.selected_copier = ""
-        self.service_calendar = DateEntry
+        # self.service_calendar = DateEntry
 
         self.customers_headers = []
         self.copiers_headers = []
@@ -951,9 +951,13 @@ class Toplevel1:
         self.customer_title_label.configure(relief="groove")
         self.customer_title_label.configure(text="Ημερολόγιο εργασιών")
 
+        self.today = datetime.today()
+        self.day = self.today.day
+        self.year = self.today.year
+        self.month = self.today.month
         self.calendar_var = StringVar()
         # create the entry and configure the calendar colors
-        self.service_calendar = Calendar(top, width=12, year=2020, month=1, day=2,
+        self.service_calendar = Calendar(top, width=12, year=self.year, month=self.month, day=self.day,
                         background='gray20', selectmode='day', foreground='white', borderwidth=5, locale="el_GR",)
         #self.service_calendar.drop_down()
         self.service_calendar.place(relx=0.021, rely=0.630, relheight=0.300, relwidth=0.250)
