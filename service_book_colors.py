@@ -314,8 +314,6 @@ class Toplevel1:
         self.service_frame.configure(highlightbackground="#d9d9d9")
         self.service_frame.configure(highlightcolor="black")
 
-
-
         self.customer_title_label = tk.Label(self.customer_frame)
         self.customer_title_label.place(relx=0.021, rely=0.005, height=30, relwidth=0.847)
         self.customer_title_label.configure(font=("Calibri", 11, "bold"))
@@ -889,7 +887,7 @@ class Toplevel1:
         self.search_selected_copier_service_entry.configure(insertbackground="black")
         self.search_selected_copier_service_entry.bind('<Return>', self.search_selected_copier_service)
         self.search_selected_copier_service_btn = tk.Button(self.service_frame)
-        self.search_selected_copier_service_btn.place(relx=0.245, rely=0.180, height=20, relwidth=0.230)
+        self.search_selected_copier_service_btn.place(relx=0.225, rely=0.180, height=20, relwidth=0.030)
         self.search_selected_copier_service_btn.configure(background="#6b6b6b")
         self.search_search_selected_copier_service_img = PhotoImage(file="icons/search.png")
         self.search_selected_copier_service_btn.configure(image=self.search_search_selected_copier_service_img)
@@ -931,6 +929,15 @@ class Toplevel1:
         self.Label16.configure(foreground="#ffffff")
         self.Label16.configure(relief="groove")
         self.Label16.configure(text='''Ιστορικό''')
+
+        self.customer_title_label = tk.Label(top)
+        self.customer_title_label.place(relx=0.021, rely=0.570, height=30, relwidth=0.967)
+        self.customer_title_label.configure(font=("Calibri", 11, "bold"))
+        self.customer_title_label.configure(background="#6b6b6b")
+        self.customer_title_label.configure(disabledforeground="#a3a3a3")
+        self.customer_title_label.configure(foreground="#ffffff")
+        self.customer_title_label.configure(relief="groove")
+        self.customer_title_label.configure(text="Ημερολόγιο εργασιών")
 
     def search_selected_copier_service(self, event=None):
         if not self.selected_copier_id:
@@ -1152,7 +1159,7 @@ class Toplevel1:
         self.copiers_title_label.configure(text="Στοιχεία φωτοτυπικού")
         self.copier_notes_scrolledtext.delete('1.0', 'end-1c')
         self.search_selected_copier_service_btn.configure(text="")
-        self.search_selected_copier_service_btn.place(relx=0.245, rely=0.180, height=20, relwidth=0.030)
+        self.search_selected_copier_service_btn.place(relx=0.225, rely=0.180, height=20, relwidth=0.030)
 
         self.selected_copier_id = ""
 
@@ -1240,7 +1247,7 @@ class Toplevel1:
         self.search_selected_copier_service_btn.configure(compound='left')
         self.search_selected_copier_service_btn.configure(foreground="white", font=("Calibri", 10, "bold"))
         self.search_selected_copier_service_btn.configure(text=self.selected_copier)
-        self.search_selected_copier_service_btn.place(relx=0.245, rely=0.180, height=20, relwidth=0.230)
+        self.search_selected_copier_service_btn.place(relx=0.225, rely=0.180, height=20, relwidth=0.300)
 
         service_conn = sqlite3.connect(dbase)
         service_cursor = service_conn.cursor()
@@ -1366,6 +1373,9 @@ class Toplevel1:
             heading = self.service_treeview.heading("#3", "text")
         except TclError as error:
             messagebox.showwarning("Προσοχή", "Παρακαλώ επιλεξτε πρώτα φωτοτυπικό")
+            # ==============================  Notebook style  =============
+            self.style.map('TNotebook.Tab', background=[('selected', "green"), ('active', "blue")])
+            self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
             return
 
         selected_service_id = (self.service_treeview.set(self.service_treeview.selection(), "#1"))
@@ -1374,6 +1384,9 @@ class Toplevel1:
             selected_customer = (self.service_treeview.set(self.service_treeview.selection(), "#4"))
             # Αυτή είναι συνάρτηση του αρχείου edi_service_windows
             create_edit_service_window(root, selected_service_id, selected_copier, selected_customer)
+            # ==============================  Notebook style  =============
+            self.style.map('TNotebook.Tab', background=[('selected', "green"), ('active', "blue")])
+            self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
         else:
             if self.selected_copier_id:  # Αν ο χρήστης έχει επιλέξει φωτοτυπικό για να δεί το ιστορικό
                 con = sqlite3.connect(dbase)
@@ -1383,6 +1396,9 @@ class Toplevel1:
                 selected_copier = copier[0][0]
 
                 create_edit_service_window(root, selected_service_id, selected_copier, self.selected_customer)
+                # ==============================  Notebook style  =============
+                self.style.map('TNotebook.Tab', background=[('selected', "green"), ('active', "blue")])
+                self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
 
 
     def add_service(self):
