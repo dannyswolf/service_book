@@ -6,6 +6,8 @@
 #    Dec 13, 2019 12:08:06 AM EET  platform: Windows NT
 
 """
+V0.8.0 Προσθήκη ημερολογίου =======================================================================02/01/2020
+
 V0.7.9 Αλλαγή χρωμάτων ============================================================================02/01/2020
 
 V0.7.8 Ευκολη αλλαγή καρτέλων =====================================================================02/01/2020
@@ -97,6 +99,7 @@ from add_service import *
 import copiers_log
 import enable_customers
 import enable_copiers
+from tkcalendar import Calendar, DateEntry
 
 # Για τα αρχεία log files
 import logging, sys
@@ -203,6 +206,7 @@ class Toplevel1:
         self.selected_copier_id = ""
         self.selected_customer = ""
         self.selected_copier = ""
+        self.service_calendar = DateEntry
 
         self.customers_headers = []
         self.copiers_headers = []
@@ -220,7 +224,7 @@ class Toplevel1:
         top.minsize(120, 1)
         top.maxsize(1980, 1980)
         top.resizable(1, 1)
-        top.title("Βιβλίο Επισκευών V0.7.8")
+        top.title("Βιβλίο Επισκευών V0.8.0")
         top.configure(background="#bfc2b6")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
@@ -942,6 +946,18 @@ class Toplevel1:
         self.customer_title_label.configure(foreground="#ffffff")
         self.customer_title_label.configure(relief="groove")
         self.customer_title_label.configure(text="Ημερολόγιο εργασιών")
+
+        self.calendar_var = StringVar()
+        # create the entry and configure the calendar colors
+        self.service_calendar = Calendar(top, width=12, year=2020, month=1, day=2,
+                        background='gray20', selectmode='day', foreground='white', borderwidth=5, locale="el_GR",)
+        #self.service_calendar.drop_down()
+        self.service_calendar.place(relx=0.021, rely=0.630, relheight=0.300, relwidth=0.250)
+        self.service_calendar.bind('<<CalendarSelected>> ', self.get_date)
+
+    def get_date(self, event=None):
+        # https://pypi.org/project/tkcalendar/
+        print("Επιλεγμένη ημερομηνία ", self.service_calendar.get_date())
 
     def search_selected_copier_service(self, event=None):
         if not self.selected_copier_id:
