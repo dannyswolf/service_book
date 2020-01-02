@@ -6,8 +6,9 @@
 #    Dec 13, 2019 12:08:06 AM EET  platform: Windows NT
 
 """
-V0.7.8 Ευκολη αλλαγή καρτέλων =====================================================================02/01/2020
+V0.7.9 Αλλαγή χρωμάτων ============================================================================02/01/2020
 
+V0.7.8 Ευκολη αλλαγή καρτέλων =====================================================================02/01/2020
 
 V0.7.7 Backup added ===============================================================================02/01/2020
 
@@ -281,7 +282,7 @@ class Toplevel1:
         self.style.configure("mystyle.Treeview", background="white", rowheight=30)
 
         # ==============================  Notebook style  =============
-        self.style.map('TNotebook.Tab', background=[('selected', "green"), ('active', "blue")])
+        self.style.map('TNotebook.Tab', background=[('selected', "#999933"), ('active', "#33994d")])
         self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
 
         # ==========================  Notebook  ==================================
@@ -320,7 +321,7 @@ class Toplevel1:
         self.customer_title_label = tk.Label(self.customer_frame)
         self.customer_title_label.place(relx=0.021, rely=0.005, height=30, relwidth=0.847)
         self.customer_title_label.configure(font=("Calibri", 11, "bold"))
-        self.customer_title_label.configure(background="brown")
+        self.customer_title_label.configure(background="#994d33")
         self.customer_title_label.configure(disabledforeground="#a3a3a3")
         self.customer_title_label.configure(foreground="#ffffff")
         self.customer_title_label.configure(relief="groove")
@@ -713,7 +714,7 @@ class Toplevel1:
         self.update_customer_btn.place(relx=0.825, rely=0.280, height=30, relwidth=0.150)
         self.update_customer_btn.configure(activebackground="#ececec")
         self.update_customer_btn.configure(activeforeground="#000000")
-        self.update_customer_btn.configure(background="brown")
+        self.update_customer_btn.configure(background="#994d33")
         self.update_customer_btn.configure(disabledforeground="#a3a3a3")
         self.update_customer_btn.configure(foreground="#ffffff")
         self.update_customer_btn.configure(highlightbackground="#d9d9d9")
@@ -785,7 +786,7 @@ class Toplevel1:
         self.customer_search_btn.place(relx=0.022, rely=0.006, height=24, relwidth=0.188)
         self.customer_search_btn.configure(activebackground="#ececec")
         self.customer_search_btn.configure(activeforeground="#000000")
-        self.customer_search_btn.configure(background="brown")
+        self.customer_search_btn.configure(background="#994d33")
         self.customer_search_btn.configure(disabledforeground="#a3a3a3")
         self.customer_search_btn.configure(foreground="white")
         self.customer_search_btn.configure(highlightbackground="#d9d9d9")
@@ -1378,7 +1379,7 @@ class Toplevel1:
         except TclError as error:
             messagebox.showwarning("Προσοχή", "Παρακαλώ επιλεξτε πρώτα φωτοτυπικό")
             # ==============================  Notebook style  =============
-            self.style.map('TNotebook.Tab', background=[('selected', "green"), ('active', "blue")])
+            self.style.map('TNotebook.Tab', background=[('selected', "#999933"), ('active', "#33994d")])
             self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
             return
 
@@ -1389,7 +1390,7 @@ class Toplevel1:
             # Αυτή είναι συνάρτηση του αρχείου edi_service_windows
             create_edit_service_window(root, selected_service_id, selected_copier, selected_customer)
             # ==============================  Notebook style  =============
-            self.style.map('TNotebook.Tab', background=[('selected', "green"), ('active', "blue")])
+            self.style.map('TNotebook.Tab', background=[('selected', "#999933"), ('active', "#33994d")])
             self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
         else:
             if self.selected_copier_id:  # Αν ο χρήστης έχει επιλέξει φωτοτυπικό για να δεί το ιστορικό
@@ -1401,7 +1402,7 @@ class Toplevel1:
 
                 create_edit_service_window(root, selected_service_id, selected_copier, self.selected_customer)
                 # ==============================  Notebook style  =============
-                self.style.map('TNotebook.Tab', background=[('selected', "green"), ('active', "blue")])
+                self.style.map('TNotebook.Tab', background=[('selected', "#999933"), ('active', "#33994d")])
                 self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
 
 
@@ -1409,7 +1410,7 @@ class Toplevel1:
         selecteted_copier_id = (self.copiers_treeview.set(self.copiers_treeview.selection(), "#1"))
         create_add_service_window(root, selecteted_copier_id)
         # ==============================  Notebook style  =============
-        self.style.map('TNotebook.Tab', background=[('selected', "green"), ('active', "blue")])
+        self.style.map('TNotebook.Tab', background=[('selected', "#999933"), ('active', "#33994d")])
         self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
     # Αναζήτηση πελάτη
     def search_customer(self, event=None):

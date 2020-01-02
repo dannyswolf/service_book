@@ -88,19 +88,22 @@ class Toplevel1:
 
         self.style = ttk.Style()
         if sys.platform == "win32":
-            self.style.theme_use('winnative')
+            self.style.theme_use('clam')
         self.style.configure('.', background=_bgcolor)
         self.style.configure('.', foreground=_fgcolor)
         self.style.configure('.', font="TkDefaultFont")
         self.style.map('.', background=
         [('selected', _compcolor), ('active', _ana2color)])
+        # ==============================  Notebook style  =============
+        self.style.map('TNotebook.Tab', background=[('selected', "#999933"), ('active', "#33994d")])
+        self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
         self.top = top
         top.geometry("900x400+480+276")
         top.minsize(120, 1)
         top.maxsize(1604, 881)
         top.resizable(1, 1)
         top.title("Ενεργοποίηση πελάτη")
-        top.configure(background="#2b6895")
+        top.configure(background="#f6f6ee")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
         top.bind('<Escape>', self.quit)
@@ -111,7 +114,7 @@ class Toplevel1:
         self.select_customer_label.place(relx=0.017, rely=0.146, height=30, relwidth=0.244)
         self.select_customer_label.configure(activebackground="#f9f9f9")
         self.select_customer_label.configure(activeforeground="black")
-        self.select_customer_label.configure(background="brown")
+        self.select_customer_label.configure(background="#994d33")
         self.select_customer_label.configure(disabledforeground="#a3a3a3")
         self.select_customer_label.configure(foreground="white")
         self.select_customer_label.configure(highlightbackground="#d9d9d9")
@@ -447,7 +450,7 @@ class Toplevel1:
         self.add_btn.place(relx=0.344, rely=0.850, height=34, relwidth=0.250)
         self.add_btn.configure(activebackground="#ececec")
         self.add_btn.configure(activeforeground="#000000")
-        self.add_btn.configure(background="#800000")
+        self.add_btn.configure(background="#339933")
         self.add_btn.configure(disabledforeground="#a3a3a3")
         self.add_btn.configure(foreground="#ffffff")
         self.add_btn.configure(highlightbackground="#d9d9d9")
@@ -462,7 +465,7 @@ class Toplevel1:
 
         self.Label11 = tk.Label(top)
         self.Label11.place(relx=0.017, rely=0.058, height=21, relwidth=0.955)
-        self.Label11.configure(background="brown")
+        self.Label11.configure(background="#994d33")
         self.Label11.configure(disabledforeground="#a3a3a3")
         self.Label11.configure(foreground="#ffffff")
         self.Label11.configure(relief="ridge")

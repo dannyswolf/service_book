@@ -98,7 +98,7 @@ class Toplevel1:
         top.maxsize(1980, 1980)
         top.resizable(1, 1)
         top.title("Εικόνες")
-        top.configure(background="#006291")
+        top.configure(background="#f6f6ee")
         top.bind('<Escape>', self.quit)
         top.protocol("WM_DELETE_WINDOW", self.del_files)
         top.focus()

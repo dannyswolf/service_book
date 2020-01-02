@@ -85,12 +85,15 @@ class add_copier_window:
         _ana2color = '#ececec'  # Closest X11 color: 'gray92'
         self.style = ttk.Style()
         if sys.platform == "win32":
-            self.style.theme_use('winnative')
+            self.style.theme_use('clam')
         self.style.configure('.', background=_bgcolor)
         self.style.configure('.', foreground=_fgcolor)
         self.style.configure('.', font="TkDefaultFont")
         self.style.map('.', background=
         [('selected', _compcolor), ('active', _ana2color)])
+        # ==============================  Notebook style  =============
+        self.style.map('TNotebook.Tab', background=[('selected', "#999933"), ('active', "#33994d")])
+        self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
 
         self.customers_list = get_copiers_data()
         self.copiers = []
@@ -100,7 +103,7 @@ class add_copier_window:
         top.maxsize(1604, 881)
         top.resizable(1, 1)
         top.title("Αλλαγή πελάτη")
-        top.configure(background="#006291")
+        top.configure(background="#f6f6ee")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
         top.bind('<Escape>', self.quit)
