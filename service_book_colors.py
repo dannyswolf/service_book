@@ -6,7 +6,9 @@
 #    Dec 13, 2019 12:08:06 AM EET  platform: Windows NT
 
 """
-V0.7.7 Backup added ==== ==========================================================================02/01/2020
+V0.7.8 Ευκολη αλλαγή καρτέλων =====================================================================02/01/2020
+
+V0.7.7 Backup added ===============================================================================02/01/2020
 
 V0.7.6 ΤNotebook και Tabs ==========================================================================02/01/2020
 
@@ -206,7 +208,7 @@ class Toplevel1:
 
         self.style = ttk.Style()
         if sys.platform == "win32":
-            self.style.theme_use('alt')
+            self.style.theme_use('clam')
         self.style.configure('.',background=_bgcolor)
         self.style.configure('.',foreground=_fgcolor)
         self.style.configure('.',font=("Calibri", 10))
@@ -216,7 +218,7 @@ class Toplevel1:
         top.minsize(120, 1)
         top.maxsize(1980, 1980)
         top.resizable(1, 1)
-        top.title("Βιβλίο Επισκευών V0.7.7")
+        top.title("Βιβλίο Επισκευών V0.7.8")
         top.configure(background="#bfc2b6")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
@@ -264,7 +266,7 @@ class Toplevel1:
 
 
         #  Modify the font of the body
-        self.style.theme_create("mystyle.Treeview", parent="alt")
+        self.style.theme_create("mystyle.Treeview", parent="clam")
         self.style.configure("mystyle.Treeview.Heading", background="gray5", foreground="#006291", relief="groove")
         self.style.map('mystyle.Treeview', foreground=self.fixed_map('foreground'),
                        background=self.fixed_map('background'))
@@ -1136,6 +1138,7 @@ class Toplevel1:
 
     # Εμφάνηση φωτοτυπικών του επιλεγμένου πελάτη
     def view_copiers(self, event=None):
+        self.notebook.select(tab_id=0)
         # Απενεργοποιηση του κουμπιου προσθήκης ιστορικού
         self.add_service_btn.configure(state="disabled")
         self.add_service_btn.configure(background="#6b6b6b")
@@ -1225,7 +1228,7 @@ class Toplevel1:
         :param event:
         :return:
         """
-
+        self.notebook.select(tab_id=3)
         # Ενεργοποιηση του κουμπιου προσθήκης ιστορικού
         if event:
             self.add_service_btn.configure(activebackground="#6b6b6b")
