@@ -6,6 +6,8 @@
 #    Dec 13, 2019 12:08:06 AM EET  platform: Windows NT
 
 """
+V0.7.7 Backup added ==== ==========================================================================02/01/2020
+
 V0.7.6 ΤNotebook και Tabs ==========================================================================02/01/2020
 
 V0.7.5 Fix  bug μεταφορά φωτοτυπικού ===============================================================31/12/2019
@@ -247,6 +249,11 @@ class Toplevel1:
         self.copier_menu.add_command(label="Μεταφορά φωτοτυπικού", command=self.change_copier)
         self.copier_menu.add_command(label="Ενεργοποίηση φωτοτυπικού", command=self.enable_copiers)
         self.copier_menu.add_command(label="Ιστορικό Μεταφορών", command=self.get_copiers_log)
+
+        self.backup_menu = tk.Menu(self.menubar, tearoff=0)
+        self.menubar.add_cascade(label="Backup", menu=self.backup_menu)
+        self.backup_menu.add_command(label="Δημιουργία αντίγραφο ασφαλείας!", command=self.backup)
+
         #
         # self.info_menu = tk.Menu(self.menubar, tearoff=0)
         # self.menubar.add_cascade(label="Info", menu=self.info_menu)
@@ -1616,6 +1623,57 @@ class Toplevel1:
         up_cursor.close()
         up_conn.close()
         messagebox.showinfo("Info", f"Τα στοιχεία του Φωτοτυπικού {self.selected_copier} του πελάτη {self.selected_customer} ενημερώθηκαν επιτυχώς")
+
+    # Αντίγραφα ασφαλείας
+    def backup(self):
+
+        def progress(status, remainig, total):
+            print(f"{status} Αντιγράφηκαν {total - remainig} απο {total} σελίδες...")
+
+        try:
+            now = datetime.now().strftime("%d %m %Y %H %M %S")
+            today = datetime.today().strftime("%d %m %Y")
+            back_dir = "backups" + "\\" + today + "\\"
+
+            backup_file = os.path.join(back_dir, os.path.basename(dbase[:-3]) + " " + now + ".db")
+            # print("============BACKUP FILE===========Line 542=\n", backup_file, "\n")
+            if not os.path.exists(back_dir):
+                os.makedirs(back_dir)
+            else:
+                pass
+            # Υπάρχουσα βάση
+            conn = sqlite3.connect(dbase)
+            print("===========Υπάρχουσα βάση===========Line 744\n ", dbase, "\n")
+
+            # Δημιουργία νέας βάσης και αντίγραφο ασφαλείας
+            back_conn = sqlite3.connect(backup_file)
+            with back_conn:
+                conn.backup(back_conn, pages=10, progress=progress)
+                back_conn.close()
+                text = "Η βάση αντιγράφηκε :  "
+                result = text + os.path.realpath(backup_file)
+                # print("=====Αποτέλεσμα ====Line 558\n", result)
+                # Ειναι ενοχλητικο να εμφανιζει καθε φορα μηνυμα οτι εγινε backup
+                messagebox.showinfo('Αποτέλεσμα αντιγράφου ασφαλείας', result)
+        except FileNotFoundError as file_error:
+            messagebox.showwarning("Σφάλμα...", "{}".format(file_error))
+            print("File Error Line 641", file_error)
+
+        except sqlite3.Error as error:
+            if not os.path.exists(backup_file):
+                result = "Σφάλμα κατα την αντιγραφή : ", error
+                messagebox.showwarning("Σφάλμα...", "{}".format(result))
+        finally:
+            try:
+                if back_conn:
+                    back_conn.close()
+                    print("Δημιουργία αντιγράφου ασφαλείας στο αρχείο  ", backup_file, " ολοκληρώθηκε")
+            except UnboundLocalError as error:
+                print(f"Η σύνδεση με {backup_file} δεν έγινε ποτέ Line 1670 {error}")
+                messagebox.showinfo(f"Η σύνδεση με {backup_file} δεν έγινε ποτέ  {error}")
+
+
+
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):
     '''Configure the scrollbars for a widget.'''
