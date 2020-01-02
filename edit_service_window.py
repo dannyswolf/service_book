@@ -196,7 +196,7 @@ class edit_service_window():
 
         # Αρχεία
         self.show_files_btn = tk.Button(top)
-        self.show_files_btn.place(relx=0.725, rely=0.230, height=55, relwidth=0.237)
+        self.show_files_btn.place(relx=0.720, rely=0.500, height=60, relwidth=0.250)
         self.show_files_btn.configure(activebackground="#ececec")
         self.show_files_btn.configure(activeforeground="#000000")
         self.show_files_btn.configure(background="#6b6b6b")
@@ -274,7 +274,7 @@ class edit_service_window():
 
         # Προσθήκη αρχείων
         self.add_files_btn = tk.Button(top)
-        self.add_files_btn.place(relx=0.720, rely=0.500, height=60, relwidth=0.250)
+        self.add_files_btn.place(relx=0.725, rely=0.230, height=55, relwidth=0.237)
         self.add_files_btn.configure(activebackground="#ececec")
         self.add_files_btn.configure(activeforeground="#000000")
         self.add_files_btn.configure(background="green")
@@ -283,7 +283,7 @@ class edit_service_window():
         self.add_files_btn.configure(highlightbackground="#d9d9d9")
         self.add_files_btn.configure(highlightcolor="black")
         self.add_files_btn.configure(pady="0")
-        self.add_files_btn.configure(text='''Προσθήκη αρχείων''')
+        self.add_files_btn.configure(text='''Προσθήκη\nαρχείων''')
         self.add_files_btn.configure(command=self.add_files)
 
         # Δελτίο Τεχνικής Εξυπηρέτησης

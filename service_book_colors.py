@@ -6,6 +6,8 @@
 #    Dec 13, 2019 12:08:06 AM EET  platform: Windows NT
 
 """
+V0.8.1 Change layout   ============================================================================02/01/2020
+
 V0.8.0 Προσθήκη ημερολογίου =======================================================================02/01/2020
 
 V0.7.9 Αλλαγή χρωμάτων ============================================================================02/01/2020
@@ -286,7 +288,7 @@ class Toplevel1:
         self.style.configure("mystyle.Treeview", background="white", rowheight=30)
 
         # ==============================  Notebook style  =============
-        self.style.map('TNotebook.Tab', background=[('selected', "#999933"), ('active', "#33994d")])
+        self.style.map('TNotebook.Tab', background=[('selected', "#999933"), ('active', "blue")])
         self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
 
         # ==========================  Notebook  ==================================
@@ -297,7 +299,7 @@ class Toplevel1:
         self.copiers_frame = tk.Frame(self.notebook)
         self.notebook.add(self.copiers_frame, padding=3)
         self.notebook.tab(0, text="Φωτοτυπικά", compound="left", underline="-1", )
-        self.copiers_frame.configure(background="#d9d9d9")
+        self.copiers_frame.configure(background="#CFD5CE")
         self.copiers_frame.configure(highlightbackground="#d9d9d9")
         self.copiers_frame.configure(highlightcolor="black")
 
@@ -742,7 +744,7 @@ class Toplevel1:
         self.notes_label.configure(text="Σημειώσεις")
         # Σημειώσεις Φωτοτυπικού
         self.copier_notes_scrolledtext = ScrolledText(self.copier_frame)
-        self.copier_notes_scrolledtext.place(relx=0.021, rely=0.400, relheight=0.220, relwidth=0.700)
+        self.copier_notes_scrolledtext.place(relx=0.021, rely=0.400, relheight=0.520, relwidth=0.700)
         self.copier_notes_scrolledtext.configure(background="white")
         self.copier_notes_scrolledtext.configure(font="TkTextFont")
         self.copier_notes_scrolledtext.configure(foreground="black")
@@ -840,7 +842,7 @@ class Toplevel1:
         self.copier_search_btn.configure(text="Αναζήτηση Φωτοτυπικού")
         # Πίνακας φωτοτυπικών
         self.copiers_treeview = ScrolledTreeView(self.copiers_frame)
-        self.copiers_treeview.place(relx=0.022, rely=0.175, relheight=0.600, relwidth=0.450)
+        self.copiers_treeview.place(relx=0.022, rely=0.175, relheight=0.810, relwidth=0.450)
         self.copiers_treeview["columns"] = ["ID", "Φωτοτυπικά"]
         self.copiers_treeview.heading("Φωτοτυπικά", text="Φωτοτυπικά", anchor="center")
         self.copiers_treeview.column("Φωτοτυπικά", anchor="w")
@@ -872,7 +874,7 @@ class Toplevel1:
         self.add_service_btn.configure(highlightcolor="black")
         self.add_service_btn.configure(pady="0")
         self.add_service_btn.configure(command=self.add_service)
-        self.add_service_btn.configure(text="Εισαγωγή ιστορικού")
+        self.add_service_btn.configure(text="Προσθήκη συντήρησης")
         self.add_service_img = PhotoImage(file="icons/add_service.png")
         self.add_service_btn.configure(image=self.add_service_img)
         self.add_service_btn.configure(compound="left")
@@ -1179,8 +1181,7 @@ class Toplevel1:
         self.serial_entry.configure(textvariable=var)
         self.copiers_title_label.configure(text="Στοιχεία φωτοτυπικού")
         self.copier_notes_scrolledtext.delete('1.0', 'end-1c')
-        self.search_selected_copier_service_btn.configure(text="")
-        self.search_selected_copier_service_btn.place(relx=0.225, rely=0.180, height=20, relwidth=0.030)
+        self.Label16.configure(text='''Ιστορικό''')
 
         self.selected_copier_id = ""
 
@@ -1265,10 +1266,8 @@ class Toplevel1:
 
         # Εμφάνηση επιλεγμένου φωτοτυπικού
         self.copiers_title_label.configure(text=self.selected_copier)
-        self.search_selected_copier_service_btn.configure(compound='left')
-        self.search_selected_copier_service_btn.configure(foreground="white", font=("Calibri", 10, "bold"))
-        self.search_selected_copier_service_btn.configure(text=self.selected_copier)
-        self.search_selected_copier_service_btn.place(relx=0.225, rely=0.180, height=20, relwidth=0.300)
+
+        self.Label16.configure(text=self.selected_copier)
 
         service_conn = sqlite3.connect(dbase)
         service_cursor = service_conn.cursor()
@@ -1395,7 +1394,7 @@ class Toplevel1:
         except TclError as error:
             messagebox.showwarning("Προσοχή", "Παρακαλώ επιλεξτε πρώτα φωτοτυπικό")
             # ==============================  Notebook style  =============
-            self.style.map('TNotebook.Tab', background=[('selected', "#999933"), ('active', "#33994d")])
+            self.style.map('TNotebook.Tab', background=[('selected', "#999933"), ('active', "blue")])
             self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
             return
 
@@ -1406,7 +1405,7 @@ class Toplevel1:
             # Αυτή είναι συνάρτηση του αρχείου edi_service_windows
             create_edit_service_window(root, selected_service_id, selected_copier, selected_customer)
             # ==============================  Notebook style  =============
-            self.style.map('TNotebook.Tab', background=[('selected', "#999933"), ('active', "#33994d")])
+            self.style.map('TNotebook.Tab', background=[('selected', "#999933"), ('active', "blue")])
             self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
         else:
             if self.selected_copier_id:  # Αν ο χρήστης έχει επιλέξει φωτοτυπικό για να δεί το ιστορικό
@@ -1418,7 +1417,7 @@ class Toplevel1:
 
                 create_edit_service_window(root, selected_service_id, selected_copier, self.selected_customer)
                 # ==============================  Notebook style  =============
-                self.style.map('TNotebook.Tab', background=[('selected', "#999933"), ('active', "#33994d")])
+                self.style.map('TNotebook.Tab', background=[('selected', "#999933"), ('active', "blue")])
                 self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
 
 
@@ -1426,7 +1425,7 @@ class Toplevel1:
         selecteted_copier_id = (self.copiers_treeview.set(self.copiers_treeview.selection(), "#1"))
         create_add_service_window(root, selecteted_copier_id)
         # ==============================  Notebook style  =============
-        self.style.map('TNotebook.Tab', background=[('selected', "#999933"), ('active', "#33994d")])
+        self.style.map('TNotebook.Tab', background=[('selected', "#999933"), ('active', "blue")])
         self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
     # Αναζήτηση πελάτη
     def search_customer(self, event=None):
@@ -1514,7 +1513,7 @@ class Toplevel1:
         self.copier_notes_scrolledtext.delete('1.0', 'end-1c')
         try:
             self.service_treeview.delete(*self.service_treeview.get_children())
-            self.search_selected_copier_service_btn.configure(text="")
+            self.Label16.configure(text='''Ιστορικό''')
             # Απενεργοποιηση του κουμπιου προσθήκης ιστορικού
             self.add_service_btn.configure(state="disabled")
             self.add_service_btn.configure(background="#6b6b6b")
