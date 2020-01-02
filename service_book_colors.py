@@ -6,6 +6,8 @@
 #    Dec 13, 2019 12:08:06 AM EET  platform: Windows NT
 
 """
+V0.8.2 Change icons   ============================================================================02/01/2020
+
 V0.8.1 Change layout   ============================================================================02/01/2020
 
 V0.8.0 Προσθήκη ημερολογίου =======================================================================02/01/2020
@@ -226,7 +228,7 @@ class Toplevel1:
         top.minsize(120, 1)
         top.maxsize(1980, 1980)
         top.resizable(1, 1)
-        top.title("Βιβλίο Επισκευών V0.8.0")
+        top.title("Βιβλίο Επισκευών V0.8.2")
         top.configure(background="#bfc2b6")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
