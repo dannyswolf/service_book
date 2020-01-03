@@ -15,6 +15,7 @@ from tkinter import StringVar, messagebox, PhotoImage, filedialog
 import add_service_window_support
 import platform
 from datetime import datetime
+import add_spare_parts
 
 dbase = "Service_book.db"
 selected_copier_id = None
@@ -132,6 +133,9 @@ class add_service_window():
         top.focus()
         top.bind('<Escape>', self.quit)
 
+        self.files = ""
+        self.service_id = self.get_service_id()
+
         self.date_label = tk.Label(top)
         self.date_label.place(relx=0.025, rely=0.150, height=31, relwidth=0.260)
         self.date_label.configure(activebackground="#f9f9f9")
@@ -157,6 +161,11 @@ class add_service_window():
         self.purpose_label.configure(highlightcolor="black")
         self.purpose_label.configure(relief="groove")
         self.purpose_label.configure(text='''Σκοπός επίσκεψης''')
+        self.purpose_combobox = ttk.Combobox(top)
+        self.purpose_combobox.place(relx=0.29, rely=0.330, relheight=0.043, relwidth=0.500)
+        self.purpose_combobox.configure(values=self.purpose_list)
+        # self.purpose_combobox.configure(textvariable=edit_service_window_support.combobox)
+        self.purpose_combobox.configure(takefocus="")
 
         self.actions_label = tk.Label(top)
         self.actions_label.place(relx=0.025, rely=0.390, height=31, relwidth=0.260)
@@ -170,6 +179,25 @@ class add_service_window():
         self.actions_label.configure(highlightcolor="black")
         self.actions_label.configure(relief="groove")
         self.actions_label.configure(text='''Ενέργειες''')
+        self.actions_combobox = ttk.Combobox(top)
+        self.actions_combobox.place(relx=0.29, rely=0.390, relheight=0.043, relwidth=0.500)
+        self.actions_combobox.configure(values=self.actions_list)
+        # self.actions_combobox.configure(textvariable=edit_service_window_support.combobox)
+        self.actions_combobox.configure(takefocus="")
+
+        # Ανταλλακτικά
+        self.add_spare_parts_btn = tk.Button(top)
+        self.add_spare_parts_btn.place(relx=0.525, rely=0.450, height=31, relwidth=0.250)
+        self.add_spare_parts_btn.configure(activebackground="#ececec")
+        self.add_spare_parts_btn.configure(activeforeground="#000000")
+        self.add_spare_parts_btn.configure(background="green")
+        self.add_spare_parts_btn.configure(disabledforeground="#a3a3a3")
+        self.add_spare_parts_btn.configure(foreground="#ffffff")
+        self.add_spare_parts_btn.configure(highlightbackground="#d9d9d9")
+        self.add_spare_parts_btn.configure(highlightcolor="black")
+        self.add_spare_parts_btn.configure(pady="0")
+        self.add_spare_parts_btn.configure(text='''Προσθήκη ανταλλακτικών''')
+        self.add_spare_parts_btn.configure(command=self.add_spare_parts)
 
         # Δελτίο Τεχνικής Εξυπηρέτησης
         self.dte_label = tk.Label(top)
@@ -297,13 +325,6 @@ class add_service_window():
         self.notes_scrolledtext.configure(selectforeground="black")
         self.notes_scrolledtext.configure(wrap="none")
 
-        self.purpose_combobox = ttk.Combobox(top)
-        self.purpose_combobox.place(relx=0.29, rely=0.330, relheight=0.043, relwidth=0.500)
-
-        self.purpose_combobox.configure(values=self.purpose_list)
-        # self.purpose_combobox.configure(textvariable=edit_service_window_support.combobox)
-        self.purpose_combobox.configure(takefocus="")
-
         self.add_to_service_data_btn1 = tk.Button(top)
         self.add_to_service_data_btn1.place(relx=0.800, rely=0.330, height=29, relwidth=0.060)
         self.add_to_service_data_btn1.configure(background="#006291")
@@ -311,11 +332,6 @@ class add_service_window():
         self.add_to_service_data_btn1.configure(image=self.add_to_service_data_img1)
         self.add_to_service_data_btn1.configure(command=lambda: (self.add_to_service_data("Σκοπός")))
 
-        self.actions_combobox = ttk.Combobox(top)
-        self.actions_combobox.place(relx=0.29, rely=0.390, relheight=0.043, relwidth=0.500)
-        self.actions_combobox.configure(values=self.actions_list)
-        # self.actions_combobox.configure(textvariable=edit_service_window_support.combobox)
-        self.actions_combobox.configure(takefocus="")
 
         self.add_to_service_data_btn2 = tk.Button(top)
         self.add_to_service_data_btn2.place(relx=0.800, rely=0.390, height=29, relwidth=0.060)
@@ -503,9 +519,29 @@ class add_service_window():
 
         self.top.focus()
 
+    # Προσθήκη αρχείων στην βάση
     def add_files_to_db(self):
         if self.files == "":
             return
+        con = sqlite3.connect(dbase)
+        cu = con.cursor()
+
+        # Εισαγωγη αρχείων
+        for img in self.files:
+            base = os.path.basename(img)
+            filename, ext = os.path.splitext(base)
+
+            with open(img, 'rb') as f:
+                file = f.read()  # Εισαγωγη αρχείων
+            cu.execute("INSERT INTO Service_images(Service_ID, Filename, Type, File, Copier_ID)VALUES(?,?,?,?,?)",
+                       (self.service_id, filename, ext, sqlite3.Binary(file), self.selected_copier_id))
+
+        con.commit()
+        con.close()
+        messagebox.showinfo("Info", f"Οι εικόνες προστέθηκαν επιτυχώς")
+        self.top.focus()
+
+    def get_service_id(self):
         con = sqlite3.connect(dbase)
         cu = con.cursor()
         # Να πάρουμε πρώτα το τελευταίο ID απο τον πίνακα sqlite_sequence το πεδία Service
@@ -518,23 +554,14 @@ class add_service_window():
             if name[0] == "Service":
                 services_ID = name[1]
 
-                new_service_ID = int(services_ID) + 1
-                break
+                new_service_id = int(services_ID) + 1
+                cu.close()
+                con.close()
+                return new_service_id
 
-        # Εισαγωγη αρχείων
-        for img in self.files:
-            base = os.path.basename(img)
-            filename, ext = os.path.splitext(base)
-
-            with open(img, 'rb') as f:
-                file = f.read()  # Εισαγωγη αρχείων
-            cu.execute("INSERT INTO Service_images(Service_ID, Filename, Type, File, Copier_ID)VALUES(?,?,?,?,?)",
-                       (new_service_ID, filename, ext, sqlite3.Binary(file), self.selected_copier_id))
-
-        con.commit()
-        con.close()
-        messagebox.showinfo("Info", f"Οι εικόνες προστέθηκαν επιτυχώς")
-        self.top.focus()
+    # Προσθήκη ανταλλακτικών
+    def add_spare_parts(self):
+        add_spare_parts.create_Toplevel1(self.top, self.service_id)
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):

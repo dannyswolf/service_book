@@ -6,6 +6,13 @@
 #    Dec 13, 2019 12:08:06 AM EET  platform: Windows NT
 
 """
+todo sizes to upladed images
+todo one file for logs
+todo αν ο χρήστης πατήση ακυρο κατα την προσθήκη επισκευής τι θα γίνει με τα ανταλλακιτκα που έχουν οριστεί με νεο service_id
+
+V0.9.0 Προσθήκη ανταλλακτικών  ===================================================================03/01/2020
+Αρχεία 1 add_spare_parts
+
 V0.8.2 Change icons   ============================================================================02/01/2020
 
 V0.8.1 Change layout   ============================================================================02/01/2020
@@ -41,7 +48,7 @@ V0.6.8 Προβολή και αποθήκευση αρχείων pdf ===========
 
 V0.6.7 Δυνατότητα προσθήκης αρχείων και στην επεξεργασία service ===================================28/12/2019
 
-todo sizes to upladed images
+
 V0.6.6 Προσθήκη Αρχείων  ===========================================================================27/12/2019
 Αρχεία 1 image_viewer
 Δυνατότητα εισαγωγεις αρχείων και προβλολής αυτών
@@ -141,8 +148,8 @@ handler = logging.FileHandler(log_file, 'w', 'utf-8')  # or whatever
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')  # or whatever
 handler.setFormatter(formatter)  # Pass handler as a parameter, not assign
 root_logger.addHandler(handler)
-sys.stderr.write = root_logger.error
-sys.stdout.write = root_logger.info
+#sys.stderr.write = root_logger.error
+#sys.stdout.write = root_logger.info
 
 # Αποκόμιση  πινάκων απο την βάση δεδομένων
 def get_tables():
@@ -290,7 +297,7 @@ class Toplevel1:
         self.style.configure("mystyle.Treeview", background="white", rowheight=30)
 
         # ==============================  Notebook style  =============
-        self.style.map('TNotebook.Tab', background=[('selected', "#999933"), ('active', "blue")])
+        self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "blue")])
         self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
 
         # ==========================  Notebook  ==================================
@@ -338,7 +345,7 @@ class Toplevel1:
         # Διαγραφή πελάτη
         self.del_customer_btn = tk.Button(self.customer_frame)
         self.del_customer_btn.place(relx=0.870, rely=0.005, height=30, relwidth=0.030)
-        self.del_customer_btn.configure(activebackground="#808000")
+        self.del_customer_btn.configure(activebackground="#6b6b6b")
         self.del_customer_btn.configure(activeforeground="#000000")
         self.del_customer_btn.configure(background="#CFD5CE")
         self.del_customer_btn.configure(disabledforeground="#a3a3a3")
@@ -641,7 +648,7 @@ class Toplevel1:
 
         self.copiers_title_label = tk.Label(self.copier_frame)
         self.copiers_title_label.place(relx=0.021, rely=0.006, height=30, relwidth=0.847)
-        self.copiers_title_label.configure(background="#808000")
+        self.copiers_title_label.configure(background="#6b6b6b")
         self.copiers_title_label.configure(disabledforeground="#a3a3a3")
         self.copiers_title_label.configure(foreground="#ffffff")
         self.copiers_title_label.configure(font=("Calibri", 10, "bold"))
@@ -653,7 +660,7 @@ class Toplevel1:
         self.serial_label.place(relx=0.021, rely=0.100, height=20, relwidth=0.200)
         self.serial_label.configure(activebackground="#f9f9f9")
         self.serial_label.configure(activeforeground="black")
-        self.serial_label.configure(background="#808000")
+        self.serial_label.configure(background="#6b6b6b")
         self.serial_label.configure(disabledforeground="#a3a3a3")
         self.serial_label.configure(foreground="#ffffff")
         self.serial_label.configure(highlightbackground="#d9d9d9")
@@ -674,9 +681,9 @@ class Toplevel1:
         # Μετρητής Εναρξης
         self.Label12 = tk.Label(self.copier_frame)
         self.Label12.place(relx=0.021, rely=0.180, height=21, relwidth=0.200)
-        self.Label12.configure(activebackground="#808000")
+        self.Label12.configure(activebackground="#6b6b6b")
         self.Label12.configure(activeforeground="black")
-        self.Label12.configure(background="#808000")
+        self.Label12.configure(background="#6b6b6b")
         self.Label12.configure(disabledforeground="#a3a3a3")
         self.Label12.configure(foreground="#ffffff")
         self.Label12.configure(highlightbackground="#d9d9d9")
@@ -699,7 +706,7 @@ class Toplevel1:
         self.Label11.place(relx=0.021, rely=0.260, height=21, relwidth=0.200)
         self.Label11.configure(activebackground="#f9f9f9")
         self.Label11.configure(activeforeground="black")
-        self.Label11.configure(background="#808000")
+        self.Label11.configure(background="#6b6b6b")
         self.Label11.configure(disabledforeground="#a3a3a3")
         self.Label11.configure(foreground="#ffffff")
         self.Label11.configure(highlightbackground="#d9d9d9")
@@ -737,7 +744,7 @@ class Toplevel1:
         self.notes_label.place(relx=0.021, rely=0.340, height=20, relwidth=0.700)
         self.notes_label.configure(activebackground="#f9f9f9")
         self.notes_label.configure(activeforeground="black")
-        self.notes_label.configure(background="#808000")
+        self.notes_label.configure(background="#6b6b6b")
         self.notes_label.configure(disabledforeground="#a3a3a3")
         self.notes_label.configure(foreground="#ffffff")
         self.notes_label.configure(highlightbackground="#d9d9d9")
@@ -761,7 +768,7 @@ class Toplevel1:
         # Διαγραφή Φωτοτυπικού
         self.del_copier_btn = tk.Button(self.copier_frame)
         self.del_copier_btn.place(relx=0.870, rely=0.006, height=30, relwidth=0.030)
-        self.del_copier_btn.configure(activebackground="#808000")
+        self.del_copier_btn.configure(activebackground="#6b6b6b")
         self.del_copier_btn.configure(activeforeground="#000000")
         self.del_copier_btn.configure(background="#CFD5CE")
         self.del_copier_btn.configure(disabledforeground="#a3a3a3")
@@ -780,7 +787,7 @@ class Toplevel1:
         self.update_copier_btn.place(relx=0.570, rely=0.130, height=35, relwidth=0.130)
         self.update_copier_btn.configure(activebackground="#ececec")
         self.update_copier_btn.configure(activeforeground="#000000")
-        self.update_copier_btn.configure(background="#808000")
+        self.update_copier_btn.configure(background="#6b6b6b")
         self.update_copier_btn.configure(disabledforeground="#a3a3a3")
         self.update_copier_btn.configure(foreground="#ffffff")
         self.update_copier_btn.configure(highlightbackground="#d9d9d9")
@@ -833,7 +840,7 @@ class Toplevel1:
         self.copier_search_btn.place(relx=0.222, rely=0.100, height=24, relwidth=0.188)
         self.copier_search_btn.configure(activebackground="#ececec")
         self.copier_search_btn.configure(activeforeground="#000000")
-        self.copier_search_btn.configure(background="#808000")
+        self.copier_search_btn.configure(background="#6b6b6b")
         self.copier_search_btn.configure(disabledforeground="#a3a3a3")
         self.copier_search_btn.configure(foreground="white")
         self.copier_search_btn.configure(highlightbackground="#d9d9d9")
@@ -1400,7 +1407,7 @@ class Toplevel1:
         except TclError as error:
             messagebox.showwarning("Προσοχή", "Παρακαλώ επιλεξτε πρώτα φωτοτυπικό")
             # ==============================  Notebook style  =============
-            self.style.map('TNotebook.Tab', background=[('selected', "#999933"), ('active', "blue")])
+            self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "blue")])
             self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
             return
 
@@ -1411,7 +1418,7 @@ class Toplevel1:
             # Αυτή είναι συνάρτηση του αρχείου edi_service_windows
             create_edit_service_window(root, selected_service_id, selected_copier, selected_customer)
             # ==============================  Notebook style  =============
-            self.style.map('TNotebook.Tab', background=[('selected', "#999933"), ('active', "blue")])
+            self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "blue")])
             self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
         else:
             if self.selected_copier_id:  # Αν ο χρήστης έχει επιλέξει φωτοτυπικό για να δεί το ιστορικό
@@ -1423,7 +1430,7 @@ class Toplevel1:
 
                 create_edit_service_window(root, selected_service_id, selected_copier, self.selected_customer)
                 # ==============================  Notebook style  =============
-                self.style.map('TNotebook.Tab', background=[('selected', "#999933"), ('active', "blue")])
+                self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "blue")])
                 self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
 
 
@@ -1431,7 +1438,7 @@ class Toplevel1:
         selecteted_copier_id = (self.copiers_treeview.set(self.copiers_treeview.selection(), "#1"))
         create_add_service_window(root, selecteted_copier_id)
         # ==============================  Notebook style  =============
-        self.style.map('TNotebook.Tab', background=[('selected', "#999933"), ('active', "blue")])
+        self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "blue")])
         self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
     # Αναζήτηση πελάτη
     def search_customer(self, event=None):

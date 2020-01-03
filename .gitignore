@@ -4,3 +4,22 @@ __pycache__
 .idea
 
 /Φωτοτυπικά.csv
+/logs/
+"Service_book - \316\221\316\275\317\204\316\271\316\263\317\201\316\261\317\206\316\256.db"
+Service_images.csv
+backups/
+build/
+dbase.db
+dist/
+icons/add_service_resized.png
+icons/add_to_service_data1_resized.png
+icons/add_to_service_data2_resized.png
+icons/add_to_service_data_resized.jpg
+icons/refresh-big_resized.png
+icons/refresh-icon-sync-icon-png-favpng-8jkYnzt2QyYLjpuRmDEBW5dhe.jpg
+icons/refresh-icon-sync-icon-png-favpng-8jkYnzt2QyYLjpuRmDEBW5dhe_resized.jpg
+icons/user_remove_man_male_profile_account_person-512.png
+service_book_colors.spec
+service_calendar.py
+test.py
+/dist/
