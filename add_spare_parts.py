@@ -5,7 +5,10 @@
 #  in conjunction with Tcl version 8.6
 #    Dec 26, 2019 12:38:51 AM EET  platform: Windows NT
 
+import logging
 import sys
+import os
+from datetime import datetime
 from tkinter import PhotoImage, StringVar, messagebox
 import sqlite3
 dbase = "3. ΚΑΙΝΟΥΡΙΑ_ΑΠΟΘΗΚΗ.db"
@@ -23,6 +26,20 @@ except ImportError:
     py3 = True
 
 import copiers_log_support
+# -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE------------------
+today = datetime.today().strftime("%d %m %Y")
+log_dir = "logs" + "\\" + today + "\\"
+log_file_name = "service_book_log" + datetime.now().strftime("%d %m %Y %H %M %S") + ".log"
+log_file = os.path.join(log_dir, log_file_name)
+# log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+root_logger = logging.getLogger()
+root_logger.setLevel(logging.DEBUG)  # or whatever
+handler = logging.FileHandler(log_file, 'w', 'utf-8')  # or whatever
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')  # or whatever
+handler.setFormatter(formatter)  # Pass handler as a parameter, not assign
+root_logger.addHandler(handler)
+sys.stderr.write = root_logger.error
+sys.stdout.write = root_logger.info
 
 def get_tables():
     needed_tables = ['BROTHER', 'CANON', 'KONICA', 'KYOCERA', 'LEXMARK', 'OKI', 'RICOH', 'SAMSUNG', 'SHARP']
@@ -52,7 +69,7 @@ service_id = ""
 def create_Toplevel1(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
     global w, w_win, rt, service_id
-    service_id = args[0]  # Το Service_ID απο το add_service.py
+    service_id = args[0]  # Το Service_ID απο το add_service.py και edit_service_windows
     rt = root
     w = tk.Toplevel (root)
     top = Toplevel1 (w)
@@ -86,9 +103,10 @@ class Toplevel1:
         self.style.map('.',background=
             [('selected', _compcolor), ('active',_ana2color)])
         # ==============================  Notebook style  =============
-        self.style.map('TNotebook.Tab', background=[('selected', "#999933"), ('active', "#33994d")])
+        self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#33994d")])
         self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
         self.top = top
+
         top.geometry("1024x500+310+227")
         top.minsize(120, 1)
         top.maxsize(2250, 2040)
@@ -97,11 +115,13 @@ class Toplevel1:
         top.configure(background="#f6f6ee")
         top.focus()
         top.bind('<Escape>', self.quit)
+        # top.protocol("WM_DELETE_WINDOW", self.previous_top.focus())
 
         self.companies = get_tables()
         self.headers = []
         self.selected_company = ""
         self.service_ID = service_id
+
         self.select_company_label = tk.Label(top)
         self.select_company_label.place(relx=0.025, rely=0.200, relheight=0.060, relwidth=0.260)
         self.select_company_label.configure(activebackground="#f9f9f9")
@@ -176,6 +196,10 @@ class Toplevel1:
         self.Label1.configure(foreground="#ffffff")
         self.Label1.configure(relief="groove")
         self.Label1.configure(text='''Επιλογή ανταλλακτικών''')
+
+        if not self.service_ID:
+            messagebox.showerror("Σφάλμα!", "Παρακαλώ επιλεξτε πρώτα ιστορικό συντήρησής.")
+            self.quit()
 
     def get_spare_parts(self, event=None):
         self.selected_company = self.company_combobox.get()
@@ -253,31 +277,105 @@ class Toplevel1:
         service_cursor = service_con.cursor()
         # # sql_insert = "INSERT INTO  " + table + "(" + culumns + ")" + "VALUES(NULL, ?, ?, ?, ?, ?, ?, ?);"
 
-        not_needed_keys = ["ID", "id", 'Id']
+        # Ελεγχος αν το ανταλλακτικό υπάρχει τοτε να προσθέση στα τεμαχια +1
+        # o ελεγχος γίνεται με τους κωδικους προιόντος
+        # αν ο κωδικός υπάρχει στο ιστορικό του Service_ID τότε ρωτάει και αναλογα προσθέτη +1 στο τεμάχιο
+        # πρώτα πέρνουμε του κωδικούς
+        service_cursor.execute("SELECT ΚΩΔΙΚΟΣ FROM Ανταλλακτικά WHERE Service_ID =?", (self.service_ID,))
+        spare_parts = service_cursor.fetchall()
+        service_con.close()
+        used_parts = []
+        for part in spare_parts:
+            # εδω τα κάνουμε σε λίστα γιατι το fetchall επιστρέφει [('6207',), ('6208',)]
+            used_parts.append(part[0])
+
         added_codes = []
         for item in items_to_add:
-            values = []  # values είναι πόσα ? να έχει ανάλογα τα culumn ==> keys
-            keys = []
-            data = []
             for key, value in item.items():   # Dictionary
+                if key == "ΚΩΔΙΚΟΣ":  #
+                    added_codes.append(value)
+                # όταν το value  πάρει την τιμή του κωδικού πχ 6207 και ο κωδικός αυτός υπάρχει στα Service_ID
+                # τότε προσθέτη +1 στο πεδίο Τεμάχια του πίνακα Ανταλλακτικά στο κωδικό 6207
+                if value in used_parts:  # value είναι ο κωδικός ==> 6207
+
+                    answer = messagebox.askyesno("Προσοχή!", f"Ο κωδικός  {value}, υπάρχει στο ιστορικό αυτό "
+                                                              f"θέλετε να το ξανα προσθέσετε;")
+
+                    # Προσθήκη +1 στα τεμάχια
+                    if answer:
+                        service_con = sqlite3.connect(service_db)
+                        service_cursor = service_con.cursor()
+                        service_cursor.execute("SELECT ΤΕΜΑΧΙΑ FROM Ανταλλακτικά WHERE ΚΩΔΙΚΟΣ = ? AND Service_ID =?",
+                                               (value, self.service_ID,))
+                        pieces = service_cursor.fetchall()
+                        new_pieces = int(pieces[0][0]) + 1
+                        service_cursor.execute("UPDATE Ανταλλακτικά SET ΤΕΜΑΧΙΑ =? WHERE ΚΩΔΙΚΟΣ =? AND Service_ID =?",
+                                               (new_pieces, value, self.service_ID))
+                        service_con.commit()
+                        service_con.close()
+                        con = sqlite3.connect(dbase)
+                        c = con.cursor()
+
+                        c.execute("SELECT ΤΕΜΑΧΙΑ FROM " + self.selected_company + " WHERE ΚΩΔΙΚΟΣ =?", (value,))
+                        old_pieces = c.fetchall()
+                        print("old_pieces of code ", old_pieces, value)
+                        new_pieces = int(old_pieces[0][0]) - 1
+                        c.execute("UPDATE " + self.selected_company + " SET ΤΕΜΑΧΙΑ =? WHERE ΚΩΔΙΚΟΣ =?",
+                                  (new_pieces, value))
+                        con.commit()
+                        print("line 302"
+                            f"Οι κωδικοί {added_codes} αφερέθηκαν απο την αποθήκη {self.selected_company} με επιτυχία ")
+                        c.close()
+                        con.close()
+                        messagebox.showinfo("Πληροφορία", f"O κωδικός {value} προστέθηκε ")
+                        self.top.focus()
+
+                    else:
+                        self.top.focus()
+                        return
+
+        self.get_spare_parts()
+        self.top.focus()
+        not_needed_keys = ["ID", "id", 'Id']
+        added_codes = []
+        service_con = sqlite3.connect(service_db)
+        service_cursor = service_con.cursor()
+        for item in items_to_add:
+            values = []  # values είναι πόσα ? να έχει ανάλογα τα culumn ==> keys
+            keys = []    # ID , parts_nr, Περιγραφή , Τεμάχια etc...
+            data = []    # Δεδομένα
+            for key, value in item.items():   # Dictionary
+                if value in used_parts:   # όταν το value  πάρει την τιμή του κωδικού πχ 6207
+                    # και ο κωδικός αυτός υπάρχει στα Service_ID
+                    # τότε να σταματήσει γιατί τρεχει το ποιο πανω loop (line 269) οταν ο κωδικός υπάρχει
+                    # todo να μήν φτάνει εδώ αλλά να σταματάει στο στο line 269
+                    return
                 if key not in keys and key not in not_needed_keys:
                     keys.append(key)
                     if key == "ΚΩΔΙΚΟΣ":
                         added_codes.append(value)
-                    data.append(value)
-                    values.append('?')
+                        data.append(value)
+                        values.append('?')
+                    elif key == "ΤΕΜΑΧΙΑ":
+                        data.append('1')
+                        values.append('?')
 
-            values.append('?')
+                    else:
+                        data.append(value)
+                        values.append('?')
+
+            values.append('?')  # Για το self.service_ID
             values = ",".join(values)
             keys.append('Service_ID')
             data.append(self.service_ID)
+
 
             sql = ("INSERT INTO Ανταλλακτικά(" + ",".join(keys) + " )VALUES( " + values + " )")
             service_cursor.execute(sql, data)
             service_con.commit()
 
         messagebox.showinfo("Info", f"Οι κωδικοί {added_codes} προστέθηκαν με επιτυχεία ")
-        print(f"Οι κωδικοί {added_codes} προστέθηκαν με επιτυχία στο service_id {self.service_ID} ")
+        print(f"Line 349 Οι κωδικοί {added_codes} προστέθηκαν με επιτυχία στο service_id {self.service_ID} ")
         service_cursor.close()
         service_con.close()
 
@@ -290,7 +388,7 @@ class Toplevel1:
             new_pieces = int(old_pieces[0][0]) - 1
             c.execute("UPDATE " + self.selected_company + " SET ΤΕΜΑΧΙΑ =? WHERE ΚΩΔΙΚΟΣ =?", (new_pieces, code))
             con.commit()
-        print(f"Οι κωδικοί {added_codes} αφερέθηκαν απο την αποθήκη {self.selected_company} με επιτυχία ")
+        print(f" Line 362 Οι κωδικοί {added_codes} αφερέθηκαν απο την αποθήκη {self.selected_company} με επιτυχία ")
         c.close()
         con.close()
         self.get_spare_parts()

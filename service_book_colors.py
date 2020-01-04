@@ -11,6 +11,8 @@ todo one file for logs
 todo αν ο χρήστης πατήση ακυρο κατα την προσθήκη επισκευής τι θα γίνει με τα ανταλλακιτκα που έχουν οριστεί με νεο service_id
 todo στο add_spare_parts βάζει οσα τεμάχεια έχει στην αποθήκη
 
+V0.9.2 Προσθήκη ανταλλακτικών και στην επεξεργασία service =======================================04/01/2020
+
 V0.9.1 Προβολή ανταλλακτικών  στην επεξεργασία service  ==========================================04/01/2020
 
 V0.9.0 Προσθήκη ανταλλακτικών  ===================================================================03/01/2020
@@ -151,8 +153,8 @@ handler = logging.FileHandler(log_file, 'w', 'utf-8')  # or whatever
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')  # or whatever
 handler.setFormatter(formatter)  # Pass handler as a parameter, not assign
 root_logger.addHandler(handler)
-#sys.stderr.write = root_logger.error
-#sys.stdout.write = root_logger.info
+sys.stderr.write = root_logger.error
+sys.stdout.write = root_logger.info
 
 # Αποκόμιση  πινάκων απο την βάση δεδομένων
 def get_tables():
@@ -238,7 +240,7 @@ class Toplevel1:
         top.minsize(120, 1)
         top.maxsize(1980, 1980)
         top.resizable(1, 1)
-        top.title("Βιβλίο Επισκευών V0.8.2")
+        top.title("Βιβλίο Επισκευών V0.9.2")
         top.configure(background="#bfc2b6")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")

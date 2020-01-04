@@ -10,6 +10,7 @@ import sqlite3
 from tkinter import StringVar, filedialog, messagebox, PhotoImage
 import edit_service_window_support
 import image_viewer
+import add_spare_parts
 
 dbase = "Service_book.db"
 selected_service_id = None
@@ -307,6 +308,28 @@ class edit_service_window():
         self.show_files_btn.configure(command=self.show_files)
         self.show_files_btn.configure(state="active")
 
+        # Ανταλλακτικά
+        self.add_spare_parts_btn = tk.Button(self.spare_parts_frame)
+        self.add_spare_parts_btn.place(relx=0.625, rely=0.700, height=60, relwidth=0.250)
+        self.add_spare_parts_btn.configure(activebackground="#ececec")
+        self.add_spare_parts_btn.configure(activeforeground="#000000")
+        self.add_spare_parts_btn.configure(background="green")
+        self.add_spare_parts_btn.configure(disabledforeground="#a3a3a3")
+        self.add_spare_parts_btn.configure(foreground="#ffffff")
+        self.add_spare_parts_btn.configure(highlightbackground="#d9d9d9")
+        self.add_spare_parts_btn.configure(highlightcolor="black")
+        self.add_spare_parts_btn.configure(pady="0")
+        self.add_spare_parts_btn.configure(text='''Προσθήκη\nανταλλακτικών''')
+        self.add_spare_parts_btn.configure(command=self.add_spare_parts)
+
+        # Ανανέωση μετα απο εισαγωγη ανταλλακτικών
+        self.refresh_btn = tk.Button(self.spare_parts_frame)
+        self.refresh_btn.place(relx=0.875, rely=0.700, height=60, relwidth=0.060)
+        self.refresh_btn.configure(background="#6b6b6b")
+        self.refresh_img = PhotoImage(file="icons/refresh.png")
+        self.refresh_btn.configure(image=self.refresh_img)
+        self.refresh_btn.configure(command=self.get_spare_parts)
+
         # Σκοπός
         self.purpose_label = tk.Label(self.service_frame)
         self.purpose_label.place(relx=0.025, rely=0.170, height=25, relwidth=0.331)
@@ -449,6 +472,20 @@ class edit_service_window():
         self.edit()
         self.check_if_files_exists()
 
+        # Ανταλλακτικά
+        self.spare_parts_label = tk.Label(self.spare_parts_frame)
+        self.spare_parts_label.place(relx=0.017, rely=0.010, height=30, relwidth=0.938)
+        self.spare_parts_label.configure(activebackground="#f9f9f9")
+        self.spare_parts_label.configure(activeforeground="black")
+        self.spare_parts_label.configure(background="#6b6b6b")
+        self.spare_parts_label.configure(disabledforeground="#a3a3a3")
+        self.spare_parts_label.configure(font=font11)
+        self.spare_parts_label.configure(foreground="#ffffff")
+        self.spare_parts_label.configure(highlightbackground="#d9d9d9")
+        self.spare_parts_label.configure(highlightcolor="black")
+        self.spare_parts_label.configure(relief="groove")
+        self.spare_parts_label.configure(text='''Ανταλλακτικά''')
+
         self.spare_parts_treeview = ScrolledTreeView(self.spare_parts_frame)
         self.spare_parts_treeview.place(relx=0.017, rely=0.100, relheight=0.500, relwidth=0.938)
         self.spare_parts_treeview.configure(show="headings", style="mystyle.Treeview")
@@ -566,7 +603,7 @@ class edit_service_window():
         self.top.destroy()
 
     def get_spare_parts(self, event=None):
-
+        self.spare_parts_treeview.delete(*self.spare_parts_treeview.get_children())
         con = sqlite3.connect(dbase)
         c = con.cursor()
         c.execute("SELECT * FROM Ανταλλακτικά WHERE Service_ID =?", (self.selected_service_id,))
@@ -586,6 +623,10 @@ class edit_service_window():
         for d in data:
             self.spare_parts_treeview.insert("", "end", values=d)
 
+    # Προσθήκη ανταλλακτικών
+    def add_spare_parts(self):
+        self.top.focus()
+        add_spare_parts.create_Toplevel1(self.top, self.selected_service_id)
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):
