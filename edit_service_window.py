@@ -11,7 +11,10 @@ from tkinter import StringVar, filedialog, messagebox, PhotoImage
 import edit_service_window_support
 import image_viewer
 import add_spare_parts
+from datetime import datetime
+import logging
 
+spare_parts_db = ""
 dbase = "Service_book.db"
 selected_service_id = None
 selected_copier = None
@@ -29,6 +32,27 @@ except ImportError:
     import tkinter.ttk as ttk
 
     py3 = True
+
+# -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE------------------
+today = datetime.today().strftime("%d %m %Y")
+log_dir = "logs" + "\\" + today + "\\"
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+else:
+    pass
+
+log_file_name = __name__ + " " + datetime.now().strftime("%d %m %Y") + ".log"
+log_file = os.path.join(log_dir, log_file_name)
+
+# log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+root_logger = logging.getLogger()
+root_logger.setLevel(logging.DEBUG)  # or whatever
+handler = logging.FileHandler(log_file, 'a', 'utf-8')  # or whatever
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')  # or whatever
+handler.setFormatter(formatter)  # Pass handler as a parameter, not assign
+root_logger.addHandler(handler)
+sys.stderr.write = root_logger.error
+sys.stdout.write = root_logger.info
 
 
 def get_service_data():
@@ -199,7 +223,7 @@ class edit_service_window():
         self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
 
         self.top = top
-        top.geometry("655x650+443+54")
+        top.geometry("655x650+0+0")
         top.minsize(120, 1)
         top.maxsize(1604, 881)
         top.resizable(1, 1)
@@ -474,7 +498,7 @@ class edit_service_window():
 
         # Ανταλλακτικά
         self.spare_parts_label = tk.Label(self.spare_parts_frame)
-        self.spare_parts_label.place(relx=0.017, rely=0.010, height=30, relwidth=0.938)
+        self.spare_parts_label.place(relx=0.017, rely=0.010, height=30, relwidth=0.970)
         self.spare_parts_label.configure(activebackground="#f9f9f9")
         self.spare_parts_label.configure(activeforeground="black")
         self.spare_parts_label.configure(background="#6b6b6b")
@@ -487,7 +511,7 @@ class edit_service_window():
         self.spare_parts_label.configure(text='''Ανταλλακτικά''')
 
         self.spare_parts_treeview = ScrolledTreeView(self.spare_parts_frame)
-        self.spare_parts_treeview.place(relx=0.017, rely=0.100, relheight=0.500, relwidth=0.938)
+        self.spare_parts_treeview.place(relx=0.017, rely=0.100, relheight=0.500, relwidth=0.970)
         self.spare_parts_treeview.configure(show="headings", style="mystyle.Treeview")
         self.get_spare_parts()
 

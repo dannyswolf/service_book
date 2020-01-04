@@ -9,9 +9,14 @@
 todo sizes to upladed images
 todo one file for logs
 todo αν ο χρήστης πατήση ακυρο κατα την προσθήκη επισκευής τι θα γίνει με τα ανταλλακιτκα που έχουν οριστεί με νεο service_id
-todo στο add_spare_parts βάζει οσα τεμάχεια έχει στην αποθήκη
+todo προβολή όλων των εικόνων
+todo προσθήκη ανταλλακτικων και χωρίς βάση αποθήκης
+todo notebook tabs colors
+
+V0.9.3 Τροποποιηση log αρχεία ===================================================================04/01/2020
 
 V0.9.2 Προσθήκη ανταλλακτικών και στην επεξεργασία service =======================================04/01/2020
+todo στο add_spare_parts βάζει οσα τεμάχεια έχει στην αποθήκη fixed ------------------------------04/01/2020
 
 V0.9.1 Προβολή ανταλλακτικών  στην επεξεργασία service  ==========================================04/01/2020
 
@@ -143,13 +148,13 @@ if not os.path.exists(log_dir):
 else:
     pass
 
-log_file_name = "service_book_log" + datetime.now().strftime("%d %m %Y %H %M %S") + ".log"
+log_file_name = "service_book_log " + datetime.now().strftime("%d %m %Y") + ".log"
 log_file = os.path.join(log_dir, log_file_name)
 
 # log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 root_logger = logging.getLogger()
 root_logger.setLevel(logging.DEBUG)  # or whatever
-handler = logging.FileHandler(log_file, 'w', 'utf-8')  # or whatever
+handler = logging.FileHandler(log_file, 'a', 'utf-8')  # or whatever
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')  # or whatever
 handler.setFormatter(formatter)  # Pass handler as a parameter, not assign
 root_logger.addHandler(handler)
@@ -240,7 +245,7 @@ class Toplevel1:
         top.minsize(120, 1)
         top.maxsize(1980, 1980)
         top.resizable(1, 1)
-        top.title("Βιβλίο Επισκευών V0.9.2")
+        top.title("Βιβλίο Επισκευών V0.9.3")
         top.configure(background="#bfc2b6")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")

@@ -11,8 +11,11 @@ import os
 from datetime import datetime
 from tkinter import PhotoImage, StringVar, messagebox
 import sqlite3
+import copiers_log_support
+
 dbase = "3. ΚΑΙΝΟΥΡΙΑ_ΑΠΟΘΗΚΗ.db"
 service_db = "Service_book.db"
+
 try:
     import Tkinter as tk
 except ImportError:
@@ -25,21 +28,29 @@ except ImportError:
     import tkinter.ttk as ttk
     py3 = True
 
-import copiers_log_support
+
+
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE------------------
 today = datetime.today().strftime("%d %m %Y")
 log_dir = "logs" + "\\" + today + "\\"
-log_file_name = "service_book_log" + datetime.now().strftime("%d %m %Y %H %M %S") + ".log"
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+else:
+    pass
+
+log_file_name = __name__ + " " + datetime.now().strftime("%d %m %Y") + ".log"
 log_file = os.path.join(log_dir, log_file_name)
+
 # log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 root_logger = logging.getLogger()
 root_logger.setLevel(logging.DEBUG)  # or whatever
-handler = logging.FileHandler(log_file, 'w', 'utf-8')  # or whatever
+handler = logging.FileHandler(log_file, 'a', 'utf-8')  # or whatever
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')  # or whatever
 handler.setFormatter(formatter)  # Pass handler as a parameter, not assign
 root_logger.addHandler(handler)
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
+
 
 def get_tables():
     needed_tables = ['BROTHER', 'CANON', 'KONICA', 'KYOCERA', 'LEXMARK', 'OKI', 'RICOH', 'SAMSUNG', 'SHARP']
@@ -85,6 +96,8 @@ class Toplevel1:
     def __init__(self, top=None):
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
+
+
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
         _fgcolor = '#000000'  # X11 color: 'black'
         _compcolor = '#d9d9d9' # X11 color: 'gray85'
@@ -115,7 +128,7 @@ class Toplevel1:
         top.configure(background="#f6f6ee")
         top.focus()
         top.bind('<Escape>', self.quit)
-        # top.protocol("WM_DELETE_WINDOW", self.previous_top.focus())
+        # top.protocol("WM_DELETE_WINDOW", self.root.focus())
 
         self.companies = get_tables()
         self.headers = []
@@ -268,6 +281,10 @@ class Toplevel1:
 
     def add_to_service(self):
         selected_items = self.spare_parts_treeview.selection()
+        if not selected_items:
+            messagebox.showerror("Προσοχή", "Παρακαλώ επιλέξτε πρώτα προιόν")
+            self.top.focus()
+            return
         items_to_add = []
         for item in selected_items:
             info = self.spare_parts_treeview.set(item)
@@ -513,6 +530,7 @@ def _on_shiftmouse(event, widget):
             widget.xview_scroll(-1, 'units')
         elif event.num == 5:
             widget.xview_scroll(1, 'units')
+
 
 if __name__ == '__main__':
     vp_start_gui()

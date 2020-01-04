@@ -6,10 +6,12 @@
 #    Dec 22, 2019 12:31:44 AM EET  platform: Windows NT
 
 
-
 import sys
 from tkinter import PhotoImage, messagebox, StringVar
 import sqlite3
+import os
+import logging
+from datetime import datetime
 
 dbase = "Service_book.db"
 try:
@@ -27,6 +29,27 @@ except ImportError:
     py3 = True
 
 import add_copier_support
+
+# -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE------------------
+today = datetime.today().strftime("%d %m %Y")
+log_dir = "logs" + "\\" + today + "\\"
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+else:
+    pass
+
+log_file_name = __name__ + " " + datetime.now().strftime("%d %m %Y") + ".log"
+log_file = os.path.join(log_dir, log_file_name)
+
+# log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+root_logger = logging.getLogger()
+root_logger.setLevel(logging.DEBUG)  # or whatever
+handler = logging.FileHandler(log_file, 'a', 'utf-8')  # or whatever
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')  # or whatever
+handler.setFormatter(formatter)  # Pass handler as a parameter, not assign
+root_logger.addHandler(handler)
+sys.stderr.write = root_logger.error
+sys.stdout.write = root_logger.info
 
 
 # Να πάρουμε Εταιρεία και μοντέλο φωτοτυπικού

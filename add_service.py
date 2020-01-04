@@ -15,8 +15,10 @@ from tkinter import StringVar, messagebox, PhotoImage, filedialog
 import add_service_window_support
 import platform
 from datetime import datetime
+import logging
 import add_spare_parts
 
+spare_parts_db = ""
 dbase = "Service_book.db"
 selected_copier_id = None
 
@@ -34,6 +36,26 @@ except ImportError:
 
     py3 = True
 
+# -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE------------------
+today = datetime.today().strftime("%d %m %Y")
+log_dir = "logs" + "\\" + today + "\\"
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+else:
+    pass
+
+log_file_name = __name__ + " " + datetime.now().strftime("%d %m %Y") + ".log"
+log_file = os.path.join(log_dir, log_file_name)
+
+# log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+root_logger = logging.getLogger()
+root_logger.setLevel(logging.DEBUG)  # or whatever
+handler = logging.FileHandler(log_file, 'a', 'utf-8')  # or whatever
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')  # or whatever
+handler.setFormatter(formatter)  # Pass handler as a parameter, not assign
+root_logger.addHandler(handler)
+sys.stderr.write = root_logger.error
+sys.stdout.write = root_logger.info
 
 def get_service_data():
     purpose_list = []
@@ -89,11 +111,17 @@ def destroy_add_service_window():
     w = None
 
 
+def focus_add_service_window():
+    global w
+    w.focus()
+
+
 class add_service_window():
 
     def __init__(self, top=None):
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
+
         # Αρχικοποιηση του selected_service_id σαν self.selected_service_id
         self.selected_copier_id = selected_copier_id
 
@@ -122,7 +150,7 @@ class add_service_window():
         self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#33994d")])
         self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
         self.top = top
-        top.geometry("655x650+443+54")
+        top.geometry("655x650+0+0")
         top.minsize(120, 1)
         top.maxsize(1604, 881)
         top.resizable(1, 1)
@@ -131,6 +159,7 @@ class add_service_window():
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
         top.focus()
+
         top.bind('<Escape>', self.quit)
 
         self.files = ""
@@ -561,8 +590,11 @@ class add_service_window():
 
     # Προσθήκη ανταλλακτικών
     def add_spare_parts(self):
-        self.top.focus()
-        add_spare_parts.create_Toplevel1(self.top, self.service_id)
+        if spare_parts_db:
+            add_spare_parts.create_Toplevel1(self.top, self.service_id)
+        else:
+            messagebox.showerror("Error", "Δεν υπάρχει αποθήκη")
+
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):
