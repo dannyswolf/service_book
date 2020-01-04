@@ -46,6 +46,84 @@ def get_service_data():
             actions_list.append(service_data[n][2])                        # Ενέργειες
     return sorted(purpose_list), sorted(actions_list)
 
+# The following code is added to facilitate the Scrolled widgets you specified.
+class AutoScroll(object):
+    '''Configure the scrollbars for a widget.'''
+
+    def __init__(self, master):
+        #  Rozen. Added the try-except clauses so that this class
+        #  could be used for scrolled entry widget for which vertical
+        #  scrolling is not supported. 5/7/14.
+        try:
+            vsb = ttk.Scrollbar(master, orient='vertical', command=self.yview)
+        except:
+            pass
+        hsb = ttk.Scrollbar(master, orient='horizontal', command=self.xview)
+
+        # self.configure(yscrollcommand=_autoscroll(vsb),
+        #    xscrollcommand=_autoscroll(hsb))
+        try:
+            self.configure(yscrollcommand=self._autoscroll(vsb))
+        except:
+            pass
+        self.configure(xscrollcommand=self._autoscroll(hsb))
+
+        self.grid(column=0, row=0, sticky='nsew')
+        try:
+            vsb.grid(column=1, row=0, sticky='ns')
+        except:
+            pass
+        hsb.grid(column=0, row=1, sticky='ew')
+
+        master.grid_columnconfigure(0, weight=1)
+        master.grid_rowconfigure(0, weight=1)
+
+        # Copy geometry methods of master  (taken from ScrolledText.py)
+        if py3:
+            methods = tk.Pack.__dict__.keys() | tk.Grid.__dict__.keys() \
+                  | tk.Place.__dict__.keys()
+        else:
+            methods = tk.Pack.__dict__.keys() + tk.Grid.__dict__.keys() \
+                  + tk.Place.__dict__.keys()
+
+        for meth in methods:
+            if meth[0] != '_' and meth not in ('config', 'configure'):
+                setattr(self, meth, getattr(master, meth))
+
+    @staticmethod
+    def _autoscroll(sbar):
+        '''Hide and show scrollbar as needed.'''
+        def wrapped(first, last):
+            first, last = float(first), float(last)
+            if first <= 0 and last >= 1:
+                sbar.grid_remove()
+            else:
+                sbar.grid()
+            sbar.set(first, last)
+        return wrapped
+
+    def __str__(self):
+        return str(self.master)
+
+
+def _create_container(func):
+    '''Creates a ttk Frame with a given master, and use this new frame to
+    place the scrollbars and the widget.'''
+    def wrapped(cls, master, **kw):
+        container = ttk.Frame(master)
+        container.bind('<Enter>', lambda e: _bound_to_mousewheel(e, container))
+        container.bind('<Leave>', lambda e: _unbound_to_mousewheel(e, container))
+        return func(cls, container, **kw)
+    return wrapped
+
+
+class ScrolledTreeView(AutoScroll, ttk.Treeview):
+    '''A standard ttk Treeview widget with scrollbars that will
+    automatically show/hide as needed.'''
+    @_create_container
+    def __init__(self, master, **kw):
+        ttk.Treeview.__init__(self, master, **kw)
+        AutoScroll.__init__(self, master)
 
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
@@ -116,10 +194,11 @@ class edit_service_window():
         self.style.configure('.', font="-family {Calibri} -size 10 -weight bold")
         self.style.map('.', background=[('selected', _compcolor), ('active', _ana2color)])
         # ==============================  Notebook style  =============
-        self.style.map('TNotebook.Tab', background=[('selected', "#999933"), ('active', "#33994d")])
+        self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "blue")])
         self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
+
         self.top = top
-        top.geometry("455x479+443+234")
+        top.geometry("655x650+443+54")
         top.minsize(120, 1)
         top.maxsize(1604, 881)
         top.resizable(1, 1)
@@ -130,8 +209,27 @@ class edit_service_window():
         top.bind('<Escape>', self.quit)
         top.focus()
 
+        # ==========================  Notebook  ==================================
+        self.notebook = ttk.Notebook(top)
+        self.notebook.place(relx=0.021, rely=0.230, relheight=0.740, relwidth=0.938)
+        self.notebook.configure(takefocus="")
+
+        self.service_frame = tk.Frame(self.notebook)
+        self.notebook.add(self.service_frame, padding=3)
+        self.notebook.tab(0, text="Συντήρηση", compound="left", underline="-1", )
+        self.service_frame.configure(background="#CFD5CE")
+        self.service_frame.configure(highlightbackground="#d9d9d9")
+        self.service_frame.configure(highlightcolor="black")
+
+        self.spare_parts_frame = tk.Frame(self.notebook)
+        self.notebook.add(self.spare_parts_frame, padding=3)
+        self.notebook.tab(1, text="Ανταλλακτικά", compound="left", underline="-1", )
+        self.spare_parts_frame.configure(background="#CFD5CE")
+        self.spare_parts_frame.configure(highlightbackground="#d9d9d9")
+        self.spare_parts_frame.configure(highlightcolor="black")
+
         # Εμφάνιση πελάτη
-        self.customer_label = tk.Label(w)
+        self.customer_label = tk.Label(top)
         self.customer_label.place(relx=0.025, rely=0.100, height=25, relwidth=0.938)
         self.customer_label.configure(activebackground="#f9f9f9")
         self.customer_label.configure(background="brown")
@@ -141,7 +239,7 @@ class edit_service_window():
         self.customer_label.configure(text=self.selecter_customer)
 
         # Εμφάνιση Φωτοτυπικού
-        self.selected_copier_label = tk.Label(w)
+        self.selected_copier_label = tk.Label(top)
         self.selected_copier_label.place(relx=0.025, rely=0.160, height=25, relwidth=0.938)
         self.selected_copier_label.configure(activebackground="#f9f9f9")
         self.selected_copier_label.configure(background="#808000")
@@ -150,8 +248,8 @@ class edit_service_window():
         self.selected_copier_label.configure(relief="groove")
         self.selected_copier_label.configure(text=self.selected_copier)
         # Ημερομηνία
-        self.date_label = tk.Label(top)
-        self.date_label.place(relx=0.025, rely=0.230, height=25, relwidth=0.331)
+        self.date_label = tk.Label(self.service_frame)
+        self.date_label.place(relx=0.025, rely=0.030, height=25, relwidth=0.331)
         self.date_label.configure(activebackground="#f9f9f9")
         self.date_label.configure(activeforeground="black")
         self.date_label.configure(background="#6b6b6b")
@@ -162,16 +260,16 @@ class edit_service_window():
         self.date_label.configure(highlightcolor="black")
         self.date_label.configure(relief="groove")
         self.date_label.configure(text='''Ημερομηνία''')
-        self.date_entry = tk.Entry(top)
-        self.date_entry.place(relx=0.37, rely=0.230, height=25, relwidth=0.331)
+        self.date_entry = tk.Entry(self.service_frame)
+        self.date_entry.place(relx=0.37, rely=0.030, height=25, relwidth=0.331)
         self.date_entry.configure(background="white")
         self.date_entry.configure(disabledforeground="#a3a3a3")
         self.date_entry.configure(font="-family {Calibri} -size 10 -weight bold")
         self.date_entry.configure(foreground="#000000")
         self.date_entry.configure(insertbackground="black")
         # Counter
-        self.counter_label = tk.Label(top)
-        self.counter_label.place(relx=0.025, rely=0.290, height=25, relwidth=0.331)
+        self.counter_label = tk.Label(self.service_frame)
+        self.counter_label.place(relx=0.025, rely=0.100, height=25, relwidth=0.331)
         self.counter_label.configure(activebackground="#f9f9f9")
         self.counter_label.configure(activeforeground="black")
         self.counter_label.configure(background="#6b6b6b")
@@ -182,8 +280,8 @@ class edit_service_window():
         self.counter_label.configure(highlightcolor="black")
         self.counter_label.configure(relief="groove")
         self.counter_label.configure(text='''Μετρητής''')
-        self.counter_entry = tk.Entry(top)
-        self.counter_entry.place(relx=0.37, rely=0.290, height=25, relwidth=0.331)
+        self.counter_entry = tk.Entry(self.service_frame)
+        self.counter_entry.place(relx=0.37, rely=0.100, height=25, relwidth=0.331)
         self.counter_entry.configure(background="white")
         self.counter_entry.configure(disabledforeground="#a3a3a3")
         self.counter_entry.configure(font="-family {Calibri} -size 10 -weight bold")
@@ -195,8 +293,8 @@ class edit_service_window():
         self.counter_entry.configure(selectforeground="black")
 
         # Αρχεία
-        self.show_files_btn = tk.Button(top)
-        self.show_files_btn.place(relx=0.720, rely=0.500, height=60, relwidth=0.250)
+        self.show_files_btn = tk.Button(self.spare_parts_frame)
+        self.show_files_btn.place(relx=0.320, rely=0.700, height=60, relwidth=0.250)
         self.show_files_btn.configure(activebackground="#ececec")
         self.show_files_btn.configure(activeforeground="#000000")
         self.show_files_btn.configure(background="#6b6b6b")
@@ -209,10 +307,9 @@ class edit_service_window():
         self.show_files_btn.configure(command=self.show_files)
         self.show_files_btn.configure(state="active")
 
-
         # Σκοπός
-        self.purpose_label = tk.Label(top)
-        self.purpose_label.place(relx=0.025, rely=0.360, height=25, relwidth=0.331)
+        self.purpose_label = tk.Label(self.service_frame)
+        self.purpose_label.place(relx=0.025, rely=0.170, height=25, relwidth=0.331)
         self.purpose_label.configure(activebackground="#f9f9f9")
         self.purpose_label.configure(activeforeground="black")
         self.purpose_label.configure(background="#6b6b6b")
@@ -223,14 +320,14 @@ class edit_service_window():
         self.purpose_label.configure(highlightcolor="black")
         self.purpose_label.configure(relief="groove")
         self.purpose_label.configure(text='''Σκοπός επίσκεψης''')
-        self.purpose_combobox = ttk.Combobox(top)
-        self.purpose_combobox.place(relx=0.37, rely=0.360, relheight=0.053, relwidth=0.6)
+        self.purpose_combobox = ttk.Combobox(self.service_frame)
+        self.purpose_combobox.place(relx=0.37, rely=0.170, relheight=0.055, relwidth=0.6)
         self.purpose_combobox.configure(values=self.purpose_list)
         # self.purpose_combobox.configure(textvariable=edit_service_window_support.combobox)
         self.purpose_combobox.configure(takefocus="")
         # Ενέργειες
-        self.actions_label = tk.Label(top)
-        self.actions_label.place(relx=0.025, rely=0.430, height=25, relwidth=0.331)
+        self.actions_label = tk.Label(self.service_frame)
+        self.actions_label.place(relx=0.025, rely=0.240, height=25, relwidth=0.331)
         self.actions_label.configure(activebackground="#f9f9f9")
         self.actions_label.configure(activeforeground="black")
         self.actions_label.configure(background="#6b6b6b")
@@ -241,15 +338,15 @@ class edit_service_window():
         self.actions_label.configure(highlightcolor="black")
         self.actions_label.configure(relief="groove")
         self.actions_label.configure(text='''Ενέργειες''')
-        self.actions_combobox = ttk.Combobox(top)
-        self.actions_combobox.place(relx=0.37, rely=0.430, relheight=0.053, relwidth=0.6)
+        self.actions_combobox = ttk.Combobox(self.service_frame)
+        self.actions_combobox.place(relx=0.37, rely=0.240, relheight=0.055, relwidth=0.6)
         self.actions_combobox.configure(values=self.actions_list)
         # self.actions_combobox.configure(textvariable=edit_service_window_support.combobox)
         self.actions_combobox.configure(takefocus="")
 
         # Επόμενο Service
-        self.next_service_label = tk.Label(top)
-        self.next_service_label.place(relx=0.025, rely=0.500, height=25, relwidth=0.331)
+        self.next_service_label = tk.Label(self.service_frame)
+        self.next_service_label.place(relx=0.025, rely=0.310, height=25, relwidth=0.331)
         self.next_service_label.configure(activebackground="#f9f9f9")
         self.next_service_label.configure(activeforeground="black")
         self.next_service_label.configure(background="#6b6b6b")
@@ -260,8 +357,8 @@ class edit_service_window():
         self.next_service_label.configure(highlightcolor="black")
         self.next_service_label.configure(relief="groove")
         self.next_service_label.configure(text='''Επόμενο Service''')
-        self.next_service_entry = tk.Entry(top)
-        self.next_service_entry.place(relx=0.37, rely=0.500, height=25, relwidth=0.331)
+        self.next_service_entry = tk.Entry(self.service_frame)
+        self.next_service_entry.place(relx=0.37, rely=0.310, height=25, relwidth=0.331)
         self.next_service_entry.configure(background="white")
         self.next_service_entry.configure(disabledforeground="#a3a3a3")
         self.next_service_entry.configure(font="TkFixedFont")
@@ -273,8 +370,8 @@ class edit_service_window():
         self.next_service_entry.configure(selectforeground="black")
 
         # Προσθήκη αρχείων
-        self.add_files_btn = tk.Button(top)
-        self.add_files_btn.place(relx=0.725, rely=0.230, height=55, relwidth=0.237)
+        self.add_files_btn = tk.Button(self.spare_parts_frame)
+        self.add_files_btn.place(relx=0.025, rely=0.700, height=55, relwidth=0.237)
         self.add_files_btn.configure(activebackground="#ececec")
         self.add_files_btn.configure(activeforeground="#000000")
         self.add_files_btn.configure(background="green")
@@ -287,8 +384,8 @@ class edit_service_window():
         self.add_files_btn.configure(command=self.add_files)
 
         # Δελτίο Τεχνικής Εξυπηρέτησης
-        self.dte_label = tk.Label(top)
-        self.dte_label.place(relx=0.025, rely=0.570, height=25, relwidth=0.331)
+        self.dte_label = tk.Label(self.service_frame)
+        self.dte_label.place(relx=0.025, rely=0.380, height=25, relwidth=0.331)
         self.dte_label.configure(activebackground="#f9f9f9")
         self.dte_label.configure(activeforeground="black")
         self.dte_label.configure(background="#6b6b6b")
@@ -299,8 +396,8 @@ class edit_service_window():
         self.dte_label.configure(highlightcolor="black")
         self.dte_label.configure(relief="groove")
         self.dte_label.configure(text='''Δελτίο Τεχν. Εξυπ.''')
-        self.dte_entry = tk.Entry(top)
-        self.dte_entry.place(relx=0.37, rely=0.570, height=25, relwidth=0.331)
+        self.dte_entry = tk.Entry(self.service_frame)
+        self.dte_entry.place(relx=0.37, rely=0.380, height=25, relwidth=0.331)
         self.dte_entry.configure(background="white")
         self.dte_entry.configure(disabledforeground="#a3a3a3")
         self.dte_entry.configure(font="TkFixedFont")
@@ -311,11 +408,11 @@ class edit_service_window():
         self.dte_entry.configure(selectbackground="#c4c4c4")
         self.dte_entry.configure(selectforeground="black")
 
-        self.TSeparator1 = ttk.Separator(top)
-        self.TSeparator1.place(relx=0.025, rely=0.635, relwidth=0.938)
+        self.TSeparator1 = ttk.Separator(self.service_frame)
+        self.TSeparator1.place(relx=0.025, rely=0.450, relwidth=0.938)
         # Σημειώσεις
-        self.notes_label = tk.Label(top)
-        self.notes_label.place(relx=0.025, rely=0.650, height=20, relwidth=0.331)
+        self.notes_label = tk.Label(self.service_frame)
+        self.notes_label.place(relx=0.025, rely=0.470, height=30, relwidth=0.331)
         self.notes_label.configure(activebackground="#f9f9f9")
         self.notes_label.configure(activeforeground="black")
         self.notes_label.configure(background="#6b6b6b")
@@ -326,8 +423,8 @@ class edit_service_window():
         self.notes_label.configure(highlightcolor="black")
         self.notes_label.configure(relief="groove")
         self.notes_label.configure(text='''Σημειώσεις''')
-        self.notes_scrolledtext = ScrolledText(top)
-        self.notes_scrolledtext.place(relx=0.025, rely=0.700, relheight=0.200, relwidth=0.941)
+        self.notes_scrolledtext = ScrolledText(self.service_frame)
+        self.notes_scrolledtext.place(relx=0.025, rely=0.550, relheight=0.300, relwidth=0.941)
         self.notes_scrolledtext.configure(background="white")
         self.notes_scrolledtext.configure(font="TkTextFont")
         self.notes_scrolledtext.configure(foreground="black")
@@ -338,7 +435,6 @@ class edit_service_window():
         self.notes_scrolledtext.configure(selectbackground="#c4c4c4")
         self.notes_scrolledtext.configure(selectforeground="black")
         self.notes_scrolledtext.configure(wrap="none")
-
 
 
         self.Label2 = tk.Label(top)
@@ -352,6 +448,12 @@ class edit_service_window():
 
         self.edit()
         self.check_if_files_exists()
+
+        self.spare_parts_treeview = ScrolledTreeView(self.spare_parts_frame)
+        self.spare_parts_treeview.place(relx=0.017, rely=0.100, relheight=0.500, relwidth=0.938)
+        self.spare_parts_treeview.configure(show="headings", style="mystyle.Treeview")
+        self.get_spare_parts()
+
 
     # Ελεγχος αν υπάρχουν αρχεία για προβολή
     def check_if_files_exists(self):
@@ -462,6 +564,27 @@ class edit_service_window():
 
     def quit(self, event):
         self.top.destroy()
+
+    def get_spare_parts(self, event=None):
+
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT * FROM Ανταλλακτικά WHERE Service_ID =?", (self.selected_service_id,))
+        headers = list(map(lambda x: x[0], c.description))
+        data = c.fetchall()
+        con.close()
+        self.spare_parts_treeview["columns"] = [head for head in headers]
+        for head in headers:
+            if head == "id" or head == "ID" or head == "Id":
+                platos = 1
+            elif head == "ΠΕΡΙΓΡΑΦΗ":
+                platos = 500
+            else:
+                platos = 121
+            self.spare_parts_treeview.heading(head, text=head, anchor="center")
+            self.spare_parts_treeview.column(head, width=platos, anchor="center")
+        for d in data:
+            self.spare_parts_treeview.insert("", "end", values=d)
 
 
 # The following code is added to facilitate the Scrolled widgets you specified.
