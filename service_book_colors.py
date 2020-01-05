@@ -6,13 +6,19 @@
 #    Dec 13, 2019 12:08:06 AM EET  platform: Windows NT
 
 """
-todo sizes to upladed images
+
 todo αν ο χρήστης πατήση ακυρο κατα την προσθήκη επισκευής τι θα γίνει με τα ανταλλακιτκα που έχουν οριστεί με νεο service_id
 todo προβολή όλων των εικόνων
 todo start day to binary file
-todo εισαγωγη οχι μονο jpg αρχείων
 
-V0.9.5 Demo Version not ready  ==============================================================================05/01/2020
+
+V0.9.7 Χρήση για 30 μέρες Demo ==================================================================05/01/2020
+
+V0.9.6 sizes to files ============================================================================05/01/2020
+todo εισαγωγη οχι μονο jpg αρχείων ---Done
+todo sizes to upladed images   -------Done
+
+V0.9.5 Demo Version not ready  ===================================================================05/01/2020
 Μέχρι 3 πελάτες και 5 φωτοτυπικά (στο σύνολο)
 
 V0.9.4 προσθήκη ανταλλακτικων και χωρίς βάση αποθήκης ============================================04/01/2020
@@ -130,7 +136,7 @@ import copiers_log
 import enable_customers
 import enable_copiers
 from tkcalendar import Calendar, DateEntry
-
+from datetime import date, timedelta
 # Για τα αρχεία log files
 import logging, sys
 
@@ -147,6 +153,41 @@ except ImportError:
     py3 = True
 
 dbase = "Service_book.db"
+
+
+# Περίδος λειτουργείας
+def days_left():
+
+    con = sqlite3.connect(dbase)
+    c = con.cursor()
+
+    # get start day
+    c.execute("SELECT * FROM sqlite_sequence")
+    names = c.fetchall()
+
+    for name in names:
+        if name[0] == "start":
+            start_day = name[1]
+
+    con.close()
+
+    if not start_day:  # if not start day write it
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("UPDATE sqlite_sequence SET seq =? WHERE name = 'start'", (today,))
+        con.commit()
+        con.close()
+        start_day = today
+
+    # datetime_object = datetime.strptime(datetime_str, '%m/%d/%y %H:%M:%S')
+
+    start_day_date = datetime.strptime(start_day, "%d %m %Y")
+    last_day = start_day_date + timedelta(days=30)
+
+    days_left_timedelta = last_day - datetime.today()
+    left_days = days_left_timedelta.days
+
+    return left_days
 
 
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE------------------
@@ -218,6 +259,20 @@ def destroy_Toplevel1():
     w.destroy()
     w = None
 
+
+def show_info():
+    messagebox.showinfo("Πληροφορίες", """ 
+        Αuthor     : "Jordanis Ntini"
+        Copyright  : "Copyright © 2020"
+        Credits    : ['Athanasia Tzampazi']
+        Version    : '0.9.7 Demo'
+        Maintainer : "Jordanis Ntini"
+        Email      : "ntinisiordanis@gmail.com"
+        Status     : 'Development' 
+       
+    """)
+
+
 class Toplevel1:
 
     def __init__(self, top=None):
@@ -243,6 +298,12 @@ class Toplevel1:
         self.copiers_headers = []
         self.service_headers = []
 
+        self.remaining_days = days_left()
+        if self.remaining_days < 10:
+            messagebox.showwarning("Προσοχή", f"Η εφαρμογή θα στματατήσει σε {self.remaining_days} μέρες")
+        elif self.remaining_days < 0:
+            messagebox.showwarning("Προσοχή", f"Η εφαρμογή έληξε παρακαλώ ανανεώστε την υποστήριξη συντηρησης")
+            return
         self.style = ttk.Style()
         if sys.platform == "win32":
             self.style.theme_use('clam')
@@ -255,7 +316,7 @@ class Toplevel1:
         top.minsize(120, 1)
         top.maxsize(1980, 1980)
         top.resizable(1, 1)
-        top.title("Βιβλίο Επισκευών V0.9.3")
+        top.title("Βιβλίο Επισκευών V0.9.7 Demo")
         top.configure(background="#bfc2b6")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
@@ -293,7 +354,14 @@ class Toplevel1:
         self.menubar.add_cascade(label="Backup", menu=self.backup_menu)
         self.backup_menu.add_command(label="Δημιουργία αντίγραφο ασφαλείας!", command=self.backup)
 
-        #
+        self.licence_menu = tk.Menu(self.menubar, tearoff=0)
+        self.menubar.add_cascade(label="Αδεια", menu=self.licence_menu)
+        self.licence_menu.add_command(label="Πληροφορίες χρήσης", command=self.show_licence)
+
+        self.info_menu = tk.Menu(self.menubar, tearoff=0)
+        self.menubar.add_cascade(label="Info", menu=self.info_menu)
+        self.info_menu.add_command(label="Πληροφορίες", command=show_info)
+
         # self.info_menu = tk.Menu(self.menubar, tearoff=0)
         # self.menubar.add_cascade(label="Info", menu=self.info_menu)
         # self.info_menu.add_command(label="Πληροφορίες", command=get_info)
@@ -378,7 +446,6 @@ class Toplevel1:
         self.del_customer_btn_img = PhotoImage(file="icons/delete_customer.png")
         self.del_customer_btn.configure(image=self.del_customer_btn_img)
         self.del_customer_btn.configure(compound="left")
-
 
         self.company_label = tk.Label(self.customer_frame)
         self.company_label.place(relx=0.021, rely=0.100, height=20, relwidth=0.200)
@@ -989,6 +1056,9 @@ class Toplevel1:
         #self.service_calendar.drop_down()
         self.service_calendar.place(relx=0.021, rely=0.630, relheight=0.300, relwidth=0.250)
         self.service_calendar.bind('<<CalendarSelected>> ', self.get_date)
+
+    def show_licence(self):
+        messagebox.showinfo("Υπολειπόμενες μέρες", f"Υπολειπόμενες μέρες χρήσης της εφαρμογής {self.remaining_days}")
 
     def get_date(self, event=None):
         # https://pypi.org/project/tkcalendar/

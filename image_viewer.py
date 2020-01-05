@@ -79,14 +79,23 @@ def get_images_from_db():
     con.close()
 
     # Δημιουργεία εικόνων
-    # images[num][3] ==> Η εικόνα σε sqlite3.Binary
+    # images[num][4] ==> Η εικόνα σε sqlite3.Binary
     # images[num][2 ] =>> Ονομα αρχείου
     for num, i in enumerate(images):
         with open(images_path + images[num][1] + images[num][2], 'wb') as image_file:
-            image_file.write(images[num][3])
+            image_file.write(images[num][4])
     images = os.listdir(images_path)
 
     return images
+
+
+def convert_bytes(size):
+    for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+        if size < 1024.0:
+            return "%3.1f %s" % (size, x)
+        size /= 1024.0
+
+    return size
 
 
 def destroy_Toplevel1():
@@ -110,6 +119,7 @@ class Toplevel1:
         self.selected_service_ID = selected_service_ID
         self.images = get_images_from_db()
         self.image = ""  # Ονομα αρχείου που προβάλεται "icon_resized.jpg"  "icon.png"
+        self.image_size = ""  # Μέγεθος αρχείου
         self.images_path = images_path
         self.filenames = os.listdir(self.images_path)
 
@@ -203,7 +213,17 @@ class Toplevel1:
         self.image_name_label.configure(background="#006291")
         self.image_name_label.configure(foreground="white")
         self.image_name_label.configure(disabledforeground="#a3a3a3")
-        self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index])
+        # Μέγεθος αρχείου
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT File_size FROM Service_images WHERE Filename =?", (self.image,))
+        size = c.fetchall()
+
+        con.close()
+        self.image_size = convert_bytes(float(size[0][0]))
+
+        self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index] +
+                                             "  Μέγεθος: " + self.image_size)
 
 
     def quit(self, event=None):
@@ -240,14 +260,11 @@ class Toplevel1:
                 new_pdf_file.write(data)
             self.top.focus()
 
-
-
-
-
-
     # Εμφάνηση επόμενης
     def show_next(self):
         self.index = self.index + 1
+
+
 
         try:
             file_ext = self.filenames[self.index][-3:]
@@ -255,12 +272,33 @@ class Toplevel1:
             if file_ext != "pdf":  # Αν δεν είναι pdf
                 self.selected_image = PIL.Image.open(self.images_path + self.filenames[self.index])
                 self.image = self.filenames[self.index][:-4]
-                self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index])
+                # Μέγεθος αρχείου
+                con = sqlite3.connect(dbase)
+                c = con.cursor()
+                c.execute("SELECT File_size FROM Service_images WHERE Filename =?", (self.image,))
+                size = c.fetchall()
+                print("self.image", self.image, size)
+                con.close()
+                self.image_size = convert_bytes(float(size[0][0]))
+                self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index] +
+                                                     "  Μέγεθος: " + self.image_size)
 
             else:  # Αν είναι pdf
                 self.selected_image = PIL.Image.open("icons/pdf.png")
+
                 self.image = self.filenames[self.index][:-4]
-                self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index])
+
+                # Μέγεθος αρχείου
+                con = sqlite3.connect(dbase)
+                c = con.cursor()
+                c.execute("SELECT File_size FROM Service_images WHERE Filename =?", (self.image,))
+                size = c.fetchall()
+                print("self.image", self.image, size)
+                con.close()
+                self.image_size = convert_bytes(float(size[0][0]))
+
+                self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index] +
+                                                     "  Μέγεθος: " + self.image_size)
 
                 subprocess.Popen([self.images_path + self.filenames[self.index]], shell=True)
 
@@ -290,11 +328,35 @@ class Toplevel1:
             if file_ext != "pdf":
                 self.selected_image = PIL.Image.open(self.images_path + self.filenames[self.index])
                 self.image = self.filenames[self.index][:-4]
-                self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index])
+
+                # Μέγεθος αρχείου
+                con = sqlite3.connect(dbase)
+                c = con.cursor()
+                c.execute("SELECT File_size FROM Service_images WHERE Filename =?", (self.image,))
+                size = c.fetchall()
+                print("self.image", self.image, size)
+                con.close()
+                self.image_size = convert_bytes(float(size[0][0]))
+
+                self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index] +
+                                                     "  Μέγεθος: " + self.image_size)
+
             else:
                 self.selected_image = PIL.Image.open("icons/pdf.png")
                 self.image = self.filenames[self.index][:-4]
-                self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index])
+
+                # Μέγεθος αρχείου
+                con = sqlite3.connect(dbase)
+                c = con.cursor()
+                c.execute("SELECT File_size FROM Service_images WHERE Filename =?", (self.image,))
+                size = c.fetchall()
+                print("self.image", self.image, size)
+                con.close()
+                self.image_size = convert_bytes(float(size[0][0]))
+
+                self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index] +
+                                                     "  Μέγεθος: " + self.image_size)
+
 
                 subprocess.Popen([self.images_path + self.filenames[self.index]], shell=True)
 

@@ -597,7 +597,7 @@ class edit_service_window():
     def add_files(self):
 
         self.files = filedialog.askopenfilenames(initialdir=os.getcwd(), title="Επιλογή αρχείων για προσθήκη",
-                                                 filetypes=(("jpg files", "*.jpg"), ("all files", "*.*")))
+                                                 filetypes=[("Υπ. αρχεία", "*.jpg *.png *.pdf")])
 
         if self.files == "":  # αν ο χρήστης επιλεξει ακυρο
             self.top.focus()
@@ -611,14 +611,25 @@ class edit_service_window():
         con = sqlite3.connect(dbase)
         cu = con.cursor()
 
+        def convert_bytes(size):
+            for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+                if size < 1024.0:
+                    return "%3.1f %s" % (size, x)
+                size /= 1024.0
+
+            return size
+
         # Εισαγωγη αρχείων
         for img in self.files:
             base = os.path.basename(img)
             filename, ext = os.path.splitext(base)
             with open(img, 'rb') as f:
                 file = f.read()  # Εισαγωγη αρχείων
-            cu.execute("INSERT INTO Service_images(Service_ID, Filename, Type, File, Copier_ID)VALUES(?,?,?,?,?)",
-                       (self.selected_service_id, filename, ext, sqlite3.Binary(file), self.copier_id))
+                # file_size = convert_bytes(len(file))  # Καλύτερα σε bytes για ευκολή ταξινόμηση
+                file_size = len(file)  # μεγεθος σε bytes
+            cu.execute("INSERT INTO Service_images(Service_ID, Filename, Type, File_size, File, Copier_ID)"
+                       "VALUES(?,?,?,?,?,?)", (self.selected_service_id, filename, ext, file_size, sqlite3.Binary(file),
+                                              self.copier_id))
 
         con.commit()
         con.close()
