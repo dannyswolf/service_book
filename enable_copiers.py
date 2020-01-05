@@ -50,6 +50,7 @@ root_logger.addHandler(handler)
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
 
+
 # Να πάρουμε Εταιρεία και μοντέλο φωτοτυπικού
 def get_copiers_data():
     conn = sqlite3.connect(dbase)

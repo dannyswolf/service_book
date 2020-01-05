@@ -10,7 +10,10 @@
 todo αν ο χρήστης πατήση ακυρο κατα την προσθήκη επισκευής τι θα γίνει με τα ανταλλακιτκα που έχουν οριστεί με νεο service_id
 todo προβολή όλων των εικόνων
 todo start day to binary file
+todo service_id sto add_task
 
+V0.9.8 Ημερολόγιο ===============================================================================05/01/2020
+Αρχεία 1 add_task
 
 V0.9.7 Χρήση για 30 μέρες Demo ==================================================================05/01/2020
 
@@ -136,6 +139,7 @@ from add_service import *
 import copiers_log
 import enable_customers
 import enable_copiers
+import add_task
 from tkcalendar import Calendar, DateEntry
 from datetime import date, timedelta
 # Για τα αρχεία log files
@@ -266,7 +270,7 @@ def show_info():
         Αuthor     : "Jordanis Ntini"
         Copyright  : "Copyright © 2020"
         Credits    : ['Athanasia Tzampazi']
-        Version    : '0.9.7 Demo'
+        Version    : '0.9.8 Demo'
         Maintainer : "Jordanis Ntini"
         Email      : "ntinisiordanis@gmail.com"
         Status     : 'Development' 
@@ -298,6 +302,7 @@ class Toplevel1:
         self.customers_headers = []
         self.copiers_headers = []
         self.service_headers = []
+        self.tasks_headers = []
 
         self.remaining_days = days_left()
         if self.remaining_days < 10:
@@ -317,7 +322,7 @@ class Toplevel1:
         top.minsize(120, 1)
         top.maxsize(1980, 1980)
         top.resizable(1, 1)
-        top.title("Βιβλίο Επισκευών V0.9.7 Demo")
+        top.title("Βιβλίο Επισκευών V0.9.8 Demo")
         top.configure(background="#bfc2b6")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
@@ -1018,7 +1023,7 @@ class Toplevel1:
         self.search_errors_btn.configure(font=("Calibri", 10, "bold"))
         self.search_errors_btn.configure(foreground="white")
         self.search_errors_btn.configure(text="Αναζήτηση σφαλμάτων")
-        self.search_errors_btn.configure(command=lambda: (self.search_error(self.search_errors_data)))
+        self.search_errors_btn.configure(command=self.search_error)
 
         # Πίνακας επισκευων
         self.service_treeview = ScrolledTreeView(self.service_frame)
@@ -1037,14 +1042,57 @@ class Toplevel1:
         self.Label16.configure(relief="groove")
         self.Label16.configure(text='''Ιστορικό''')
 
-        self.customer_title_label = tk.Label(top)
-        self.customer_title_label.place(relx=0.021, rely=0.570, height=30, relwidth=0.967)
-        self.customer_title_label.configure(font=("Calibri", 11, "bold"))
-        self.customer_title_label.configure(background="#6b6b6b")
-        self.customer_title_label.configure(disabledforeground="#a3a3a3")
-        self.customer_title_label.configure(foreground="#ffffff")
-        self.customer_title_label.configure(relief="groove")
-        self.customer_title_label.configure(text="Ημερολόγιο εργασιών")
+        self.calendar_title_label = tk.Label(top)
+        self.calendar_title_label.place(relx=0.021, rely=0.570, height=30, relwidth=0.967)
+        self.calendar_title_label.configure(font=("Calibri", 11, "bold"))
+        self.calendar_title_label.configure(background="#6b6b6b")
+        self.calendar_title_label.configure(disabledforeground="#a3a3a3")
+        self.calendar_title_label.configure(foreground="#ffffff")
+        self.calendar_title_label.configure(relief="groove")
+        self.calendar_title_label.configure(text="Ημερολόγιο εργασιών")
+
+        # Προσθήκη Ημερολόγιο εργασιών
+        self.add_task_btn = tk.Button(top)
+        self.add_task_btn.place(relx=0.300, rely=0.630, height=30, relwidth=0.120)
+        self.add_task_btn.configure(activebackground="#6b6b6b")
+        self.add_task_btn.configure(activeforeground="#000000")
+        self.add_task_btn.configure(background="#6b6b6b")
+        self.add_task_btn.configure(disabledforeground="#a3a3a3")
+        self.add_task_btn.configure(foreground="white")
+        self.add_task_btn.configure(highlightbackground="#d9d9d9")
+        self.add_task_btn.configure(highlightcolor="black")
+        self.add_task_btn.configure(pady="0")
+        self.add_task_btn.configure(command=self.add_scheduled_tasks)
+        self.add_task_btn.configure(text="Προσθήκη εγρασίας")
+        self.add_task_btn_img = PhotoImage(file="icons/add_scheduled_tasks.png")
+        self.add_task_btn.configure(image=self.add_task_btn_img)
+        self.add_task_btn.configure(compound="left")
+
+        self.search_tasks_data = StringVar()
+        self.search_tasks_entry = tk.Entry(top)
+        self.search_tasks_entry.place(relx=0.675, rely=0.630, height=30, relwidth=0.180)
+        self.search_tasks_entry.configure(background="white")
+        self.search_tasks_entry.configure(disabledforeground="#a3a3a3")
+        self.search_tasks_entry.configure(font=("Calibri", 12))
+        self.search_tasks_entry.configure(foreground="#000000")
+        self.search_tasks_entry.configure(insertbackground="black")
+        self.search_tasks_entry.bind('<Return>', lambda: (self.search_tasks(self.search_tasks_data.get())))
+        self.search_tasks_btn = tk.Button(top)
+        self.search_tasks_btn.place(relx=0.865, rely=0.630, height=30, relwidth=0.120)
+        self.search_tasks_btn.configure(background="#6b6b6b")
+        self.search_tasks_btn_img = PhotoImage(file="icons/search_tasks.png")
+        self.search_tasks_btn.configure(image=self.search_tasks_btn_img)
+        self.search_tasks_btn.configure(compound='left')
+        self.search_tasks_btn.configure(font=("Calibri", 10, "bold"))
+        self.search_tasks_btn.configure(foreground="white")
+        self.search_tasks_btn.configure(text="Αναζήτηση εργασιών")
+        self.search_tasks_btn.configure(command=lambda: (self.search_tasks(self.search_tasks_data.get())))
+
+        # Πίνακας Ημερολόγιο εργασιών
+        self.calendar_treeview = ScrolledTreeView(top)
+        self.calendar_treeview.place(relx=0.300, rely=0.680, relheight=0.300, relwidth=0.685)
+        self.calendar_treeview.configure(show="headings", style="mystyle.Treeview")
+        self.calendar_treeview.bind("<<TreeviewSelect>>", self.edit_scheduled_tasks)
 
         self.today = datetime.today()
         self.day = self.today.day
@@ -1053,17 +1101,81 @@ class Toplevel1:
         self.calendar_var = StringVar()
         # create the entry and configure the calendar colors
         self.service_calendar = Calendar(top, width=12, year=self.year, month=self.month, day=self.day,
-                        background='gray20', selectmode='day', foreground='white', borderwidth=5, locale="el_GR",)
+                        background='gray20', selectmode='day', foreground='white', borderwidth=5, locale="el_GR",
+                                         font=("Calibri", 10, 'bold'))
         #self.service_calendar.drop_down()
-        self.service_calendar.place(relx=0.021, rely=0.630, relheight=0.300, relwidth=0.250)
-        self.service_calendar.bind('<<CalendarSelected>> ', self.get_date)
+        self.service_calendar.place(relx=0.021, rely=0.630, relheight=0.350, relwidth=0.270)
+        self.service_calendar.bind('<<CalendarSelected>> ', self.view_scheduled_tasks)
+
+        self.get_calendar()
+
+    def get_calendar(self, event=None):
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT * FROM  Calendar;")
+        self.tasks_headers = list(map(lambda x: x[0], c.description))
+        data = c.fetchall()
+        con.close()
+        self.calendar_treeview["columns"] = [head for head in self.tasks_headers]
+        for head in self.tasks_headers:
+            if head == "id" or head == "ID" or head == "Id":
+                platos = 1
+            elif head == "Πελάτης":
+                platos = 200
+            elif head == "Φωτοτυπικό":
+                platos = 200
+            else:
+                platos = 80
+            self.calendar_treeview.heading(head, text=head, anchor="center")
+            self.calendar_treeview.column(head, width=platos, anchor="center")
+        for d in data:
+            self.calendar_treeview.insert("", "end", values=d)
+
+    def add_scheduled_tasks(self):
+        add_task.create_add_task_window(root)
+
+
+    def view_scheduled_tasks(self, event=None):
+        # https://pypi.org/project/tkcalendar/
+        selected_date = self.service_calendar.selection_get()
+        formated_date = selected_date.strftime("%d/%m/%Y")
+        self.search_tasks(formated_date)
+
+    def edit_scheduled_tasks(self, event=None):
+        pass
+
+    def search_tasks(self, data):
+        # Αδειάζουμε πρώτα το tree
+        self.calendar_treeview.delete(*self.calendar_treeview.get_children())
+        if not data:
+            data_to_search = self.search_tasks_data.get()
+        data_to_search = data
+        search_headers = []
+        no_neded_headers = ["id", "ID", "Id"]
+        operators = []
+        for header in self.tasks_headers:
+
+            if header not in no_neded_headers:
+                search_headers.append(header + " LIKE ?")
+                operators.append('%' + str(data_to_search) + '%')
+        search_headers = " OR ".join(search_headers)
+        # ΕΤΑΙΡΕΙΑ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
+
+        # search_cursor.execute("SELECT * FROM " + table + " WHERE \
+        # ΤΟΝΕΡ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
+        # ('%' + str(search_data.get()) + '%', '%' + str(search_data.get()) + '%', '%' + str(search_data.get())...
+
+        conn = sqlite3.connect(dbase)
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM Calendar WHERE " + search_headers, operators)
+        fetch = cursor.fetchall()  # Δεδομένα απο Service
+        conn.close()
+        for item in fetch:
+            self.calendar_treeview.insert("", "end", values=item)
 
     def show_licence(self):
         messagebox.showinfo("Υπολειπόμενες μέρες", f"Υπολειπόμενες μέρες χρήσης της εφαρμογής {self.remaining_days}")
 
-    def get_date(self, event=None):
-        # https://pypi.org/project/tkcalendar/
-        print("Επιλεγμένη ημερομηνία ", self.service_calendar.get_date())
 
     def search_selected_copier_service(self, event=None):
         if not self.selected_copier_id:
@@ -1231,6 +1343,7 @@ class Toplevel1:
         root.destroy()
 
         # ---------------------Fix -Of- Style------------------------------------
+
     def fixed_map(self, option):
         # Fix for setting text colour for Tkinter 8.6.9
         # From: https://core.tcl.tk/tk/info/509cafafae
@@ -1523,7 +1636,6 @@ class Toplevel1:
                 # ==============================  Notebook style  =============
                 self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "blue")])
                 self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
-
 
     def add_service(self):
         selecteted_copier_id = (self.copiers_treeview.set(self.copiers_treeview.selection(), "#1"))

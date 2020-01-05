@@ -375,7 +375,6 @@ class add_copier_window:
         cursor.close()
         con.close()
 
-
         self.copiers_combobox.configure(values=copiers)
 
 
