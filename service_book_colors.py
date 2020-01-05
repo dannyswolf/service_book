@@ -10,6 +10,10 @@ todo sizes to upladed images
 todo αν ο χρήστης πατήση ακυρο κατα την προσθήκη επισκευής τι θα γίνει με τα ανταλλακιτκα που έχουν οριστεί με νεο service_id
 todo προβολή όλων των εικόνων
 todo start day to binary file
+todo εισαγωγη οχι μονο jpg αρχείων
+
+V0.9.5 Demo Version not ready  ==============================================================================05/01/2020
+Μέχρι 3 πελάτες και 5 φωτοτυπικά (στο σύνολο)
 
 V0.9.4 προσθήκη ανταλλακτικων και χωρίς βάση αποθήκης ============================================04/01/2020
 Αρχεία 1 insert_spare_parts
@@ -126,7 +130,7 @@ import copiers_log
 import enable_customers
 import enable_copiers
 from tkcalendar import Calendar, DateEntry
-from datetime import timedelta
+
 # Για τα αρχεία log files
 import logging, sys
 
@@ -166,13 +170,7 @@ root_logger.addHandler(handler)
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
 
-# Demo
-# start_day = '04 01 2020'
-# end_day = '05 01 2020'
-#
-# if today == end_day:
-#     messagebox.showerror("Το πρόγραμμα έλιξε", "Επικοινωνήστε μαζί μας για ανανέωση υποστήριξη χρήσης")
-#     raise 1
+
 # Αποκόμιση  πινάκων απο την βάση δεδομένων
 def get_tables():
     """

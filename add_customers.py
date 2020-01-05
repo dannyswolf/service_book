@@ -456,6 +456,20 @@ class Toplevel1:
             self.top.focus()
             return
 
+        # Demo
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT *  FROM Πελάτες ;")
+        customers = c.fetchall()
+        c.close()
+        con.close()
+        if len(customers) > 2:
+            messagebox.showerror("Demo",
+                                 "Λυπούμαστε η εκδοση αυτή είναι demo και δεν μπορείτε να προσθέσεται νέους πελάτες")
+
+            self.top.focus()
+            return
+
         data = [self.company_name.get(), self.name.get(), self.address.get(), self.city.get(), self.post.get(),
                 self.place.get(), self.phone.get(), self.mobile.get(), self.fax.get(), self.email.get(),
                 self.package.get(), self.cost.get(), 1]  # Το 1 είναι ενεργός πελάτης 0 ανενεργός

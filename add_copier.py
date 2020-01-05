@@ -390,6 +390,20 @@ class add_copier_window:
 
     def add_copier(self):
 
+        # Demo
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT *  FROM Φωτοτυπικά ;")
+        copiers = c.fetchall()
+        c.close()
+        con.close()
+        if len(copiers) > 4:
+            messagebox.showerror("Demo",
+                                 "Λυπούμαστε η εκδοση αυτή είναι demo και δεν μπορείτε να προσθέσεται νέα φωτοτυπικά")
+
+            self.top.focus()
+            return
+
         # πρέπει πρώτα να πάρουμε το  ID του πελάτη για να το ορίσουμε στο φωτοτυπικό
         conn = sqlite3.connect(dbase)
         cursor = conn.cursor()
