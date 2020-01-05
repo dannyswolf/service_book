@@ -14,6 +14,8 @@ import add_spare_parts
 from datetime import datetime
 import logging
 
+import insert_spare_parts
+
 spare_parts_db = ""
 dbase = "Service_book.db"
 selected_service_id = None
@@ -41,7 +43,7 @@ if not os.path.exists(log_dir):
 else:
     pass
 
-log_file_name = __name__ + " " + datetime.now().strftime("%d %m %Y") + ".log"
+log_file_name = "Service Book " + datetime.now().strftime("%d %m %Y") + ".log"
 log_file = os.path.join(log_dir, log_file_name)
 
 # log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -650,7 +652,10 @@ class edit_service_window():
     # Προσθήκη ανταλλακτικών
     def add_spare_parts(self):
         self.top.focus()
-        add_spare_parts.create_Toplevel1(self.top, self.selected_service_id)
+        if spare_parts_db:
+            add_spare_parts.create_Toplevel1(self.top, self.selected_service_id)
+        else:
+            insert_spare_parts.create_insert_spare_parts_window(self.top, self.selected_service_id)
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):

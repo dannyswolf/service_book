@@ -7,16 +7,21 @@
 
 """
 todo sizes to upladed images
-todo one file for logs
 todo αν ο χρήστης πατήση ακυρο κατα την προσθήκη επισκευής τι θα γίνει με τα ανταλλακιτκα που έχουν οριστεί με νεο service_id
 todo προβολή όλων των εικόνων
-todo προσθήκη ανταλλακτικων και χωρίς βάση αποθήκης
-todo notebook tabs colors
+todo start day to binary file
+
+V0.9.4 προσθήκη ανταλλακτικων και χωρίς βάση αποθήκης ============================================04/01/2020
+Αρχεία 1 insert_spare_parts
+todo προσθήκη ανταλλακτικων και χωρίς βάση αποθήκης ---- Done
+todo notebook tabs colors -------------------------------Done
+todo one file for logs  ---------------------------------Done
+
 
 V0.9.3 Τροποποιηση log αρχεία ===================================================================04/01/2020
 
 V0.9.2 Προσθήκη ανταλλακτικών και στην επεξεργασία service =======================================04/01/2020
-todo στο add_spare_parts βάζει οσα τεμάχεια έχει στην αποθήκη fixed ------------------------------04/01/2020
+todo στο add_spare_parts βάζει οσα τεμάχεια έχει στην αποθήκη--Done ------------------------------04/01/2020
 
 V0.9.1 Προβολή ανταλλακτικών  στην επεξεργασία service  ==========================================04/01/2020
 
@@ -121,7 +126,7 @@ import copiers_log
 import enable_customers
 import enable_copiers
 from tkcalendar import Calendar, DateEntry
-
+from datetime import timedelta
 # Για τα αρχεία log files
 import logging, sys
 
@@ -148,7 +153,7 @@ if not os.path.exists(log_dir):
 else:
     pass
 
-log_file_name = "service_book_log " + datetime.now().strftime("%d %m %Y") + ".log"
+log_file_name = "Service Book " + datetime.now().strftime("%d %m %Y") + ".log"
 log_file = os.path.join(log_dir, log_file_name)
 
 # log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -161,6 +166,13 @@ root_logger.addHandler(handler)
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
 
+# Demo
+# start_day = '04 01 2020'
+# end_day = '05 01 2020'
+#
+# if today == end_day:
+#     messagebox.showerror("Το πρόγραμμα έλιξε", "Επικοινωνήστε μαζί μας για ανανέωση υποστήριξη χρήσης")
+#     raise 1
 # Αποκόμιση  πινάκων απο την βάση δεδομένων
 def get_tables():
     """

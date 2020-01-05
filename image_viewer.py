@@ -30,7 +30,7 @@ if not os.path.exists(log_dir):
 else:
     pass
 
-log_file_name = __name__ + " " + datetime.now().strftime("%d %m %Y") + ".log"
+log_file_name = "Service Book " + datetime.now().strftime("%d %m %Y") + ".log"
 log_file = os.path.join(log_dir, log_file_name)
 
 # log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'

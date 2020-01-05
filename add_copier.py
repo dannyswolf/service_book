@@ -38,7 +38,7 @@ if not os.path.exists(log_dir):
 else:
     pass
 
-log_file_name = __name__ + " " + datetime.now().strftime("%d %m %Y") + ".log"
+log_file_name = "Service Book " + datetime.now().strftime("%d %m %Y") + ".log"
 log_file = os.path.join(log_dir, log_file_name)
 
 # log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -127,7 +127,7 @@ class add_copier_window:
         self.style.map('.', background=
         [('selected', _compcolor), ('active', _ana2color)])
         # ==============================  Notebook style  =============
-        self.style.map('TNotebook.Tab', background=[('selected', "#999933"), ('active', "#33994d")])
+        self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "blue")])
         self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
 
         self.company_list, self.model_list, self.customers_list = get_copiers_data()
@@ -416,7 +416,7 @@ class add_copier_window:
         try:
             data = [self.company_combobox.get() + " " + self.model_combobox.get(), self.serial.get(), self.start.get(),
                     self.start_counter.get(), customer_id[0][0], self.notes_scrolledtext.get('1.0', 'end-1c'),
-                    1]  # Το 1 είναι ενεργός φωτοτυπικό 0 ανενεργό
+                    1]  # Το 1 είναι ενεργό φωτοτυπικό 0 ανενεργό
         except IndexError as error:  # βγάζει error το customer_id[0][0] αν δεν επιλεξουμε πελάτη
             messagebox.showwarning("Προσοχή", "Παρακαλώ \n4.Επιλέξτε πελάτη")
             self.top.focus()

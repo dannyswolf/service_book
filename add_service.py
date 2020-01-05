@@ -17,6 +17,7 @@ import platform
 from datetime import datetime
 import logging
 import add_spare_parts
+import insert_spare_parts
 
 spare_parts_db = ""
 dbase = "Service_book.db"
@@ -44,7 +45,7 @@ if not os.path.exists(log_dir):
 else:
     pass
 
-log_file_name = __name__ + " " + datetime.now().strftime("%d %m %Y") + ".log"
+log_file_name = "Service Book " + datetime.now().strftime("%d %m %Y") + ".log"
 log_file = os.path.join(log_dir, log_file_name)
 
 # log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -147,7 +148,7 @@ class add_service_window():
         self.style.configure('.', font="TkDefaultFont")
         self.style.map('.', background=[('selected', _compcolor), ('active', _ana2color)])
         # ==============================  Notebook style  =============
-        self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#33994d")])
+        self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "blue")])
         self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
         self.top = top
         top.geometry("655x650+0+0")
@@ -593,7 +594,7 @@ class add_service_window():
         if spare_parts_db:
             add_spare_parts.create_Toplevel1(self.top, self.service_id)
         else:
-            messagebox.showerror("Error", "Δεν υπάρχει αποθήκη")
+            insert_spare_parts.create_insert_spare_parts_window(self.top, self.service_id)
 
 
 # The following code is added to facilitate the Scrolled widgets you specified.
