@@ -12,6 +12,9 @@ todo προβολή όλων των εικόνων
 todo start day to binary file
 todo service_id sto add_task
 
+V0.9.9 Επεξεργασία ημερολογίου ===============================================================================05/01/2020
+Αρχεία 1 edit_task
+
 V0.9.8 Ημερολόγιο ===============================================================================05/01/2020
 Αρχεία 1 add_task
 
@@ -140,6 +143,7 @@ import copiers_log
 import enable_customers
 import enable_copiers
 import add_task
+import edit_task
 from tkcalendar import Calendar, DateEntry
 from datetime import date, timedelta
 # Για τα αρχεία log files
@@ -270,7 +274,7 @@ def show_info():
         Αuthor     : "Jordanis Ntini"
         Copyright  : "Copyright © 2020"
         Credits    : ['Athanasia Tzampazi']
-        Version    : '0.9.8 Demo'
+        Version    : '0.9.9 Demo'
         Maintainer : "Jordanis Ntini"
         Email      : "ntinisiordanis@gmail.com"
         Status     : 'Development' 
@@ -322,7 +326,7 @@ class Toplevel1:
         top.minsize(120, 1)
         top.maxsize(1980, 1980)
         top.resizable(1, 1)
-        top.title("Βιβλίο Επισκευών V0.9.8 Demo")
+        top.title("Βιβλίο Επισκευών V0.9.9 Demo")
         top.configure(background="#bfc2b6")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
@@ -945,11 +949,13 @@ class Toplevel1:
         # Πίνακας φωτοτυπικών
         self.copiers_treeview = ScrolledTreeView(self.copiers_frame)
         self.copiers_treeview.place(relx=0.022, rely=0.175, relheight=0.810, relwidth=0.450)
-        self.copiers_treeview["columns"] = ["ID", "Φωτοτυπικά"]
+        self.copiers_treeview["columns"] = ["ID", "Φωτοτυπικά", "Σειριακός αριθμός"]
         self.copiers_treeview.heading("Φωτοτυπικά", text="Φωτοτυπικά", anchor="center")
         self.copiers_treeview.column("Φωτοτυπικά", anchor="w")
         self.copiers_treeview.heading("ID", text="ID", anchor="w", )
         self.copiers_treeview.column("ID", anchor="w", width="1")
+        self.copiers_treeview.heading("Σειριακός αριθμός", text="Σειριακός αριθμός", anchor="center")
+        self.copiers_treeview.column("Σειριακός αριθμός", anchor="w")
         self.copiers_treeview.configure(show="headings", style="mystyle.Treeview")
         self.copiers_treeview.bind("<<TreeviewSelect>>", self.service_click)
 
@@ -1067,6 +1073,13 @@ class Toplevel1:
         self.add_task_btn_img = PhotoImage(file="icons/add_scheduled_tasks.png")
         self.add_task_btn.configure(image=self.add_task_btn_img)
         self.add_task_btn.configure(compound="left")
+        # Ανανέωση μετα απο Προσθήκη εγρασίας
+        self.refresh_btn = tk.Button(top)
+        self.refresh_btn.place(relx=0.420, rely=0.630, height=30, relwidth=0.030)
+        self.refresh_btn.configure(background="#6b6b6b")
+        self.refresh_img = PhotoImage(file="icons/refresh.png")
+        self.refresh_btn.configure(image=self.refresh_img)
+        self.refresh_btn.configure(command=self.get_calendar)
 
         self.search_tasks_data = StringVar()
         self.search_tasks_entry = tk.Entry(top)
@@ -1110,9 +1123,10 @@ class Toplevel1:
         self.get_calendar()
 
     def get_calendar(self, event=None):
+        self.calendar_treeview.delete(*self.calendar_treeview.get_children())
         con = sqlite3.connect(dbase)
         c = con.cursor()
-        c.execute("SELECT * FROM  Calendar;")
+        c.execute("SELECT * FROM  Calendar WHERE Κατάσταση = 1;")
         self.tasks_headers = list(map(lambda x: x[0], c.description))
         data = c.fetchall()
         con.close()
@@ -1142,7 +1156,8 @@ class Toplevel1:
         self.search_tasks(formated_date)
 
     def edit_scheduled_tasks(self, event=None):
-        pass
+        selected_task_id = (self.calendar_treeview.set(self.calendar_treeview.selection(), '#1'))
+        edit_task.create_edit_task_window(root, selected_task_id)
 
     def search_tasks(self, data):
         # Αδειάζουμε πρώτα το tree

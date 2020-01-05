@@ -570,8 +570,8 @@ class edit_service_window():
             edited_culumns = ",".join(edited_culumns)
             data_to_add = [date.get(), self.purpose_combobox.get(), self.actions_combobox.get(),
                            self.notes_scrolledtext.get("1.0", "end-1c"), counter.get(), next_service.get(),
-                           self.copier_id,
-                           dte.get(), self.selected_service_id]
+                           self.copier_id, dte.get(), self.selected_service_id]
+
             add_conn = sqlite3.connect(dbase)
             add_cursor = add_conn.cursor()
             add_cursor.execute("UPDATE Service  SET " + edited_culumns + " WHERE ID=? ", (tuple(data_to_add)))
