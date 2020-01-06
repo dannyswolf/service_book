@@ -332,7 +332,7 @@ class edit_service_window():
         self.show_files_btn.configure(pady="0")
         self.show_files_btn.configure(text='''Προβολή \nαρχείων''')
         self.show_files_btn.configure(command=self.show_files)
-        self.show_files_btn.configure(state="active")
+        # self.show_files_btn.configure(state="active")
 
         # Ανταλλακτικά
         self.add_spare_parts_btn = tk.Button(self.spare_parts_frame)
@@ -526,8 +526,8 @@ class edit_service_window():
         images = cursor.fetchall()
         cursor.close()
         con.close()
-        if images == []:  # αδεια λιστα δλδ δεν υπάρχουν αρχεια και απενεργοποιουμε το κουμπί προβολή αρχείων
-            self.show_files_btn.configure(state="disabled")
+        if not images:  # αδεια λιστα δλδ δεν υπάρχουν αρχεια και απενεργοποιουμε το κουμπί προβολή αρχείων
+            self.show_files_btn.place_forget()
 
     # Προβολή αρχείων
     def show_files(self):
@@ -583,7 +583,7 @@ class edit_service_window():
         self.save_btn.place(relx=0.350, rely=0.914, height=34, width=147)
         self.save_btn.configure(activebackground="#ececec")
         self.save_btn.configure(activeforeground="#000000")
-        self.save_btn.configure(background="#808000")
+        self.save_btn.configure(background="#4f8c23")
         self.save_btn.configure(disabledforeground="#a3a3a3")
         self.save_btn.configure(font=("Calibri", 12, "bold"))
         self.save_btn.configure(foreground="#ffffff")

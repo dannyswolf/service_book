@@ -13,6 +13,8 @@ todo start day to binary file
 todo service_id sto add_task
 todo change colors
 
+V1.0.0 Demo ready == ==========================================================================06/01/2020
+
 V1.0.0 Task notifier ==========================================================================06/01/2020
 
 
