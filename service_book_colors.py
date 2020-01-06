@@ -11,8 +11,12 @@ todo αν ο χρήστης πατήση ακυρο κατα την προσθή
 todo προβολή όλων των εικόνων
 todo start day to binary file
 todo service_id sto add_task
+todo change colors
 
-V0.9.9 Επεξεργασία ημερολογίου ===============================================================================05/01/2020
+V1.0.0 Task notifier ==========================================================================06/01/2020
+
+
+V0.9.9 Επεξεργασία ημερολογίου =================================================================05/01/2020
 Αρχεία 1 edit_task
 
 V0.9.8 Ημερολόγιο ===============================================================================05/01/2020
@@ -274,7 +278,7 @@ def show_info():
         Αuthor     : "Jordanis Ntini"
         Copyright  : "Copyright © 2020"
         Credits    : ['Athanasia Tzampazi']
-        Version    : '0.9.9 Demo'
+        Version    : '1.0.0 Demo'
         Maintainer : "Jordanis Ntini"
         Email      : "ntinisiordanis@gmail.com"
         Status     : 'Development' 
@@ -326,7 +330,7 @@ class Toplevel1:
         top.minsize(120, 1)
         top.maxsize(1980, 1980)
         top.resizable(1, 1)
-        top.title("Βιβλίο Επισκευών V0.9.9 Demo")
+        top.title("Βιβλίο Επισκευών V1.0.0 Demo")
         top.configure(background="#bfc2b6")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
@@ -395,7 +399,7 @@ class Toplevel1:
         self.style.configure("mystyle.Treeview", background="white", rowheight=30)
 
         # ==============================  Notebook style  =============
-        self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "blue")])
+        self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#69ab3a")])
         self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
 
         # ==========================  Notebook  ==================================
@@ -972,7 +976,7 @@ class Toplevel1:
         self.search_copier()  # Εμφάνιση όλων των φωτοτυπικών κατα την εκκίνηση
         # Προσθήκη ιστορικού φωτοτυπικού
         self.add_service_btn = tk.Button(self.service_frame)
-        self.add_service_btn.place(relx=0.021, rely=0.100, height=20, relwidth=0.200)
+        # self.add_service_btn.place(relx=0.021, rely=0.100, height=20, relwidth=0.200)
         self.add_service_btn.configure(activebackground="#6b6b6b")
         self.add_service_btn.configure(activeforeground="#000000")
         self.add_service_btn.configure(background="#6b6b6b")
@@ -986,14 +990,15 @@ class Toplevel1:
         self.add_service_img = PhotoImage(file="icons/add_service.png")
         self.add_service_btn.configure(image=self.add_service_img)
         self.add_service_btn.configure(compound="left")
-        self.add_service_btn.configure(state="disabled")
+        # self.add_service_btn.configure(state="disabled")
         # Ανανέωση μετα απο εισαγωγη ιστορικού
         self.refresh_btn = tk.Button(self.service_frame)
-        self.refresh_btn.place(relx=0.225, rely=0.100, height=20, relwidth=0.030)
+        self.refresh_btn.place(relx=0.225, rely=0.100, height=25, relwidth=0.030)
         self.refresh_btn.configure(background="#6b6b6b")
         self.refresh_img = PhotoImage(file="icons/refresh.png")
         self.refresh_btn.configure(image=self.refresh_img)
         self.refresh_btn.configure(command=lambda: (self.service_click(event=None)))
+
         # Αναζήτηση στο επιλεγμένο φωτοτυπικό
         self.search_selected_copier_service_data = StringVar()
         self.search_selected_copier_service_entry = tk.Entry(self.service_frame, textvariable=self.search_selected_copier_service_data)
@@ -1047,6 +1052,11 @@ class Toplevel1:
         self.Label16.configure(foreground="#ffffff")
         self.Label16.configure(relief="groove")
         self.Label16.configure(text='''Ιστορικό''')
+        self.task_notifier_btn = tk.Button(self.service_frame)
+        self.task_notifier_btn.configure(background="#6b6b6b")
+        self.task_notifier_img = PhotoImage(file="icons/task_notifier.png")
+        self.task_notifier_btn.configure(image=self.task_notifier_img)
+        self.task_notifier_btn.configure(command=self.search_tasks_of_selected_copier)
 
         self.calendar_title_label = tk.Label(top)
         self.calendar_title_label.place(relx=0.021, rely=0.570, height=30, relwidth=0.967)
@@ -1073,13 +1083,14 @@ class Toplevel1:
         self.add_task_btn_img = PhotoImage(file="icons/add_scheduled_tasks.png")
         self.add_task_btn.configure(image=self.add_task_btn_img)
         self.add_task_btn.configure(compound="left")
+
         # Ανανέωση μετα απο Προσθήκη εγρασίας
-        self.refresh_btn = tk.Button(top)
-        self.refresh_btn.place(relx=0.420, rely=0.630, height=30, relwidth=0.030)
-        self.refresh_btn.configure(background="#6b6b6b")
-        self.refresh_img = PhotoImage(file="icons/refresh.png")
-        self.refresh_btn.configure(image=self.refresh_img)
-        self.refresh_btn.configure(command=self.get_calendar)
+        self.refresh_task_btn = tk.Button(top)
+        self.refresh_task_btn.place(relx=0.420, rely=0.630, height=30, relwidth=0.030)
+        self.refresh_task_btn.configure(background="#6b6b6b")
+        self.refresh_task_img = PhotoImage(file="icons/refresh.png")
+        self.refresh_task_btn.configure(image=self.refresh_task_img)
+        self.refresh_task_btn.configure(command=self.get_calendar)
 
         self.search_tasks_data = StringVar()
         self.search_tasks_entry = tk.Entry(top)
@@ -1122,6 +1133,39 @@ class Toplevel1:
 
         self.get_calendar()
 
+    def search_tasks_of_selected_copier(self):
+        self.calendar_treeview.delete(*self.calendar_treeview.get_children())
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT * FROM Calendar WHERE Copier_ID =? AND Κατάσταση =1", (self.selected_copier_id,))
+        data = c.fetchall()
+        c.close()
+        con.close()
+        for task in data:
+            self.calendar_treeview.insert("", "end", values=task)
+
+    def set_task_notifier(self, selected_copier_id):
+
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT Κατάσταση FROM Calendar WHERE Copier_ID =?", (selected_copier_id,))
+        data = c.fetchall()
+        c.close()
+        con.close()
+
+        try:
+            status = data[0][0]
+        except IndexError:
+            self.task_notifier_btn.place_forget()
+            return
+        #messagebox.showwarning("data notifier", f"{calendar_id}")
+        if status:
+            self.task_notifier_btn.configure(text="Εργασίες σε\n εκκρεμότητα", foreground='white')
+            self.task_notifier_btn.configure(compound='left')
+            self.task_notifier_btn.place(relx=0.860, rely=0.006, height=50, relwidth=0.130)
+        else:
+            self.task_notifier_btn.place_forget()
+
     def get_calendar(self, event=None):
         self.calendar_treeview.delete(*self.calendar_treeview.get_children())
         con = sqlite3.connect(dbase)
@@ -1160,6 +1204,7 @@ class Toplevel1:
         edit_task.create_edit_task_window(root, selected_task_id)
 
     def search_tasks(self, data):
+
         # Αδειάζουμε πρώτα το tree
         self.calendar_treeview.delete(*self.calendar_treeview.get_children())
         if not data:
@@ -1392,10 +1437,8 @@ class Toplevel1:
     def view_copiers(self, event=None):
         self.notebook.select(tab_id=0)
         # Απενεργοποιηση του κουμπιου προσθήκης ιστορικού
-        self.add_service_btn.configure(state="disabled")
-        self.add_service_btn.configure(background="#6b6b6b")
-        self.add_service_btn.configure(activebackground="#6b6b6b")
-        self.add_service_btn.configure(activeforeground="#000000")
+        self.add_service_btn.place_forget()
+
 
 
         #  Αδιάζουμε πρώτα το tree των φωτοτυπικών
@@ -1480,12 +1523,15 @@ class Toplevel1:
         :return:
         """
         self.notebook.select(tab_id=3)
+
         # Ενεργοποιηση του κουμπιου προσθήκης ιστορικού
         if event:
+
             self.add_service_btn.configure(activebackground="#6b6b6b")
             self.add_service_btn.configure(activeforeground="white")
             self.add_service_btn.configure(state="active")
             self.add_service_btn.configure(background="#6b6b6b")
+            self.add_service_btn.place(relx=0.021, rely=0.100, height=25, relwidth=0.200)
 
 
         # αδιάζουμε πρώτα το tree του ιστορικού
@@ -1495,7 +1541,7 @@ class Toplevel1:
         selected_item = (self.copiers_treeview.set(self.copiers_treeview.selection(), '#1'))
         # Αρχικοποιήση επιλεγμένου φωτοτυπικού
         self.selected_copier = (self.copiers_treeview.set(self.copiers_treeview.selection(), "#2"))
-
+        self.set_task_notifier(selected_item)  # Εμφάνηση ιδοποιήσης αν υπάρχουν προγραμματισμένες εργασίες
         # Εμφάνηση επιλεγμένου φωτοτυπικού
         self.copiers_title_label.configure(text=self.selected_copier)
 
@@ -1626,7 +1672,7 @@ class Toplevel1:
         except TclError as error:
             messagebox.showwarning("Προσοχή", "Παρακαλώ επιλεξτε πρώτα φωτοτυπικό")
             # ==============================  Notebook style  =============
-            self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "blue")])
+            self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#69ab3a")])
             self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
             return
 
@@ -1637,7 +1683,7 @@ class Toplevel1:
             # Αυτή είναι συνάρτηση του αρχείου edi_service_windows
             create_edit_service_window(root, selected_service_id, selected_copier, selected_customer)
             # ==============================  Notebook style  =============
-            self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "blue")])
+            self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#69ab3a")])
             self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
         else:
             if self.selected_copier_id:  # Αν ο χρήστης έχει επιλέξει φωτοτυπικό για να δεί το ιστορικό
@@ -1649,14 +1695,14 @@ class Toplevel1:
 
                 create_edit_service_window(root, selected_service_id, selected_copier, self.selected_customer)
                 # ==============================  Notebook style  =============
-                self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "blue")])
+                self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#69ab3a")])
                 self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
 
     def add_service(self):
         selecteted_copier_id = (self.copiers_treeview.set(self.copiers_treeview.selection(), "#1"))
         create_add_service_window(root, selecteted_copier_id)
         # ==============================  Notebook style  =============
-        self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "blue")])
+        self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#69ab3a")])
         self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
     # Αναζήτηση πελάτη
     def search_customer(self, event=None):
@@ -1746,10 +1792,8 @@ class Toplevel1:
             self.service_treeview.delete(*self.service_treeview.get_children())
             self.Label16.configure(text='''Ιστορικό''')
             # Απενεργοποιηση του κουμπιου προσθήκης ιστορικού
-            self.add_service_btn.configure(state="disabled")
-            self.add_service_btn.configure(background="#6b6b6b")
-            self.add_service_btn.configure(activebackground="#6b6b6b")
-            self.add_service_btn.configure(activeforeground="#000000")
+            self.add_service_btn.place_forget()
+
         except AttributeError as error:  # στην πρώτη εκκινηση δεν τα εχει φτιάξει και πετάει error
             pass
         self.selected_copier_id = ""

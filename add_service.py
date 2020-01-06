@@ -149,7 +149,7 @@ class add_service_window():
         self.style.configure('.', font="TkDefaultFont")
         self.style.map('.', background=[('selected', _compcolor), ('active', _ana2color)])
         # ==============================  Notebook style  =============
-        self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "blue")])
+        self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#69ab3a")])
         self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
         self.top = top
         top.geometry("655x650+0+0")
@@ -528,7 +528,7 @@ class add_service_window():
         self.save_btn.place(relx=0.396, rely=0.934, height=34, width=147)
         self.save_btn.configure(activebackground="#ececec")
         self.save_btn.configure(activeforeground="#000000")
-        self.save_btn.configure(background="#808000")
+        self.save_btn.configure(background="#4f8c23")
         self.save_btn.configure(disabledforeground="#a3a3a3")
         self.save_btn.configure(font=("Calibri", 10, "bold"))
         self.save_btn.configure(foreground="#ffffff")

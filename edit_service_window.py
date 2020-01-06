@@ -221,7 +221,7 @@ class edit_service_window():
         self.style.configure('.', font="-family {Calibri} -size 10 -weight bold")
         self.style.map('.', background=[('selected', _compcolor), ('active', _ana2color)])
         # ==============================  Notebook style  =============
-        self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "blue")])
+        self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#69ab3a")])
         self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
 
         self.top = top

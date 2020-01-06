@@ -92,7 +92,7 @@ class Toplevel1:
         self.style.map('.', background=
         [('selected', _compcolor), ('active', _ana2color)])
         # ==============================  Notebook style  =============
-        self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "blue")])
+        self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#69ab3a")])
         self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
         self.top = top
         top.geometry("581x400+480+276")
