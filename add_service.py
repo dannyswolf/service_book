@@ -218,7 +218,7 @@ class add_service_window():
 
         # Ανταλλακτικά
         self.add_spare_parts_btn = tk.Button(top)
-        self.add_spare_parts_btn.place(relx=0.525, rely=0.450, height=31, relwidth=0.250)
+        self.add_spare_parts_btn.place(relx=0.525, rely=0.450, height=31, relwidth=0.300)
         self.add_spare_parts_btn.configure(activebackground="#ececec")
         self.add_spare_parts_btn.configure(activeforeground="#000000")
         self.add_spare_parts_btn.configure(background="green")
@@ -229,6 +229,9 @@ class add_service_window():
         self.add_spare_parts_btn.configure(pady="0")
         self.add_spare_parts_btn.configure(text='''Προσθήκη ανταλλακτικών''')
         self.add_spare_parts_btn.configure(command=self.add_spare_parts)
+        self.add_spare_parts_btn_img = PhotoImage(file="icons/add_spare_parts.png")
+        self.add_spare_parts_btn.configure(image=self.add_spare_parts_btn_img)
+        self.add_spare_parts_btn.configure(compound="left")
 
         # Δελτίο Τεχνικής Εξυπηρέτησης
         self.dte_label = tk.Label(top)
@@ -281,6 +284,9 @@ class add_service_window():
         self.add_files_btn.configure(pady="0")
         self.add_files_btn.configure(text='''Προσθήκη αρχείων''')
         self.add_files_btn.configure(command=self.add_files)
+        self.add_files_btn_img = PhotoImage(file="icons/add_files.png")
+        self.add_files_btn.configure(image=self.add_files_btn_img)
+        self.add_files_btn.configure(compound="left")
 
         self.counter_label = tk.Label(top)
         self.counter_label.place(relx=0.025, rely=0.210, height=31, relwidth=0.260)
@@ -528,7 +534,7 @@ class add_service_window():
         self.save_btn.place(relx=0.396, rely=0.934, height=34, width=147)
         self.save_btn.configure(activebackground="#ececec")
         self.save_btn.configure(activeforeground="#000000")
-        self.save_btn.configure(background="#4f8c23")
+        self.save_btn.configure(background="green")
         self.save_btn.configure(disabledforeground="#a3a3a3")
         self.save_btn.configure(font=("Calibri", 10, "bold"))
         self.save_btn.configure(foreground="#ffffff")

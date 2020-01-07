@@ -321,7 +321,7 @@ class edit_service_window():
 
         # Αρχεία
         self.show_files_btn = tk.Button(self.spare_parts_frame)
-        self.show_files_btn.place(relx=0.320, rely=0.700, height=60, relwidth=0.250)
+        self.show_files_btn.place(relx=0.320, rely=0.750, height=60, relwidth=0.250)
         self.show_files_btn.configure(activebackground="#ececec")
         self.show_files_btn.configure(activeforeground="#000000")
         self.show_files_btn.configure(background="#6b6b6b")
@@ -336,21 +336,24 @@ class edit_service_window():
 
         # Ανταλλακτικά
         self.add_spare_parts_btn = tk.Button(self.spare_parts_frame)
-        self.add_spare_parts_btn.place(relx=0.625, rely=0.700, height=60, relwidth=0.250)
+        self.add_spare_parts_btn.place(relx=0.600, rely=0.750, height=50, relwidth=0.320)
         self.add_spare_parts_btn.configure(activebackground="#ececec")
         self.add_spare_parts_btn.configure(activeforeground="#000000")
-        self.add_spare_parts_btn.configure(background="green")
+        self.add_spare_parts_btn.configure(background="#3a7337")
         self.add_spare_parts_btn.configure(disabledforeground="#a3a3a3")
         self.add_spare_parts_btn.configure(foreground="#ffffff")
         self.add_spare_parts_btn.configure(highlightbackground="#d9d9d9")
         self.add_spare_parts_btn.configure(highlightcolor="black")
         self.add_spare_parts_btn.configure(pady="0")
-        self.add_spare_parts_btn.configure(text='''Προσθήκη\nανταλλακτικών''')
+        self.add_spare_parts_btn.configure(text='''    Προσθήκη\n    ανταλλακτικών''')
         self.add_spare_parts_btn.configure(command=self.add_spare_parts)
+        self.add_spare_parts_btn_img = PhotoImage(file="icons/add_spare_parts.png")
+        self.add_spare_parts_btn.configure(image=self.add_spare_parts_btn_img)
+        self.add_spare_parts_btn.configure(compound="left")
 
         # Ανανέωση μετα απο εισαγωγη ανταλλακτικών
         self.refresh_btn = tk.Button(self.spare_parts_frame)
-        self.refresh_btn.place(relx=0.875, rely=0.700, height=60, relwidth=0.060)
+        self.refresh_btn.place(relx=0.875, rely=0.750, height=50, relwidth=0.060)
         self.refresh_btn.configure(background="#6b6b6b")
         self.refresh_img = PhotoImage(file="icons/refresh.png")
         self.refresh_btn.configure(image=self.refresh_img)
@@ -418,19 +421,40 @@ class edit_service_window():
         self.next_service_entry.configure(selectbackground="#c4c4c4")
         self.next_service_entry.configure(selectforeground="black")
 
+        # Διαγραφή ανταλλακτικών
+        self.del_spare_parts_btn = tk.Button(self.spare_parts_frame)
+        self.del_spare_parts_btn.place(relx=0.025, rely=0.600, height=50, relwidth=0.300)
+        self.del_spare_parts_btn.configure(activebackground="#ececec")
+        self.del_spare_parts_btn.configure(activeforeground="#000000")
+        self.del_spare_parts_btn.configure(background="#6b6b6b")
+        self.del_spare_parts_btn.configure(disabledforeground="#a3a3a3")
+        self.del_spare_parts_btn.configure(foreground="#ffffff")
+        self.del_spare_parts_btn.configure(highlightbackground="#d9d9d9")
+        self.del_spare_parts_btn.configure(highlightcolor="black")
+        self.del_spare_parts_btn.configure(pady="0")
+        self.del_spare_parts_btn.configure(text='''   Διαγραφή επιλεγμένου\n   ανταλλακτικού''')
+        self.del_spare_parts_btn.configure(command=self.del_spare_parts)
+        self.del_spare_parts_btn_img = PhotoImage(file="icons/delete_spare_parts.png")
+        self.del_spare_parts_btn.configure(image=self.del_spare_parts_btn_img)
+        self.del_spare_parts_btn.configure(compound="left")
+
+
         # Προσθήκη αρχείων
         self.add_files_btn = tk.Button(self.spare_parts_frame)
-        self.add_files_btn.place(relx=0.025, rely=0.700, height=55, relwidth=0.237)
+        self.add_files_btn.place(relx=0.025, rely=0.750, height=50, relwidth=0.300)
         self.add_files_btn.configure(activebackground="#ececec")
         self.add_files_btn.configure(activeforeground="#000000")
-        self.add_files_btn.configure(background="green")
+        self.add_files_btn.configure(background="#3a7337")
         self.add_files_btn.configure(disabledforeground="#a3a3a3")
         self.add_files_btn.configure(foreground="#ffffff")
         self.add_files_btn.configure(highlightbackground="#d9d9d9")
         self.add_files_btn.configure(highlightcolor="black")
         self.add_files_btn.configure(pady="0")
-        self.add_files_btn.configure(text='''Προσθήκη\nαρχείων''')
+        self.add_files_btn.configure(text='''      Προσθήκη\n      αρχείων''')
         self.add_files_btn.configure(command=self.add_files)
+        self.add_files_btn_img = PhotoImage(file="icons/add_files.png")
+        self.add_files_btn.configure(image=self.add_files_btn_img)
+        self.add_files_btn.configure(compound="left")
 
         # Δελτίο Τεχνικής Εξυπηρέτησης
         self.dte_label = tk.Label(self.service_frame)
@@ -514,7 +538,7 @@ class edit_service_window():
 
         self.spare_parts_treeview = ScrolledTreeView(self.spare_parts_frame)
         self.spare_parts_treeview.place(relx=0.017, rely=0.100, relheight=0.500, relwidth=0.970)
-        self.spare_parts_treeview.configure(show="headings", style="mystyle.Treeview")
+        self.spare_parts_treeview.configure(show="headings", style="mystyle.Treeview", selectmode="browse")
         self.get_spare_parts()
 
 
@@ -583,7 +607,7 @@ class edit_service_window():
         self.save_btn.place(relx=0.350, rely=0.914, height=34, width=147)
         self.save_btn.configure(activebackground="#ececec")
         self.save_btn.configure(activeforeground="#000000")
-        self.save_btn.configure(background="#4f8c23")
+        self.save_btn.configure(background="green")
         self.save_btn.configure(disabledforeground="#a3a3a3")
         self.save_btn.configure(font=("Calibri", 12, "bold"))
         self.save_btn.configure(foreground="#ffffff")
@@ -667,6 +691,21 @@ class edit_service_window():
             add_spare_parts.create_Toplevel1(self.top, self.selected_service_id)
         else:
             insert_spare_parts.create_insert_spare_parts_window(self.top, self.selected_service_id)
+
+    # Διαγραφή ανταλλακτικών
+    def del_spare_parts(self):
+        selected_spare_part = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#1'))
+        selected_part_nur = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#2'))
+        answer = messagebox.askokcancel("Προσοχή!", f"Ειστε σήγουρος για την διαγραφή του {selected_part_nur};")
+        if not answer:
+            self.top.focus()
+            return
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("DELETE FROM Ανταλλακτικά WHERE ID=?", (selected_spare_part,))
+        con.commit()
+        con.close()
+        self.spare_parts_treeview.delete(self.spare_parts_treeview.selection())
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):
