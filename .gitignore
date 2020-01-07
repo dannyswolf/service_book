@@ -2,7 +2,7 @@
 ### ignore files template
 __pycache__
 .idea
-
+Service_book.db
 /Φωτοτυπικά.csv
 /logs/
 "Service_book - \316\221\316\275\317\204\316\271\316\263\317\201\316\261\317\206\316\256.db"
