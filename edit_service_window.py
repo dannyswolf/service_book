@@ -16,8 +16,9 @@ import logging
 
 import insert_spare_parts
 
-spare_parts_db = ""
-dbase = "Service_book.db"
+
+dbase = "\\\\192.168.1.200\\Public\\DROPBOX\\ΕΓΓΡΑΦΑ\\6.  ΒΙΒΛΙΟ SERVICE\\Service_book.db"
+spare_parts_db = "\\\\192.168.1.200\\Public\\DROPBOX\\ΕΓΓΡΑΦΑ\\2.  ΑΠΟΘΗΚΗ\\3. ΚΑΙΝΟΥΡΙΑ_ΑΠΟΘΗΚΗ.db"
 selected_service_id = None
 selected_copier = None
 selected_customer = None
