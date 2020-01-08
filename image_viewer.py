@@ -19,7 +19,7 @@ import shutil  # για διαγραφη των φακέλων με τις ει�
 import sys
 import logging
 from datetime import datetime
-dbase = "Service_book.db"
+from settings import dbase, spare_parts_db
 
 
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE------------------

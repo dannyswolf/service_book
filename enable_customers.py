@@ -11,6 +11,7 @@ from tkinter import StringVar, messagebox
 import os
 import logging
 from datetime import datetime
+from settings import dbase, spare_parts_db
 
 try:
     import Tkinter as tk
@@ -27,6 +28,7 @@ except ImportError:
     py3 = True
 
 import enable_customers_support
+
 
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE------------------
 today = datetime.today().strftime("%d %m %Y")
@@ -49,7 +51,7 @@ root_logger.addHandler(handler)
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
 
-dbase = "Service_book.db"
+
 
 
 def vp_start_gui():

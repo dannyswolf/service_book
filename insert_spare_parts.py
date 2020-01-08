@@ -12,8 +12,9 @@ import sqlite3
 import os
 import logging
 from datetime import datetime
+from settings import dbase, spare_parts_db
 
-dbase = "Service_book.db"
+
 try:
     import Tkinter as tk
 except ImportError:

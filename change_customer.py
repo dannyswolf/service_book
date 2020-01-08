@@ -12,9 +12,9 @@ import change_customer_support
 from datetime import datetime
 import logging
 import os
+from settings import dbase, spare_parts_db
 
 
-dbase = "Service_book.db"
 try:
     import Tkinter as tk
 except ImportError:

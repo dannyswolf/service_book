@@ -18,10 +18,9 @@ from datetime import datetime
 import logging
 import add_spare_parts
 import insert_spare_parts
+from settings import dbase, spare_parts_db
 
 
-spare_parts_db = ""
-dbase = "Service_book.db"
 selected_copier_id = None
 
 try:

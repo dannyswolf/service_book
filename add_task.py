@@ -12,8 +12,9 @@ import sqlite3
 import os
 import logging
 from datetime import datetime
+from settings import dbase, spare_parts_db, demo
 
-dbase = "Service_book.db"
+
 try:
     import Tkinter as tk
 except ImportError:
@@ -73,6 +74,7 @@ def get_copiers_data():
     cursor.close()
     conn.close()
     return sorted(customers_list), serials
+
 
 def get_service_data():
     purpose_list = []
@@ -218,8 +220,30 @@ class add_task_window:
         self.customer_combobox.bind("<<ComboboxSelected>>", self.get_copier)
         self.customer_combobox.configure(state="readonly")
 
+        self.phone_label = tk.Label(top)
+        self.phone_label.place(relx=0.025, rely=0.248, height=31, relwidth=0.230)
+        self.phone_label.configure(activebackground="#f9f9f9")
+        self.phone_label.configure(activeforeground="black")
+        self.phone_label.configure(background="#6b6b6b")
+        self.phone_label.configure(disabledforeground="#a3a3a3")
+        self.phone_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.phone_label.configure(foreground="#ffffff")
+        self.phone_label.configure(highlightbackground="#d9d9d9")
+        self.phone_label.configure(highlightcolor="black")
+        self.phone_label.configure(relief="groove")
+        self.phone_label.configure(text='''Τηλέφωνο''')
+        self.phone = ""
+        self.phone_var = StringVar(w, value=self.phone)
+        self.phone_entry = tk.Entry(top)
+        self.phone_entry.place(relx=0.27, rely=0.248, height=31, relwidth=0.593)
+        self.phone_entry.configure(background="white")
+        self.phone_entry.configure(disabledforeground="#a3a3a3")
+        self.phone_entry.configure(font="TkFixedFont")
+        self.phone_entry.configure(foreground="#000000")
+        self.phone_entry.configure(insertbackground="black")
+
         self.customer_copiers_label = tk.Label(top)
-        self.customer_copiers_label.place(relx=0.025, rely=0.248, height=31, relwidth=0.230)
+        self.customer_copiers_label.place(relx=0.025, rely=0.324, height=31, relwidth=0.230)
         self.customer_copiers_label.configure(activebackground="#f9f9f9")
         self.customer_copiers_label.configure(activeforeground="black")
         self.customer_copiers_label.configure(background="#6b6b6b")
@@ -230,14 +254,15 @@ class add_task_window:
         self.customer_copiers_label.configure(highlightcolor="black")
         self.customer_copiers_label.configure(relief="groove")
         self.customer_copiers_label.configure(text='''Φωτοτυπικό''')
+        self.copier_stringvar = StringVar()
         self.copiers_combobox = ttk.Combobox(top)
-        self.copiers_combobox.place(relx=0.27, rely=0.248, relheight=0.057, relwidth=0.593)
-        self.copiers_combobox.configure(values="")
+        self.copiers_combobox.place(relx=0.27, rely=0.324, relheight=0.057, relwidth=0.593)
+        self.copiers_combobox.set(value=self.copier_stringvar.get())
         self.copiers_combobox.configure(takefocus="")
         self.copiers_combobox.bind('<<ComboboxSelected>>', self.get_copier_id)
 
         self.purpose_label = tk.Label(top)
-        self.purpose_label.place(relx=0.025, rely=0.324, height=31, relwidth=0.230)
+        self.purpose_label.place(relx=0.025, rely=0.400, height=31, relwidth=0.230)
         self.purpose_label.configure(activebackground="#f9f9f9")
         self.purpose_label.configure(activeforeground="black")
         self.purpose_label.configure(background="#6b6b6b")
@@ -249,19 +274,19 @@ class add_task_window:
         self.purpose_label.configure(relief="groove")
         self.purpose_label.configure(text='''Σκοπός επίσκεψης''')
         self.purpose_combobox = ttk.Combobox(top)
-        self.purpose_combobox.place(relx=0.27, rely=0.330, relheight=0.057, relwidth=0.593)
+        self.purpose_combobox.place(relx=0.27, rely=0.400, relheight=0.057, relwidth=0.593)
         self.purpose_combobox.configure(values=self.purpose_list)
         # self.purpose_combobox.configure(textvariable=edit_service_window_support.combobox)
         self.purpose_combobox.configure(takefocus="")
         self.add_to_service_data_btn1 = tk.Button(top)
-        self.add_to_service_data_btn1.place(relx=0.880, rely=0.330, height=29, relwidth=0.060)
+        self.add_to_service_data_btn1.place(relx=0.880, rely=0.400, height=29, relwidth=0.060)
         self.add_to_service_data_btn1.configure(background="#006291")
         self.add_to_service_data_img1 = PhotoImage(file="icons/add_to_service_data1.png")
         self.add_to_service_data_btn1.configure(image=self.add_to_service_data_img1)
         self.add_to_service_data_btn1.configure(command=lambda: (self.add_to_service_data("Σκοπός")))
 
         self.technician_label = tk.Label(top)
-        self.technician_label.place(relx=0.025, rely=0.400, height=31, relwidth=0.230)
+        self.technician_label.place(relx=0.025, rely=0.480, height=31, relwidth=0.230)
         self.technician_label.configure(activebackground="#f9f9f9")
         self.technician_label.configure(activeforeground="black")
         self.technician_label.configure(background="#6b6b6b")
@@ -274,7 +299,7 @@ class add_task_window:
         self.technician_label.configure(text='''Τεχνικός''')
         self.technician = StringVar()
         self.technician_entry = tk.Entry(top)
-        self.technician_entry.place(relx=0.27, rely=0.400, height=30, relwidth=0.593)
+        self.technician_entry.place(relx=0.27, rely=0.480, height=30, relwidth=0.593)
         self.technician_entry.configure(textvariable=self.technician)
         self.technician_entry.configure(background="white")
         self.technician_entry.configure(disabledforeground="#a3a3a3")
@@ -283,7 +308,7 @@ class add_task_window:
         self.technician_entry.configure(insertbackground="black")
 
         self.urgent_label = tk.Label(top)
-        self.urgent_label.place(relx=0.025, rely=0.488, height=31, relwidth=0.230)
+        self.urgent_label.place(relx=0.025, rely=0.553, height=31, relwidth=0.230)
         self.urgent_label.configure(activebackground="#f9f9f9")
         self.urgent_label.configure(activeforeground="black")
         self.urgent_label.configure(background="#6b6b6b")
@@ -296,7 +321,7 @@ class add_task_window:
         self.urgent_label.configure(text='''Επείγων''')
         self.urgent = StringVar()
         self.urgent_entry = tk.Entry(top)
-        self.urgent_entry.place(relx=0.27, rely=0.488, height=30, relwidth=0.593)
+        self.urgent_entry.place(relx=0.27, rely=0.553, height=30, relwidth=0.593)
         self.urgent_entry.configure(textvariable=self.urgent)
         self.urgent_entry.configure(background="white")
         self.urgent_entry.configure(disabledforeground="#a3a3a3")
@@ -305,7 +330,7 @@ class add_task_window:
         self.urgent_entry.configure(insertbackground="black")
 
         self.notes_label = tk.Label(top)
-        self.notes_label.place(relx=0.025, rely=0.573, height=31, relwidth=0.940)
+        self.notes_label.place(relx=0.025, rely=0.633, height=31, relwidth=0.940)
         self.notes_label.configure(activebackground="#f9f9f9")
         self.notes_label.configure(activeforeground="black")
         self.notes_label.configure(background="#6b6b6b")
@@ -317,12 +342,9 @@ class add_task_window:
         self.notes_label.configure(relief="groove")
         self.notes_label.configure(text='''Σημειώσεις''')
 
-        self.TSeparator1 = ttk.Separator(top)
-        self.TSeparator1.place(relx=0.025, rely=0.553, relwidth=0.938)
-
         self.notes = StringVar()
         self.notes_scrolledtext = ScrolledText(top)
-        self.notes_scrolledtext.place(relx=0.025, rely=0.649, relheight=0.25, relwidth=0.941)
+        self.notes_scrolledtext.place(relx=0.025, rely=0.690, relheight=0.23, relwidth=0.941)
         self.notes_scrolledtext.insert('1.0', self.notes.get())
         self.notes_scrolledtext.configure(background="white")
         self.notes_scrolledtext.configure(font="TkTextFont")
@@ -336,7 +358,7 @@ class add_task_window:
         self.notes_scrolledtext.configure(wrap="none")
 
         self.save_btn = tk.Button(top)
-        self.save_btn.place(relx=0.296, rely=0.916, height=34, width=147)
+        self.save_btn.place(relx=0.296, rely=0.936, height=34, width=147)
         self.save_btn.configure(activebackground="#ececec")
         self.save_btn.configure(activeforeground="#000000")
         self.save_btn.configure(background="#6b6b6b")
@@ -360,29 +382,36 @@ class add_task_window:
         c.execute("SELECT ID, Εταιρεία FROM Φωτοτυπικά WHERE Serial =?", (self.selected_serial,))
         data = c.fetchall()
         self.copier_id = data[0][0]
-        self.selected_copier = data[0][1]
+        self.selected_copier = data[0][1] + "  Σειριακός : " + self.selected_serial
         con.close()
 
     def get_copier(self, event=None):
         # να πάρουμε το id του πελάτη απο το ονομα του
-        old_customer = self.customer_combobox.get()
+        customer = self.customer_combobox.get()
         self.copiers_combobox.set(value="")
 
         con = sqlite3.connect(dbase)
         cursor = con.cursor()
-        cursor.execute("SELECT ID FROM Πελάτες WHERE  Επωνυμία_Επιχείρησης =?", (old_customer,))
-        old_customer_id = cursor.fetchall()  # ==> [(4,)] αρα θέλουμε το customer_id[0][0]
-        self.customer_id = old_customer_id[0][0]
+        cursor.execute("SELECT ID, Τηλέφωνο FROM Πελάτες WHERE  Επωνυμία_Επιχείρησης =?", (customer,))
+        customer_data = cursor.fetchall()  # ==> [(4,)] αρα θέλουμε το customer_id[0][0]
+        self.customer_id = customer_data[0][0]
+
+        self.phone_var = StringVar(w, value=customer_data[0][1])
+        self.phone_entry.configure(textvariable=self.phone_var)
 
         # Εμφάνιση φωτοτυπικών σύμφονα με το customer_id
-        cursor.execute("SELECT * FROM Φωτοτυπικά WHERE Πελάτη_ID = ? AND Κατάσταση = 1 ", (self.customer_id,))
+        cursor.execute("SELECT Εταιρεία, Serial FROM Φωτοτυπικά WHERE Πελάτη_ID = ? AND Κατάσταση = 1 ", (self.customer_id,))
         copiers = cursor.fetchall()
         for copier in copiers:
-            self.copiers.append(copier)
+            self.copiers.append("   Σειριακός: ".join(copier))
         cursor.close()
         con.close()
-
-        self.copiers_combobox.configure(values=copiers)
+        # Αν επιλέξουμε φωτοτυπικό του πελάτη απο τα περασμένα στην βάση φωτοτυπικά
+        if copiers:
+            self.copiers_combobox.configure(values=self.copiers)
+        # Διαφορετικά μπορούμε να εισάγουμε νέο μηχάνημα
+        else:
+            self.copiers_combobox.configure(textvariable=self.copier_stringvar)
 
     def quit(self, event):
         self.top.destroy()
@@ -390,18 +419,19 @@ class add_task_window:
     def add_task(self):
 
         # Demo
-        con = sqlite3.connect(dbase)
-        c = con.cursor()
-        c.execute("SELECT *  FROM Calendar ;")
-        tasks = c.fetchall()
-        c.close()
-        con.close()
-        if len(tasks) > 4:
-            messagebox.showerror("Demo",
-                                 "Λυπούμαστε η εκδοση αυτή είναι demo και δεν μπορείτε να προσθέσεται νέες εργασίες")
+        if demo:
+            con = sqlite3.connect(dbase)
+            c = con.cursor()
+            c.execute("SELECT *  FROM Calendar ;")
+            tasks = c.fetchall()
+            c.close()
+            con.close()
+            if len(tasks) > 4:
+                messagebox.showerror("Demo",
+                                    "Λυπούμαστε η εκδοση αυτή είναι demo και δεν μπορείτε να προσθέσεται νέες εργασίες")
 
-            self.top.focus()
-            return
+                self.top.focus()
+                return
 
         conn = sqlite3.connect(dbase)
         cursor = conn.cursor()
@@ -427,10 +457,16 @@ class add_task_window:
             messagebox.showwarning("Προσοχή", "Η ημερομηνία πρέπει να έχει την μορφή ΄01/01/2020΄")
             self.top.focus()
             return
+        # Αν γράψουμε νέο φωτοτυπικό και όχι απο την λίστα
+        if not self.selected_copier:
+            self.selected_copier = self.copiers_combobox.get()
+
         # τα "" είναι η ημερομηνία ολοκλήροσης και ΔΤΕ που δεν τα συμπληρώνουμε εδώ αλλα στην επεξεργασία task
+        # Το 1 στο τέλος είναι κατάσταση 1=> ενεργό 0 => ανενεργό δλδ ολοκληρώθηκε
         data = [self.date.get(), self.customer_combobox.get(), self.selected_copier, self.purpose_combobox.get(),
-                self.technician.get(), "", self.urgent.get(), self.notes_scrolledtext.get('1.0', 'end-1c'),
-                self.copier_id, "", 1]  # Το 1 είναι κατάσταση 1=> ενεργό 0 => ανενεργό δλδ ολοκληρόθηκε
+                self.technician.get(), "", self.urgent.get(), self.phone_var.get(),
+                self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, "", 1]
+
 
         sql_insert = "INSERT INTO Calendar (" + culumns + ")" + "VALUES(" + values + ");"
 

@@ -13,8 +13,8 @@ import os
 import logging
 from datetime import datetime
 import enable_copiers_support
+from settings import dbase, spare_parts_db
 
-dbase = "Service_book.db"
 try:
     import Tkinter as tk
 except ImportError:

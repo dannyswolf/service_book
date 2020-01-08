@@ -12,8 +12,8 @@ import sqlite3
 import os
 import logging
 from datetime import datetime
+from settings import dbase, spare_parts_db, demo
 
-dbase = "Service_book.db"
 try:
     import Tkinter as tk
 except ImportError:
@@ -52,9 +52,6 @@ sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
 
 
-
-
-
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
     global val, w, root
@@ -66,7 +63,6 @@ def vp_start_gui():
 
 
 w = None
-
 selected_calendar_id = None
 
 
@@ -120,7 +116,7 @@ class edit_task_window:
         self.urgent = ""
         self.columns = None
         self.top = top
-        top.geometry("505x524+444+228")
+        top.geometry("505x624+444+228")
         top.minsize(120, 1)
         top.maxsize(1604, 881)
         top.resizable(1, 1)
@@ -155,8 +151,7 @@ class edit_task_window:
         self.date_label.configure(highlightbackground="#d9d9d9")
         self.date_label.configure(highlightcolor="black")
         self.date_label.configure(relief="groove")
-        self.date_label.configure(text='''Ημερομηνία''')
-        self.today = datetime.today().strftime("%d/%m/%Y")
+        self.date_label.configure(text='''Προγραμ. Ημερομ.''')
         self.date = StringVar(self.top, value=today)
         self.start_date_entry = tk.Entry(top)
         self.start_date_entry.place(relx=0.27, rely=0.095, height=31, relwidth=0.593)
@@ -181,12 +176,34 @@ class edit_task_window:
         self.customer_label.configure(relief="groove")
         self.customer_label.configure(text='''Πελάτης''')
         self.customer_combobox = ttk.Combobox(top)
-        self.customer_combobox.place(relx=0.27, rely=0.172, relheight=0.057, relwidth=0.593)
+        self.customer_combobox.place(relx=0.27, rely=0.172, relheight=0.048, relwidth=0.593)
         self.customer_combobox.configure(takefocus="")
         self.customer_combobox.configure(state="readonly")
 
+        self.phone_label = tk.Label(top)
+        self.phone_label.place(relx=0.025, rely=0.248, height=31, relwidth=0.230)
+        self.phone_label.configure(activebackground="#f9f9f9")
+        self.phone_label.configure(activeforeground="black")
+        self.phone_label.configure(background="#6b6b6b")
+        self.phone_label.configure(disabledforeground="#a3a3a3")
+        self.phone_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.phone_label.configure(foreground="#ffffff")
+        self.phone_label.configure(highlightbackground="#d9d9d9")
+        self.phone_label.configure(highlightcolor="black")
+        self.phone_label.configure(relief="groove")
+        self.phone_label.configure(text='''Τηλέφωνο''')
+        self.phone = ""
+        self.phone_var = StringVar(w, value=self.phone)
+        self.phone_entry = tk.Entry(top)
+        self.phone_entry.place(relx=0.27, rely=0.248, height=31, relwidth=0.593)
+        self.phone_entry.configure(background="white")
+        self.phone_entry.configure(disabledforeground="#a3a3a3")
+        self.phone_entry.configure(font="TkFixedFont")
+        self.phone_entry.configure(foreground="#000000")
+        self.phone_entry.configure(insertbackground="black")
+
         self.customer_copiers_label = tk.Label(top)
-        self.customer_copiers_label.place(relx=0.025, rely=0.248, height=31, relwidth=0.230)
+        self.customer_copiers_label.place(relx=0.025, rely=0.324, height=31, relwidth=0.230)
         self.customer_copiers_label.configure(activebackground="#f9f9f9")
         self.customer_copiers_label.configure(activeforeground="black")
         self.customer_copiers_label.configure(background="#6b6b6b")
@@ -198,13 +215,13 @@ class edit_task_window:
         self.customer_copiers_label.configure(relief="groove")
         self.customer_copiers_label.configure(text='''Φωτοτυπικό''')
         self.copiers_combobox = ttk.Combobox(top)
-        self.copiers_combobox.place(relx=0.27, rely=0.248, relheight=0.057, relwidth=0.593)
+        self.copiers_combobox.place(relx=0.27, rely=0.324, relheight=0.048, relwidth=0.593)
         self.copiers_combobox.configure(values="")
         self.copiers_combobox.configure(takefocus="")
         self.copiers_combobox.configure(state="readonly")
 
         self.purpose_label = tk.Label(top)
-        self.purpose_label.place(relx=0.025, rely=0.324, height=31, relwidth=0.230)
+        self.purpose_label.place(relx=0.025, rely=0.401, height=31, relwidth=0.230)
         self.purpose_label.configure(activebackground="#f9f9f9")
         self.purpose_label.configure(activeforeground="black")
         self.purpose_label.configure(background="#6b6b6b")
@@ -217,7 +234,7 @@ class edit_task_window:
         self.purpose_label.configure(text='''Σκοπός επίσκεψης''')
         # self.purpose = StringVar()
         self.purpose_entry = tk.Entry(top)
-        self.purpose_entry.place(relx=0.27, rely=0.324, height=30, relwidth=0.593)
+        self.purpose_entry.place(relx=0.27, rely=0.401, height=30, relwidth=0.593)
         # self.purpose_entry.configure(textvariable=self.purpose)
         self.purpose_entry.configure(background="white")
         self.purpose_entry.configure(disabledforeground="#a3a3a3")
@@ -226,7 +243,7 @@ class edit_task_window:
         self.purpose_entry.configure(insertbackground="black")
 
         self.technician_label = tk.Label(top)
-        self.technician_label.place(relx=0.025, rely=0.401, height=31, relwidth=0.230)
+        self.technician_label.place(relx=0.025, rely=0.477, height=31, relwidth=0.230)
         self.technician_label.configure(activebackground="#f9f9f9")
         self.technician_label.configure(activeforeground="black")
         self.technician_label.configure(background="#6b6b6b")
@@ -239,7 +256,7 @@ class edit_task_window:
         self.technician_label.configure(text='''Τεχνικός''')
         self.technician = StringVar()
         self.technician_entry = tk.Entry(top)
-        self.technician_entry.place(relx=0.27, rely=0.401, height=30, relwidth=0.593)
+        self.technician_entry.place(relx=0.27, rely=0.477, height=30, relwidth=0.593)
         self.technician_entry.configure(textvariable=self.technician)
         self.technician_entry.configure(background="white")
         self.technician_entry.configure(disabledforeground="#a3a3a3")
@@ -248,7 +265,7 @@ class edit_task_window:
         self.technician_entry.configure(insertbackground="black")
 
         self.compl_date_label = tk.Label(top)
-        self.compl_date_label.place(relx=0.025, rely=0.477, height=31, relwidth=0.230)
+        self.compl_date_label.place(relx=0.025, rely=0.555, height=31, relwidth=0.230)
         self.compl_date_label.configure(activebackground="#f9f9f9")
         self.compl_date_label.configure(activeforeground="black")
         self.compl_date_label.configure(background="#6b6b6b")
@@ -258,9 +275,11 @@ class edit_task_window:
         self.compl_date_label.configure(highlightbackground="#d9d9d9")
         self.compl_date_label.configure(highlightcolor="black")
         self.compl_date_label.configure(relief="groove")
-        self.compl_date_label.configure(text='''Ημ_Ολοκλ''')
+        self.compl_date_label.configure(text='''Ημερομ. Ολοκλ''')
+
         self.compl_date_entry = tk.Entry(top)
-        self.compl_date_entry.place(relx=0.27, rely=0.477, height=30, relwidth=0.593)
+        self.compl_date_entry.place(relx=0.27, rely=0.555, height=30, relwidth=0.593)
+        # self.compl_date_entry.configure(textvariable=today)
         self.compl_date_entry.configure(background="white")
         self.compl_date_entry.configure(disabledforeground="#a3a3a3")
         self.compl_date_entry.configure(font="TkFixedFont")
@@ -268,7 +287,7 @@ class edit_task_window:
         self.compl_date_entry.configure(insertbackground="black")
 
         self.completed_label = tk.Label(top)
-        self.completed_label.place(relx=0.025, rely=0.555, height=31, relwidth=0.230)
+        self.completed_label.place(relx=0.025, rely=0.635, height=31, relwidth=0.230)
         self.completed_label.configure(activebackground="#f9f9f9")
         self.completed_label.configure(activeforeground="black")
         self.completed_label.configure(background="#6b6b6b")
@@ -281,19 +300,21 @@ class edit_task_window:
         self.completed_label.configure(text='''Ολοκληρώθηκε;''')
         self.completed_var = IntVar()
         self.completed_Checkbutton1 = tk.Checkbutton(top)
-        self.completed_Checkbutton1.place(relx=0.27, rely=0.555, height=31, relwidth=0.102)
+        self.completed_Checkbutton1.place(relx=0.27, rely=0.635, height=31, relwidth=0.102)
         self.completed_Checkbutton1.configure(activebackground="#ececec")
-        self.completed_Checkbutton1.configure(activeforeground="#000000")
+        self.completed_Checkbutton1.configure(activeforeground="white")
         self.completed_Checkbutton1.configure(background="#6b6b6b")
-        self.completed_Checkbutton1.configure(foreground="#000000")
+
         self.completed_Checkbutton1.configure(highlightbackground="#d9d9d9")
+        self.completed_Checkbutton1.configure(font="-family {Calibri} -size 10 -weight bold")
         self.completed_Checkbutton1.configure(highlightcolor="black")
         self.completed_Checkbutton1.configure(justify='left')
-        self.completed_Checkbutton1.configure(text='''Ναι''')
+        # self.completed_Checkbutton1.configure(text=''' Ναι''')
         self.completed_Checkbutton1.configure(variable=self.completed_var)
+        self.completed_Checkbutton1.configure(command=self.on_check)
 
         self.dte_label = tk.Label(top)
-        self.dte_label.place(relx=0.450, rely=0.555, height=31, relwidth=0.230)
+        self.dte_label.place(relx=0.450, rely=0.635, height=31, relwidth=0.230)
         self.dte_label.configure(activebackground="#f9f9f9")
         self.dte_label.configure(activeforeground="black")
         self.dte_label.configure(background="#6b6b6b")
@@ -306,7 +327,7 @@ class edit_task_window:
         self.dte_label.configure(text='''Δελτ.Τεχν.Εξυπ.''')
         self.dte = StringVar()
         self.dte_entry = tk.Entry(top)
-        self.dte_entry.place(relx=0.685, rely=0.555, height=30, relwidth=0.150)
+        self.dte_entry.place(relx=0.685, rely=0.635, height=30, relwidth=0.150)
         self.dte_entry.configure(textvariable=self.dte)
         self.dte_entry.configure(background="white")
         self.dte_entry.configure(disabledforeground="#a3a3a3")
@@ -314,8 +335,11 @@ class edit_task_window:
         self.dte_entry.configure(foreground="#000000")
         self.dte_entry.configure(insertbackground="black")
 
+        self.TSeparator1 = ttk.Separator(top)
+        self.TSeparator1.place(relx=0.025, rely=0.700, relwidth=0.938)
+
         self.notes_label = tk.Label(top)
-        self.notes_label.place(relx=0.025, rely=0.640, height=31, relwidth=0.940)
+        self.notes_label.place(relx=0.025, rely=0.710, height=31, relwidth=0.940)
         self.notes_label.configure(activebackground="#f9f9f9")
         self.notes_label.configure(activeforeground="black")
         self.notes_label.configure(background="#6b6b6b")
@@ -327,11 +351,9 @@ class edit_task_window:
         self.notes_label.configure(relief="groove")
         self.notes_label.configure(text='''Σημειώσεις''')
 
-        self.TSeparator1 = ttk.Separator(top)
-        self.TSeparator1.place(relx=0.025, rely=0.630, relwidth=0.938)
 
         self.notes_scrolledtext = ScrolledText(top)
-        self.notes_scrolledtext.place(relx=0.025, rely=0.710, relheight=0.2, relwidth=0.941)
+        self.notes_scrolledtext.place(relx=0.025, rely=0.750, relheight=0.2, relwidth=0.941)
         self.notes_scrolledtext.configure(background="white")
         self.notes_scrolledtext.configure(font="TkTextFont")
         self.notes_scrolledtext.configure(foreground="black")
@@ -345,6 +367,20 @@ class edit_task_window:
         self.notes = StringVar()
 
         self.get_data()
+
+    # αλαγή χρώματος κουμπιού ολοκλήρωσης this function will run on click on checkbutton
+    def on_check(self):
+        off_color = "red"
+        on_color = "green"
+
+        if self.completed_var.get():  # if (get current checkbutton state) is "1" then....
+
+            self.completed_Checkbutton1.configure(fg=on_color)
+            self.completed_Checkbutton1.configure(text=' Ναι')
+        else:
+            self.completed_Checkbutton1.configure(fg=off_color)
+            self.completed_Checkbutton1.configure(text=" Oxi")
+
 
     # Να πάρουμε Δεδομένα
     def get_data(self):
@@ -369,14 +405,29 @@ class edit_task_window:
         technician = StringVar(w, value=data[0][5])
         self.technician_entry.configure(textvariable=technician)
         compl_date = StringVar(w, value=data[0][6])
-        self.compl_date_entry.configure(textvariable=compl_date)
+        if data[0][6] == "":
+            date_today = datetime.today().strftime("%d/%m/%Y")
+            today_data = StringVar(w, value=date_today)
+            self.compl_date_entry.configure(textvariable=today_data)
+        else:
+            self.compl_date_entry.configure(textvariable=compl_date)
         urgent = StringVar(w, value=data[0][7])
         self.urgent = urgent.get()
-        notes = StringVar(w, value=data[0][8])
+        phone = StringVar(w, value=data[0][8])
+        self.phone_entry.configure(textvariable=phone)
+        notes = StringVar(w, value=data[0][9])
         self.notes_scrolledtext.insert('1.0', notes.get())
-        self.copier_id = data[0][9]
-        dte = StringVar(w, value=data[0][10])
+        self.copier_id = data[0][10]
+        dte = StringVar(w, value=data[0][11])
         self.dte_entry.configure(textvariable=dte)
+
+        if not data[0][-1]:  # αν η κατάσταση δεν είναι 1 ==>  δλδ δεν ολοκληρόθηκε
+            self.completed_Checkbutton1.configure(fg="green")
+            self.completed_Checkbutton1.configure(text=' Ναι')
+            self.completed_Checkbutton1.select()
+        else:
+            self.completed_Checkbutton1.configure(fg="red")
+            self.completed_Checkbutton1.configure(text=' Οχι')
 
         cursor.close()
         conn.close()
@@ -391,18 +442,19 @@ class edit_task_window:
             completed = self.completed_var.get()
 
             # Demo
-            con = sqlite3.connect(dbase)
-            c = con.cursor()
-            c.execute("SELECT *  FROM Calendar ;")
-            tasks = c.fetchall()
-            c.close()
-            con.close()
-            if len(tasks) > 5:
-                messagebox.showerror("Demo",
-                                     "Λυπούμαστε η εκδοση αυτή είναι demo και δεν μπορείτε να προσθέσεται νέες εργασίες")
+            if demo:
+                con = sqlite3.connect(dbase)
+                c = con.cursor()
+                c.execute("SELECT *  FROM Calendar ;")
+                tasks = c.fetchall()
+                c.close()
+                con.close()
+                if len(tasks) > 5:
+                    messagebox.showerror("Demo",
+                                        "Λυπούμαστε η εκδοση αυτή είναι demo και δεν μπορείτε να προσθέσεται νέες εργασίες")
 
-                self.top.focus()
-                return
+                    self.top.focus()
+                    return
 
             conn = sqlite3.connect(dbase)
             cursor = conn.cursor()
@@ -418,20 +470,19 @@ class edit_task_window:
                     values.append("?")
             values = ", ".join(values)
 
-            if completed:  # Αν ολοκληρόθηκε
-
-                if len(compl_date.get()) != 10:  # Ελεγχος ημερομηνίας ολοκλήροσης
+            if completed:  # Αν ολοκληρώθηκε
+                if len(self.compl_date_entry.get()) != 10:  # Ελεγχος ημερομηνίας ολοκλήροσης
                     messagebox.showwarning("Προσοχή", "Η ημερομηνία ολοκλήρωσης πρέπει να έχει την μορφή ΄01/01/2020΄")
                     self.top.focus()
                     return
 
                 data = [date.get(), customer_combobox.get(), copier.get(), purpose.get(), technician.get(),
-                        compl_date.get(), urgent.get(), self.notes_scrolledtext.get('1.0', 'end-1c'),
+                        self.compl_date_entry.get(), urgent.get(), self.phone_entry.get(), self.notes_scrolledtext.get('1.0', 'end-1c'),
                         self.copier_id, dte.get(), 0, self.selected_calendar_id]  # Το  0 => ανενεργό δλδ ολοκληρόθηκε
             else:
-
+                # "" Κενή ημερωμηνία ολοκλήρωσεις
                 data = [date.get(), customer_combobox.get(), copier.get(), purpose.get(), technician.get(),
-                        compl_date.get(), urgent.get(), self.notes_scrolledtext.get('1.0', 'end-1c'),
+                        "", urgent.get(), self.phone_entry.get(), self.notes_scrolledtext.get('1.0', 'end-1c'),
                         self.copier_id, dte.get(), 1, self.selected_calendar_id]  # Το  1 => ενενεργό δλδ δεν ολοκληρόθηκε
 
             cursor.execute("UPDATE Calendar  SET " + edited_columns + " WHERE ID=? ", (tuple(data,)))

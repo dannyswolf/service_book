@@ -13,11 +13,10 @@ import image_viewer
 import add_spare_parts
 from datetime import datetime
 import logging
-
+from settings import dbase, spare_parts_db
 import insert_spare_parts
 
-spare_parts_db = ""
-dbase = "Service_book.db"
+
 selected_service_id = None
 selected_copier = None
 selected_customer = None

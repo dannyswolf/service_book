@@ -12,9 +12,8 @@ from datetime import datetime
 from tkinter import PhotoImage, StringVar, messagebox
 import sqlite3
 import copiers_log_support
+from settings import dbase, spare_parts_db
 
-dbase = "3. ΚΑΙΝΟΥΡΙΑ_ΑΠΟΘΗΚΗ.db"
-service_db = "Service_book.db"
 
 try:
     import Tkinter as tk
@@ -289,7 +288,7 @@ class Toplevel1:
             info = self.spare_parts_treeview.set(item)
             items_to_add.append(info)
 
-        service_con = sqlite3.connect(service_db)
+        service_con = sqlite3.connect(spare_parts_db)
         service_cursor = service_con.cursor()
         # # sql_insert = "INSERT INTO  " + table + "(" + culumns + ")" + "VALUES(NULL, ?, ?, ?, ?, ?, ?, ?);"
 
@@ -319,7 +318,7 @@ class Toplevel1:
 
                     # Προσθήκη +1 στα τεμάχια
                     if answer:
-                        service_con = sqlite3.connect(service_db)
+                        service_con = sqlite3.connect(spare_parts_db)
                         service_cursor = service_con.cursor()
                         service_cursor.execute("SELECT ΤΕΜΑΧΙΑ FROM Ανταλλακτικά WHERE ΚΩΔΙΚΟΣ = ? AND Service_ID =?",
                                                (value, self.service_ID,))
@@ -354,7 +353,7 @@ class Toplevel1:
         self.top.focus()
         not_needed_keys = ["ID", "id", 'Id']
         added_codes = []
-        service_con = sqlite3.connect(service_db)
+        service_con = sqlite3.connect(spare_parts_db)
         service_cursor = service_con.cursor()
         for item in items_to_add:
             values = []  # values είναι πόσα ? να έχει ανάλογα τα culumn ==> keys

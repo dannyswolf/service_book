@@ -11,6 +11,8 @@ from tkinter import StringVar, messagebox
 import logging
 import os
 from datetime import datetime
+from settings import dbase, spare_parts_db, demo
+
 try:
     import Tkinter as tk
 except ImportError:
@@ -56,7 +58,6 @@ def vp_start_gui():
     root.mainloop()
 
 
-dbase = "Service_book.db"
 w = None
 
 def create_Toplevel1(root, *args, **kwargs):
@@ -457,18 +458,20 @@ class Toplevel1:
             return
 
         # Demo
-        con = sqlite3.connect(dbase)
-        c = con.cursor()
-        c.execute("SELECT *  FROM Πελάτες ;")
-        customers = c.fetchall()
-        c.close()
-        con.close()
-        if len(customers) > 2:
-            messagebox.showerror("Demo",
-                                 "Λυπούμαστε η εκδοση αυτή είναι demo και δεν μπορείτε να προσθέσεται νέους πελάτες")
+        if demo:
 
-            self.top.focus()
-            return
+            con = sqlite3.connect(dbase)
+            c = con.cursor()
+            c.execute("SELECT *  FROM Πελάτες ;")
+            customers = c.fetchall()
+            c.close()
+            con.close()
+            if len(customers) > 2:
+                messagebox.showerror("Demo",
+                                    "Λυπούμαστε η εκδοση αυτή είναι demo και δεν μπορείτε να προσθέσεται νέους πελάτες")
+
+                self.top.focus()
+                return
 
         data = [self.company_name.get(), self.name.get(), self.address.get(), self.city.get(), self.post.get(),
                 self.place.get(), self.phone.get(), self.mobile.get(), self.fax.get(), self.email.get(),
