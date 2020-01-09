@@ -13,7 +13,7 @@ import os
 import logging
 from datetime import datetime
 from settings import dbase, spare_parts_db, demo
-
+import mail
 
 try:
     import Tkinter as tk
@@ -329,6 +329,13 @@ class add_task_window:
         self.urgent_entry.configure(foreground="#000000")
         self.urgent_entry.configure(insertbackground="black")
 
+        self.send_mail_btn = tk.Button(top)
+        self.send_mail_btn.place(relx=0.880, rely=0.553, relheight=0.060, relwidth=0.070)
+        self.send_mail_btn.configure(background="#6b6b6b")
+        self.send_mail_btn_img1 = PhotoImage(file="icons/send_mail.png")
+        self.send_mail_btn.configure(image=self.send_mail_btn_img1)
+        self.send_mail_btn.configure(command=self.send_mail)
+
         self.notes_label = tk.Label(top)
         self.notes_label.place(relx=0.025, rely=0.633, height=31, relwidth=0.940)
         self.notes_label.configure(activebackground="#f9f9f9")
@@ -463,6 +470,7 @@ class add_task_window:
 
         # τα "" είναι η ημερομηνία ολοκλήροσης και ΔΤΕ που δεν τα συμπληρώνουμε εδώ αλλα στην επεξεργασία task
         # Το 1 στο τέλος είναι κατάσταση 1=> ενεργό 0 => ανενεργό δλδ ολοκληρώθηκε
+
         data = [self.date.get(), self.customer_combobox.get(), self.selected_copier, self.purpose_combobox.get(),
                 self.technician.get(), "", self.urgent.get(), self.phone_var.get(),
                 self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, "", 1]
@@ -476,6 +484,13 @@ class add_task_window:
         messagebox.showinfo("Info", f"H εργασία προστέθηκε επιτυχώς στον πελάτη {self.customer_combobox.get()}")
         self.top.destroy()
         return None
+
+    # Αποστολή email
+    def send_mail(self):
+        data = [self.date.get(), self.customer_combobox.get(), self.selected_copier, self.purpose_combobox.get(),
+                self.technician.get(), "", self.urgent.get(), self.phone_var.get(),
+                self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, "", 1]
+        mail.send_mail(data)
 
     def add_to_service_data(self, column):
         # self.purpose_list, self.actions_list

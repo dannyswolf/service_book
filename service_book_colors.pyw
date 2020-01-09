@@ -13,6 +13,9 @@ todo start day to binary file
 todo service_id sto add_task
 
 
+V1.2.0 Αποστολή email ===== ================================================================09/01/2020
+Αρχεία 1 mail
+
 V1.1.1 Προσθήκη τηλ στο tasks ================================================================08/01/2020
 Αρχεία 1 settings
 Ημερομηνία απο το ιντερνετ
@@ -168,7 +171,6 @@ from settings import dbase, spare_parts_db, demo, service_book_version  # settin
 from urllib.request import urlopen
 
 
-
 try:
     import Tkinter as tk
 except ImportError:
@@ -180,6 +182,19 @@ try:
 except ImportError:
     import tkinter.ttk as ttk
     py3 = True
+
+try:
+    res = urlopen('http://just-the-time.appspot.com/')
+    result = res.read().strip()
+    result_str = result.decode('utf-8')  # 2020-01-08 22:30:56
+    only_date = result_str[:11]
+    day = only_date[8:10]
+    month = only_date[5:7]
+    year = only_date[:4]
+    today = day + " " + month + " " + year  # 08 01 2020
+
+except:
+    messagebox.showerror("Σφάλμα στην σύνδεση σας", "Παρακαλω ελέγξτε την σύνδεση σας στο διαδίκτυο")
 
 
 # Περίδος λειτουργείας
@@ -214,34 +229,21 @@ def days_left():
     else:
         last_day = start_day_date + timedelta(days=365)
 
-    days_left_timedelta = last_day - datetime.today()
+    days_left_timedelta = last_day - datetime.strptime(today, "%d %m %Y")
     left_days = days_left_timedelta.days
 
     return left_days
 
 
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE και Ημερομηνία ------------------
-try:
-    res = urlopen('http://just-the-time.appspot.com/')
-    result = res.read().strip()
-    result_str = result.decode('utf-8')  # 2020-01-08 22:30:56
-    only_date = result_str[:11]
-    day = only_date[8:10]
-    month = only_date[5:7]
-    year = only_date[:4]
-    today = day + " " + month + " " + year
 
-except:
-    messagebox.showerror("Σφάλμα στην σύνδεση σας", "Παρακαλω ελέγξτε την σύνδεση σας στο διαδίκτυο")
-
-#today = datetime.today().strftime("%d %m %Y")
 log_dir = "logs" + "\\" + today + "\\"
 if not os.path.exists(log_dir):
     os.makedirs(log_dir)
 else:
     pass
 
-log_file_name = "Service Book " + datetime.now().strftime("%d %m %Y") + ".log"
+log_file_name = "Service Book " + today + ".log"
 log_file = os.path.join(log_dir, log_file_name)
 
 # log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -1172,7 +1174,7 @@ class Toplevel1:
         self.calendar_treeview.configure(show="headings", style="mystyle.Treeview")
         self.calendar_treeview.bind("<<TreeviewSelect>>", self.edit_scheduled_tasks)
 
-        self.today = datetime.today()
+        self.today = datetime.strptime(today, "%d %m %Y")
         self.day = self.today.day
         self.year = self.today.year
         self.month = self.today.month
@@ -2010,7 +2012,7 @@ class Toplevel1:
 
         try:
             now = datetime.now().strftime("%d %m %Y %H %M %S")
-            today = datetime.today().strftime("%d %m %Y")
+
             back_dir = "backups" + "\\" + today + "\\"
 
             backup_file = os.path.join(back_dir, os.path.basename(dbase[:-3]) + " " + now + ".db")
