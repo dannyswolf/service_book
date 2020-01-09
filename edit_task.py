@@ -496,7 +496,7 @@ class edit_task_window:
         self.save_btn.place(relx=0.296, rely=0.916, height=34, width=147)
         self.save_btn.configure(activebackground="#ececec")
         self.save_btn.configure(activeforeground="#000000")
-        self.save_btn.configure(background="#6b6b6b")
+        self.save_btn.configure(background="#339933")
         self.save_btn.configure(disabledforeground="#a3a3a3")
         self.save_btn.configure(font="-family {Calibri} -size 11 -weight bold")
         self.save_btn.configure(foreground="#ffffff")

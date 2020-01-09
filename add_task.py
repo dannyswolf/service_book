@@ -105,11 +105,13 @@ def vp_start_gui():
 
 w = None
 
+selected_customer = ""
 
 def create_add_task_window(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
-    global w, w_win, rt
+    global w, w_win, rt, selected_customer
     rt = root
+    selected_customer = args[0]
     w = tk.Toplevel(root)
     add_copier_support.set_Tk_var()
     top = add_task_window(w)
@@ -147,6 +149,7 @@ class add_task_window:
         # self.company_list, self.model_list, self.customers_list = get_copiers_data()
         self.customers_list, self.serials = get_copiers_data()
         self.purpose_list, self.actions_list = get_service_data()
+        self.selected_customer = selected_customer  # Επιλεγμένος πελάτης απο το service_book_colors
         self.customer_id = ""
         self.copiers = []  # Τα φωτοτυπικά του επιλεγμένου πελάτη
         self.selected_copier = ""  # το επιλεγμένο φωτοτυπικό
@@ -216,9 +219,11 @@ class add_task_window:
         self.customer_combobox = ttk.Combobox(top)
         self.customer_combobox.place(relx=0.27, rely=0.172, relheight=0.057, relwidth=0.593)
         self.customer_combobox.configure(values=self.customers_list)
+        self.customer_combobox.set(value=self.selected_customer)
         self.customer_combobox.configure(takefocus="")
         self.customer_combobox.bind("<<ComboboxSelected>>", self.get_copier)
         self.customer_combobox.configure(state="readonly")
+
 
         self.phone_label = tk.Label(top)
         self.phone_label.place(relx=0.025, rely=0.248, height=31, relwidth=0.230)
@@ -297,10 +302,10 @@ class add_task_window:
         self.technician_label.configure(highlightcolor="black")
         self.technician_label.configure(relief="groove")
         self.technician_label.configure(text='''Τεχνικός''')
-        self.technician = StringVar()
+        self.technician = StringVar(top, value="Ιορδάνης")
         self.technician_entry = tk.Entry(top)
         self.technician_entry.place(relx=0.27, rely=0.480, height=30, relwidth=0.593)
-        self.technician_entry.configure(textvariable=self.technician)
+        self.technician_entry.configure(textvariable=self.technician.get())
         self.technician_entry.configure(background="white")
         self.technician_entry.configure(disabledforeground="#a3a3a3")
         self.technician_entry.configure(font="TkFixedFont")
@@ -368,7 +373,7 @@ class add_task_window:
         self.save_btn.place(relx=0.296, rely=0.936, height=34, width=147)
         self.save_btn.configure(activebackground="#ececec")
         self.save_btn.configure(activeforeground="#000000")
-        self.save_btn.configure(background="#6b6b6b")
+        self.save_btn.configure(background="#339933")
         self.save_btn.configure(disabledforeground="#a3a3a3")
         self.save_btn.configure(font="-family {Calibri} -size 11 -weight bold")
         self.save_btn.configure(foreground="#ffffff")
@@ -377,6 +382,9 @@ class add_task_window:
         self.save_btn.configure(pady="0")
         self.save_btn.configure(text='''Αποθήκευση''')
         self.save_btn.configure(command=self.add_task)
+
+        if self.selected_customer:
+            self.get_copier()
 
     def get_copier_id(self, event=None):
         copier = self.copiers_combobox.get()
@@ -399,12 +407,22 @@ class add_task_window:
 
         con = sqlite3.connect(dbase)
         cursor = con.cursor()
-        cursor.execute("SELECT ID, Τηλέφωνο FROM Πελάτες WHERE  Επωνυμία_Επιχείρησης =?", (customer,))
+        cursor.execute("SELECT ID, Τηλέφωνο, Κινητό, Διεύθυνση FROM Πελάτες WHERE  Επωνυμία_Επιχείρησης =?", (customer,))
         customer_data = cursor.fetchall()  # ==> [(4,)] αρα θέλουμε το customer_id[0][0]
         self.customer_id = customer_data[0][0]
 
         self.phone_var = StringVar(w, value=customer_data[0][1])
         self.phone_entry.configure(textvariable=self.phone_var)
+
+        self.notes_scrolledtext.delete('1.0', "end")
+        self.mobile = StringVar(w, value="Κινητό : " + customer_data[0][2] + "\n")
+        self.notes_scrolledtext.insert("1.0", self.mobile.get())
+        self.notes = StringVar(w, value="Διεύθυνση : " + customer_data[0][3] + "\n")
+        self.notes_scrolledtext.insert("2.0", self.notes.get())
+
+        self.technician = StringVar(w, value="Ιορδάνης ")
+        self.technician_entry.delete(0, 'end')
+        self.technician_entry.insert(0, self.technician.get())
 
         # Εμφάνιση φωτοτυπικών σύμφονα με το customer_id
         cursor.execute("SELECT Εταιρεία, Serial FROM Φωτοτυπικά WHERE Πελάτη_ID = ? AND Κατάσταση = 1 ", (self.customer_id,))
@@ -416,6 +434,7 @@ class add_task_window:
         # Αν επιλέξουμε φωτοτυπικό του πελάτη απο τα περασμένα στην βάση φωτοτυπικά
         if copiers:
             self.copiers_combobox.configure(values=self.copiers)
+            self.copiers_combobox.set(value=self.copiers[0])
         # Διαφορετικά μπορούμε να εισάγουμε νέο μηχάνημα
         else:
             self.copiers_combobox.configure(textvariable=self.copier_stringvar)
@@ -487,6 +506,10 @@ class add_task_window:
 
     # Αποστολή email
     def send_mail(self):
+        # Αν γράψουμε νέο φωτοτυπικό και όχι απο την λίστα
+        if not self.selected_copier:
+            self.selected_copier = self.copiers_combobox.get()
+
         data = [self.date.get(), self.customer_combobox.get(), self.selected_copier, self.purpose_combobox.get(),
                 self.technician.get(), "", self.urgent.get(), self.phone_var.get(),
                 self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, "", 1]

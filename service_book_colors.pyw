@@ -12,6 +12,9 @@ todo προβολή όλων των εικόνων
 todo start day to binary file
 todo service_id sto add_task
 
+V1.2.1 Fix Αποστολή email ======================================================================09/01/2020
+δεν στέλνει το φωτοτυπικό οταν ο χρήστης εισάγει φωτοτυπικό που δεν είναι δηλομένο στον πελάτη----Done
+Διαφορεα αλλαγές
 
 V1.2.0 Αποστολή email ===== ================================================================09/01/2020
 Αρχεία 1 mail
@@ -306,11 +309,11 @@ def destroy_Toplevel1():
 
 
 def show_info():
-    messagebox.showinfo("Πληροφορίες", """ 
+    messagebox.showinfo("Πληροφορίες", f""" 
         Αuthor     : "Jordanis Ntini"
         Copyright  : "Copyright © 2020"
         Credits    : ['Athanasia Tzampazi']
-        Version    : '1.1.1 '
+        Version    : '{service_book_version}'
         Maintainer : "Jordanis Ntini"
         Email      : "ntinisiordanis@gmail.com"
         Status     : 'Development' 
@@ -506,7 +509,7 @@ class Toplevel1:
         self.company_label.configure(highlightbackground="#d9d9d9")
         self.company_label.configure(highlightcolor="black")
         self.company_label.configure(relief="groove")
-        self.company_label.configure(text="Επωνυμία Επιχείρησης")
+        self.company_label.configure(text="Εμφανιζόμενο όνομα")
 
         self.company_name_entry = tk.Entry(self.customer_frame)
         self.company_name_entry.place(relx=0.225, rely=0.100, height=20, relwidth=0.250)
@@ -553,7 +556,7 @@ class Toplevel1:
         self.Label3.configure(highlightbackground="#d9d9d9")
         self.Label3.configure(highlightcolor="black")
         self.Label3.configure(relief="groove")
-        self.Label3.configure(text='''Ονοματεπώνυμο''')
+        self.Label3.configure(text='''Ονομα υπεύθυνου''')
         self.name_entry = tk.Entry(self.customer_frame)
         self.name_entry.place(relx=0.225, rely=0.180, height=20, relwidth=0.250)
         self.name_entry.configure(background="white")
@@ -1246,7 +1249,7 @@ class Toplevel1:
             self.calendar_treeview.insert("", "end", values=d)
 
     def add_scheduled_tasks(self):
-        add_task.create_add_task_window(root)
+        add_task.create_add_task_window(root, self.selected_customer)
 
     def view_scheduled_tasks(self, event=None):
         # https://pypi.org/project/tkcalendar/
@@ -1486,7 +1489,7 @@ class Toplevel1:
         customers_conn.close()
 
         # Κατασκευή tree το up_index -1 == το τελος ("end")
-        self.customers_treeview.column("ID", anchor="w", width=1)
+        self.customers_treeview.delete(*self.customers_treeview.get_children())
         for n in range(len(customers_data)):
             self.customers_treeview.insert("", "end", values=customers_data[n])
 

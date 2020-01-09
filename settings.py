@@ -8,8 +8,8 @@ spare_parts_db = "\\\\192.168.1.200\\Public\\DROPBOX\\ΕΓΓΡΑΦΑ\\2.  ΑΠΟ
 
 #spare_parts_db = ""
 
-service_book_version = "V 1.2.0"
-# dbase = "Service_book.db"  # Local Dbase
+service_book_version = "V 1.2.1"
+#dbase = "Service_book.db"  # Local Dbase
 
 demo = 0  # 0 Demo Disabled 1 Demo enabled
 

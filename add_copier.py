@@ -448,8 +448,8 @@ class add_copier_window:
         conn.commit()
         conn.close()
         messagebox.showinfo("Info", f"Το  {data[0]} προστέθηκε επιτυχώς στον πελάτη {self.customer_combobox.get()}")
-        self.top.focus()
-        return None
+        self.top.destroy()
+
 
 
 # The following code is added to facilitate the Scrolled widgets you specified.

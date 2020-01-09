@@ -117,7 +117,7 @@ class Toplevel1:
         self.Label1.configure(highlightbackground="#d9d9d9")
         self.Label1.configure(highlightcolor="black")
         self.Label1.configure(relief="groove")
-        self.Label1.configure(text='''Επωνυμία Επιχείρησης''')
+        self.Label1.configure(text='''Εμφανιζόμενο όνομα''')
 
         self.company_name_entry = tk.Entry(top)
         self.company_name_entry.place(relx=0.275, rely=0.146, height=20
@@ -156,7 +156,7 @@ class Toplevel1:
         self.Label3.configure(highlightbackground="#d9d9d9")
         self.Label3.configure(highlightcolor="black")
         self.Label3.configure(relief="groove")
-        self.Label3.configure(text='''Ονοματεπώνυμο''')
+        self.Label3.configure(text='''Υπεύθυνος''')
 
         self.fax_entry = tk.Entry(top)
         self.fax_entry.place(relx=0.757, rely=0.497, height=20, relwidth=0.217)
@@ -507,7 +507,8 @@ class Toplevel1:
         conn.commit()
         conn.close()
         messagebox.showinfo("Info", f"Ο πελάτης {self.company_name.get()} προστέθηκε επιτυχώς")
-        return None
+        self.top.destroy()
+
 
 
 if __name__ == '__main__':
