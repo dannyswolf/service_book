@@ -52,7 +52,7 @@ sys.stdout.write = root_logger.info
 
 def get_tables():
     needed_tables = ['BROTHER', 'CANON', 'KONICA', 'KYOCERA', 'LEXMARK', 'OKI', 'RICOH', 'SAMSUNG', 'SHARP']
-    con = sqlite3.connect(dbase)
+    con = sqlite3.connect(spare_parts_db)
     c = con.cursor()
     c.execute("SELECT name FROM sqlite_sequence ORDER BY name")
     tables = c.fetchall()
@@ -210,14 +210,14 @@ class Toplevel1:
 
         if not self.service_ID:
             messagebox.showerror("Σφάλμα!", "Παρακαλώ επιλεξτε πρώτα ιστορικό συντήρησής.")
-            self.quit()
+            self.top.destroy()
 
     def get_spare_parts(self, event=None):
         self.selected_company = self.company_combobox.get()
         if self.selected_company != "":
             self.spare_parts_treeview.delete(*self.spare_parts_treeview.get_children())
 
-        con = sqlite3.connect(dbase)
+        con = sqlite3.connect(spare_parts_db)
         c = con.cursor()
         c.execute("SELECT * FROM " + self.selected_company + ";")
         self.headers = list(map(lambda x: x[0], c.description))
@@ -269,7 +269,7 @@ class Toplevel1:
         # ΤΟΝΕΡ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
         # ('%' + str(search_data.get()) + '%', '%' + str(search_data.get()) + '%', '%' + str(search_data.get())...
 
-        conn = sqlite3.connect(dbase)
+        conn = sqlite3.connect(spare_parts_db)
         cusror = conn.cursor()
         cusror.execute("SELECT * FROM " + self.selected_company + " WHERE " + search_headers, operators)
         fetch = cusror.fetchall()  # Δεδομένα απο Service
@@ -288,7 +288,7 @@ class Toplevel1:
             info = self.spare_parts_treeview.set(item)
             items_to_add.append(info)
 
-        service_con = sqlite3.connect(spare_parts_db)
+        service_con = sqlite3.connect(dbase)
         service_cursor = service_con.cursor()
         # # sql_insert = "INSERT INTO  " + table + "(" + culumns + ")" + "VALUES(NULL, ?, ?, ?, ?, ?, ?, ?);"
 
@@ -318,7 +318,7 @@ class Toplevel1:
 
                     # Προσθήκη +1 στα τεμάχια
                     if answer:
-                        service_con = sqlite3.connect(spare_parts_db)
+                        service_con = sqlite3.connect(dbase)
                         service_cursor = service_con.cursor()
                         service_cursor.execute("SELECT ΤΕΜΑΧΙΑ FROM Ανταλλακτικά WHERE ΚΩΔΙΚΟΣ = ? AND Service_ID =?",
                                                (value, self.service_ID,))
@@ -328,7 +328,7 @@ class Toplevel1:
                                                (new_pieces, value, self.service_ID))
                         service_con.commit()
                         service_con.close()
-                        con = sqlite3.connect(dbase)
+                        con = sqlite3.connect(spare_parts_db)
                         c = con.cursor()
 
                         c.execute("SELECT ΤΕΜΑΧΙΑ FROM " + self.selected_company + " WHERE ΚΩΔΙΚΟΣ =?", (value,))
@@ -343,17 +343,18 @@ class Toplevel1:
                         c.close()
                         con.close()
                         messagebox.showinfo("Πληροφορία", f"O κωδικός {value} προστέθηκε ")
-                        self.top.focus()
-
+                        self.top.destroy()
+                        return
                     else:
                         self.top.focus()
                         return
 
+        # Μετά το for item in items_to_add:
         self.get_spare_parts()
         self.top.focus()
         not_needed_keys = ["ID", "id", 'Id']
         added_codes = []
-        service_con = sqlite3.connect(spare_parts_db)
+        service_con = sqlite3.connect(dbase)
         service_cursor = service_con.cursor()
         for item in items_to_add:
             values = []  # values είναι πόσα ? να έχει ανάλογα τα culumn ==> keys
@@ -394,7 +395,7 @@ class Toplevel1:
         service_cursor.close()
         service_con.close()
 
-        con = sqlite3.connect(dbase)
+        con = sqlite3.connect(spare_parts_db)
         c = con.cursor()
         for code in added_codes:
             c.execute("SELECT ΤΕΜΑΧΙΑ FROM " + self.selected_company + " WHERE ΚΩΔΙΚΟΣ =?", (code,))
@@ -407,7 +408,7 @@ class Toplevel1:
         c.close()
         con.close()
         self.get_spare_parts()
-        self.top.focus()
+        self.top.destroy()
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):
     '''Configure the scrollbars for a widget.'''

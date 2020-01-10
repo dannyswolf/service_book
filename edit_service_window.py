@@ -436,7 +436,13 @@ class edit_service_window():
         self.del_spare_parts_btn_img = PhotoImage(file="icons/delete_spare_parts.png")
         self.del_spare_parts_btn.configure(image=self.del_spare_parts_btn_img)
         self.del_spare_parts_btn.configure(compound="left")
-
+        # Ανανέωση μετα απο Διαγραφή επιλεγμένου ανταλλακτικού
+        self.refresh_after_delete_btn = tk.Button(self.spare_parts_frame)
+        self.refresh_after_delete_btn.place(relx=0.325, rely=0.600, height=50, relwidth=0.060)
+        self.refresh_after_delete_btn.configure(background="#6b6b6b")
+        self.refresh_after_delete_img = PhotoImage(file="icons/refresh.png")
+        self.refresh_after_delete_btn.configure(image=self.refresh_after_delete_img)
+        self.refresh_after_delete_btn.configure(command=self.get_spare_parts)
 
         # Προσθήκη αρχείων
         self.add_files_btn = tk.Button(self.spare_parts_frame)
@@ -656,7 +662,7 @@ class edit_service_window():
 
         con.commit()
         con.close()
-        messagebox.showinfo("Info", f"Οι εικόνες προστέθηκαν επιτυχώς")
+        # messagebox.showinfo("Info", f"Οι εικόνες προστέθηκαν επιτυχώς")
         self.top.focus()
 
     def quit(self, event):
@@ -694,8 +700,10 @@ class edit_service_window():
     # Διαγραφή ανταλλακτικών
     def del_spare_parts(self):
         selected_spare_part = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#1'))
-        selected_part_nur = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#2'))
-        answer = messagebox.askokcancel("Προσοχή!", f"Ειστε σήγουρος για την διαγραφή του {selected_part_nur};")
+        selected_part_nr = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#2'))
+        selected_part_code = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#4'))
+        selected_part_pieces = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#5'))
+        answer = messagebox.askokcancel("Προσοχή!", f"Ειστε σήγουρος για την διαγραφή του {selected_part_nr};")
         if not answer:
             self.top.focus()
             return
@@ -704,6 +712,33 @@ class edit_service_window():
         c.execute("DELETE FROM Ανταλλακτικά WHERE ID=?", (selected_spare_part,))
         con.commit()
         con.close()
+        # Προσθήκη πίσω στην αποθήκη
+        con = sqlite3.connect(spare_parts_db)
+        c = con.cursor()
+        # ευρεση προίοντος στην αποθήκη ψάχνοντας όλους τους πίνακες σύμφονα με part_nr και κωδικό
+        for table in c.execute("SELECT name FROM sqlite_sequence").fetchall():
+            c.execute("SELECT * FROM " + str(table[0]) + " WHERE ΚΩΔΙΚΟΣ =? and PARTS_NR =? ",
+                      (selected_part_code, selected_part_nr))
+            data = c.fetchall()
+            if data:  # αφου το βρούμε πέρνουμε μόνο τον πίνακα
+                part_table = table[0]
+                break
+        # Πέρνουμε τα τεμάχια που έχουν απομείνει
+        c.execute("SELECT ΤΕΜΑΧΙΑ FROM " + part_table + " WHERE ΚΩΔΙΚΟΣ =? and PARTS_NR =? ",
+                  (selected_part_code, selected_part_nr))
+        old_part_pieces = c.fetchall()
+        # και προσθέτουμε σε αυτά τα τεμάχια που έχουμε εισάγει στο Service
+        new_pieces = str(int(old_part_pieces[0][0]) + int(selected_part_pieces))
+
+        # ενημερώνουμε το προιόν στον πίνακα
+        c.execute("UPDATE " + part_table + " SET ΤΕΜΑΧΙΑ =?  WHERE ΚΩΔΙΚΟΣ =? and PARTS_NR =?",
+                  (new_pieces, selected_part_code, selected_part_nr))
+
+        messagebox.showinfo("Πληροφορία!", f"Το προιόν με κωδικό {selected_part_code}  της εταιρείας {part_table} ενημερώθηκε")
+        con.commit()
+        c.close()
+        con.close()
+
         self.spare_parts_treeview.delete(self.spare_parts_treeview.selection())
 
 # The following code is added to facilitate the Scrolled widgets you specified.

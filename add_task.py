@@ -385,6 +385,7 @@ class add_task_window:
 
         if self.selected_customer:
             self.get_copier()
+            self.get_copier_id()
 
     def get_copier_id(self, event=None):
         copier = self.copiers_combobox.get()
@@ -399,6 +400,7 @@ class add_task_window:
         self.copier_id = data[0][0]
         self.selected_copier = data[0][1] + "  Σειριακός : " + self.selected_serial
         con.close()
+        return
 
     def get_copier(self, event=None):
         # να πάρουμε το id του πελάτη απο το ονομα του
@@ -423,6 +425,7 @@ class add_task_window:
         self.technician = StringVar(w, value="Ιορδάνης ")
         self.technician_entry.delete(0, 'end')
         self.technician_entry.insert(0, self.technician.get())
+
 
         # Εμφάνιση φωτοτυπικών σύμφονα με το customer_id
         cursor.execute("SELECT Εταιρεία, Serial FROM Φωτοτυπικά WHERE Πελάτη_ID = ? AND Κατάσταση = 1 ", (self.customer_id,))
