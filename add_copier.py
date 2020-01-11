@@ -90,12 +90,14 @@ def vp_start_gui():
 
 
 w = None
-
+customer_id = None
 
 def create_add_copier_window(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
-    global w, w_win, rt
+    global w, w_win, rt, customer_id
     rt = root
+    if args[0]:
+        customer_id = args[0]
     w = tk.Toplevel(root)
     add_copier_support.set_Tk_var()
     top = add_copier_window(w)
@@ -131,6 +133,7 @@ class add_copier_window:
         self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
 
         self.company_list, self.model_list, self.customers_list = get_copiers_data()
+        self.customer_id = customer_id
         self.top = top
         top.geometry("505x524+444+228")
         top.minsize(120, 1)
@@ -264,10 +267,11 @@ class add_copier_window:
         self.customer = StringVar()
         self.customer_combobox = ttk.Combobox(top)
         self.customer_combobox.place(relx=0.27, rely=0.477, relheight=0.057, relwidth=0.593)
-        self.customer_combobox.configure(values=self.customers_list)
         # self.purpose_combobox.configure(textvariable=edit_service_window_support.combobox)
         self.customer_combobox.configure(takefocus="")
         self.customer_combobox.configure(state="readonly")
+
+        self.get_customer()
 
         self.save_btn = tk.Button(top)
         self.save_btn.place(relx=0.296, rely=0.916, height=34, width=147)
@@ -346,6 +350,17 @@ class add_copier_window:
     def company_callback(self, event=None):
         print("File add_copier.py Line 323 Επιλεγμένη εταιρεία", self.company_combobox.get())
 
+    def get_customer(self):
+        if self.customer_id:
+            con = sqlite3.connect(dbase)
+            cur = con.cursor()
+            cur.execute("SELECT Επωνυμία_Επιχείρησης FROM Πελάτες WHERE ID =?", (self.customer_id,))
+            data = cur.fetchall()
+            customer_name = data[0][0]
+            self.customer = StringVar(w, value=customer_name)
+            self.customer_combobox.set(value=self.customer.get())
+        else:
+            self.customer_combobox.configure(values=self.customers_list)
 
     def quit(self, event):
         self.top.destroy()

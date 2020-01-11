@@ -7,13 +7,16 @@
 
 
 import sys
-from tkinter import PhotoImage, messagebox, StringVar, IntVar
+from tkinter import PhotoImage, messagebox, StringVar, IntVar, filedialog
 import sqlite3
 import os
 import logging
 from datetime import datetime
 from settings import dbase, spare_parts_db, demo
-
+import mail
+import add_spare_parts
+import insert_spare_parts
+import image_viewer
 try:
     import Tkinter as tk
 except ImportError:
@@ -52,6 +55,23 @@ sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
 
 
+def get_service_data():
+    purpose_list = []
+    actions_list = []
+    conn = sqlite3.connect(dbase)
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM Service_data")
+    service_data = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    for n in range(len(service_data)):
+        if service_data[n][1] != "" and service_data[n][1] is not None:
+            purpose_list.append(service_data[n][1])                        # Σκοπός
+        if service_data[n][2] != "" and service_data[n][2] is not None:
+            actions_list.append(service_data[n][2])                        # Ενέργειες
+    return sorted(actions_list)
+
+
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
     global val, w, root
@@ -76,6 +96,88 @@ def create_edit_task_window(root, *args, **kwargs):
     top = edit_task_window(w)
     add_copier_support.init(w, top, *args, **kwargs)
     return (w, top)
+
+
+# The following code is added to facilitate the Scrolled widgets you specified.
+class AutoScroll(object):
+    '''Configure the scrollbars for a widget.'''
+
+    def __init__(self, master):
+        #  Rozen. Added the try-except clauses so that this class
+        #  could be used for scrolled entry widget for which vertical
+        #  scrolling is not supported. 5/7/14.
+        try:
+            vsb = ttk.Scrollbar(master, orient='vertical', command=self.yview)
+        except:
+            pass
+        hsb = ttk.Scrollbar(master, orient='horizontal', command=self.xview)
+
+        # self.configure(yscrollcommand=_autoscroll(vsb),
+        #    xscrollcommand=_autoscroll(hsb))
+        try:
+            self.configure(yscrollcommand=self._autoscroll(vsb))
+        except:
+            pass
+        self.configure(xscrollcommand=self._autoscroll(hsb))
+
+        self.grid(column=0, row=0, sticky='nsew')
+        try:
+            vsb.grid(column=1, row=0, sticky='ns')
+        except:
+            pass
+        hsb.grid(column=0, row=1, sticky='ew')
+
+        master.grid_columnconfigure(0, weight=1)
+        master.grid_rowconfigure(0, weight=1)
+
+        # Copy geometry methods of master  (taken from ScrolledText.py)
+        if py3:
+            methods = tk.Pack.__dict__.keys() | tk.Grid.__dict__.keys() \
+                      | tk.Place.__dict__.keys()
+        else:
+            methods = tk.Pack.__dict__.keys() + tk.Grid.__dict__.keys() \
+                      + tk.Place.__dict__.keys()
+
+        for meth in methods:
+            if meth[0] != '_' and meth not in ('config', 'configure'):
+                setattr(self, meth, getattr(master, meth))
+
+    @staticmethod
+    def _autoscroll(sbar):
+        '''Hide and show scrollbar as needed.'''
+
+        def wrapped(first, last):
+            first, last = float(first), float(last)
+            if first <= 0 and last >= 1:
+                sbar.grid_remove()
+            else:
+                sbar.grid()
+            sbar.set(first, last)
+
+        return wrapped
+
+    def __str__(self):
+        return str(self.master)
+
+def _create_container(func):
+    '''Creates a ttk Frame with a given master, and use this new frame to
+    place the scrollbars and the widget.'''
+
+    def wrapped(cls, master, **kw):
+        container = ttk.Frame(master)
+        container.bind('<Enter>', lambda e: _bound_to_mousewheel(e, container))
+        container.bind('<Leave>', lambda e: _unbound_to_mousewheel(e, container))
+        return func(cls, container, **kw)
+
+    return wrapped
+
+class ScrolledTreeView(AutoScroll, ttk.Treeview):
+    '''A standard ttk Treeview widget with scrollbars that will
+    automatically show/hide as needed.'''
+    @_create_container
+    def __init__(self, master, **kw):
+        ttk.Treeview.__init__(self, master, **kw)
+        AutoScroll.__init__(self, master)
 
 
 def destroy_edit_task_window():
@@ -107,16 +209,18 @@ class edit_task_window:
 
         # self.company_list, self.model_list, self.customers_list = get_copiers_data()
         self.selected_calendar_id = selected_calendar_id
-
+        self.actions_list = get_service_data()
+        self.service_id = ""
         self.customer_id = ""
         self.copiers = []  # Τα φωτοτυπικά του επιλεγμένου πελάτη
         self.selected_copier = ""  # το επιλεγμένο φωτοτυπικό
         self.selected_serial = ""
         self.copier_id = ""
-        self.urgent = ""
+        self.files = ""
+        self.urgent = StringVar()
         self.columns = None
         self.top = top
-        top.geometry("505x624+444+228")
+        top.geometry("600x654+444+228")
         top.minsize(120, 1)
         top.maxsize(1604, 881)
         top.resizable(1, 1)
@@ -127,7 +231,26 @@ class edit_task_window:
         top.bind('<Escape>', self.quit)
         top.focus()
 
-        self.Label2 = tk.Label(top)
+        # ==========================  Notebook  ==================================
+        self.notebook = ttk.Notebook(top)
+        self.notebook.place(relx=0.021, rely=0.006, relheight=0.980, relwidth=0.938)
+        self.notebook.configure(takefocus="")
+
+        self.service_frame = tk.Frame(self.notebook)
+        self.notebook.add(self.service_frame, padding=3)
+        self.notebook.tab(0, text="Συντήρηση", compound="left", underline="-1", )
+        self.service_frame.configure(background="#CFD5CE")
+        self.service_frame.configure(highlightbackground="#d9d9d9")
+        self.service_frame.configure(highlightcolor="black")
+
+        self.spare_parts_frame = tk.Frame(self.notebook)
+        self.notebook.add(self.spare_parts_frame, padding=3)
+        self.notebook.tab(1, text="Ανταλλακτικά", compound="left", underline="-1", )
+        self.spare_parts_frame.configure(background="#CFD5CE")
+        self.spare_parts_frame.configure(highlightbackground="#d9d9d9")
+        self.spare_parts_frame.configure(highlightcolor="black")
+
+        self.Label2 = tk.Label(self.service_frame)
         self.Label2.place(relx=0.025, rely=0.019, height=31, relwidth=0.938)
         self.Label2.configure(activebackground="#f9f9f9")
         self.Label2.configure(activeforeground="black")
@@ -140,8 +263,8 @@ class edit_task_window:
         self.Label2.configure(relief="groove")
         self.Label2.configure(text='''Επεξεργασία εγρασίας''')
 
-        self.date_label = tk.Label(top)
-        self.date_label.place(relx=0.025, rely=0.095, height=31, relwidth=0.230)
+        self.date_label = tk.Label(self.service_frame)
+        self.date_label.place(relx=0.025, rely=0.085, height=31, relwidth=0.230)
         self.date_label.configure(activebackground="#f9f9f9")
         self.date_label.configure(activeforeground="black")
         self.date_label.configure(background="#6b6b6b")
@@ -152,9 +275,9 @@ class edit_task_window:
         self.date_label.configure(highlightcolor="black")
         self.date_label.configure(relief="groove")
         self.date_label.configure(text='''Προγραμ. Ημερομ.''')
-        self.date = StringVar(self.top, value=today)
-        self.start_date_entry = tk.Entry(top)
-        self.start_date_entry.place(relx=0.27, rely=0.095, height=31, relwidth=0.593)
+        self.date = StringVar(self.service_frame, value=today)
+        self.start_date_entry = tk.Entry(self.service_frame)
+        self.start_date_entry.place(relx=0.27, rely=0.085, height=31, relwidth=0.593)
         self.start_date_entry.configure(textvariable=self.date)
         self.start_date_entry.configure(background="white")
         self.start_date_entry.configure(disabledforeground="#a3a3a3")
@@ -163,8 +286,8 @@ class edit_task_window:
         self.start_date_entry.configure(insertbackground="black")
         self.start_date_entry.configure(state="readonly")
 
-        self.customer_label = tk.Label(top)
-        self.customer_label.place(relx=0.025, rely=0.172, height=29, relwidth=0.230)
+        self.customer_label = tk.Label(self.service_frame)
+        self.customer_label.place(relx=0.025, rely=0.152, height=29, relwidth=0.230)
         self.customer_label.configure(activebackground="#f9f9f9")
         self.customer_label.configure(activeforeground="black")
         self.customer_label.configure(background="#6b6b6b")
@@ -175,13 +298,13 @@ class edit_task_window:
         self.customer_label.configure(highlightcolor="black")
         self.customer_label.configure(relief="groove")
         self.customer_label.configure(text='''Πελάτης''')
-        self.customer_combobox = ttk.Combobox(top)
-        self.customer_combobox.place(relx=0.27, rely=0.172, relheight=0.048, relwidth=0.593)
+        self.customer_combobox = ttk.Combobox(self.service_frame)
+        self.customer_combobox.place(relx=0.27, rely=0.152, relheight=0.048, relwidth=0.593)
         self.customer_combobox.configure(takefocus="")
         self.customer_combobox.configure(state="readonly")
 
-        self.phone_label = tk.Label(top)
-        self.phone_label.place(relx=0.025, rely=0.248, height=31, relwidth=0.230)
+        self.phone_label = tk.Label(self.service_frame)
+        self.phone_label.place(relx=0.025, rely=0.218, height=31, relwidth=0.230)
         self.phone_label.configure(activebackground="#f9f9f9")
         self.phone_label.configure(activeforeground="black")
         self.phone_label.configure(background="#6b6b6b")
@@ -194,16 +317,16 @@ class edit_task_window:
         self.phone_label.configure(text='''Τηλέφωνο''')
         self.phone = ""
         self.phone_var = StringVar(w, value=self.phone)
-        self.phone_entry = tk.Entry(top)
-        self.phone_entry.place(relx=0.27, rely=0.248, height=31, relwidth=0.593)
+        self.phone_entry = tk.Entry(self.service_frame)
+        self.phone_entry.place(relx=0.27, rely=0.218, height=31, relwidth=0.593)
         self.phone_entry.configure(background="white")
         self.phone_entry.configure(disabledforeground="#a3a3a3")
         self.phone_entry.configure(font="TkFixedFont")
         self.phone_entry.configure(foreground="#000000")
         self.phone_entry.configure(insertbackground="black")
 
-        self.customer_copiers_label = tk.Label(top)
-        self.customer_copiers_label.place(relx=0.025, rely=0.324, height=31, relwidth=0.230)
+        self.customer_copiers_label = tk.Label(self.service_frame)
+        self.customer_copiers_label.place(relx=0.025, rely=0.284, height=31, relwidth=0.230)
         self.customer_copiers_label.configure(activebackground="#f9f9f9")
         self.customer_copiers_label.configure(activeforeground="black")
         self.customer_copiers_label.configure(background="#6b6b6b")
@@ -214,14 +337,14 @@ class edit_task_window:
         self.customer_copiers_label.configure(highlightcolor="black")
         self.customer_copiers_label.configure(relief="groove")
         self.customer_copiers_label.configure(text='''Φωτοτυπικό''')
-        self.copiers_combobox = ttk.Combobox(top)
-        self.copiers_combobox.place(relx=0.27, rely=0.324, relheight=0.048, relwidth=0.593)
+        self.copiers_combobox = ttk.Combobox(self.service_frame)
+        self.copiers_combobox.place(relx=0.27, rely=0.284, relheight=0.048, relwidth=0.593)
         self.copiers_combobox.configure(values="")
         self.copiers_combobox.configure(takefocus="")
         self.copiers_combobox.configure(state="readonly")
 
-        self.purpose_label = tk.Label(top)
-        self.purpose_label.place(relx=0.025, rely=0.401, height=31, relwidth=0.230)
+        self.purpose_label = tk.Label(self.service_frame)
+        self.purpose_label.place(relx=0.025, rely=0.351, height=31, relwidth=0.230)
         self.purpose_label.configure(activebackground="#f9f9f9")
         self.purpose_label.configure(activeforeground="black")
         self.purpose_label.configure(background="#6b6b6b")
@@ -233,8 +356,8 @@ class edit_task_window:
         self.purpose_label.configure(relief="groove")
         self.purpose_label.configure(text='''Σκοπός επίσκεψης''')
         # self.purpose = StringVar()
-        self.purpose_entry = tk.Entry(top)
-        self.purpose_entry.place(relx=0.27, rely=0.401, height=30, relwidth=0.593)
+        self.purpose_entry = tk.Entry(self.service_frame)
+        self.purpose_entry.place(relx=0.27, rely=0.351, height=30, relwidth=0.593)
         # self.purpose_entry.configure(textvariable=self.purpose)
         self.purpose_entry.configure(background="white")
         self.purpose_entry.configure(disabledforeground="#a3a3a3")
@@ -242,7 +365,33 @@ class edit_task_window:
         self.purpose_entry.configure(foreground="#000000")
         self.purpose_entry.configure(insertbackground="black")
 
-        self.technician_label = tk.Label(top)
+        # Ενέργειες
+        self.actions_label = tk.Label(self.service_frame)
+        self.actions_label.place(relx=0.025, rely=0.420, height=25, relwidth=0.230)
+        self.actions_label.configure(activebackground="#f9f9f9")
+        self.actions_label.configure(activeforeground="black")
+        self.actions_label.configure(background="#6b6b6b")
+        self.actions_label.configure(disabledforeground="#a3a3a3")
+        self.actions_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.actions_label.configure(foreground="#ffffff")
+        self.actions_label.configure(highlightbackground="#d9d9d9")
+        self.actions_label.configure(highlightcolor="black")
+        self.actions_label.configure(relief="groove")
+        self.actions_label.configure(text='''Ενέργειες''')
+        self.actions_combobox = ttk.Combobox(self.service_frame)
+        self.actions_combobox.place(relx=0.27, rely=0.420, relheight=0.048, relwidth=0.593)
+        self.actions_combobox.configure(values=self.actions_list)
+        # self.actions_combobox.configure(textvariable=edit_service_window_support.combobox)
+        self.actions_combobox.configure(takefocus="")
+
+        self.add_to_service_data_btn2 = tk.Button(self.service_frame)
+        self.add_to_service_data_btn2.place(relx=0.880, rely=0.420, height=29, relwidth=0.060)
+        self.add_to_service_data_btn2.configure(background="#006291")
+        self.add_to_service_data_img2 = PhotoImage(file="icons/add_to_service_data2.png")
+        self.add_to_service_data_btn2.configure(image=self.add_to_service_data_img2)
+        self.add_to_service_data_btn2.configure(command=lambda: (self.add_to_service_data("Ενέργειες")))
+
+        self.technician_label = tk.Label(self.service_frame)
         self.technician_label.place(relx=0.025, rely=0.477, height=31, relwidth=0.230)
         self.technician_label.configure(activebackground="#f9f9f9")
         self.technician_label.configure(activeforeground="black")
@@ -255,7 +404,7 @@ class edit_task_window:
         self.technician_label.configure(relief="groove")
         self.technician_label.configure(text='''Τεχνικός''')
         self.technician = StringVar()
-        self.technician_entry = tk.Entry(top)
+        self.technician_entry = tk.Entry(self.service_frame)
         self.technician_entry.place(relx=0.27, rely=0.477, height=30, relwidth=0.593)
         self.technician_entry.configure(textvariable=self.technician)
         self.technician_entry.configure(background="white")
@@ -264,7 +413,7 @@ class edit_task_window:
         self.technician_entry.configure(foreground="#000000")
         self.technician_entry.configure(insertbackground="black")
 
-        self.compl_date_label = tk.Label(top)
+        self.compl_date_label = tk.Label(self.service_frame)
         self.compl_date_label.place(relx=0.025, rely=0.555, height=31, relwidth=0.230)
         self.compl_date_label.configure(activebackground="#f9f9f9")
         self.compl_date_label.configure(activeforeground="black")
@@ -277,7 +426,7 @@ class edit_task_window:
         self.compl_date_label.configure(relief="groove")
         self.compl_date_label.configure(text='''Ημερομ. Ολοκλ''')
 
-        self.compl_date_entry = tk.Entry(top)
+        self.compl_date_entry = tk.Entry(self.service_frame)
         self.compl_date_entry.place(relx=0.27, rely=0.555, height=30, relwidth=0.593)
         # self.compl_date_entry.configure(textvariable=today)
         self.compl_date_entry.configure(background="white")
@@ -286,7 +435,7 @@ class edit_task_window:
         self.compl_date_entry.configure(foreground="#000000")
         self.compl_date_entry.configure(insertbackground="black")
 
-        self.completed_label = tk.Label(top)
+        self.completed_label = tk.Label(self.service_frame)
         self.completed_label.place(relx=0.025, rely=0.635, height=31, relwidth=0.230)
         self.completed_label.configure(activebackground="#f9f9f9")
         self.completed_label.configure(activeforeground="black")
@@ -299,7 +448,7 @@ class edit_task_window:
         self.completed_label.configure(relief="groove")
         self.completed_label.configure(text='''Ολοκληρώθηκε;''')
         self.completed_var = IntVar()
-        self.completed_Checkbutton1 = tk.Checkbutton(top)
+        self.completed_Checkbutton1 = tk.Checkbutton(self.service_frame)
         self.completed_Checkbutton1.place(relx=0.27, rely=0.635, height=31, relwidth=0.102)
         self.completed_Checkbutton1.configure(activebackground="#ececec")
         self.completed_Checkbutton1.configure(activeforeground="white")
@@ -313,7 +462,7 @@ class edit_task_window:
         self.completed_Checkbutton1.configure(variable=self.completed_var)
         self.completed_Checkbutton1.configure(command=self.on_check)
 
-        self.dte_label = tk.Label(top)
+        self.dte_label = tk.Label(self.service_frame)
         self.dte_label.place(relx=0.450, rely=0.635, height=31, relwidth=0.230)
         self.dte_label.configure(activebackground="#f9f9f9")
         self.dte_label.configure(activeforeground="black")
@@ -326,7 +475,7 @@ class edit_task_window:
         self.dte_label.configure(relief="groove")
         self.dte_label.configure(text='''Δελτ.Τεχν.Εξυπ.''')
         self.dte = StringVar()
-        self.dte_entry = tk.Entry(top)
+        self.dte_entry = tk.Entry(self.service_frame)
         self.dte_entry.place(relx=0.685, rely=0.635, height=30, relwidth=0.150)
         self.dte_entry.configure(textvariable=self.dte)
         self.dte_entry.configure(background="white")
@@ -335,10 +484,17 @@ class edit_task_window:
         self.dte_entry.configure(foreground="#000000")
         self.dte_entry.configure(insertbackground="black")
 
-        self.TSeparator1 = ttk.Separator(top)
+        self.send_mail_btn = tk.Button(self.service_frame)
+        self.send_mail_btn.place(relx=0.880, rely=0.635, relheight=0.060, relwidth=0.080)
+        self.send_mail_btn.configure(background="#6b6b6b")
+        self.send_mail_btn_img1 = PhotoImage(file="icons/send_mail.png")
+        self.send_mail_btn.configure(image=self.send_mail_btn_img1)
+        self.send_mail_btn.configure(command=self.send_mail)
+
+        self.TSeparator1 = ttk.Separator(self.service_frame)
         self.TSeparator1.place(relx=0.025, rely=0.700, relwidth=0.938)
 
-        self.notes_label = tk.Label(top)
+        self.notes_label = tk.Label(self.service_frame)
         self.notes_label.place(relx=0.025, rely=0.710, height=31, relwidth=0.940)
         self.notes_label.configure(activebackground="#f9f9f9")
         self.notes_label.configure(activeforeground="black")
@@ -351,8 +507,7 @@ class edit_task_window:
         self.notes_label.configure(relief="groove")
         self.notes_label.configure(text='''Σημειώσεις''')
 
-
-        self.notes_scrolledtext = ScrolledText(top)
+        self.notes_scrolledtext = ScrolledText(self.service_frame)
         self.notes_scrolledtext.place(relx=0.025, rely=0.750, relheight=0.2, relwidth=0.941)
         self.notes_scrolledtext.configure(background="white")
         self.notes_scrolledtext.configure(font="TkTextFont")
@@ -366,7 +521,142 @@ class edit_task_window:
         self.notes_scrolledtext.configure(wrap="none")
         self.notes = StringVar()
 
+        # Ανταλλακτικά
+        self.add_spare_parts_btn = tk.Button(self.spare_parts_frame)
+        self.add_spare_parts_btn.place(relx=0.017, rely=0.600, height=50, relwidth=0.380)
+        self.add_spare_parts_btn.configure(activebackground="#ececec")
+        self.add_spare_parts_btn.configure(activeforeground="#000000")
+        self.add_spare_parts_btn.configure(background="#3a7337")
+        self.add_spare_parts_btn.configure(disabledforeground="#a3a3a3")
+        self.add_spare_parts_btn.configure(foreground="#ffffff")
+        self.add_spare_parts_btn.configure(highlightbackground="#d9d9d9")
+        self.add_spare_parts_btn.configure(highlightcolor="black")
+        self.add_spare_parts_btn.configure(pady="0")
+        self.add_spare_parts_btn.configure(text='''    Προσθήκη\n    ανταλλακτικών''')
+        self.add_spare_parts_btn.configure(command=self.add_spare_parts)
+        self.add_spare_parts_btn_img = PhotoImage(file="icons/add_spare_parts.png")
+        self.add_spare_parts_btn.configure(image=self.add_spare_parts_btn_img)
+        self.add_spare_parts_btn.configure(compound="left")
+
+        # Ανταλλακτικά
+        self.spare_parts_label = tk.Label(self.spare_parts_frame)
+        self.spare_parts_label.place(relx=0.017, rely=0.010, height=30, relwidth=0.970)
+        self.spare_parts_label.configure(activebackground="#f9f9f9")
+        self.spare_parts_label.configure(activeforeground="black")
+        self.spare_parts_label.configure(background="#6b6b6b")
+        self.spare_parts_label.configure(disabledforeground="#a3a3a3")
+        self.spare_parts_label.configure(font=('Calibri', 11, "bold"))
+        self.spare_parts_label.configure(foreground="#ffffff")
+        self.spare_parts_label.configure(highlightbackground="#d9d9d9")
+        self.spare_parts_label.configure(highlightcolor="black")
+        self.spare_parts_label.configure(relief="groove")
+        self.spare_parts_label.configure(text='''Ανταλλακτικά''')
+
+        # Ανανέωση μετα απο εισαγωγη ανταλλακτικών
+        self.refresh_btn = tk.Button(self.spare_parts_frame)
+        self.refresh_btn.place(relx=0.450, rely=0.600, height=50, relwidth=0.080)
+        self.refresh_btn.configure(background="#6b6b6b")
+        self.refresh_img = PhotoImage(file="icons/refresh.png")
+        self.refresh_btn.configure(image=self.refresh_img)
+        self.refresh_btn.configure(command=self.get_spare_parts)
+
+        # Διαγραφή ανταλλακτικών
+        self.del_spare_parts_btn = tk.Button(self.spare_parts_frame)
+        self.del_spare_parts_btn.place(relx=0.575, rely=0.600, height=50, relwidth=0.380)
+        self.del_spare_parts_btn.configure(activebackground="#ececec")
+        self.del_spare_parts_btn.configure(activeforeground="#000000")
+        self.del_spare_parts_btn.configure(background="#6b6b6b")
+        self.del_spare_parts_btn.configure(disabledforeground="#a3a3a3")
+        self.del_spare_parts_btn.configure(foreground="#ffffff")
+        self.del_spare_parts_btn.configure(highlightbackground="#d9d9d9")
+        self.del_spare_parts_btn.configure(highlightcolor="black")
+        self.del_spare_parts_btn.configure(pady="0")
+        self.del_spare_parts_btn.configure(text='''   Διαγραφή επιλεγμένου\n   ανταλλακτικού''')
+        self.del_spare_parts_btn.configure(command=self.del_spare_parts)
+        self.del_spare_parts_btn_img = PhotoImage(file="icons/delete_spare_parts.png")
+        self.del_spare_parts_btn.configure(image=self.del_spare_parts_btn_img)
+        self.del_spare_parts_btn.configure(compound="left")
+
+        # Προσθήκη αρχείων
+        self.add_files_btn = tk.Button(self.spare_parts_frame)
+        self.add_files_btn.place(relx=0.017, rely=0.700, height=50, relwidth=0.380)
+        self.add_files_btn.configure(activebackground="#ececec")
+        self.add_files_btn.configure(activeforeground="#000000")
+        self.add_files_btn.configure(background="green")
+        self.add_files_btn.configure(disabledforeground="#a3a3a3")
+        self.add_files_btn.configure(foreground="#ffffff")
+        self.add_files_btn.configure(highlightbackground="#d9d9d9")
+        self.add_files_btn.configure(highlightcolor="black")
+        self.add_files_btn.configure(pady="0")
+        self.add_files_btn.configure(text='''Προσθήκη αρχείων''')
+        self.add_files_btn.configure(command=self.add_files)
+        self.add_files_btn_img = PhotoImage(file="icons/add_files.png")
+        self.add_files_btn.configure(image=self.add_files_btn_img)
+        self.add_files_btn.configure(compound="left")
+
+        # Αρχεία
+        self.show_files_btn = tk.Button(self.spare_parts_frame)
+        self.show_files_btn.place(relx=0.575, rely=0.700, height=50, relwidth=0.250)
+        self.show_files_btn.configure(activebackground="#ececec")
+        self.show_files_btn.configure(activeforeground="#000000")
+        self.show_files_btn.configure(background="#6b6b6b")
+        self.show_files_btn.configure(disabledforeground="red")
+        self.show_files_btn.configure(foreground="#ffffff")
+        self.show_files_btn.configure(highlightbackground="#d9d9d9")
+        self.show_files_btn.configure(highlightcolor="black")
+        self.show_files_btn.configure(pady="0")
+        self.show_files_btn.configure(text='''Προβολή \nαρχείων''')
+        self.show_files_btn.configure(command=self.show_files)
+
+
+        self.spare_parts_treeview = ScrolledTreeView(self.spare_parts_frame)
+        self.spare_parts_treeview.place(relx=0.017, rely=0.100, relheight=0.500, relwidth=0.970)
+        self.spare_parts_treeview.configure(show="headings", style="mystyle.Treeview", selectmode="browse")
+
+        self.save_btn = tk.Button(w)
+        self.save_btn.place(relx=0.296, rely=0.932, height=34, width=147)
+        self.save_btn.configure(activebackground="#ececec")
+        self.save_btn.configure(activeforeground="#000000")
+        self.save_btn.configure(background="#339933")
+        self.save_btn.configure(disabledforeground="#a3a3a3")
+        self.save_btn.configure(font="-family {Calibri} -size 11 -weight bold")
+        self.save_btn.configure(foreground="#ffffff")
+        self.save_btn.configure(highlightbackground="#d9d9d9")
+        self.save_btn.configure(highlightcolor="black")
+        self.save_btn.configure(pady="0")
+        self.save_btn.configure(text='''Αποθήκευση''')
+        self.save_btn.configure(command=self.add_to_db)
+
         self.get_data()
+        self.get_spare_parts()
+        self.check_if_files_exists()
+
+    # Ελεγχος αν υπάρχουν αρχεία για προβολή
+    def check_if_files_exists(self):
+        con = sqlite3.connect(dbase)
+        cursor = con.cursor()
+        cursor.execute("SELECT * FROM Service_images WHERE Service_id =?", (self.service_id,))
+        images = cursor.fetchall()
+        cursor.close()
+        con.close()
+        if not images:  # αδεια λιστα δλδ δεν υπάρχουν αρχεια και απενεργοποιουμε το κουμπί προβολή αρχείων
+            self.show_files_btn.place_forget()
+
+    # Προβολή αρχείων
+    def show_files(self):
+        image_viewer.create_Toplevel1(w, self.service_id)
+
+    # Προσθήκη αρχείων
+    def add_files(self):
+
+        self.files = filedialog.askopenfilenames(initialdir=os.getcwd(), title="Επιλογή αρχείων για προσθήκη",
+                                                     filetypes=[("Υπ. αρχεία", "*.jpg *.png *.pdf")])
+
+        if self.files == "":  # αν ο χρήστης επιλεξει ακυρο
+            self.top.focus()
+            return
+
+        self.top.focus()
 
     # αλαγή χρώματος κουμπιού ολοκλήρωσης this function will run on click on checkbutton
     def on_check(self):
@@ -381,6 +671,110 @@ class edit_task_window:
             self.completed_Checkbutton1.configure(fg=off_color)
             self.completed_Checkbutton1.configure(text=" Oxi")
 
+    def add_to_service_data(self, column):
+
+        if column == "Ενέργειες":
+            if self.actions_combobox.get() != "" and self.actions_combobox.get() in self.actions_list:
+                messagebox.showinfo("Προσοχή", f"Το {self.actions_combobox.get()} υπάρχει στην λίστα")
+                self.top.focus()
+                return None
+            elif self.actions_combobox.get() != "":
+                self.actions_list.append(self.actions_combobox.get())
+                self.actions_combobox.configure(values=self.actions_list)
+                conn = sqlite3.connect(dbase)
+                cursor = conn.cursor()
+                sql = "INSERT INTO Service_data(Ενέργειες)VALUES(?);"
+                cursor.execute(sql, (self.actions_combobox.get(),))
+                conn.commit()
+                cursor.close()
+                conn.close()
+                messagebox.showinfo("Info", f"H ενέργεια {self.actions_combobox.get()} Προστέθηκε επιτυχώς")
+                self.top.focus()
+
+    def get_spare_parts(self, event=None):
+        self.spare_parts_treeview.delete(*self.spare_parts_treeview.get_children())
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT * FROM Ανταλλακτικά WHERE Service_ID =?", (self.service_id,))
+        headers = list(map(lambda x: x[0], c.description))
+        data = c.fetchall()
+        con.close()
+        self.spare_parts_treeview["columns"] = [head for head in headers]
+        for head in headers:
+            if head == "id" or head == "ID" or head == "Id":
+                platos = 1
+            elif head == "ΠΕΡΙΓΡΑΦΗ":
+                platos = 500
+            else:
+                platos = 121
+            self.spare_parts_treeview.heading(head, text=head, anchor="center")
+            self.spare_parts_treeview.column(head, width=platos, anchor="center")
+        for d in data:
+            self.spare_parts_treeview.insert("", "end", values=d)
+
+    # Προσθήκη ανταλλακτικών
+    def add_spare_parts(self):
+        self.top.focus()
+        if spare_parts_db:
+            add_spare_parts.create_Toplevel1(self.top, self.service_id)
+        else:
+            insert_spare_parts.create_insert_spare_parts_window(self.top, self.service_id)
+
+    # Διαγραφή ανταλλακτικών
+    def del_spare_parts(self):
+        selected_spare_part = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#1'))  # ID
+        selected_part_nr = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#2'))  # Parts Nr
+        selected_part_code = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#4'))  # Κωδικός
+        selected_part_pieces = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#5'))  # Τεμάχια
+        answer = messagebox.askokcancel("Προσοχή!", f"Ειστε σήγουρος για την διαγραφή του {selected_part_nr};")
+        if not answer:
+            self.top.focus()
+            return
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("DELETE FROM Ανταλλακτικά WHERE ID=?", (selected_spare_part,))
+        con.commit()
+        con.close()
+        # Προσθήκη πίσω στην αποθήκη
+        con = sqlite3.connect(spare_parts_db)
+        c = con.cursor()
+        # ευρεση προίοντος στην αποθήκη ψάχνοντας όλους τους πίνακες σύμφονα με part_nr και κωδικό
+        for table in c.execute("SELECT name FROM sqlite_sequence").fetchall():
+            c.execute("SELECT * FROM " + str(table[0]) + " WHERE ΚΩΔΙΚΟΣ =? and PARTS_NR =? ",
+                      (selected_part_code, selected_part_nr))
+            data = c.fetchall()
+            if data:  # αφου το βρούμε πέρνουμε μόνο τον πίνακα
+                part_table = table[0]
+                break
+        # Πέρνουμε τα τεμάχια που έχουν απομείνει
+        c.execute("SELECT ΤΕΜΑΧΙΑ FROM " + part_table + " WHERE ΚΩΔΙΚΟΣ =? and PARTS_NR =? ",
+                      (selected_part_code, selected_part_nr))
+        old_part_pieces = c.fetchall()
+        # και προσθέτουμε σε αυτά τα τεμάχια που έχουμε εισάγει στο Service
+        new_pieces = str(int(old_part_pieces[0][0]) + int(selected_part_pieces))
+
+        # ενημερώνουμε το προιόν στον πίνακα
+        c.execute("UPDATE " + part_table + " SET ΤΕΜΑΧΙΑ =?  WHERE ΚΩΔΙΚΟΣ =? and PARTS_NR =?",
+                      (new_pieces, selected_part_code, selected_part_nr))
+
+        messagebox.showinfo("Πληροφορία!",
+                                f"Το προιόν με κωδικό {selected_part_code}  της εταιρείας {part_table} ενημερώθηκε")
+        con.commit()
+        c.close()
+        con.close()
+
+        self.spare_parts_treeview.delete(self.spare_parts_treeview.selection())
+
+    # Αποστολή email
+    def send_mail(self):
+        # Αν γράψουμε νέο φωτοτυπικό και όχι απο την λίστα
+        if not self.selected_copier:
+            self.selected_copier = self.copiers_combobox.get()
+
+        data = [self.date.get(), self.customer_combobox.get(), self.selected_copier, self.purpose_entry.get(),
+                self.technician.get(), "", self.urgent.get(), self.phone_var.get(),
+                self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, "", 1]
+        mail.send_mail(data)
 
     # Να πάρουμε Δεδομένα
     def get_data(self):
@@ -394,7 +788,7 @@ class edit_task_window:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM Calendar WHERE ID =?", (self.selected_calendar_id,))
         data = cursor.fetchall()
-        date = StringVar(self.top, value=data[0][1])
+        date = StringVar(self.service_frame, value=data[0][1])
         self.start_date_entry.configure(textvariable=date)
         customer_combobox = StringVar(w, value=data[0][2])
         self.customer_combobox.set(customer_combobox.get())
@@ -402,24 +796,29 @@ class edit_task_window:
         self.copiers_combobox.set(copier.get())
         purpose = StringVar(w, value=data[0][4])
         self.purpose_entry.configure(textvariable=purpose)
-        technician = StringVar(w, value=data[0][5])
+        action = StringVar(w, value=data[0][5])
+        self.actions_combobox.set(action.get())
+        technician = StringVar(w, value=data[0][6])
         self.technician_entry.configure(textvariable=technician)
-        compl_date = StringVar(w, value=data[0][6])
-        if data[0][6] == "":
+        compl_date = StringVar(w, value=data[0][7])
+        if data[0][7] == "":
             date_today = datetime.today().strftime("%d/%m/%Y")
             today_data = StringVar(w, value=date_today)
             self.compl_date_entry.configure(textvariable=today_data)
         else:
             self.compl_date_entry.configure(textvariable=compl_date)
-        urgent = StringVar(w, value=data[0][7])
+        urgent = StringVar(w, value=data[0][8])
         self.urgent = urgent.get()
-        phone = StringVar(w, value=data[0][8])
+        phone = StringVar(w, value=data[0][9])
         self.phone_entry.configure(textvariable=phone)
-        notes = StringVar(w, value=data[0][9])
+        notes = StringVar(w, value=data[0][10])
         self.notes_scrolledtext.insert('1.0', notes.get())
-        self.copier_id = data[0][10]
-        dte = StringVar(w, value=data[0][11])
+        self.copier_id = data[0][11]
+        dte = StringVar(w, value=data[0][12])
         self.dte_entry.configure(textvariable=dte)
+        service_id = StringVar(w, value=data[0][13])
+        self.service_id = service_id.get()
+
 
         if not data[0][-1]:  # αν η κατάσταση δεν είναι 1 ==>  δλδ δεν ολοκληρόθηκε
             self.completed_Checkbutton1.configure(fg="green")
@@ -432,80 +831,135 @@ class edit_task_window:
         cursor.close()
         conn.close()
 
-        def add_to_db():
-            edited_columns = []
-            for column in self.columns:
-                if column != "ID":
-                    edited_columns.append(column + "=?")
-            edited_columns = ",".join(edited_columns)
+    # Προσθήκη αρχείων στην βάση
+    def add_files_to_db(self):
+        if self.files == "":
+            return
+        con = sqlite3.connect(dbase)
+        cu = con.cursor()
 
-            completed = self.completed_var.get()
+        def convert_bytes(size):
+            for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+                if size < 1024.0:
+                    return "%3.1f %s" % (size, x)
+                size /= 1024.0
 
-            # Demo
-            if demo:
-                con = sqlite3.connect(dbase)
-                c = con.cursor()
-                c.execute("SELECT *  FROM Calendar ;")
-                tasks = c.fetchall()
-                c.close()
-                con.close()
-                if len(tasks) > 5:
-                    messagebox.showerror("Demo",
-                                        "Λυπούμαστε η εκδοση αυτή είναι demo και δεν μπορείτε να προσθέσεται νέες εργασίες")
+            return size
 
-                    self.top.focus()
-                    return
+        # Εισαγωγη αρχείων
+        for img in self.files:
+            base = os.path.basename(img)
+            filename, ext = os.path.splitext(base)
+            with open(img, 'rb') as f:
+                file = f.read()  # Εισαγωγη αρχείων
+                # file_size = convert_bytes(len(file))  # Καλύτερα σε bytes για ευκολή ταξινόμηση
+                file_size = len(file)  # μεγεθος σε bytes
 
-            conn = sqlite3.connect(dbase)
-            cursor = conn.cursor()
-            # Δημιουργία culumns για της εργασίες
-            cursor.execute("SELECT * FROM Calendar")
-            headers = list(map(lambda x: x[0], cursor.description))
-            culumns = ", ".join(headers)
-            values = []
-            for head in headers:
-                if head == "ID":
-                    values.append("Null")
-                else:
-                    values.append("?")
-            values = ", ".join(values)
+                cu.execute("INSERT INTO Service_images(Service_ID, Filename, Type, File_size, File, Copier_ID)"
+                           "VALUES(?,?,?,?,?,?)", (self.service_id, filename, ext, file_size, sqlite3.Binary(file),
+                                                   self.copier_id))
 
-            if completed:  # Αν ολοκληρώθηκε
-                if len(self.compl_date_entry.get()) != 10:  # Ελεγχος ημερομηνίας ολοκλήροσης
-                    messagebox.showwarning("Προσοχή", "Η ημερομηνία ολοκλήρωσης πρέπει να έχει την μορφή ΄01/01/2020΄")
-                    self.top.focus()
-                    return
+        con.commit()
+        con.close()
 
-                data = [date.get(), customer_combobox.get(), copier.get(), purpose.get(), technician.get(),
-                        self.compl_date_entry.get(), urgent.get(), self.phone_entry.get(), self.notes_scrolledtext.get('1.0', 'end-1c'),
-                        self.copier_id, dte.get(), 0, self.selected_calendar_id]  # Το  0 => ανενεργό δλδ ολοκληρόθηκε
+    def add_to_db(self,):
+        edited_columns = []
+        for column in self.columns:
+            if column != "ID":
+                edited_columns.append(column + "=?")
+        edited_columns = ",".join(edited_columns)
+
+        completed = self.completed_var.get()
+
+        # Demo
+        if demo:
+            con = sqlite3.connect(dbase)
+            c = con.cursor()
+            c.execute("SELECT *  FROM Calendar ;")
+            tasks = c.fetchall()
+            c.close()
+            con.close()
+            if len(tasks) > 5:
+                messagebox.showerror("Demo",
+                                         "Λυπούμαστε η εκδοση αυτή είναι demo και δεν μπορείτε να προσθέσεται νέες"
+                                         " εργασίες")
+
+                self.top.focus()
+                return
+
+        conn = sqlite3.connect(dbase)
+        cursor = conn.cursor()
+        # Δημιουργία culumns για της εργασίες
+        cursor.execute("SELECT * FROM Calendar")
+        headers = list(map(lambda x: x[0], cursor.description))
+        culumns = ", ".join(headers)
+        values = []
+        for head in headers:
+            if head == "ID":
+                values.append("Null")
             else:
-                # "" Κενή ημερωμηνία ολοκλήρωσεις
-                data = [date.get(), customer_combobox.get(), copier.get(), purpose.get(), technician.get(),
-                        "", urgent.get(), self.phone_entry.get(), self.notes_scrolledtext.get('1.0', 'end-1c'),
-                        self.copier_id, dte.get(), 1, self.selected_calendar_id]  # Το  1 => ενενεργό δλδ δεν ολοκληρόθηκε
+                values.append("?")
+        values = ", ".join(values)
 
-            cursor.execute("UPDATE Calendar  SET " + edited_columns + " WHERE ID=? ", (tuple(data,)))
-            conn.commit()
-            conn.close()
-            messagebox.showinfo("Info", f"H εργασία αποθηκεύτηκε επιτυχώς στον πελάτη {self.customer_combobox.get()}")
-            self.top.destroy()
-            return None
+        if completed:  # Αν ολοκληρώθηκε
+            if len(self.compl_date_entry.get()) != 10:  # Ελεγχος ημερομηνίας ολοκλήροσης
+                messagebox.showwarning("Προσοχή", "Η ημερομηνία ολοκλήρωσης πρέπει να έχει την μορφή ΄01/01/2020΄")
+                self.top.focus()
+                return
+            # Το  0 => ανενεργό δλδ ολοκληρόθηκε
+            data = [self.start_date_entry.get(), self.customer_combobox.get(), self.copiers_combobox.get(),
+                    self.purpose_entry.get(), self.actions_combobox.get(), self.technician_entry.get(),
+                    self.compl_date_entry.get(), self.urgent, self.phone_entry.get(),
+                    self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, self.dte_entry.get(),
+                    self.service_id, 0, self.selected_calendar_id]
+        else:
+            # "" Κενή ημερωμηνία ολοκλήρωσεις
+            # Το  1 => ενενεργό δλδ δεν ολοκληρόθηκε
+            data = [self.start_date_entry.get(), self.customer_combobox.get(), self.copiers_combobox.get(),
+                    self.purpose_entry.get(), self.actions_combobox.get(), self.technician_entry.get(), "", self.urgent,
+                    self.phone_entry.get(), self.notes_scrolledtext.get('1.0', 'end-1c'),
+                    self.copier_id, self.dte_entry.get(), self.service_id, 1, self.selected_calendar_id]
 
-        self.save_btn = tk.Button(w)
-        self.save_btn.place(relx=0.296, rely=0.916, height=34, width=147)
-        self.save_btn.configure(activebackground="#ececec")
-        self.save_btn.configure(activeforeground="#000000")
-        self.save_btn.configure(background="#339933")
-        self.save_btn.configure(disabledforeground="#a3a3a3")
-        self.save_btn.configure(font="-family {Calibri} -size 11 -weight bold")
-        self.save_btn.configure(foreground="#ffffff")
-        self.save_btn.configure(highlightbackground="#d9d9d9")
-        self.save_btn.configure(highlightcolor="black")
-        self.save_btn.configure(pady="0")
-        self.save_btn.configure(text='''Αποθήκευση''')
-        self.save_btn.configure(command=add_to_db)
+        cursor.execute("UPDATE Calendar  SET " + edited_columns + " WHERE ID=? ", (tuple(data,)))
+        conn.commit()
+        conn.close()
 
+        # Δημιουργία culumns για το Service
+        conn = sqlite3.connect(dbase)
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM Service WHERE ID = ?", (self.service_id,))
+        columns = list(map(lambda x: x[0], cursor.description))
+        values = []
+        edited_columns = []
+        for column in columns:
+            if column != "ID":
+                edited_columns.append(column + "=?")
+        edited_columns = ",".join(edited_columns)
+        # Δεδομένα για το Service
+        # CREATE TABLE "Service" (
+        # 	"ID"	INTEGER PRIMARY KEY AUTOINCREMENT,   # Service_id
+        # 	"Ημερομηνία"	TEXT,      # ---------------  [self.date.get()
+        # 	"Σκοπός_Επίσκεψης"	TEXT,  # ---------------  self.purpose_combobox.get()
+        # 	"Ενέργειες"	TEXT,          #  --------------  self.actions_combobox.get()
+        # 	"Σημειώσεις"	TEXT,       # --------------  self.notes_scrolledtext.get('1.0', 'end-1c')
+        # 	"Μετρητής"	TEXT,           #  ""
+        # 	"Επ_Service"	TEXT,       #  ""
+        # 	"Copier_ID"	INTEGER,        # -------------   self.copier_id
+        # 	"ΔΤΕ"	TEXT,               # ------------    self.dte_entry.get()
+        # 	FOREIGN KEY("Copier_ID") REFERENCES "Φωτοτυπικά"("ID")
+        # )
+        data = [self.date.get(), self.purpose_entry.get(), self.actions_combobox.get(),
+                self.notes_scrolledtext.get('1.0', 'end-1c'), "", "", self.copier_id, self.dte_entry.get(),
+                self.service_id]
+
+        cursor.execute("UPDATE Service  SET " + edited_columns + " WHERE ID=? ", (tuple(data)))
+        conn.commit()
+        conn.close()
+        self.add_files_to_db()
+        messagebox.showinfo("Info", f"H εργασία αποθηκεύτηκε επιτυχώς στον πελάτη {self.customer_combobox.get()}")
+        self.top.destroy()
+
+        return None
 
     def quit(self, event):
         self.top.destroy()

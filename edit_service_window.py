@@ -591,7 +591,7 @@ class edit_service_window():
 
         # Προσθήκη αλλαγών στην βαση δεδομένων
         def add_to_db():
-            self.add_files_to_db()
+
             edited_culumns = []
             for culumn in self.culumns:
                 if culumn != "ID":
@@ -606,6 +606,7 @@ class edit_service_window():
             add_cursor.execute("UPDATE Service  SET " + edited_culumns + " WHERE ID=? ", (tuple(data_to_add)))
             add_conn.commit()
             add_conn.close()
+            self.add_files_to_db()
             w.destroy()
 
         self.save_btn = tk.Button(w)

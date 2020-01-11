@@ -14,6 +14,7 @@ import logging
 from datetime import datetime
 from settings import dbase, spare_parts_db, demo
 import mail
+import add_copier
 
 try:
     import Tkinter as tk
@@ -74,6 +75,25 @@ def get_copiers_data():
     cursor.close()
     conn.close()
     return sorted(customers_list), serials
+
+
+def get_service_id():
+    con = sqlite3.connect(dbase)
+    cu = con.cursor()
+    # Να πάρουμε πρώτα το τελευταίο ID απο τον πίνακα sqlite_sequence το πεδία Service
+    # για να προσθέσουμε τις εικόνες στο νέο service
+    # νεο service_ID == τελευταίο ID απο τον πίνακα Service +1
+    cu.execute("SELECT * FROM sqlite_sequence")
+    names = cu.fetchall()
+
+    for name in names:
+        if name[0] == "Service":
+            services_ID = name[1]
+
+            new_service_id = int(services_ID) + 1
+            cu.close()
+            con.close()
+            return new_service_id
 
 
 def get_service_data():
@@ -150,6 +170,7 @@ class add_task_window:
         self.customers_list, self.serials = get_copiers_data()
         self.purpose_list, self.actions_list = get_service_data()
         self.selected_customer = selected_customer  # Επιλεγμένος πελάτης απο το service_book_colors
+        self.service_id = get_service_id()
         self.customer_id = ""
         self.copiers = []  # Τα φωτοτυπικά του επιλεγμένου πελάτη
         self.selected_copier = ""  # το επιλεγμένο φωτοτυπικό
@@ -265,6 +286,12 @@ class add_task_window:
         self.copiers_combobox.set(value=self.copier_stringvar.get())
         self.copiers_combobox.configure(takefocus="")
         self.copiers_combobox.bind('<<ComboboxSelected>>', self.get_copier_id)
+        self.add_copier_btn1 = tk.Button(top)
+        self.add_copier_btn1.place(relx=0.880, rely=0.324, height=29, relwidth=0.060)
+        self.add_copier_btn1.configure(background="#006291")
+        self.add_copier_btn1_img1 = PhotoImage(file="icons/add_to_service_data1.png")
+        self.add_copier_btn1.configure(image=self.add_copier_btn1_img1)
+        self.add_copier_btn1.configure(command=self.add_copier)
 
         self.purpose_label = tk.Label(top)
         self.purpose_label.place(relx=0.025, rely=0.400, height=31, relwidth=0.230)
@@ -486,19 +513,52 @@ class add_task_window:
             messagebox.showwarning("Προσοχή", "Η ημερομηνία πρέπει να έχει την μορφή ΄01/01/2020΄")
             self.top.focus()
             return
-        # Αν γράψουμε νέο φωτοτυπικό και όχι απο την λίστα
-        if not self.selected_copier:
-            self.selected_copier = self.copiers_combobox.get()
+
 
         # τα "" είναι η ημερομηνία ολοκλήροσης και ΔΤΕ που δεν τα συμπληρώνουμε εδώ αλλα στην επεξεργασία task
         # Το 1 στο τέλος είναι κατάσταση 1=> ενεργό 0 => ανενεργό δλδ ολοκληρώθηκε
-
-        data = [self.date.get(), self.customer_combobox.get(), self.selected_copier, self.purpose_combobox.get(),
+        # Δεδομένα για το Calendar
+        # "" ==> Ενέργειες
+        data = [self.date.get(), self.customer_combobox.get(), self.copiers_combobox.get(), self.purpose_combobox.get(), "",
                 self.technician.get(), "", self.urgent.get(), self.phone_var.get(),
-                self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, "", 1]
-
+                self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, "", self.service_id, 1]
 
         sql_insert = "INSERT INTO Calendar (" + culumns + ")" + "VALUES(" + values + ");"
+
+        cursor.execute(sql_insert, tuple(data))
+        conn.commit()
+        conn.close()
+
+        # Δημιουργία culumns για το Service
+        conn = sqlite3.connect(dbase)
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM Service")
+        headers = list(map(lambda x: x[0], cursor.description))
+        culumns = ", ".join(headers)
+        values = []
+        for head in headers:
+            if head == "ID":
+                values.append("Null")
+            else:
+                values.append("?")
+        values = ", ".join(values)
+        # Δεδομένα για το Service
+        # CREATE TABLE "Service" (
+        # 	"ID"	INTEGER PRIMARY KEY AUTOINCREMENT,   # Service_id
+        # 	"Ημερομηνία"	TEXT,      # ---------------  [self.date.get()
+        # 	"Σκοπός_Επίσκεψης"	TEXT,  # ---------------  self.purpose_combobox.get()
+        # 	"Ενέργειες"	TEXT,          #  ""
+        # 	"Σημειώσεις"	TEXT,       # --------------  self.notes_scrolledtext.get('1.0', 'end-1c')
+        # 	"Μετρητής"	TEXT,           #  ""
+        # 	"Επ_Service"	TEXT,       #  ""
+        # 	"Copier_ID"	INTEGER,        # -------------   self.copier_id
+        # 	"ΔΤΕ"	TEXT,               # ""
+        # 	FOREIGN KEY("Copier_ID") REFERENCES "Φωτοτυπικά"("ID")
+        # )
+        data = [self.date.get(), self.purpose_combobox.get(), "", self.notes_scrolledtext.get('1.0', 'end-1c'),
+                "", "", self.copier_id, ""]
+
+        sql_insert = "INSERT INTO Service (" + culumns + ")" + "VALUES(" + values + ");"
 
         cursor.execute(sql_insert, tuple(data))
         conn.commit()
@@ -513,7 +573,7 @@ class add_task_window:
         if not self.selected_copier:
             self.selected_copier = self.copiers_combobox.get()
 
-        data = [self.date.get(), self.customer_combobox.get(), self.selected_copier, self.purpose_combobox.get(),
+        data = [self.date.get(), self.customer_combobox.get(), self.copiers_combobox.get(), self.purpose_combobox.get(),
                 self.technician.get(), "", self.urgent.get(), self.phone_var.get(),
                 self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, "", 1]
         mail.send_mail(data)
@@ -542,7 +602,14 @@ class add_task_window:
                 messagebox.showinfo("Info", f"Ο σκοπός {self.purpose_combobox.get()} προστέθηκε επιτυχώς")
                 self.top.focus()
 
+ # Προσθήκη Φωτοτυπικού
+    def add_copier(self, event=None):
+        """ Προσθήκη φωτοτυπικού
+        Καλει την συνάρτηση create_Topelevel1 του αρχείου add_copier
 
+        :return:
+        """
+        add_copier.create_add_copier_window(w, self.customer_id)
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):

@@ -58,6 +58,7 @@ root_logger.addHandler(handler)
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
 
+
 def get_service_data():
     purpose_list = []
     actions_list = []
