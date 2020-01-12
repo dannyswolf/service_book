@@ -8,7 +8,7 @@ user = getpass.getuser()
 
 spare_parts_db = "3. ΚΑΙΝΟΥΡΙΑ_ΑΠΟΘΗΚΗ.db"
 
-service_book_version = "V 1.2.2 ML Shop"
+service_book_version = "V 1.2.6 ML Shop"
 dbase = "Service_book.db"  # Local Dbase
 
 demo = 0  # 0 Demo Disabled 1 Demo enabled

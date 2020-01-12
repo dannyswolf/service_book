@@ -342,7 +342,7 @@ class Toplevel1:
                             f"Οι κωδικοί {added_codes} αφερέθηκαν απο την αποθήκη {self.selected_company} με επιτυχία ")
                         c.close()
                         con.close()
-                        messagebox.showinfo("Πληροφορία", f"O κωδικός {value} προστέθηκε ")
+                        # messagebox.showinfo("Πληροφορία", f"O κωδικός {value} προστέθηκε ")
                         self.top.destroy()
                         return
                     else:
@@ -389,7 +389,7 @@ class Toplevel1:
             service_cursor.execute(sql, data)
             service_con.commit()
 
-        messagebox.showinfo("Info", f"Οι κωδικοί {added_codes} προστέθηκαν με επιτυχεία ")
+        # messagebox.showinfo("Info", f"Οι κωδικοί {added_codes} προστέθηκαν με επιτυχεία ")
         print(f"Line 349 Οι κωδικοί {added_codes} προστέθηκαν με επιτυχία στο service_id {self.service_ID} ")
         service_cursor.close()
         service_con.close()

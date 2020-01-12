@@ -191,7 +191,7 @@ class add_task_window:
         self.selected_serial = ""
         self.copier_id = ""
         self.top = top
-        top.geometry("505x524+444+228")
+        top.geometry("505x524+10+10")
         top.minsize(120, 1)
         top.maxsize(1604, 881)
         top.resizable(1, 1)
@@ -451,16 +451,22 @@ class add_task_window:
         self.customers_list, self.serials = get_copiers_data()
         copier = self.copiers_combobox.get()
         list_data_of_copier = copier.split()
-
-        for serial in self.serials:
-            if serial == list_data_of_copier[-1]:
-                self.selected_serial = serial
+        try:
+            for serial in self.serials:
+                if serial == list_data_of_copier[-1]:
+                    self.selected_serial = serial
+        except IndexError:  # Αν εισάγουμε μηχάνημα μόνο όνομα και όχι serial nr
+            self.selected_serial = ""
         con = sqlite3.connect(dbase)
         c = con.cursor()
         c.execute("SELECT ID, Εταιρεία FROM Φωτοτυπικά WHERE Serial =?", (self.selected_serial,))
         data = c.fetchall()
-        self.copier_id = data[0][0]
-        self.selected_copier = data[0][1] + "  Σειριακός : " + self.selected_serial
+        try:
+            self.copier_id = data[0][0]
+            self.selected_copier = data[0][1] + "  Σειριακός : " + self.selected_serial
+        except IndexError:  # Αν εισάγουμε μηχάνημα μόνο όνομα και όχι serial nr
+            self.copier_id = 0
+            self.selected_copier = self.copiers_combobox.get() + "  Σειριακός : " + self.selected_serial
         con.close()
         return
 
@@ -600,7 +606,7 @@ class add_task_window:
         cursor.execute(sql_insert, tuple(data))
         conn.commit()
         conn.close()
-        messagebox.showinfo("Info", f"H εργασία προστέθηκε επιτυχώς στον πελάτη {self.customer_combobox.get()}")
+        # messagebox.showinfo("Info", f"H εργασία προστέθηκε επιτυχώς στον πελάτη {self.customer_combobox.get()}")
         self.top.destroy()
         return None
 

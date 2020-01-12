@@ -18,6 +18,8 @@ todo start day to binary file
 ---------------------- Προσθήκη Μετρητής στο Calendar μετά το Service_ID ---------------
 -----------------------Προσθήκη Επ_Service στο Calendar μετά το Μετρητής ---------------
 
+V1.2.6 Δημιουργία ημερολογίου χωρίς υπάρχον φωτοτυπικό =======================================12/01/2020
+
 V1.2.5 Προσθήκη drop down Calendar ===========================================================12/01/2020
 Ενήμερωση βάσης δεδομένων
 Προσθήκη Μετρητής στο Calendar μετά το Service_ID
@@ -1277,7 +1279,7 @@ class Toplevel1:
             self.calendar_treeview.insert("", "end", values=d)
 
     def add_scheduled_tasks(self):
-        self.top.wm_state('iconic')
+
         add_task.create_add_task_window(root, self.selected_customer)
 
     def view_scheduled_tasks(self, event=None):

@@ -812,8 +812,8 @@ class edit_task_window:
         c.execute("UPDATE " + part_table + " SET ΤΕΜΑΧΙΑ =?  WHERE ΚΩΔΙΚΟΣ =? and PARTS_NR =?",
                       (new_pieces, selected_part_code, selected_part_nr))
 
-        messagebox.showinfo("Πληροφορία!",
-                                f"Το προιόν με κωδικό {selected_part_code}  της εταιρείας {part_table} ενημερώθηκε")
+        # messagebox.showinfo("Πληροφορία!",
+        #                         f"Το προιόν με κωδικό {selected_part_code}  της εταιρείας {part_table} ενημερώθηκε")
         con.commit()
         c.close()
         con.close()
