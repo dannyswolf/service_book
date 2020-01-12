@@ -10,15 +10,28 @@
 todo αν ο χρήστης πατήση ακυρο κατα την προσθήκη επισκευής τι θα γίνει με τα ανταλλακτικα που έχουν οριστεί με νεο service_id
 todo προβολή όλων των εικόνων
 todo start day to binary file
-todo service_id sto add_task
+
 
 ======================= Ενήμερωση βάσης δεδομένων =======================================
 -----------------------Προσθήκη Ενέργειες στο Calendar μετά απο Σκοπός ------------------
 -----------------------Προσθήκη Service_ID στο Calendar μετά απο ΔΤΕ - ------------------
+---------------------- Προσθήκη Μετρητής στο Calendar μετά το Service_ID ---------------
+-----------------------Προσθήκη Επ_Service στο Calendar μετά το Μετρητής ---------------
+
+V1.2.5 Προσθήκη drop down Calendar ===========================================================12/01/2020
+Ενήμερωση βάσης δεδομένων
+Προσθήκη Μετρητής στο Calendar μετά το Service_ID
+Προσθήκη Επ_Service στο Calendar μετά το Μετρητής
+
 
 V1.2.4 Αλλαγές στο Ημερολόγιο εργασίων  ========================================================11/01/2020
+Ενήμερωση βάσης δεδομένων
+Προσθήκη Ενέργειες στο Calendar μετά απο Σκοπός
+Προσθήκη Service_ID στο Calendar μετά απο ΔΤΕ
+
 
 V1.2.3 Αλλαγές στο Ημερολόγιο εργασίων  ============ ===========================================11/01/2020
+todo service_id sto add_task === Done
 
 V1.2.2 Ενημέρωση αποθήκης όταν αφερούμε ανταλλακτικά ===========================================11/01/2020
 fix bug on copier_id στην προσθήκη task
@@ -1271,7 +1284,16 @@ class Toplevel1:
         # https://pypi.org/project/tkcalendar/
         selected_date = self.service_calendar.selection_get()
         formated_date = selected_date.strftime("%d/%m/%Y")
-        self.search_tasks(formated_date)
+        # Αδειάζουμε πρώτα το tree
+        self.calendar_treeview.delete(*self.calendar_treeview.get_children())
+
+        conn = sqlite3.connect(dbase)
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM Calendar WHERE Ημερομηνία =? AND Κατάσταση = 1", (formated_date,))
+        fetch = cursor.fetchall()  # Δεδομένα απο Service
+        conn.close()
+        for item in fetch:
+            self.calendar_treeview.insert("", "end", values=item)
 
     def edit_scheduled_tasks(self, event=None):
         selected_task_id = (self.calendar_treeview.set(self.calendar_treeview.selection(), '#1'))

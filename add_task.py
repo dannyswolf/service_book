@@ -15,7 +15,8 @@ from datetime import datetime
 from settings import dbase, spare_parts_db, demo
 import mail
 import add_copier
-
+from tkcalendar import DateEntry
+from urllib.request import urlopen
 try:
     import Tkinter as tk
 except ImportError:
@@ -31,6 +32,19 @@ except ImportError:
     py3 = True
 
 import add_copier_support
+
+try:
+    res = urlopen('http://just-the-time.appspot.com/')
+    result = res.read().strip()
+    result_str = result.decode('utf-8')  # 2020-01-08 22:30:56
+    only_date = result_str[:11]
+    day = only_date[8:10]
+    month = only_date[5:7]
+    year = only_date[:4]
+    today = day + " " + month + " " + year  # 08 01 2020
+
+except:
+    messagebox.showerror("Σφάλμα στην σύνδεση σας", "Παρακαλω ελέγξτε την σύνδεση σας στο διαδίκτυο")
 
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE------------------
 today = datetime.today().strftime("%d %m %Y")
@@ -188,6 +202,11 @@ class add_task_window:
         top.bind('<Escape>', self.quit)
         top.focus()
 
+        self.today = datetime.strptime(today, "%d %m %Y")
+        self.day = self.today.day
+        self.year = self.today.year
+        self.month = self.today.month
+
         self.Label2 = tk.Label(top)
         self.Label2.place(relx=0.025, rely=0.019, height=31, relwidth=0.938)
         self.Label2.configure(activebackground="#f9f9f9")
@@ -214,15 +233,20 @@ class add_task_window:
         self.date_label.configure(relief="groove")
         self.date_label.configure(text='''Ημερομηνία''')
         self.today = datetime.today().strftime("%d/%m/%Y")
-        self.date = StringVar(w, value=self.today)
-        self.start_date_entry = tk.Entry(top)
-        self.start_date_entry.place(relx=0.27, rely=0.095, height=31, relwidth=0.593)
-        self.start_date_entry.configure(textvariable=self.date)
-        self.start_date_entry.configure(background="white")
-        self.start_date_entry.configure(disabledforeground="#a3a3a3")
-        self.start_date_entry.configure(font="TkFixedFont")
-        self.start_date_entry.configure(foreground="#000000")
-        self.start_date_entry.configure(insertbackground="black")
+        # self.date = StringVar(w, value=self.today)
+        # self.start_date_entry = tk.Entry(top)
+        # self.start_date_entry.place(relx=0.27, rely=0.095, height=31, relwidth=0.593)
+        # self.start_date_entry.configure(textvariable=self.date)
+        # self.start_date_entry.configure(background="white")
+        # self.start_date_entry.configure(disabledforeground="#a3a3a3")
+        # self.start_date_entry.configure(font="TkFixedFont")
+        # self.start_date_entry.configure(foreground="#000000")
+        # self.start_date_entry.configure(insertbackground="black")
+
+        self.start_date = DateEntry(top, width=12, year=self.year, month=self.month, day=self.day,
+                             background='gray20', selectmode='day', foreground='white', borderwidth=5, locale="el_GR",
+                             font=("Calibri", 10, 'bold'), date_pattern='dd/mm/yyyy')
+        self.start_date.place(relx=0.27, rely=0.095, height=31, relwidth=0.593)
 
         self.customer_label = tk.Label(top)
         self.customer_label.place(relx=0.025, rely=0.172, height=29, relwidth=0.230)
@@ -516,16 +540,12 @@ class add_task_window:
         values = ", ".join(values)
 
         # Ελεγχος αν εχουμε σημπληρώσει τα απαρέτητα πεδία
-        if self.date.get() == "" or self.customer_combobox.get() == "" or self.copiers_combobox.get() == "":
+
+        if self.start_date.get() == "" or self.customer_combobox.get() == "" or self.copiers_combobox.get() == "":
             messagebox.showwarning("Προσοχή", "Παρακαλώ επιλέξτε \n1.Ημερομηνία, \n2.Πελάτη "
                                               "\n3.Φωτοτυπικό")
             self.top.focus()
             return
-        if len(self.date.get()) != 10:
-            messagebox.showwarning("Προσοχή", "Η ημερομηνία πρέπει να έχει την μορφή ΄01/01/2020΄")
-            self.top.focus()
-            return
-
 
         # τα "" είναι η ημερομηνία ολοκλήροσης και ΔΤΕ που δεν τα συμπληρώνουμε εδώ αλλα στην επεξεργασία task
         # Το 1 στο τέλος είναι κατάσταση 1=> ενεργό 0 => ανενεργό δλδ ολοκληρώθηκε
@@ -533,10 +553,11 @@ class add_task_window:
         # "" ==> Ενέργειες
         # Αν ο χρήστης εισάγει νέο μηχάνημα που δεν είναι στην βάση
         if not self.copiers_combobox.get() in self.copiers:
-            self.copier_id = ""
-        data = [self.date.get(), self.customer_combobox.get(), self.copiers_combobox.get(), self.purpose_combobox.get(), "",
+            self.copier_id = "0"
+        # "", "", ==>> Μετρητής και Επώμενο service
+        data = [self.start_date.get(), self.customer_combobox.get(), self.copiers_combobox.get(), self.purpose_combobox.get(), "",
                 self.technician.get(), "", self.urgent.get(), self.phone_var.get(),
-                self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, "", self.service_id, 1]
+                self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, "", self.service_id, "", "", 1]
 
         sql_insert = "INSERT INTO Calendar (" + culumns + ")" + "VALUES(" + values + ");"
 
@@ -560,7 +581,7 @@ class add_task_window:
         # Δεδομένα για το Service
         # CREATE TABLE "Service" (
         # 	"ID"	INTEGER PRIMARY KEY AUTOINCREMENT,   # Service_id
-        # 	"Ημερομηνία"	TEXT,      # ---------------  [self.date.get()
+        # 	"Ημερομηνία"	TEXT,      # ---------------  self.start_date.get()
         # 	"Σκοπός_Επίσκεψης"	TEXT,  # ---------------  self.purpose_combobox.get()
         # 	"Ενέργειες"	TEXT,          #  ""
         # 	"Σημειώσεις"	TEXT,       # --------------  self.notes_scrolledtext.get('1.0', 'end-1c')
@@ -570,7 +591,8 @@ class add_task_window:
         # 	"ΔΤΕ"	TEXT,               # ""
         # 	FOREIGN KEY("Copier_ID") REFERENCES "Φωτοτυπικά"("ID")
         # )
-        data = [self.date.get(), self.purpose_combobox.get(), "", self.notes_scrolledtext.get('1.0', 'end-1c'),
+
+        data = [self.start_date.get(), self.purpose_combobox.get(), "", self.notes_scrolledtext.get('1.0', 'end-1c'),
                 "", "", self.copier_id, ""]
 
         sql_insert = "INSERT INTO Service (" + culumns + ")" + "VALUES(" + values + ");"
@@ -588,7 +610,7 @@ class add_task_window:
         if not self.selected_copier:
             self.selected_copier = self.copiers_combobox.get()
 
-        data = [self.date.get(), self.customer_combobox.get(), self.copiers_combobox.get(), self.purpose_combobox.get(),
+        data = [self.start_date.get(), self.customer_combobox.get(), self.copiers_combobox.get(), self.purpose_combobox.get(),
                 self.technician.get(), "", self.urgent.get(), self.phone_var.get(),
                 self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, "", 1]
         mail.send_mail(data)

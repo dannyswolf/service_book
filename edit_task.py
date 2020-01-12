@@ -17,6 +17,7 @@ import mail
 import add_spare_parts
 import insert_spare_parts
 import image_viewer
+from tkcalendar import DateEntry
 try:
     import Tkinter as tk
 except ImportError:
@@ -231,6 +232,11 @@ class edit_task_window:
         top.bind('<Escape>', self.quit)
         top.focus()
 
+        self.today = datetime.strptime(today, "%d %m %Y")
+        self.day = self.today.day
+        self.year = self.today.year
+        self.month = self.today.month
+
         # ==========================  Notebook  ==================================
         self.notebook = ttk.Notebook(top)
         self.notebook.place(relx=0.021, rely=0.006, relheight=0.980, relwidth=0.938)
@@ -426,14 +432,10 @@ class edit_task_window:
         self.compl_date_label.configure(relief="groove")
         self.compl_date_label.configure(text='''Ημερομ. Ολοκλ''')
 
-        self.compl_date_entry = tk.Entry(self.service_frame)
-        self.compl_date_entry.place(relx=0.27, rely=0.555, height=30, relwidth=0.593)
-        # self.compl_date_entry.configure(textvariable=today)
-        self.compl_date_entry.configure(background="white")
-        self.compl_date_entry.configure(disabledforeground="#a3a3a3")
-        self.compl_date_entry.configure(font="TkFixedFont")
-        self.compl_date_entry.configure(foreground="#000000")
-        self.compl_date_entry.configure(insertbackground="black")
+        self.compl_date_entry = DateEntry(self.service_frame, width=12, year=self.year, month=self.month, day=self.day,
+                                    background='gray20', selectmode='day', foreground='white', borderwidth=5,
+                                    locale="el_GR", font=("Calibri", 10, 'bold'), date_pattern='dd/mm/yyyy')
+        self.compl_date_entry.place(relx=0.27, rely=0.555, relheight=0.048, relwidth=0.593)
 
         self.completed_label = tk.Label(self.service_frame)
         self.completed_label.place(relx=0.025, rely=0.635, height=31, relwidth=0.230)
@@ -854,12 +856,16 @@ class edit_task_window:
         technician = StringVar(w, value=data[0][6])
         self.technician_entry.configure(textvariable=technician)
         compl_date = StringVar(w, value=data[0][7])
+
         if data[0][7] == "":
             date_today = datetime.today().strftime("%d/%m/%Y")
             today_data = StringVar(w, value=date_today)
-            self.compl_date_entry.configure(textvariable=today_data)
+            self.compl_date_entry.setvar(value=today_data)
+
         else:
-            self.compl_date_entry.configure(textvariable=compl_date)
+            self.compl_date_entry.set_date(compl_date.get())
+
+
         urgent = StringVar(w, value=data[0][8])
         self.urgent = urgent.get()
         phone = StringVar(w, value=data[0][9])
@@ -871,6 +877,10 @@ class edit_task_window:
         self.dte_entry.configure(textvariable=dte)
         service_id = StringVar(w, value=data[0][13])
         self.service_id = service_id.get()
+        counter_entry = StringVar(w, value=data[0][14])
+        self.counter_entry.configure(textvariable=counter_entry)
+        next_service = StringVar(w, value=data[0][15])
+        self.next_service_entry.configure(textvariable=next_service)
 
         if not data[0][-1]:  # αν η κατάσταση δεν είναι 1 ==>  δλδ δεν ολοκληρόθηκε
             self.completed_Checkbutton1.configure(fg="green")
@@ -963,14 +973,16 @@ class edit_task_window:
                     self.purpose_entry.get(), self.actions_combobox.get(), self.technician_entry.get(),
                     self.compl_date_entry.get(), self.urgent, self.phone_entry.get(),
                     self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, self.dte_entry.get(),
-                    self.service_id, 0, self.selected_calendar_id]
+                    self.service_id, self.counter_entry.get(), self.next_service_entry.get(), 0,
+                    self.selected_calendar_id]
         else:
-            # "" Κενή ημερωμηνία ολοκλήρωσεις
             # Το  1 => ανενεργό δλδ δεν ολοκληρόθηκε
             data = [self.start_date_entry.get(), self.customer_combobox.get(), self.copiers_combobox.get(),
-                    self.purpose_entry.get(), self.actions_combobox.get(), self.technician_entry.get(), "", self.urgent,
-                    self.phone_entry.get(), self.notes_scrolledtext.get('1.0', 'end-1c'),
-                    self.copier_id, self.dte_entry.get(), self.service_id, 1, self.selected_calendar_id]
+                    self.purpose_entry.get(), self.actions_combobox.get(), self.technician_entry.get(),
+                    self.compl_date_entry.get(), self.urgent, self.phone_entry.get(),
+                    self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, self.dte_entry.get(),
+                    self.service_id, self.counter_entry.get(), self.next_service_entry.get(), 1,
+                    self.selected_calendar_id]
 
         cursor.execute("UPDATE Calendar  SET " + edited_columns + " WHERE ID=? ", (tuple(data,)))
         conn.commit()
