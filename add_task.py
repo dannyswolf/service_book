@@ -244,6 +244,13 @@ class add_task_window:
         self.customer_combobox.configure(takefocus="")
         self.customer_combobox.bind("<<ComboboxSelected>>", self.get_copier)
         self.customer_combobox.configure(state="readonly")
+        # Ανανέωση μετα απο Προσθήκη Φωτοτυπικού
+        self.refresh_task_btn = tk.Button(top)
+        self.refresh_task_btn.place(relx=0.880, rely=0.172, height=30, relwidth=0.060)
+        self.refresh_task_btn.configure(background="#0685c4")
+        self.refresh_task_img = PhotoImage(file="icons/refresh.png")
+        self.refresh_task_btn.configure(image=self.refresh_task_img)
+        self.refresh_task_btn.configure(command=self.get_copier)
 
 
         self.phone_label = tk.Label(top)
@@ -292,6 +299,8 @@ class add_task_window:
         self.add_copier_btn1_img1 = PhotoImage(file="icons/add_to_service_data1.png")
         self.add_copier_btn1.configure(image=self.add_copier_btn1_img1)
         self.add_copier_btn1.configure(command=self.add_copier)
+
+
 
         self.purpose_label = tk.Label(top)
         self.purpose_label.place(relx=0.025, rely=0.400, height=31, relwidth=0.230)
@@ -415,10 +424,12 @@ class add_task_window:
             self.get_copier_id()
 
     def get_copier_id(self, event=None):
+        self.customers_list, self.serials = get_copiers_data()
         copier = self.copiers_combobox.get()
+        list_data_of_copier = copier.split()
 
         for serial in self.serials:
-            if serial in copier:
+            if serial == list_data_of_copier[-1]:
                 self.selected_serial = serial
         con = sqlite3.connect(dbase)
         c = con.cursor()
@@ -453,10 +464,10 @@ class add_task_window:
         self.technician_entry.delete(0, 'end')
         self.technician_entry.insert(0, self.technician.get())
 
-
         # Εμφάνιση φωτοτυπικών σύμφονα με το customer_id
         cursor.execute("SELECT Εταιρεία, Serial FROM Φωτοτυπικά WHERE Πελάτη_ID = ? AND Κατάσταση = 1 ", (self.customer_id,))
         copiers = cursor.fetchall()
+        self.copiers = []
         for copier in copiers:
             self.copiers.append("   Σειριακός: ".join(copier))
         cursor.close()
@@ -489,6 +500,7 @@ class add_task_window:
                 self.top.focus()
                 return
 
+        self.get_copier_id()  # Να πάρουμε το id του μηχανήματος
         conn = sqlite3.connect(dbase)
         cursor = conn.cursor()
         # Δημιουργία culumns για της εργασίες
@@ -519,6 +531,9 @@ class add_task_window:
         # Το 1 στο τέλος είναι κατάσταση 1=> ενεργό 0 => ανενεργό δλδ ολοκληρώθηκε
         # Δεδομένα για το Calendar
         # "" ==> Ενέργειες
+        # Αν ο χρήστης εισάγει νέο μηχάνημα που δεν είναι στην βάση
+        if not self.copiers_combobox.get() in self.copiers:
+            self.copier_id = ""
         data = [self.date.get(), self.customer_combobox.get(), self.copiers_combobox.get(), self.purpose_combobox.get(), "",
                 self.technician.get(), "", self.urgent.get(), self.phone_var.get(),
                 self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, "", self.service_id, 1]
@@ -609,7 +624,9 @@ class add_task_window:
 
         :return:
         """
+        self.top.focus()
         add_copier.create_add_copier_window(w, self.customer_id)
+
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):

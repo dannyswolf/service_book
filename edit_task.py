@@ -522,6 +522,56 @@ class edit_task_window:
         self.notes = StringVar()
 
         # Ανταλλακτικά
+        # Counter
+        self.counter_label = tk.Label(self.spare_parts_frame)
+        self.counter_label.place(relx=0.025, rely=0.070, height=30, relwidth=0.230)
+        self.counter_label.configure(activebackground="#f9f9f9")
+        self.counter_label.configure(activeforeground="black")
+        self.counter_label.configure(background="#6b6b6b")
+        self.counter_label.configure(disabledforeground="#a3a3a3")
+        self.counter_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.counter_label.configure(foreground="#ffffff")
+        self.counter_label.configure(highlightbackground="#d9d9d9")
+        self.counter_label.configure(highlightcolor="black")
+        self.counter_label.configure(relief="groove")
+        self.counter_label.configure(text='''Μετρητής''')
+        self.counter_entry = tk.Entry(self.spare_parts_frame)
+        self.counter_entry.place(relx=0.27, rely=0.070, height=30, relwidth=0.300)
+        self.counter_entry.configure(background="white")
+        self.counter_entry.configure(disabledforeground="#a3a3a3")
+        self.counter_entry.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.counter_entry.configure(foreground="#000000")
+        self.counter_entry.configure(highlightbackground="#d9d9d9")
+        self.counter_entry.configure(highlightcolor="black")
+        self.counter_entry.configure(insertbackground="black")
+        self.counter_entry.configure(selectbackground="#c4c4c4")
+        self.counter_entry.configure(selectforeground="black")
+
+        # Επόμενο Service
+        self.next_service_label = tk.Label(self.spare_parts_frame)
+        self.next_service_label.place(relx=0.025, rely=0.140, height=30, relwidth=0.230)
+        self.next_service_label.configure(activebackground="#f9f9f9")
+        self.next_service_label.configure(activeforeground="black")
+        self.next_service_label.configure(background="#6b6b6b")
+        self.next_service_label.configure(disabledforeground="#a3a3a3")
+        self.next_service_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.next_service_label.configure(foreground="#ffffff")
+        self.next_service_label.configure(highlightbackground="#d9d9d9")
+        self.next_service_label.configure(highlightcolor="black")
+        self.next_service_label.configure(relief="groove")
+        self.next_service_label.configure(text='''Επόμενο Service''')
+        self.next_service_entry = tk.Entry(self.spare_parts_frame)
+        self.next_service_entry.place(relx=0.27, rely=0.140, height=30, relwidth=0.300)
+        self.next_service_entry.configure(background="white")
+        self.next_service_entry.configure(disabledforeground="#a3a3a3")
+        self.next_service_entry.configure(font="TkFixedFont")
+        self.next_service_entry.configure(foreground="#000000")
+        self.next_service_entry.configure(highlightbackground="#d9d9d9")
+        self.next_service_entry.configure(highlightcolor="black")
+        self.next_service_entry.configure(insertbackground="black")
+        self.next_service_entry.configure(selectbackground="#c4c4c4")
+        self.next_service_entry.configure(selectforeground="black")
+
         self.add_spare_parts_btn = tk.Button(self.spare_parts_frame)
         self.add_spare_parts_btn.place(relx=0.017, rely=0.600, height=50, relwidth=0.380)
         self.add_spare_parts_btn.configure(activebackground="#ececec")
@@ -555,7 +605,7 @@ class edit_task_window:
         # Ανανέωση μετα απο εισαγωγη ανταλλακτικών
         self.refresh_btn = tk.Button(self.spare_parts_frame)
         self.refresh_btn.place(relx=0.450, rely=0.600, height=50, relwidth=0.080)
-        self.refresh_btn.configure(background="#6b6b6b")
+        self.refresh_btn.configure(background="#0685c4")
         self.refresh_img = PhotoImage(file="icons/refresh.png")
         self.refresh_btn.configure(image=self.refresh_img)
         self.refresh_btn.configure(command=self.get_spare_parts)
@@ -607,10 +657,13 @@ class edit_task_window:
         self.show_files_btn.configure(pady="0")
         self.show_files_btn.configure(text='''Προβολή \nαρχείων''')
         self.show_files_btn.configure(command=self.show_files)
+        self.show_files_btn_img = PhotoImage(file="icons/view_files.png")
+        self.show_files_btn.configure(image=self.show_files_btn_img)
+        self.show_files_btn.configure(compound="left")
 
 
         self.spare_parts_treeview = ScrolledTreeView(self.spare_parts_frame)
-        self.spare_parts_treeview.place(relx=0.017, rely=0.100, relheight=0.500, relwidth=0.970)
+        self.spare_parts_treeview.place(relx=0.017, rely=0.200, relheight=0.400, relwidth=0.970)
         self.spare_parts_treeview.configure(show="headings", style="mystyle.Treeview", selectmode="browse")
 
         self.save_btn = tk.Button(w)
@@ -819,7 +872,6 @@ class edit_task_window:
         service_id = StringVar(w, value=data[0][13])
         self.service_id = service_id.get()
 
-
         if not data[0][-1]:  # αν η κατάσταση δεν είναι 1 ==>  δλδ δεν ολοκληρόθηκε
             self.completed_Checkbutton1.configure(fg="green")
             self.completed_Checkbutton1.configure(text=' Ναι')
@@ -914,7 +966,7 @@ class edit_task_window:
                     self.service_id, 0, self.selected_calendar_id]
         else:
             # "" Κενή ημερωμηνία ολοκλήρωσεις
-            # Το  1 => ενενεργό δλδ δεν ολοκληρόθηκε
+            # Το  1 => ανενεργό δλδ δεν ολοκληρόθηκε
             data = [self.start_date_entry.get(), self.customer_combobox.get(), self.copiers_combobox.get(),
                     self.purpose_entry.get(), self.actions_combobox.get(), self.technician_entry.get(), "", self.urgent,
                     self.phone_entry.get(), self.notes_scrolledtext.get('1.0', 'end-1c'),
@@ -942,15 +994,15 @@ class edit_task_window:
         # 	"Σκοπός_Επίσκεψης"	TEXT,  # ---------------  self.purpose_combobox.get()
         # 	"Ενέργειες"	TEXT,          #  --------------  self.actions_combobox.get()
         # 	"Σημειώσεις"	TEXT,       # --------------  self.notes_scrolledtext.get('1.0', 'end-1c')
-        # 	"Μετρητής"	TEXT,           #  ""
-        # 	"Επ_Service"	TEXT,       #  ""
+        # 	"Μετρητής"	TEXT,           # --------------  self.counter_entry.get()
+        # 	"Επ_Service"	TEXT,       # --------------  self.next_service_entry.get()
         # 	"Copier_ID"	INTEGER,        # -------------   self.copier_id
         # 	"ΔΤΕ"	TEXT,               # ------------    self.dte_entry.get()
         # 	FOREIGN KEY("Copier_ID") REFERENCES "Φωτοτυπικά"("ID")
         # )
         data = [self.date.get(), self.purpose_entry.get(), self.actions_combobox.get(),
-                self.notes_scrolledtext.get('1.0', 'end-1c'), "", "", self.copier_id, self.dte_entry.get(),
-                self.service_id]
+                self.notes_scrolledtext.get('1.0', 'end-1c'), self.counter_entry.get(), self.next_service_entry.get(),
+                self.copier_id, self.dte_entry.get(), self.service_id]
 
         cursor.execute("UPDATE Service  SET " + edited_columns + " WHERE ID=? ", (tuple(data)))
         conn.commit()

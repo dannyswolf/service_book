@@ -385,7 +385,6 @@ class Toplevel1:
             keys.append('Service_ID')
             data.append(self.service_ID)
 
-
             sql = ("INSERT INTO Ανταλλακτικά(" + ",".join(keys) + " )VALUES( " + values + " )")
             service_cursor.execute(sql, data)
             service_con.commit()

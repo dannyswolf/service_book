@@ -16,7 +16,7 @@ todo service_id sto add_task
 -----------------------Προσθήκη Ενέργειες στο Calendar μετά απο Σκοπός ------------------
 -----------------------Προσθήκη Service_ID στο Calendar μετά απο ΔΤΕ - ------------------
 
-
+V1.2.4 Αλλαγές στο Ημερολόγιο εργασίων  ========================================================11/01/2020
 
 V1.2.3 Αλλαγές στο Ημερολόγιο εργασίων  ============ ===========================================11/01/2020
 
@@ -965,7 +965,7 @@ class Toplevel1:
 
         self.customer_refresh_btn = tk.Button(top)
         self.customer_refresh_btn.place(relx=0.180, rely=0.006, height=30, relwidth=0.030)
-        self.customer_refresh_btn.configure(background="#6b6b6b")
+        self.customer_refresh_btn.configure(background="#0685c4")
         self.customer_refresh_btn_img = PhotoImage(file="icons/refresh.png")
         self.customer_refresh_btn.configure(image=self.customer_refresh_btn_img)
         self.customer_refresh_btn.configure(command=self.get_customers)
@@ -1015,7 +1015,7 @@ class Toplevel1:
         self.copier_search_btn.configure(compound="left")
         self.copier_refresh_btn = tk.Button(self.copiers_frame)
         self.copier_refresh_btn.place(relx=0.440, rely=0.085, height=32, relwidth=0.032)
-        self.copier_refresh_btn.configure(background="#6b6b6b")
+        self.copier_refresh_btn.configure(background="#0685c4")
         self.copier_refresh_btn_img = PhotoImage(file="icons/refresh.png")
         self.copier_refresh_btn.configure(image=self.copier_refresh_btn_img)
         self.copier_refresh_btn.configure(command=self.show_all_enabled_copiers)
@@ -1063,7 +1063,7 @@ class Toplevel1:
         # Ανανέωση μετα απο εισαγωγη ιστορικού
         self.refresh_btn = tk.Button(self.service_frame)
         self.refresh_btn.place(relx=0.225, rely=0.100, height=25, relwidth=0.030)
-        self.refresh_btn.configure(background="#6b6b6b")
+        self.refresh_btn.configure(background="#0685c4")
         self.refresh_img = PhotoImage(file="icons/refresh.png")
         self.refresh_btn.configure(image=self.refresh_img)
         self.refresh_btn.configure(command=lambda: (self.service_click(event=None)))
@@ -1156,7 +1156,7 @@ class Toplevel1:
         # Ανανέωση μετα απο Προσθήκη εγρασίας
         self.refresh_task_btn = tk.Button(top)
         self.refresh_task_btn.place(relx=0.420, rely=0.630, height=30, relwidth=0.030)
-        self.refresh_task_btn.configure(background="#6b6b6b")
+        self.refresh_task_btn.configure(background="#0685c4")
         self.refresh_task_img = PhotoImage(file="icons/refresh.png")
         self.refresh_task_btn.configure(image=self.refresh_task_img)
         self.refresh_task_btn.configure(command=self.get_calendar)
@@ -1183,10 +1183,12 @@ class Toplevel1:
         self.search_tasks_btn.configure(command=self.search_tasks)
 
         # Πίνακας Ημερολόγιο εργασιών
+
         self.calendar_treeview = ScrolledTreeView(top)
         self.calendar_treeview.place(relx=0.300, rely=0.680, relheight=0.300, relwidth=0.685)
         self.calendar_treeview.configure(show="headings", style="mystyle.Treeview")
         self.calendar_treeview.bind("<<TreeviewSelect>>", self.edit_scheduled_tasks)
+
 
         self.today = datetime.strptime(today, "%d %m %Y")
         self.day = self.today.day
@@ -1211,6 +1213,7 @@ class Toplevel1:
         data = c.fetchall()
         c.close()
         con.close()
+
         for task in data:
             self.calendar_treeview.insert("", "end", values=task)
 
@@ -1244,6 +1247,7 @@ class Toplevel1:
         self.tasks_headers = list(map(lambda x: x[0], c.description))
         data = c.fetchall()
         con.close()
+
         self.calendar_treeview["columns"] = [head for head in self.tasks_headers]
         for head in self.tasks_headers:
             if head == "id" or head == "ID" or head == "Id":
@@ -1260,6 +1264,7 @@ class Toplevel1:
             self.calendar_treeview.insert("", "end", values=d)
 
     def add_scheduled_tasks(self):
+        self.top.wm_state('iconic')
         add_task.create_add_task_window(root, self.selected_customer)
 
     def view_scheduled_tasks(self, event=None):

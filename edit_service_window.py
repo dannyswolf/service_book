@@ -320,7 +320,7 @@ class edit_service_window():
 
         # Αρχεία
         self.show_files_btn = tk.Button(self.spare_parts_frame)
-        self.show_files_btn.place(relx=0.320, rely=0.750, height=60, relwidth=0.250)
+        self.show_files_btn.place(relx=0.600, rely=0.750, height=50, relwidth=0.250)
         self.show_files_btn.configure(activebackground="#ececec")
         self.show_files_btn.configure(activeforeground="#000000")
         self.show_files_btn.configure(background="#6b6b6b")
@@ -331,11 +331,14 @@ class edit_service_window():
         self.show_files_btn.configure(pady="0")
         self.show_files_btn.configure(text='''Προβολή \nαρχείων''')
         self.show_files_btn.configure(command=self.show_files)
+        self.show_files_btn_img = PhotoImage(file="icons/view_files.png")
+        self.show_files_btn.configure(image=self.show_files_btn_img)
+        self.show_files_btn.configure(compound="left")
         # self.show_files_btn.configure(state="active")
 
         # Ανταλλακτικά
         self.add_spare_parts_btn = tk.Button(self.spare_parts_frame)
-        self.add_spare_parts_btn.place(relx=0.600, rely=0.750, height=50, relwidth=0.320)
+        self.add_spare_parts_btn.place(relx=0.025, rely=0.620, height=50, relwidth=0.320)
         self.add_spare_parts_btn.configure(activebackground="#ececec")
         self.add_spare_parts_btn.configure(activeforeground="#000000")
         self.add_spare_parts_btn.configure(background="#3a7337")
@@ -350,13 +353,7 @@ class edit_service_window():
         self.add_spare_parts_btn.configure(image=self.add_spare_parts_btn_img)
         self.add_spare_parts_btn.configure(compound="left")
 
-        # Ανανέωση μετα απο εισαγωγη ανταλλακτικών
-        self.refresh_btn = tk.Button(self.spare_parts_frame)
-        self.refresh_btn.place(relx=0.875, rely=0.750, height=50, relwidth=0.060)
-        self.refresh_btn.configure(background="#6b6b6b")
-        self.refresh_img = PhotoImage(file="icons/refresh.png")
-        self.refresh_btn.configure(image=self.refresh_img)
-        self.refresh_btn.configure(command=self.get_spare_parts)
+
 
         # Σκοπός
         self.purpose_label = tk.Label(self.service_frame)
@@ -422,7 +419,7 @@ class edit_service_window():
 
         # Διαγραφή ανταλλακτικών
         self.del_spare_parts_btn = tk.Button(self.spare_parts_frame)
-        self.del_spare_parts_btn.place(relx=0.025, rely=0.600, height=50, relwidth=0.300)
+        self.del_spare_parts_btn.place(relx=0.600, rely=0.620, height=50, relwidth=0.300)
         self.del_spare_parts_btn.configure(activebackground="#ececec")
         self.del_spare_parts_btn.configure(activeforeground="#000000")
         self.del_spare_parts_btn.configure(background="#6b6b6b")
@@ -438,15 +435,15 @@ class edit_service_window():
         self.del_spare_parts_btn.configure(compound="left")
         # Ανανέωση μετα απο Διαγραφή επιλεγμένου ανταλλακτικού
         self.refresh_after_delete_btn = tk.Button(self.spare_parts_frame)
-        self.refresh_after_delete_btn.place(relx=0.325, rely=0.600, height=50, relwidth=0.060)
-        self.refresh_after_delete_btn.configure(background="#6b6b6b")
+        self.refresh_after_delete_btn.place(relx=0.450, rely=0.620, height=50, relwidth=0.080)
+        self.refresh_after_delete_btn.configure(background="#0685c4")
         self.refresh_after_delete_img = PhotoImage(file="icons/refresh.png")
         self.refresh_after_delete_btn.configure(image=self.refresh_after_delete_img)
         self.refresh_after_delete_btn.configure(command=self.get_spare_parts)
 
         # Προσθήκη αρχείων
         self.add_files_btn = tk.Button(self.spare_parts_frame)
-        self.add_files_btn.place(relx=0.025, rely=0.750, height=50, relwidth=0.300)
+        self.add_files_btn.place(relx=0.025, rely=0.750, height=50, relwidth=0.320)
         self.add_files_btn.configure(activebackground="#ececec")
         self.add_files_btn.configure(activeforeground="#000000")
         self.add_files_btn.configure(background="#3a7337")
@@ -718,8 +715,11 @@ class edit_service_window():
         c = con.cursor()
         # ευρεση προίοντος στην αποθήκη ψάχνοντας όλους τους πίνακες σύμφονα με part_nr και κωδικό
         for table in c.execute("SELECT name FROM sqlite_sequence").fetchall():
-            c.execute("SELECT * FROM " + str(table[0]) + " WHERE ΚΩΔΙΚΟΣ =? and PARTS_NR =? ",
-                      (selected_part_code, selected_part_nr))
+            try:
+                c.execute("SELECT * FROM " + str(table[0]) + " WHERE ΚΩΔΙΚΟΣ =? and PARTS_NR =? ",
+                          (selected_part_code, selected_part_nr))
+            except sqlite3.OperationalError:
+                continue
             data = c.fetchall()
             if data:  # αφου το βρούμε πέρνουμε μόνο τον πίνακα
                 part_table = table[0]
