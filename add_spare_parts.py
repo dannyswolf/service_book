@@ -75,10 +75,14 @@ def vp_start_gui():
 
 w = None
 service_id = ""
+customer_id = ""
+copier_name = ""
 def create_Toplevel1(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
-    global w, w_win, rt, service_id
-    service_id = args[0]  # Το Service_ID απο το add_service.py και edit_service_windows
+    global w, w_win, rt, service_id, customer_id, copier_name
+    service_id = args[0]  # Το Service_ID απο το add_service.py, edit_service_windows, edit_task.py
+    customer_id = args[1]   # Το customer_id απο το add_service.py, edit_service_windows, edit_task.py
+    copier_name = args[2]
     rt = root
     w = tk.Toplevel (root)
     top = Toplevel1 (w)
@@ -132,7 +136,8 @@ class Toplevel1:
         self.headers = []
         self.selected_company = ""
         self.service_ID = service_id
-
+        self.customer_id = customer_id[0]
+        self.copier = copier_name
         self.select_company_label = tk.Label(top)
         self.select_company_label.place(relx=0.025, rely=0.200, relheight=0.060, relwidth=0.260)
         self.select_company_label.configure(activebackground="#f9f9f9")
@@ -251,7 +256,6 @@ class Toplevel1:
         return [elm for elm in self.style.map('Treeview', query_opt=option) if elm[:2] != ('!disabled', '!selected')]
 
     def search(self, event=None):
-        # Αδειάζουμε πρώτα το tree
         self.spare_parts_treeview.delete(*self.spare_parts_treeview.get_children())
         data_to_search = self.entry.get()
         search_headers = []
@@ -331,6 +335,7 @@ class Toplevel1:
                         con = sqlite3.connect(spare_parts_db)
                         c = con.cursor()
 
+                        # Ενημέρωση αποθήκης  -1 στα προιόντα
                         c.execute("SELECT ΤΕΜΑΧΙΑ FROM " + self.selected_company + " WHERE ΚΩΔΙΚΟΣ =?", (value,))
                         old_pieces = c.fetchall()
                         print("old_pieces of code ", old_pieces, value)
@@ -379,11 +384,16 @@ class Toplevel1:
                     else:
                         data.append(value)
                         values.append('?')
-
+            values.append('?')  # Για το self.copier
             values.append('?')  # Για το self.service_ID
+            values.append('?')  # Για το self.customer_id
             values = ",".join(values)
+            keys.append('Φωτοτυπικό')
             keys.append('Service_ID')
+            keys.append('Customer_ID')
+            data.append(self.copier)
             data.append(self.service_ID)
+            data.append(self.customer_id)
 
             sql = ("INSERT INTO Ανταλλακτικά(" + ",".join(keys) + " )VALUES( " + values + " )")
             service_cursor.execute(sql, data)
@@ -394,6 +404,7 @@ class Toplevel1:
         service_cursor.close()
         service_con.close()
 
+        # Ενημέρωση αποθήκης -1
         con = sqlite3.connect(spare_parts_db)
         c = con.cursor()
         for code in added_codes:

@@ -85,14 +85,15 @@ def vp_start_gui():
 
 w = None
 selected_calendar_id = None
-
+selected_customer_id = None
 
 def create_edit_task_window(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
-    global w, w_win, rt, selected_calendar_id
+    global w, w_win, rt, selected_calendar_id, selected_customer_id
     rt = root
     w = tk.Toplevel(root)
-    selected_calendar_id = args[0]
+    selected_calendar_id = args[0]  # Απο το service_book
+    selected_customer_id = args[1]  # Απο το service_book
     add_copier_support.set_Tk_var()
     top = edit_task_window(w)
     add_copier_support.init(w, top, *args, **kwargs)
@@ -212,7 +213,7 @@ class edit_task_window:
         self.selected_calendar_id = selected_calendar_id
         self.actions_list = get_service_data()
         self.service_id = ""
-        self.customer_id = ""
+        self.customer_id = selected_customer_id
         self.copiers = []  # Τα φωτοτυπικά του επιλεγμένου πελάτη
         self.selected_copier = ""  # το επιλεγμένο φωτοτυπικό
         self.selected_serial = ""
@@ -770,10 +771,16 @@ class edit_task_window:
     # Προσθήκη ανταλλακτικών
     def add_spare_parts(self):
         self.top.focus()
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT ID FROM Πελάτες WHERE Επωνυμία_Επιχείρησης =?", (self.customer_combobox.get(),))
+        data = c.fetchall()
+        con.close()
+        self.customer_id = data[0]
         if spare_parts_db:
-            add_spare_parts.create_Toplevel1(self.top, self.service_id)
+            add_spare_parts.create_Toplevel1(self.top, self.service_id, self.customer_id, self.copiers_combobox.get())
         else:
-            insert_spare_parts.create_insert_spare_parts_window(self.top, self.service_id)
+            insert_spare_parts.create_insert_spare_parts_window(self.top, self.service_id, self.customer_id, self.copiers_combobox.get())
 
     # Διαγραφή ανταλλακτικών
     def del_spare_parts(self):
@@ -808,7 +815,7 @@ class edit_task_window:
         # και προσθέτουμε σε αυτά τα τεμάχια που έχουμε εισάγει στο Service
         new_pieces = str(int(old_part_pieces[0][0]) + int(selected_part_pieces))
 
-        # ενημερώνουμε το προιόν στον πίνακα
+        # ενημερώνουμε το προιόν στον πίνακα στην αποθήκη
         c.execute("UPDATE " + part_table + " SET ΤΕΜΑΧΙΑ =?  WHERE ΚΩΔΙΚΟΣ =? and PARTS_NR =?",
                       (new_pieces, selected_part_code, selected_part_nr))
 

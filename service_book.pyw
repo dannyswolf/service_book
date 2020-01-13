@@ -10,6 +10,7 @@
 todo αν ο χρήστης πατήση ακυρο κατα την προσθήκη επισκευής τι θα γίνει με τα ανταλλακτικα που έχουν οριστεί με νεο service_id
 todo προβολή όλων των εικόνων
 todo start day to binary file
+todo Αποθήκη για τα ανταλλακτικά που εισάγουμε
 
 
 ======================= Ενήμερωση βάσης δεδομένων =======================================
@@ -17,6 +18,11 @@ todo start day to binary file
 -----------------------Προσθήκη Service_ID στο Calendar μετά απο ΔΤΕ - ------------------
 ---------------------- Προσθήκη Μετρητής στο Calendar μετά το Service_ID ---------------
 -----------------------Προσθήκη Επ_Service στο Calendar μετά το Μετρητής ---------------
+
+
+V1.2.7 Εμφάνιση ανταλλακτικών του κάθε πελάτη ------------------------------------------------13/01/2020
+Προσθήκη Customer_ID στα Ανταλλακτικά
+Προσθήκη Φωτοτυπικό στα Ανταλλακτικά
 
 V1.2.6 Δημιουργία ημερολογίου χωρίς υπάρχον φωτοτυπικό =======================================12/01/2020
 
@@ -372,6 +378,7 @@ class Toplevel1:
         self.copiers_headers = []
         self.service_headers = []
         self.tasks_headers = []
+        self.spare_parts_headers = []
 
         self.remaining_days = days_left()
         if self.remaining_days < 10:
@@ -498,6 +505,13 @@ class Toplevel1:
         self.service_frame.configure(background="#d9d9d9")
         self.service_frame.configure(highlightbackground="#d9d9d9")
         self.service_frame.configure(highlightcolor="black")
+
+        self.spare_parts_frame = tk.Frame(self.notebook)
+        self.notebook.add(self.spare_parts_frame, padding=3)
+        self.notebook.tab(4, text="Ανταλλακτικά", compound="left", underline="-1", )
+        self.spare_parts_frame.configure(background="#d9d9d9")
+        self.spare_parts_frame.configure(highlightbackground="#d9d9d9")
+        self.spare_parts_frame.configure(highlightcolor="black")
 
         self.customer_title_label = tk.Label(self.customer_frame)
         self.customer_title_label.place(relx=0.021, rely=0.005, height=30, relwidth=0.847)
@@ -1126,6 +1140,33 @@ class Toplevel1:
         self.service_treeview.configure(show="headings", style="mystyle.Treeview")
         self.service_treeview.bind("<<TreeviewSelect>>", self.edit_service)
 
+        # Αναζήτηση ανταλλακτικών
+        self.search_spare_parts_data = StringVar()
+        self.search_spare_parts_entry = tk.Entry(self.spare_parts_frame, textvariable=self.search_spare_parts_data)
+        self.search_spare_parts_entry.place(relx=0.200, rely=0.150, height=30, relwidth=0.200)
+        self.search_spare_parts_entry.configure(background="white")
+        self.search_spare_parts_entry.configure(disabledforeground="#a3a3a3")
+        self.search_spare_parts_entry.configure(font=("Calibri", 10))
+        self.search_spare_parts_entry.configure(foreground="#000000")
+        self.search_spare_parts_entry.configure(insertbackground="black")
+        self.search_spare_parts_entry.bind('<Return>', self.search_spare_parts)
+        self.search_spare_parts_btn = tk.Button(self.spare_parts_frame)
+        self.search_spare_parts_btn.place(relx=0.410, rely=0.150, height=30, relwidth=0.400)
+        self.search_spare_parts_btn.configure(background="#6b6b6b")
+        self.search_spare_parts_btn_img = PhotoImage(file="icons/search_spare_parts.png")
+        self.search_spare_parts_btn.configure(image=self.search_spare_parts_btn_img)
+        self.search_spare_parts_btn.configure(compound='left')
+        self.search_spare_parts_btn.configure(font=("Calibri", 10, "bold"))
+        self.search_spare_parts_btn.configure(foreground="white")
+        self.search_spare_parts_btn.configure(command=self.search_spare_parts)
+
+        # Πίνακας ανταλλακτικών
+        self.spare_parts_treeview = ScrolledTreeView(self.spare_parts_frame)
+        self.spare_parts_treeview.place(relx=0.021, rely=0.240, relheight=0.700, relwidth=0.960)
+        self.spare_parts_treeview.configure(show="headings", style="mystyle.Treeview")
+        self.spare_parts_treeview.bind("<<TreeviewSelect>>", self.view_service_from_spare_parts)
+
+
         self.TSeparator1 = ttk.Separator(top)
         self.TSeparator1.place(relx=0.022, rely=0.555, relwidth=0.965)
 
@@ -1254,6 +1295,32 @@ class Toplevel1:
         else:
             self.task_notifier_btn.place_forget()
 
+    def get_spare_parts(self, event=None):
+        self.spare_parts_treeview.delete(*self.spare_parts_treeview.get_children())
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT * FROM  Ανταλλακτικά WHERE Customer_ID = ?", (self.selected_customer_id,))
+        self.spare_parts_headers = list(map(lambda x: x[0], c.description))
+        data = c.fetchall()
+        con.close()
+
+        self.spare_parts_treeview["columns"] = [head for head in self.spare_parts_headers]
+        for head in self.spare_parts_headers:
+            if head == "id" or head == "ID" or head == "Id":
+                platos = 1
+            elif head == "ΠΕΡΙΓΡΑΦΗ":
+                platos = 300
+            elif head == "PARTS_NR":
+                platos = 120
+            elif head == "Φωτοτυπικό":
+                platos = 200
+            else:
+                platos = 100
+            self.spare_parts_treeview.heading(head, text=head, anchor="center")
+            self.spare_parts_treeview.column(head, width=platos, anchor="center")
+        for d in data:
+            self.spare_parts_treeview.insert("", "end", values=d)
+
     def get_calendar(self, event=None):
         self.calendar_treeview.delete(*self.calendar_treeview.get_children())
         con = sqlite3.connect(dbase)
@@ -1297,9 +1364,25 @@ class Toplevel1:
         for item in fetch:
             self.calendar_treeview.insert("", "end", values=item)
 
+    def view_service_from_spare_parts(self, event):
+
+        service_id = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), "#8"))
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT Copier_ID FROM Service WHERE ID =? ", (service_id,))
+        copier_data = c.fetchall()
+        copier_id = copier_data[0][0]
+        c.execute("SELECT Εταιρεία FROM Φωτοτυπικά WHERE ID =?", (copier_id,))
+        copier_name = c.fetchall()
+        selected_copier = copier_name[0][0]
+        con.close()
+        # Αυτή είναι συνάρτηση του αρχείου edi_service_windows
+        create_edit_service_window(root, service_id, selected_copier, self.selected_customer)
+
+
     def edit_scheduled_tasks(self, event=None):
         selected_task_id = (self.calendar_treeview.set(self.calendar_treeview.selection(), '#1'))
-        edit_task.create_edit_task_window(root, selected_task_id)
+        edit_task.create_edit_task_window(root, selected_task_id, self.selected_customer_id)
 
     def search_tasks(self, data=None):
 
@@ -1310,13 +1393,12 @@ class Toplevel1:
         # Αδειάζουμε πρώτα το tree
         self.calendar_treeview.delete(*self.calendar_treeview.get_children())
 
-
         search_headers = []
-        no_neded_headers = ["id", "ID", "Id"]
+        no_need_headers = ["id", "ID", "Id"]
         operators = []
         for header in self.tasks_headers:
 
-            if header not in no_neded_headers:
+            if header not in no_need_headers:
                 search_headers.append(header + " LIKE ?")
                 operators.append('%' + str(data_to_search) + '%')
         search_headers = " OR ".join(search_headers)
@@ -1346,11 +1428,11 @@ class Toplevel1:
         data_to_search = self.search_selected_copier_service_data.get()
 
         search_headers = []
-        no_neded_headers = ["id", "ID", "Id"]
+        no_need_headers = ["id", "ID", "Id"]
         operators = []
         for header in self.service_headers:
 
-            if header not in no_neded_headers:
+            if header not in no_need_headers:
                 search_headers.append(header + " LIKE ?")
                 operators.append('%' + str(data_to_search) + '%')
         search_headers = " OR ".join(search_headers)
@@ -1498,12 +1580,45 @@ class Toplevel1:
         else:
             return
 
+    # Αναζήτηση ανταλλακτικών
+    def search_spare_parts(self, event=None):
+
+        data_to_search = self.search_spare_parts_entry.get()
+
+        # Αδειάζουμε πρώτα το tree
+        self.spare_parts_treeview.delete(*self.spare_parts_treeview.get_children())
+
+        search_headers = []
+        no_need_headers = ["id", "ID", "Id"]
+        operators = []
+        for header in self.spare_parts_headers:
+
+            if header not in no_need_headers:
+                search_headers.append("( " + header + f" LIKE ?  AND Customer_ID = {self.selected_customer_id} )")
+
+                operators.append('%' + str(data_to_search) + '%')
+        search_headers = " OR ".join(search_headers)
+        print("search_headers", search_headers)
+
+        # ΕΤΑΙΡΕΙΑ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
+
+        # search_cursor.execute("SELECT * FROM " + table + " WHERE \
+        # ΤΟΝΕΡ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
+        # ('%' + str(search_data.get()) + '%', '%' + str(search_data.get()) + '%', '%' + str(search_data.get())...
+
+        conn = sqlite3.connect(dbase)
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM Ανταλλακτικά WHERE " + search_headers, operators )
+        fetch = cursor.fetchall()  # Δεδομένα απο Service
+        conn.close()
+        for item in fetch:
+            self.spare_parts_treeview.insert("", "end", values=item)
+
     def quit(self, event):
 
         root.destroy()
 
         # ---------------------Fix -Of- Style------------------------------------
-
     def fixed_map(self, option):
         # Fix for setting text colour for Tkinter 8.6.9
         # From: https://core.tcl.tk/tk/info/509cafafae
@@ -1624,6 +1739,10 @@ class Toplevel1:
         self.page_package_entry.configure(textvariable=var)
         var = StringVar(root, value=customers_data[0][12])
         self.package_cost_entry.configure(textvariable=var)
+        # Εμφάνηση κουμπιού αναζήτησης ανταλλακτικών
+        self.get_spare_parts()  # Πρώτα να πάρουμε τα ανταλλακτικά
+        self.search_spare_parts_btn.configure(text=f"Αναζήτηση ανταλλακτικών του πελάτη {self.selected_customer}")
+
 
     # Εμφάνισει ιστορικού επισκευών επιλεγμένου φωτοτυπικού
     def service_click(self, event):
@@ -1764,6 +1883,9 @@ class Toplevel1:
         for n in range(len(service_data)):
             self.service_treeview.insert("", "end", values=service_data[n])
 
+        # Εμφάνηση κουμπιού αναζήτησης ανταλλακτικών
+        self.get_spare_parts()  # Πρώτα να πάρουμε τα ανταλλακτικά
+        self.search_spare_parts_btn.configure(text=f"Αναζήτηση ανταλλακτικών του πελάτη {self.selected_customer}")
     # Επεξεργασία του επιλεγμένου ιστορικού συντηρησης φωτοτυπικού
     def edit_service(self, event):
         """ Επεξεργασία του επιλεγμένου ιστορικού συντηρησης φωτοτυπικού
@@ -1777,13 +1899,12 @@ class Toplevel1:
         # των σφαλμάτων (search_error(self)) και στέλνουμε το Φωτοτυπικό και τον πελάτη απο το tree
         # "#1" => id Service  "#3" -> Φωτοτυπικό "#4" -> Πελάτης
         # Διαφορετικά στέλνουμε μόνο το selected_service_id
+
         try:
             heading = self.service_treeview.heading("#3", "text")
         except TclError as error:
+
             messagebox.showwarning("Προσοχή", "Παρακαλώ επιλεξτε πρώτα φωτοτυπικό")
-            # ==============================  Notebook style  =============
-            self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#69ab3a")])
-            self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
             return
 
         selected_service_id = (self.service_treeview.set(self.service_treeview.selection(), "#1"))

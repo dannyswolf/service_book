@@ -166,6 +166,7 @@ class add_service_window():
 
         self.files = ""
         self.service_id = self.get_service_id()
+        self.customer_id = ""
 
         self.date_label = tk.Label(top)
         self.date_label.place(relx=0.025, rely=0.150, height=31, relwidth=0.260)
@@ -444,15 +445,16 @@ class add_service_window():
         cursor.close()
         conn.close()
         try:
-            customer_id = selected_copier_data[0][5]
+            self.customer_id = selected_copier_data[0][5]
         except IndexError as error:
             self.top.destroy()
-            messagebox.showwarning("Προσοχή", "Παρακαλώ επιλέξτε φωτοτυπικό")
+            messagebox.showwarning("Σφάλμα", f"{error},\nΠαρακαλώ επιλέξτε φωτοτυπικό")
             return
         conn = sqlite3.connect(dbase)
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM Πελάτες WHERE ID = ?", (customer_id,))
+        cursor.execute("SELECT * FROM Πελάτες WHERE ID = ?", (self.customer_id,))
         curtomer_data = cursor.fetchall()
+
         cursor.close()
         conn.close()
         # Εμφάνιση πελάτη
@@ -610,10 +612,11 @@ class add_service_window():
 
     # Προσθήκη ανταλλακτικών
     def add_spare_parts(self):
+
         if spare_parts_db:
-            add_spare_parts.create_Toplevel1(self.top, self.service_id)
+            add_spare_parts.create_Toplevel1(self.top, self.service_id, self.customer_id)
         else:
-            insert_spare_parts.create_insert_spare_parts_window(self.top, self.service_id)
+            insert_spare_parts.create_insert_spare_parts_window(self.top, self.service_id, self.customer_id)
 
 
 # The following code is added to facilitate the Scrolled widgets you specified.

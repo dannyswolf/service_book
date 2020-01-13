@@ -167,10 +167,10 @@ w = None
 def create_edit_service_window(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
     global w, w_win, rt, selected_service_id, selected_copier, selected_customer
-    selected_service_id = args[0]  # Επιλεγμένο Service  περνουμε το selected_service_id απο το service_book_colors.py
+    selected_service_id = args[0]  # Επιλεγμένο Service  περνουμε το selected_service_id απο το service_book.pyw
     try:
-        selected_copier = args[1]      # Επιλεγμένο Φωτοτυπικό περνουμε το selected_copier απο το service_book_colors.py
-        selected_customer = args[2]    # Επιλεγμένο πελάτης περνουμε το selected_customer απο το service_book_colors.py
+        selected_copier = args[1]      # Επιλεγμένο Φωτοτυπικό περνουμε το selected_copier απο το service_book.pyw
+        selected_customer = args[2]    # Επιλεγμένο πελάτης περνουμε το selected_customer απο το service_book.pyw
     except IndexError as error:
         pass
     rt = root
@@ -195,8 +195,9 @@ class edit_service_window():
         # Αρχικοποιηση του selected_service_id σαν self.selected_service_id
         self.selected_service_id = selected_service_id
         self.copier_id = ""
+        self.customer_id = ""
         self.selected_copier = selected_copier
-        self.selecter_customer = selected_customer
+        self.selected_customer = selected_customer
         self.purpose_list, self.actions_list = get_service_data()
         self.files = []
         self.culumns = None
@@ -262,7 +263,7 @@ class edit_service_window():
         self.customer_label.configure(font="-family {Calibri} -size 10 -weight bold")
         self.customer_label.configure(foreground="#ffffff")
         self.customer_label.configure(relief="groove")
-        self.customer_label.configure(text=self.selecter_customer)
+        self.customer_label.configure(text=self.selected_customer)
 
         # Εμφάνιση Φωτοτυπικού
         self.selected_copier_label = tk.Label(top)
@@ -352,8 +353,6 @@ class edit_service_window():
         self.add_spare_parts_btn_img = PhotoImage(file="icons/add_spare_parts.png")
         self.add_spare_parts_btn.configure(image=self.add_spare_parts_btn_img)
         self.add_spare_parts_btn.configure(compound="left")
-
-
 
         # Σκοπός
         self.purpose_label = tk.Label(self.service_frame)
@@ -543,7 +542,6 @@ class edit_service_window():
         self.spare_parts_treeview.configure(show="headings", style="mystyle.Treeview", selectmode="browse")
         self.get_spare_parts()
 
-
     # Ελεγχος αν υπάρχουν αρχεία για προβολή
     def check_if_files_exists(self):
         con = sqlite3.connect(dbase)
@@ -679,7 +677,7 @@ class edit_service_window():
             if head == "id" or head == "ID" or head == "Id":
                 platos = 1
             elif head == "ΠΕΡΙΓΡΑΦΗ":
-                platos = 500
+                platos = 300
             else:
                 platos = 121
             self.spare_parts_treeview.heading(head, text=head, anchor="center")
@@ -690,10 +688,17 @@ class edit_service_window():
     # Προσθήκη ανταλλακτικών
     def add_spare_parts(self):
         self.top.focus()
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT ID FROM Πελάτες WHERE Επωνυμία_Επιχείρησης =?", (self.selected_customer,))
+        data = c.fetchall()
+        con.close()
+        self.customer_id = data[0]
         if spare_parts_db:
-            add_spare_parts.create_Toplevel1(self.top, self.selected_service_id)
+            add_spare_parts.create_Toplevel1(self.top, self.selected_service_id, self.customer_id, self.selected_copier)
         else:
-            insert_spare_parts.create_insert_spare_parts_window(self.top, self.selected_service_id)
+            insert_spare_parts.create_insert_spare_parts_window(self.top, self.selected_service_id, self.customer_id,
+                                                                self.selected_copier)
 
     # Διαγραφή ανταλλακτικών
     def del_spare_parts(self):
