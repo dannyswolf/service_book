@@ -721,24 +721,21 @@ class edit_service_window():
         # ευρεση προίοντος στην αποθήκη ψάχνοντας όλους τους πίνακες σύμφονα με part_nr και κωδικό
         for table in c.execute("SELECT name FROM sqlite_sequence").fetchall():
             try:
-                c.execute("SELECT * FROM " + str(table[0]) + " WHERE ΚΩΔΙΚΟΣ =? and PARTS_NR =? ",
-                          (selected_part_code, selected_part_nr))
-            except sqlite3.OperationalError:
+                c.execute("SELECT * FROM " + str(table[0]) + " WHERE ΚΩΔΙΚΟΣ =? ", (selected_part_code,))
+            except sqlite3.OperationalError:  # sqlite3.OperationalError: no such table: ΠΡΩΤΟΣ_ΟΡΟΦΟΣ todo
                 continue
             data = c.fetchall()
             if data:  # αφου το βρούμε πέρνουμε μόνο τον πίνακα
                 part_table = table[0]
                 break
         # Πέρνουμε τα τεμάχια που έχουν απομείνει
-        c.execute("SELECT ΤΕΜΑΧΙΑ FROM " + part_table + " WHERE ΚΩΔΙΚΟΣ =? and PARTS_NR =? ",
-                  (selected_part_code, selected_part_nr))
+        c.execute("SELECT ΤΕΜΑΧΙΑ FROM " + part_table + " WHERE ΚΩΔΙΚΟΣ =? and PARTS_NR =? ", (selected_part_code,))
         old_part_pieces = c.fetchall()
         # και προσθέτουμε σε αυτά τα τεμάχια που έχουμε εισάγει στο Service
         new_pieces = str(int(old_part_pieces[0][0]) + int(selected_part_pieces))
 
         # ενημερώνουμε το προιόν στον πίνακα
-        c.execute("UPDATE " + part_table + " SET ΤΕΜΑΧΙΑ =?  WHERE ΚΩΔΙΚΟΣ =? and PARTS_NR =?",
-                  (new_pieces, selected_part_code, selected_part_nr))
+        c.execute("UPDATE " + part_table + " SET ΤΕΜΑΧΙΑ =?  WHERE ΚΩΔΙΚΟΣ =?", (new_pieces, selected_part_code))
 
         messagebox.showinfo("Πληροφορία!", f"Το προιόν με κωδικό {selected_part_code}  της εταιρείας {part_table} ενημερώθηκε")
         con.commit()

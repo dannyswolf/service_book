@@ -51,7 +51,7 @@ sys.stdout.write = root_logger.info
 
 
 def get_tables():
-    needed_tables = ['BROTHER', 'CANON', 'KONICA', 'KYOCERA', 'LEXMARK', 'OKI', 'RICOH', 'SAMSUNG', 'SHARP']
+    no_needed_tables = ['ΠΡΩΤΟΣ_ΟΡΟΦΟΣ']
     con = sqlite3.connect(spare_parts_db)
     c = con.cursor()
     c.execute("SELECT name FROM sqlite_sequence ORDER BY name")
@@ -60,7 +60,7 @@ def get_tables():
     con.close()
     companies = []
     for table in tables:
-        if table[0] in needed_tables:
+        if table[0] not in no_needed_tables:
             companies.append(table[0])
 
     return companies
@@ -291,7 +291,7 @@ class Toplevel1:
         for item in selected_items:
             info = self.spare_parts_treeview.set(item)
             items_to_add.append(info)
-
+        messagebox.showinfo("items_to_add", f'{items_to_add}')
         service_con = sqlite3.connect(dbase)
         service_cursor = service_con.cursor()
         # # sql_insert = "INSERT INTO  " + table + "(" + culumns + ")" + "VALUES(NULL, ?, ?, ?, ?, ?, ?, ?);"
@@ -357,7 +357,7 @@ class Toplevel1:
         # Μετά το for item in items_to_add:
         self.get_spare_parts()
         self.top.focus()
-        not_needed_keys = ["ID", "id", 'Id']
+        not_needed_keys = ["ID", "id", 'Id', 'ΕΤΑΙΡΕΙΑ', 'ΠΟΙΟΤΗΤΑ', 'ΑΝΑΛΩΣΙΜΟ', 'ΤΙΜΗ', 'ΣΥΝΟΛΟ', 'ΣΕΛΙΔΕΣ', 'ΠΕΛΑΤΕΣ']
         added_codes = []
         service_con = sqlite3.connect(dbase)
         service_cursor = service_con.cursor()
@@ -394,7 +394,7 @@ class Toplevel1:
             data.append(self.copier)
             data.append(self.service_ID)
             data.append(self.customer_id)
-
+            print("keys", keys)
             sql = ("INSERT INTO Ανταλλακτικά(" + ",".join(keys) + " )VALUES( " + values + " )")
             service_cursor.execute(sql, data)
             service_con.commit()

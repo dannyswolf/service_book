@@ -96,8 +96,11 @@ def create_add_copier_window(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
     global w, w_win, rt, customer_id
     rt = root
-    if args[0]:
-        customer_id = args[0]
+
+    try:
+        customer_id = args[0]  # Αν έχουμε επιλέξει πελάτη
+    except IndexError:
+        customer_id = 0
     w = tk.Toplevel(root)
     add_copier_support.set_Tk_var()
     top = add_copier_window(w)

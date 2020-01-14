@@ -652,6 +652,7 @@ class add_task_window:
 
         :return:
         """
+
         self.top.focus()
         add_copier.create_add_copier_window(w, self.customer_id)
 

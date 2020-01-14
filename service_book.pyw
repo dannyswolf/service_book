@@ -20,6 +20,9 @@ todo Αποθήκη για τα ανταλλακτικά που εισάγουμ
 -----------------------Προσθήκη Επ_Service στο Calendar μετά το Μετρητής ---------------
 
 
+V1.2.8 Δυνατότητα εισαγωγείς TONER ========= ------------------------------------------------14/01/2020
+fix some bugs adding copier
+
 V1.2.7 Εμφάνιση ανταλλακτικών του κάθε πελάτη ------------------------------------------------13/01/2020
 Προσθήκη Customer_ID στα Ανταλλακτικά
 Προσθήκη Φωτοτυπικό στα Ανταλλακτικά
@@ -1262,6 +1265,7 @@ class Toplevel1:
         self.get_calendar()
 
     def search_tasks_of_selected_copier(self):
+
         self.calendar_treeview.delete(*self.calendar_treeview.get_children())
         con = sqlite3.connect(dbase)
         c = con.cursor()
@@ -1296,6 +1300,7 @@ class Toplevel1:
             self.task_notifier_btn.place_forget()
 
     def get_spare_parts(self, event=None):
+
         self.spare_parts_treeview.delete(*self.spare_parts_treeview.get_children())
         con = sqlite3.connect(dbase)
         c = con.cursor()
@@ -1313,15 +1318,16 @@ class Toplevel1:
             elif head == "PARTS_NR":
                 platos = 120
             elif head == "Φωτοτυπικό":
-                platos = 200
+                platos = 250
             else:
-                platos = 100
+                platos = 120
             self.spare_parts_treeview.heading(head, text=head, anchor="center")
             self.spare_parts_treeview.column(head, width=platos, anchor="center")
         for d in data:
             self.spare_parts_treeview.insert("", "end", values=d)
 
     def get_calendar(self, event=None):
+
         self.calendar_treeview.delete(*self.calendar_treeview.get_children())
         con = sqlite3.connect(dbase)
         c = con.cursor()
@@ -1350,6 +1356,7 @@ class Toplevel1:
         add_task.create_add_task_window(root, self.selected_customer)
 
     def view_scheduled_tasks(self, event=None):
+
         # https://pypi.org/project/tkcalendar/
         selected_date = self.service_calendar.selection_get()
         formated_date = selected_date.strftime("%d/%m/%Y")
@@ -1381,6 +1388,7 @@ class Toplevel1:
 
 
     def edit_scheduled_tasks(self, event=None):
+
         selected_task_id = (self.calendar_treeview.set(self.calendar_treeview.selection(), '#1'))
         edit_task.create_edit_task_window(root, selected_task_id, self.selected_customer_id)
 
@@ -1417,9 +1425,11 @@ class Toplevel1:
             self.calendar_treeview.insert("", "end", values=item)
 
     def show_licence(self):
+
         messagebox.showinfo("Υπολειπόμενες μέρες", f"Υπολειπόμενες μέρες χρήσης της εφαρμογής {self.remaining_days}")
 
     def search_selected_copier_service(self, event=None):
+
         if not self.selected_copier_id:
             messagebox.showwarning("Προσοχή", "Παρακαλώ επιλεξτε πρώτα φωτοτυπικό")
             return
@@ -1484,6 +1494,7 @@ class Toplevel1:
 
     # Προβολή ισορικού μεταφοράς φωτοτυπικών
     def get_copiers_log(self, event=None):
+
         copiers_log.create_Toplevel1(root)
 
     # Αναζήτηση σφαλμάτων
@@ -1598,7 +1609,7 @@ class Toplevel1:
 
                 operators.append('%' + str(data_to_search) + '%')
         search_headers = " OR ".join(search_headers)
-        print("search_headers", search_headers)
+
 
         # ΕΤΑΙΡΕΙΑ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
 
@@ -1620,6 +1631,7 @@ class Toplevel1:
 
         # ---------------------Fix -Of- Style------------------------------------
     def fixed_map(self, option):
+
         # Fix for setting text colour for Tkinter 8.6.9
         # From: https://core.tcl.tk/tk/info/509cafafae
         #
