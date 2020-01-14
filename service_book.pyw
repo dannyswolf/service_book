@@ -19,6 +19,7 @@ todo Αποθήκη για τα ανταλλακτικά που εισάγουμ
 ---------------------- Προσθήκη Μετρητής στο Calendar μετά το Service_ID ---------------
 -----------------------Προσθήκη Επ_Service στο Calendar μετά το Μετρητής ---------------
 
+V1.2.9 Δυνατότητα αλλαγών στο edit_task ==== ------------------------------------------------14/01/2020
 
 V1.2.8 Δυνατότητα εισαγωγείς TONER ========= ------------------------------------------------14/01/2020
 fix some bugs adding copier
@@ -1263,6 +1264,8 @@ class Toplevel1:
         self.service_calendar.bind('<<CalendarSelected>> ', self.view_scheduled_tasks)
 
         self.get_calendar()
+
+
 
     def search_tasks_of_selected_copier(self):
 

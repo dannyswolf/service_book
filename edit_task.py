@@ -82,6 +82,27 @@ def vp_start_gui():
     add_copier_support.init(root, top)
     root.mainloop()
 
+# Να πάρουμε Φωτοτυπικά και πελάτη
+def get_copiers_data():
+    customers_list = []
+
+    conn = sqlite3.connect(dbase)
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM Πελάτες WHERE Κατάσταση =1")
+    customers = cursor.fetchall()
+    for n in range(len(customers)):
+        if customers[n][1] != "" and customers[n][1] is not None:
+            customers_list.append(customers[n][1])
+
+    cursor.execute("SELECT * FROM Φωτοτυπικά WHERE Κατάσταση = 1")
+    copiers_data = cursor.fetchall()
+    serials = []
+    for n in range(len(copiers_data)):
+        serials.append(copiers_data[n][2])
+
+    cursor.close()
+    conn.close()
+    return sorted(customers_list), serials
 
 w = None
 selected_calendar_id = None
@@ -214,12 +235,15 @@ class edit_task_window:
         self.actions_list = get_service_data()
         self.service_id = ""
         self.customer_id = selected_customer_id
+        self.customers_list, self.serials = get_copiers_data()
+        self.mobile = ""
         self.copiers = []  # Τα φωτοτυπικά του επιλεγμένου πελάτη
         self.selected_copier = ""  # το επιλεγμένο φωτοτυπικό
         self.selected_serial = ""
         self.copier_id = ""
         self.files = ""
         self.urgent = StringVar()
+        self.old_notes = ""
         self.columns = None
         self.top = top
         top.geometry("600x654+444+228")
@@ -291,7 +315,7 @@ class edit_task_window:
         self.start_date_entry.configure(font="TkFixedFont")
         self.start_date_entry.configure(foreground="#000000")
         self.start_date_entry.configure(insertbackground="black")
-        self.start_date_entry.configure(state="readonly")
+        # self.start_date_entry.configure(state="readonly")
 
         self.customer_label = tk.Label(self.service_frame)
         self.customer_label.place(relx=0.025, rely=0.152, height=29, relwidth=0.230)
@@ -308,7 +332,7 @@ class edit_task_window:
         self.customer_combobox = ttk.Combobox(self.service_frame)
         self.customer_combobox.place(relx=0.27, rely=0.152, relheight=0.048, relwidth=0.593)
         self.customer_combobox.configure(takefocus="")
-        self.customer_combobox.configure(state="readonly")
+        # self.customer_combobox.configure(state="readonly")
 
         self.phone_label = tk.Label(self.service_frame)
         self.phone_label.place(relx=0.025, rely=0.218, height=31, relwidth=0.230)
@@ -344,11 +368,19 @@ class edit_task_window:
         self.customer_copiers_label.configure(highlightcolor="black")
         self.customer_copiers_label.configure(relief="groove")
         self.customer_copiers_label.configure(text='''Φωτοτυπικό''')
+        self.copier_stringvar = StringVar()
         self.copiers_combobox = ttk.Combobox(self.service_frame)
         self.copiers_combobox.place(relx=0.27, rely=0.284, relheight=0.048, relwidth=0.593)
         self.copiers_combobox.configure(values="")
         self.copiers_combobox.configure(takefocus="")
-        self.copiers_combobox.configure(state="readonly")
+        # self.copiers_combobox.configure(state="readonly")
+        # Ανανέωση μετα
+        self.refresh_task_btn = tk.Button(self.service_frame)
+        self.refresh_task_btn.place(relx=0.880, rely=0.284, height=30, relwidth=0.060)
+        self.refresh_task_btn.configure(background="#0685c4")
+        self.refresh_task_img = PhotoImage(file="icons/refresh.png")
+        self.refresh_task_btn.configure(image=self.refresh_task_img)
+        self.refresh_task_btn.configure(command=self.get_copier)
 
         self.purpose_label = tk.Label(self.service_frame)
         self.purpose_label.place(relx=0.025, rely=0.351, height=31, relwidth=0.230)
@@ -854,8 +886,11 @@ class edit_task_window:
         self.start_date_entry.configure(textvariable=date)
         customer_combobox = StringVar(w, value=data[0][2])
         self.customer_combobox.set(customer_combobox.get())
+        self.customer_combobox.configure(values=self.customers_list)
+        self.customer_combobox.bind("<<ComboboxSelected>>", self.get_copier)
         copier = StringVar(w, value=data[0][3])
         self.copiers_combobox.set(copier.get())
+
         purpose = StringVar(w, value=data[0][4])
         self.purpose_entry.configure(textvariable=purpose)
         action = StringVar(w, value=data[0][5])
@@ -872,12 +907,12 @@ class edit_task_window:
         else:
             self.compl_date_entry.set_date(compl_date.get())
 
-
         urgent = StringVar(w, value=data[0][8])
         self.urgent = urgent.get()
         phone = StringVar(w, value=data[0][9])
         self.phone_entry.configure(textvariable=phone)
         notes = StringVar(w, value=data[0][10])
+        self.old_notes = notes.get()
         self.notes_scrolledtext.insert('1.0', notes.get())
         self.copier_id = data[0][11]
         dte = StringVar(w, value=data[0][12])
@@ -899,6 +934,42 @@ class edit_task_window:
 
         cursor.close()
         conn.close()
+
+    def get_copier(self, event=None):
+        # να πάρουμε το id του πελάτη απο το ονομα του
+        customer = self.customer_combobox.get()
+        self.copiers_combobox.set(value="")
+
+        con = sqlite3.connect(dbase)
+        cursor = con.cursor()
+        cursor.execute("SELECT ID, Τηλέφωνο, Κινητό, Διεύθυνση FROM Πελάτες WHERE  Επωνυμία_Επιχείρησης =?", (customer,))
+        customer_data = cursor.fetchall()  # ==> [(4,)] αρα θέλουμε το customer_id[0][0]
+        self.customer_id = customer_data[0][0]
+
+        self.phone_var = StringVar(w, value=customer_data[0][1])
+        self.phone_entry.configure(textvariable=self.phone_var)
+
+        self.notes_scrolledtext.delete('1.0', "end")
+        self.mobile = StringVar(w, value="Κινητό : " + customer_data[0][2] + "\n")
+        self.notes_scrolledtext.insert("1.0", self.mobile.get())
+        self.notes = StringVar(w, value="Διεύθυνση : " + customer_data[0][3] + "\n")
+        self.notes_scrolledtext.insert("2.0", self.notes.get())
+
+        # Εμφάνιση φωτοτυπικών σύμφονα με το customer_id
+        cursor.execute("SELECT Εταιρεία, Serial FROM Φωτοτυπικά WHERE Πελάτη_ID = ? AND Κατάσταση = 1 ", (self.customer_id,))
+        copiers = cursor.fetchall()
+        self.copiers = []
+        for copier in copiers:
+            self.copiers.append("   Σειριακός: ".join(copier))
+        cursor.close()
+        con.close()
+        # Αν επιλέξουμε φωτοτυπικό του πελάτη απο τα περασμένα στην βάση φωτοτυπικά
+        if copiers:
+            self.copiers_combobox.configure(values=self.copiers)
+            self.copiers_combobox.set(value=self.copiers[0])
+        # Διαφορετικά μπορούμε να εισάγουμε νέο μηχάνημα
+        else:
+            self.copiers_combobox.configure(textvariable=self.copier_stringvar)
 
     # Προσθήκη αρχείων στην βάση
     def add_files_to_db(self):
