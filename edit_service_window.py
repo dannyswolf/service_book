@@ -11,11 +11,15 @@ from tkinter import StringVar, filedialog, messagebox, PhotoImage
 import edit_service_window_support
 import image_viewer
 import add_spare_parts
-from datetime import datetime
-import logging
-from settings import dbase, spare_parts_db
 import insert_spare_parts
+from tkcalendar import DateEntry
+from settings import dbase, spare_parts_db, root_logger  # settings
 
+
+# -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
+sys.stderr.write = root_logger.error
+sys.stdout.write = root_logger.info
+print(f"{100 * '*'}\n\t\t\t\t\t\t\t\t\t\tFILE {__name__}")
 
 selected_service_id = None
 selected_copier = None
@@ -34,27 +38,6 @@ except ImportError:
 
     py3 = True
 
-# -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE------------------
-today = datetime.today().strftime("%d %m %Y")
-log_dir = "logs" + "\\" + today + "\\"
-if not os.path.exists(log_dir):
-    os.makedirs(log_dir)
-else:
-    pass
-
-log_file_name = "Service Book " + datetime.now().strftime("%d %m %Y") + ".log"
-log_file = os.path.join(log_dir, log_file_name)
-
-# log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-root_logger = logging.getLogger()
-root_logger.setLevel(logging.DEBUG)  # or whatever
-handler = logging.FileHandler(log_file, 'a', 'utf-8')  # or whatever
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')  # or whatever
-handler.setFormatter(formatter)  # Pass handler as a parameter, not assign
-root_logger.addHandler(handler)
-sys.stderr.write = root_logger.error
-sys.stdout.write = root_logger.info
-
 
 def get_service_data():
     purpose_list = []
@@ -71,6 +54,7 @@ def get_service_data():
         if service_data[n][2] != "" and service_data[n][2] is not None:
             actions_list.append(service_data[n][2])                        # Ενέργειες
     return sorted(purpose_list), sorted(actions_list)
+
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):
@@ -150,6 +134,7 @@ class ScrolledTreeView(AutoScroll, ttk.Treeview):
     def __init__(self, master, **kw):
         ttk.Treeview.__init__(self, master, **kw)
         AutoScroll.__init__(self, master)
+
 
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
@@ -287,13 +272,12 @@ class edit_service_window():
         self.date_label.configure(highlightcolor="black")
         self.date_label.configure(relief="groove")
         self.date_label.configure(text='''Ημερομηνία''')
-        self.date_entry = tk.Entry(self.service_frame)
+        # self.date_entry = tk.Entry(self.service_frame)
+        # self.date_entry.place(relx=0.37, rely=0.030, height=25, relwidth=0.331)
+        self.date_entry = DateEntry(self.service_frame, width=12, background='gray20', selectmode='day',
+                                    foreground='white', borderwidth=5, locale="el_GR", font=("Calibri", 10, 'bold'),
+                                    date_pattern='dd/mm/yyyy')
         self.date_entry.place(relx=0.37, rely=0.030, height=25, relwidth=0.331)
-        self.date_entry.configure(background="white")
-        self.date_entry.configure(disabledforeground="#a3a3a3")
-        self.date_entry.configure(font="-family {Calibri} -size 10 -weight bold")
-        self.date_entry.configure(foreground="#000000")
-        self.date_entry.configure(insertbackground="black")
         # Counter
         self.counter_label = tk.Label(self.service_frame)
         self.counter_label.place(relx=0.025, rely=0.100, height=25, relwidth=0.331)
@@ -570,7 +554,8 @@ class edit_service_window():
         edit_conn.close()
         # w ==>> το global root
         date = StringVar(w, value=data[0][1])
-        self.date_entry.configure(textvariable=date)
+
+        self.date_entry.set_date(date.get())
         purpose_combobox = StringVar(w, value=data[0][2])
         self.purpose_combobox.set(purpose_combobox.get())
         action = StringVar(w, value=data[0][3])
@@ -703,10 +688,9 @@ class edit_service_window():
     # Διαγραφή ανταλλακτικών
     def del_spare_parts(self):
         selected_spare_part = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#1'))
-        selected_part_nr = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#2'))
         selected_part_code = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#4'))
         selected_part_pieces = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#5'))
-        answer = messagebox.askokcancel("Προσοχή!", f"Ειστε σήγουρος για την διαγραφή του {selected_part_nr};")
+        answer = messagebox.askokcancel("Προσοχή!", f"Ειστε σήγουρος για την διαγραφή προϊόντος με κωδικό {selected_part_code};")
         if not answer:
             self.top.focus()
             return
@@ -718,7 +702,7 @@ class edit_service_window():
         # Προσθήκη πίσω στην αποθήκη
         con = sqlite3.connect(spare_parts_db)
         c = con.cursor()
-        # ευρεση προίοντος στην αποθήκη ψάχνοντας όλους τους πίνακες σύμφονα με part_nr και κωδικό
+        # ευρεση προίοντος στην αποθήκη ψάχνοντας όλους τους πίνακες σύμφονα με κωδικό
         for table in c.execute("SELECT name FROM sqlite_sequence").fetchall():
             try:
                 c.execute("SELECT * FROM " + str(table[0]) + " WHERE ΚΩΔΙΚΟΣ =? ", (selected_part_code,))
@@ -729,7 +713,7 @@ class edit_service_window():
                 part_table = table[0]
                 break
         # Πέρνουμε τα τεμάχια που έχουν απομείνει
-        c.execute("SELECT ΤΕΜΑΧΙΑ FROM " + part_table + " WHERE ΚΩΔΙΚΟΣ =? and PARTS_NR =? ", (selected_part_code,))
+        c.execute("SELECT ΤΕΜΑΧΙΑ FROM " + part_table + " WHERE ΚΩΔΙΚΟΣ =?", (selected_part_code,))
         old_part_pieces = c.fetchall()
         # και προσθέτουμε σε αυτά τα τεμάχια που έχουμε εισάγει στο Service
         new_pieces = str(int(old_part_pieces[0][0]) + int(selected_part_pieces))
@@ -737,12 +721,14 @@ class edit_service_window():
         # ενημερώνουμε το προιόν στον πίνακα
         c.execute("UPDATE " + part_table + " SET ΤΕΜΑΧΙΑ =?  WHERE ΚΩΔΙΚΟΣ =?", (new_pieces, selected_part_code))
 
-        messagebox.showinfo("Πληροφορία!", f"Το προιόν με κωδικό {selected_part_code}  της εταιρείας {part_table} ενημερώθηκε")
+        messagebox.showinfo("Πληροφορία!", f"Το προιόν με κωδικό {selected_part_code}  της εταιρείας {part_table}"
+                                           f" ενημερώθηκε")
         con.commit()
         c.close()
         con.close()
 
         self.spare_parts_treeview.delete(self.spare_parts_treeview.selection())
+
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):

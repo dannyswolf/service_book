@@ -5,18 +5,22 @@
 #  in conjunction with Tcl version 8.6
 #    Dec 22, 2019 12:31:44 AM EET  platform: Windows NT
 
-
+import add_copier_support
 import sys
 from tkinter import PhotoImage, messagebox, StringVar
 import sqlite3
-import os
-import logging
 from datetime import datetime
-from settings import dbase, spare_parts_db, demo
 import mail
 import add_copier
 from tkcalendar import DateEntry
-from urllib.request import urlopen
+from settings import dbase,  root_logger, demo, today  # settings
+
+
+# -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
+sys.stderr.write = root_logger.error
+sys.stdout.write = root_logger.info
+print(f"{100 * '*'}\n\t\t\t\t\t\t\t\t\t\tFILE {__name__}")
+
 try:
     import Tkinter as tk
 except ImportError:
@@ -30,42 +34,6 @@ except ImportError:
     import tkinter.ttk as ttk
 
     py3 = True
-
-import add_copier_support
-
-try:
-    res = urlopen('http://just-the-time.appspot.com/')
-    result = res.read().strip()
-    result_str = result.decode('utf-8')  # 2020-01-08 22:30:56
-    only_date = result_str[:11]
-    day = only_date[8:10]
-    month = only_date[5:7]
-    year = only_date[:4]
-    today = day + " " + month + " " + year  # 08 01 2020
-
-except:
-    messagebox.showerror("Σφάλμα στην σύνδεση σας", "Παρακαλω ελέγξτε την σύνδεση σας στο διαδίκτυο")
-
-# -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE------------------
-today = datetime.today().strftime("%d %m %Y")
-log_dir = "logs" + "\\" + today + "\\"
-if not os.path.exists(log_dir):
-    os.makedirs(log_dir)
-else:
-    pass
-
-log_file_name = "Service Book " + datetime.now().strftime("%d %m %Y") + ".log"
-log_file = os.path.join(log_dir, log_file_name)
-
-# log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-root_logger = logging.getLogger()
-root_logger.setLevel(logging.DEBUG)  # or whatever
-handler = logging.FileHandler(log_file, 'a', 'utf-8')  # or whatever
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')  # or whatever
-handler.setFormatter(formatter)  # Pass handler as a parameter, not assign
-root_logger.addHandler(handler)
-sys.stderr.write = root_logger.error
-sys.stdout.write = root_logger.info
 
 
 # Να πάρουμε Φωτοτυπικά και πελάτη
@@ -232,16 +200,7 @@ class add_task_window:
         self.date_label.configure(highlightcolor="black")
         self.date_label.configure(relief="groove")
         self.date_label.configure(text='''Ημερομηνία''')
-        self.today = datetime.today().strftime("%d/%m/%Y")
-        # self.date = StringVar(w, value=self.today)
-        # self.start_date_entry = tk.Entry(top)
-        # self.start_date_entry.place(relx=0.27, rely=0.095, height=31, relwidth=0.593)
-        # self.start_date_entry.configure(textvariable=self.date)
-        # self.start_date_entry.configure(background="white")
-        # self.start_date_entry.configure(disabledforeground="#a3a3a3")
-        # self.start_date_entry.configure(font="TkFixedFont")
-        # self.start_date_entry.configure(foreground="#000000")
-        # self.start_date_entry.configure(insertbackground="black")
+
 
         self.start_date = DateEntry(top, width=12, year=self.year, month=self.month, day=self.day,
                              background='gray20', selectmode='day', foreground='white', borderwidth=5, locale="el_GR",

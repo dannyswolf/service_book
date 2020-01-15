@@ -1,9 +1,17 @@
 #  -*- coding: utf-8 -*-
-from settings import smtp_server, port, sender_email, password, ssl_port, user
+import sys
 import smtplib
 import ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from settings import smtp_server, port, sender_email, password, ssl_port, user, root_logger  # settings
+
+
+# -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
+sys.stderr.write = root_logger.error
+sys.stdout.write = root_logger.info
+print(f"{100 * '*'}\n\t\t\t\t\t\t\t\t\t\tFILE {__name__}")
+
 
 # ssl_port = 465  # For SSL
 # port = 587  # For starttls

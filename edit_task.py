@@ -5,19 +5,25 @@
 #  in conjunction with Tcl version 8.6
 #    Dec 22, 2019 12:31:44 AM EET  platform: Windows NT
 
-
+import add_copier_support
 import sys
 from tkinter import PhotoImage, messagebox, StringVar, IntVar, filedialog
 import sqlite3
 import os
-import logging
 from datetime import datetime
-from settings import dbase, spare_parts_db, demo
 import mail
 import add_spare_parts
 import insert_spare_parts
 import image_viewer
 from tkcalendar import DateEntry
+from settings import dbase, spare_parts_db, root_logger, demo, today  # settings
+
+
+# -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
+sys.stderr.write = root_logger.error
+sys.stdout.write = root_logger.info
+print(f"{100 * '*'}\n\t\t\t\t\t\t\t\t\t\tFILE {__name__}")
+
 try:
     import Tkinter as tk
 except ImportError:
@@ -31,29 +37,6 @@ except ImportError:
     import tkinter.ttk as ttk
 
     py3 = True
-
-import add_copier_support
-
-# -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE------------------
-today = datetime.today().strftime("%d %m %Y")
-log_dir = "logs" + "\\" + today + "\\"
-if not os.path.exists(log_dir):
-    os.makedirs(log_dir)
-else:
-    pass
-
-log_file_name = "Service Book " + datetime.now().strftime("%d %m %Y") + ".log"
-log_file = os.path.join(log_dir, log_file_name)
-
-# log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-root_logger = logging.getLogger()
-root_logger.setLevel(logging.DEBUG)  # or whatever
-handler = logging.FileHandler(log_file, 'a', 'utf-8')  # or whatever
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')  # or whatever
-handler.setFormatter(formatter)  # Pass handler as a parameter, not assign
-root_logger.addHandler(handler)
-sys.stderr.write = root_logger.error
-sys.stdout.write = root_logger.info
 
 
 def get_service_data():
@@ -70,7 +53,7 @@ def get_service_data():
             purpose_list.append(service_data[n][1])                        # Σκοπός
         if service_data[n][2] != "" and service_data[n][2] is not None:
             actions_list.append(service_data[n][2])                        # Ενέργειες
-    return sorted(actions_list)
+    return sorted(purpose_list), sorted(actions_list)
 
 
 def vp_start_gui():
@@ -232,7 +215,7 @@ class edit_task_window:
 
         # self.company_list, self.model_list, self.customers_list = get_copiers_data()
         self.selected_calendar_id = selected_calendar_id
-        self.actions_list = get_service_data()
+        self.purpose_list, self.actions_list = get_service_data()
         self.service_id = ""
         self.customer_id = selected_customer_id
         self.customers_list, self.serials = get_copiers_data()
@@ -391,15 +374,17 @@ class edit_task_window:
         self.purpose_label.configure(highlightcolor="black")
         self.purpose_label.configure(relief="groove")
         self.purpose_label.configure(text='''Σκοπός επίσκεψης''')
-        # self.purpose = StringVar()
-        self.purpose_entry = tk.Entry(self.service_frame)
-        self.purpose_entry.place(relx=0.27, rely=0.351, height=30, relwidth=0.593)
-        # self.purpose_entry.configure(textvariable=self.purpose)
-        self.purpose_entry.configure(background="white")
-        self.purpose_entry.configure(disabledforeground="#a3a3a3")
-        self.purpose_entry.configure(font="TkFixedFont")
-        self.purpose_entry.configure(foreground="#000000")
-        self.purpose_entry.configure(insertbackground="black")
+        self.purpose_combobox = ttk.Combobox(self.service_frame)
+        self.purpose_combobox.place(relx=0.27, rely=0.351, relheight=0.057, relwidth=0.593)
+        self.purpose_combobox.configure(values=self.purpose_list)
+        # self.purpose_combobox.configure(textvariable=edit_service_window_support.combobox)
+        self.purpose_combobox.configure(takefocus="")
+        self.add_to_service_data_btn1 = tk.Button(self.service_frame)
+        self.add_to_service_data_btn1.place(relx=0.880, rely=0.351, height=29, relwidth=0.060)
+        self.add_to_service_data_btn1.configure(background="#006291")
+        self.add_to_service_data_img1 = PhotoImage(file="icons/add_to_service_data1.png")
+        self.add_to_service_data_btn1.configure(image=self.add_to_service_data_img1)
+        self.add_to_service_data_btn1.configure(command=lambda: (self.add_to_service_data("Σκοπός")))
 
         # Ενέργειες
         self.actions_label = tk.Label(self.service_frame)
@@ -754,7 +739,7 @@ class edit_task_window:
         else:
             self.completed_Checkbutton1.configure(bg=off_color)
             self.completed_Checkbutton1.configure(fg="blue")
-            self.completed_Checkbutton1.configure(text=" Oxi")
+            self.completed_Checkbutton1.configure(text="")
 
     def add_to_service_data(self, column):
 
@@ -862,7 +847,7 @@ class edit_task_window:
         if not self.selected_copier:
             self.selected_copier = self.copiers_combobox.get()
 
-        data = [self.start_date.get(), self.customer_combobox.get(), self.selected_copier, self.purpose_entry.get(),
+        data = [self.start_date.get(), self.customer_combobox.get(), self.selected_copier, self.purpose_combobox.get(),
                 self.technician.get(), "", self.urgent.get(), self.phone_var.get(),
                 self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, "", 1]
         mail.send_mail(data)
@@ -890,7 +875,7 @@ class edit_task_window:
         self.copiers_combobox.set(copier.get())
 
         purpose = StringVar(w, value=data[0][4])
-        self.purpose_entry.configure(textvariable=purpose)
+        self.purpose_combobox.set(value=purpose.get())
         action = StringVar(w, value=data[0][5])
         self.actions_combobox.set(action.get())
         technician = StringVar(w, value=data[0][6])
@@ -898,9 +883,10 @@ class edit_task_window:
         compl_date = StringVar(w, value=data[0][7])
 
         if data[0][7] == "":
-            date_today = datetime.today().strftime("%d/%m/%Y")
-            today_data = StringVar(w, value=date_today)
-            self.compl_date_entry.setvar(value=today_data)
+
+
+            today_data = StringVar(w, value=today)
+            self.compl_date_entry.set_date(today_data.get())
 
         else:
             self.compl_date_entry.set_date(compl_date.get())
@@ -928,7 +914,7 @@ class edit_task_window:
             self.completed_Checkbutton1.select()
         else:
             self.completed_Checkbutton1.configure(bg="red")
-            self.completed_Checkbutton1.configure(text=' Οχι')
+            self.completed_Checkbutton1.configure(text='')
 
         cursor.close()
         conn.close()
@@ -1046,7 +1032,7 @@ class edit_task_window:
                 return
             # Το  0 => ανενεργό δλδ ολοκληρόθηκε
             data = [self.start_date.get(), self.customer_combobox.get(), self.copiers_combobox.get(),
-                    self.purpose_entry.get(), self.actions_combobox.get(), self.technician_entry.get(),
+                    self.purpose_combobox.get(), self.actions_combobox.get(), self.technician_entry.get(),
                     self.compl_date_entry.get(), self.urgent, self.phone_entry.get(),
                     self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, self.dte_entry.get(),
                     self.service_id, self.counter_entry.get(), self.next_service_entry.get(), 0,
@@ -1054,7 +1040,7 @@ class edit_task_window:
         else:
             # Το  1 => ανενεργό δλδ δεν ολοκληρόθηκε
             data = [self.start_date.get(), self.customer_combobox.get(), self.copiers_combobox.get(),
-                    self.purpose_entry.get(), self.actions_combobox.get(), self.technician_entry.get(),
+                    self.purpose_combobox.get(), self.actions_combobox.get(), self.technician_entry.get(),
                     self.compl_date_entry.get(), self.urgent, self.phone_entry.get(),
                     self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, self.dte_entry.get(),
                     self.service_id, self.counter_entry.get(), self.next_service_entry.get(), 1,
@@ -1088,7 +1074,7 @@ class edit_task_window:
         # 	"ΔΤΕ"	TEXT,               # ------------    self.dte_entry.get()
         # 	FOREIGN KEY("Copier_ID") REFERENCES "Φωτοτυπικά"("ID")
         # )
-        data = [self.date.get(), self.purpose_entry.get(), self.actions_combobox.get(),
+        data = [self.date.get(), self.purpose_combobox.get(), self.actions_combobox.get(),
                 self.notes_scrolledtext.get('1.0', 'end-1c'), self.counter_entry.get(), self.next_service_entry.get(),
                 self.copier_id, self.dte_entry.get(), self.service_id]
 

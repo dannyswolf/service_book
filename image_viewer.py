@@ -9,39 +9,20 @@ import os
 import subprocess
 
 import PIL.Image
-from PIL import ImageTk, Image
+from PIL import ImageTk
 import sqlite3
 import tkinter as tk
-import tkinter.ttk as ttk
-from tkinter import PhotoImage, messagebox, filedialog
+from tkinter import messagebox, filedialog
 import image_viewer_support
 import shutil  # για διαγραφη των φακέλων με τις εικόνες
 import sys
-import logging
-from datetime import datetime
-from settings import dbase, spare_parts_db
+from settings import dbase, root_logger  # settings
 
-
-# -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE------------------
-today = datetime.today().strftime("%d %m %Y")
-log_dir = "logs" + "\\" + today + "\\"
-if not os.path.exists(log_dir):
-    os.makedirs(log_dir)
-else:
-    pass
-
-log_file_name = "Service Book " + datetime.now().strftime("%d %m %Y") + ".log"
-log_file = os.path.join(log_dir, log_file_name)
-
-# log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-root_logger = logging.getLogger()
-root_logger.setLevel(logging.DEBUG)  # or whatever
-handler = logging.FileHandler(log_file, 'a', 'utf-8')  # or whatever
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')  # or whatever
-handler.setFormatter(formatter)  # Pass handler as a parameter, not assign
-root_logger.addHandler(handler)
+# -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
+print(f"{100 * '*'}\n\t\t\t\t\t\t\t\t\t\tFILE {__name__}")
+
 
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
@@ -176,7 +157,6 @@ class Toplevel1:
             self.image_label.configure(image=photo)
             self.image_label.image = photo
 
-
         else:
             subprocess.Popen(self.images_path + self.filenames[self.index], shell=True)
 
@@ -213,22 +193,29 @@ class Toplevel1:
         self.image_name_label.configure(background="#006291")
         self.image_name_label.configure(foreground="white")
         self.image_name_label.configure(disabledforeground="#a3a3a3")
-        # Μέγεθος αρχείου
-        con = sqlite3.connect(dbase)
-        c = con.cursor()
-        c.execute("SELECT File_size FROM Service_images WHERE Filename =?", (self.image,))
-        size = c.fetchall()
 
-        con.close()
-        self.image_size = convert_bytes(float(size[0][0]))
-
-        self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index] +
-                                             "  Μέγεθος: " + self.image_size)
+        self.get_size_of_files()
 
 
     def quit(self, event=None):
         self.del_files()
         self.top.destroy()
+
+    def get_size_of_files(self):
+        # Μέγεθος αρχείου
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT File_size FROM Service_images WHERE Filename =?", (self.image,))
+        size = c.fetchall()
+        messagebox.showinfo("self.image + size", f'{self.image, size}')
+        con.close()
+        try:
+            self.image_size = convert_bytes(float(size[0][0]))
+        except IndexError:
+            self.image_size = convert_bytes(float(size[0]))
+
+        self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index] +
+                                             "  Μέγεθος: " + self.image_size)
 
     # Αποθήκευση επιλεγμένης εικόνας
     def save_img(self, ):

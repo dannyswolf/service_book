@@ -11,7 +11,10 @@ todo αν ο χρήστης πατήση ακυρο κατα την προσθή
 todo προβολή όλων των εικόνων
 todo start day to binary file
 todo Αποθήκη για τα ανταλλακτικά που εισάγουμε στο local version
+todo να μπει στις σημειώσεις πότε ενεργοποίθηκε/απενεργοποίθηκε φωτοτυπικό και πελάτης
+todo fix on image_viewer
 
+V1.3.1 Ενα αρχεία log file στο settings = ==== --------------------------------------------15/01/2020
 
 V1.3.0 Ημερολόγιο στην επεξεργασία κλήσης ==== --------------------------------------------15/01/2020
 στο αρχειο edit_task
@@ -187,7 +190,6 @@ v 0.0.1 Ενας πελάτης με πολλά φωτοτυπικά το κάθ
         Η ημερομηνία εναρξης και Μετρητής εναρξης είναι πεδία του φωτοτυπικού γιατί πάνε με το φωτοτυπικό
 """
 
-from operator import itemgetter  # Για ταξινόμηση πελατών
 import service_book_colors_support
 from edit_service_window import *  # Δημιουργία παραθύρου επεξεργασίας ιστορικού επισκευής
 import add_customers  # Δημιουργία παραθύρου προσθήκης πελάτη
@@ -202,10 +204,11 @@ import add_task
 import edit_task
 from tkcalendar import Calendar, DateEntry
 from datetime import date, timedelta
-import logging, sys  # Για τα αρχεία log files
-from settings import dbase, spare_parts_db, demo, service_book_version  # settings
-from urllib.request import urlopen
+import sys  # Για τα αρχεία log files
+from settings import dbase, demo, service_book_version, root_logger, today  # settings
 
+sys.stderr.write = root_logger.error
+sys.stdout.write = root_logger.info
 
 try:
     import Tkinter as tk
@@ -218,19 +221,6 @@ try:
 except ImportError:
     import tkinter.ttk as ttk
     py3 = True
-
-try:
-    res = urlopen('http://just-the-time.appspot.com/')
-    result = res.read().strip()
-    result_str = result.decode('utf-8')  # 2020-01-08 22:30:56
-    only_date = result_str[:11]
-    day = only_date[8:10]
-    month = only_date[5:7]
-    year = only_date[:4]
-    today = day + " " + month + " " + year  # 08 01 2020
-
-except:
-    messagebox.showerror("Σφάλμα στην σύνδεση σας", "Παρακαλω ελέγξτε την σύνδεση σας στο διαδίκτυο")
 
 
 # Περίδος λειτουργείας
@@ -269,28 +259,6 @@ def days_left():
     left_days = days_left_timedelta.days
 
     return left_days
-
-
-# -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE και Ημερομηνία ------------------
-
-log_dir = "logs" + "\\" + today + "\\"
-if not os.path.exists(log_dir):
-    os.makedirs(log_dir)
-else:
-    pass
-
-log_file_name = "Service Book " + today + ".log"
-log_file = os.path.join(log_dir, log_file_name)
-
-# log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-root_logger = logging.getLogger()
-root_logger.setLevel(logging.DEBUG)  # or whatever
-handler = logging.FileHandler(log_file, 'a', 'utf-8')  # or whatever
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')  # or whatever
-handler.setFormatter(formatter)  # Pass handler as a parameter, not assign
-root_logger.addHandler(handler)
-sys.stderr.write = root_logger.error
-sys.stdout.write = root_logger.info
 
 
 # Αποκόμιση  πινάκων απο την βάση δεδομένων
@@ -409,7 +377,7 @@ class Toplevel1:
         top.bind('<F1>', self.add_customer_event)
         top.bind('<Escape>', self.quit)
         top.bind('<F2>', self.add_copier)
-        top.iconbitmap("icons/icon.ico")
+        # top.iconbitmap("icons/icon.ico")
 
         # ---------------------------------------Menu-----------------------------------------
         self.menubar = tk.Menu(top, font=("Calibri", 10, "bold"), bg=_bgcolor, fg=_fgcolor)
@@ -525,7 +493,7 @@ class Toplevel1:
 
         # Διαγραφή πελάτη
         self.del_customer_btn = tk.Button(self.customer_frame)
-        self.del_customer_btn.place(relx=0.870, rely=0.005, height=30, relwidth=0.030)
+        self.del_customer_btn.place(relx=0.870, rely=0.005, relheight=0.080, relwidth=0.060)
         self.del_customer_btn.configure(activebackground="#6b6b6b")
         self.del_customer_btn.configure(activeforeground="#000000")
         self.del_customer_btn.configure(background="#CFD5CE")
@@ -535,7 +503,7 @@ class Toplevel1:
         self.del_customer_btn.configure(highlightcolor="black")
         self.del_customer_btn.configure(pady="0")
         self.del_customer_btn.configure(command=self.del_customer)
-        self.del_customer_btn.configure(text="Απενεργοποίηση πελάτη")
+        # self.del_customer_btn.configure(tolitip="Απενεργοποίηση πελάτη")
         self.del_customer_btn_img = PhotoImage(file="icons/delete_customer.png")
         self.del_customer_btn.configure(image=self.del_customer_btn_img)
         self.del_customer_btn.configure(compound="top")
@@ -947,7 +915,7 @@ class Toplevel1:
 
         # Διαγραφή Φωτοτυπικού
         self.del_copier_btn = tk.Button(self.copier_frame)
-        self.del_copier_btn.place(relx=0.870, rely=0.006, height=30, relwidth=0.030)
+        self.del_copier_btn.place(relx=0.870, rely=0.006, relheight=0.080, relwidth=0.060)
         self.del_copier_btn.configure(activebackground="#6b6b6b")
         self.del_copier_btn.configure(activeforeground="#000000")
         self.del_copier_btn.configure(background="#CFD5CE")
@@ -957,7 +925,7 @@ class Toplevel1:
         self.del_copier_btn.configure(highlightcolor="black")
         self.del_copier_btn.configure(pady="0")
         self.del_copier_btn.configure(command=self.del_copier)
-        self.del_copier_btn.configure(text="Απενεργοποίηση φωτοτυπικού")
+        # self.del_copier_btn.configure(text="Απενεργοποίηση φωτοτυπικού")
         self.del_copier_btn_img = PhotoImage(file="icons/Delete_copier.png")
         self.del_copier_btn.configure(image=self.del_copier_btn_img)
         self.del_copier_btn.configure(compound="top")
@@ -1195,7 +1163,7 @@ class Toplevel1:
 
         # Προσθήκη Ημερολόγιο εργασιών
         self.add_task_btn = tk.Button(top)
-        self.add_task_btn.place(relx=0.300, rely=0.630, height=30, relwidth=0.120)
+        self.add_task_btn.place(relx=0.300, rely=0.630, height=30, relwidth=0.200)
         self.add_task_btn.configure(activebackground="#6b6b6b")
         self.add_task_btn.configure(activeforeground="#000000")
         self.add_task_btn.configure(background="#6b6b6b")
@@ -1212,7 +1180,7 @@ class Toplevel1:
 
         # Ανανέωση μετα απο Προσθήκη εγρασίας
         self.refresh_task_btn = tk.Button(top)
-        self.refresh_task_btn.place(relx=0.420, rely=0.630, height=30, relwidth=0.030)
+        self.refresh_task_btn.place(relx=0.520, rely=0.630, height=30, relwidth=0.030)
         self.refresh_task_btn.configure(background="#0685c4")
         self.refresh_task_img = PhotoImage(file="icons/refresh.png")
         self.refresh_task_btn.configure(image=self.refresh_task_img)
@@ -2108,6 +2076,9 @@ class Toplevel1:
             con.commit()
             cu.close()
             con.close()
+            # todo
+            # Ενημέρωση στις σημειώσεις πότε απενεργοποίθηκε να πάρω πρωτα τις σημειώσεις που έχει και να προσθέσω μετα
+
             self.copiers_treeview.delete(*self.copiers_treeview.get_children())
             self.search_copier()
         else:

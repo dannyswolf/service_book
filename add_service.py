@@ -14,13 +14,17 @@ import sqlite3
 from tkinter import StringVar, messagebox, PhotoImage, filedialog
 import add_service_window_support
 import platform
+from tkcalendar import DateEntry
 from datetime import datetime
-import logging
 import add_spare_parts
 import insert_spare_parts
-from settings import dbase, spare_parts_db
+from settings import dbase, spare_parts_db, root_logger, today  # settings
 
 
+# -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
+sys.stderr.write = root_logger.error
+sys.stdout.write = root_logger.info
+print(f"{100 * '*'}\n\t\t\t\t\t\t\t\t\t\tFILE {__name__}")
 selected_copier_id = None
 
 try:
@@ -36,27 +40,6 @@ except ImportError:
     import tkinter.ttk as ttk
 
     py3 = True
-
-# -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE------------------
-today = datetime.today().strftime("%d %m %Y")
-log_dir = "logs" + "\\" + today + "\\"
-if not os.path.exists(log_dir):
-    os.makedirs(log_dir)
-else:
-    pass
-
-log_file_name = "Service Book " + datetime.now().strftime("%d %m %Y") + ".log"
-log_file = os.path.join(log_dir, log_file_name)
-
-# log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-root_logger = logging.getLogger()
-root_logger.setLevel(logging.DEBUG)  # or whatever
-handler = logging.FileHandler(log_file, 'a', 'utf-8')  # or whatever
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')  # or whatever
-handler.setFormatter(formatter)  # Pass handler as a parameter, not assign
-root_logger.addHandler(handler)
-sys.stderr.write = root_logger.error
-sys.stdout.write = root_logger.info
 
 
 def get_service_data():
@@ -129,7 +112,7 @@ class add_service_window():
 
         self.purpose_list, self.actions_list = get_service_data()
         self.culumns = None
-
+        self.today = today
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
         _fgcolor = '#000000'  # X11 color: 'black'
         _compcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -167,6 +150,21 @@ class add_service_window():
         self.files = ""
         self.service_id = self.get_service_id()
         self.customer_id = ""
+        self.customer = StringVar()
+        self.today = datetime.strptime(today, "%d %m %Y")
+        self.day = self.today.day
+        self.year = self.today.year
+        self.month = self.today.month
+
+
+        # Εμφάνιση πελάτη
+        self.customer_label = tk.Label(w)
+        self.customer_label.place(relx=0.025, rely=0.060, height=25, relwidth=0.938)
+        self.customer_label.configure(activebackground="#f9f9f9")
+        self.customer_label.configure(background="brown")
+        self.customer_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.customer_label.configure(foreground="#ffffff")
+        self.customer_label.configure(relief="groove")
 
         self.date_label = tk.Label(top)
         self.date_label.place(relx=0.025, rely=0.150, height=31, relwidth=0.260)
@@ -180,6 +178,11 @@ class add_service_window():
         self.date_label.configure(highlightcolor="black")
         self.date_label.configure(relief="groove")
         self.date_label.configure(text='''Ημερομηνία''')
+
+        self.date_entry = DateEntry(top, width=12, year=self.year, month=self.month, day=self.day,
+                                    background='gray20', selectmode='day', foreground='white', borderwidth=5,
+                                    locale="el_GR", font=("Calibri", 10, 'bold'), date_pattern='dd/mm/yyyy')
+        self.date_entry.place(relx=0.29, rely=0.150, height=30, relwidth=0.331)
 
         self.purpose_label = tk.Label(top)
         self.purpose_label.place(relx=0.025, rely=0.330, height=31, relwidth=0.260)
@@ -318,13 +321,7 @@ class add_service_window():
         self.TSeparator1 = ttk.Separator(top)
         self.TSeparator1.place(relx=0.025, rely=0.520, relwidth=0.938)
 
-        self.date_entry = tk.Entry(top)
-        self.date_entry.place(relx=0.29, rely=0.150, height=30, relwidth=0.331)
-        self.date_entry.configure(background="white")
-        self.date_entry.configure(disabledforeground="#a3a3a3")
-        self.date_entry.configure(font="TkFixedFont")
-        self.date_entry.configure(foreground="#000000")
-        self.date_entry.configure(insertbackground="black")
+
 
         self.counter_entry = tk.Entry(top)
         self.counter_entry.place(relx=0.29, rely=0.210, height=30, relwidth=0.331)
@@ -458,14 +455,8 @@ class add_service_window():
         cursor.close()
         conn.close()
         # Εμφάνιση πελάτη
-        self.customer_label = tk.Label(w)
-        self.customer_label.place(relx=0.025, rely=0.060, height=25, relwidth=0.938)
-        self.customer_label.configure(activebackground="#f9f9f9")
-        self.customer_label.configure(background="brown")
-        self.customer_label.configure(font="-family {Calibri} -size 10 -weight bold")
-        self.customer_label.configure(foreground="#ffffff")
-        self.customer_label.configure(relief="groove")
-        self.customer_label.configure(text=curtomer_data[0][1])
+        self.customer = StringVar(self.top, value=curtomer_data[0][1])
+        self.customer_label.configure(text=self.customer.get())
 
         # Εμφάνιση Φωτοτυπικού
         self.selected_copier_label = tk.Label(w)
@@ -484,9 +475,6 @@ class add_service_window():
         edit_corsor.close()
         edit_conn.close()
 
-        today = datetime.today().strftime("%d/%m/%Y")
-        date = StringVar(w, value=today)
-        self.date_entry.configure(textvariable=date)
         purpose_combobox = StringVar()
         self.purpose_combobox.set(purpose_combobox.get())
         action = StringVar()
@@ -512,7 +500,7 @@ class add_service_window():
                     values_var.append('?')
             values = ",".join(values_var)
 
-            data_to_add = [date.get(), self.purpose_combobox.get(), self.actions_combobox.get(),
+            data_to_add = [self.date_entry.get(), self.purpose_combobox.get(), self.actions_combobox.get(),
                            self.notes_scrolledtext.get("1.0", "end-1c"), counter.get(), next_service.get(),
                            self.selected_copier_id, dte.get()]
             add_conn = sqlite3.connect(dbase)
@@ -614,7 +602,7 @@ class add_service_window():
     def add_spare_parts(self):
 
         if spare_parts_db:
-            add_spare_parts.create_Toplevel1(self.top, self.service_id, self.customer_id)
+            add_spare_parts.create_Toplevel1(self.top, self.service_id, self.customer_id, self.customer.get())
         else:
             insert_spare_parts.create_insert_spare_parts_window(self.top, self.service_id, self.customer_id)
 

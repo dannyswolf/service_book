@@ -5,16 +5,18 @@
 #  in conjunction with Tcl version 8.6
 #    Dec 26, 2019 12:38:51 AM EET  platform: Windows NT
 
-import logging
+
 import sys
-import os
-from datetime import datetime
 from tkinter import PhotoImage, StringVar, messagebox
 import sqlite3
 import copiers_log_support
-from settings import dbase, spare_parts_db
+from settings import dbase, spare_parts_db, root_logger  # settings
 
 
+# -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
+sys.stderr.write = root_logger.error
+sys.stdout.write = root_logger.info
+print(f"{100 * '*'}\n\t\t\t\t\t\t\t\t\t\tFILE {__name__}")
 try:
     import Tkinter as tk
 except ImportError:
@@ -26,28 +28,6 @@ try:
 except ImportError:
     import tkinter.ttk as ttk
     py3 = True
-
-
-# -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE------------------
-today = datetime.today().strftime("%d %m %Y")
-log_dir = "logs" + "\\" + today + "\\"
-if not os.path.exists(log_dir):
-    os.makedirs(log_dir)
-else:
-    pass
-
-log_file_name = "Service Book " + datetime.now().strftime("%d %m %Y") + ".log"
-log_file = os.path.join(log_dir, log_file_name)
-
-# log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-root_logger = logging.getLogger()
-root_logger.setLevel(logging.DEBUG)  # or whatever
-handler = logging.FileHandler(log_file, 'a', 'utf-8')  # or whatever
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')  # or whatever
-handler.setFormatter(formatter)  # Pass handler as a parameter, not assign
-root_logger.addHandler(handler)
-sys.stderr.write = root_logger.error
-sys.stdout.write = root_logger.info
 
 
 def get_tables():
@@ -77,6 +57,7 @@ w = None
 service_id = ""
 customer_id = ""
 copier_name = ""
+
 def create_Toplevel1(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
     global w, w_win, rt, service_id, customer_id, copier_name
@@ -156,7 +137,6 @@ class Toplevel1:
         # self.actions_combobox.configure(textvariable=edit_service_window_support.combobox)
         self.company_combobox.configure(takefocus="")
         self.company_combobox.bind("<<ComboboxSelected>>", self.get_spare_parts)
-
 
         self.entry = StringVar()
         self.Entry1 = tk.Entry(top, textvariable=self.entry)

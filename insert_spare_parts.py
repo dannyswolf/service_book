@@ -5,15 +5,16 @@
 #  in conjunction with Tcl version 8.6
 #    Dec 22, 2019 12:31:44 AM EET  platform: Windows NT
 
-
+import add_copier_support
 import sys
-from tkinter import PhotoImage, messagebox, StringVar
+from tkinter import messagebox, StringVar
 import sqlite3
-import os
-import logging
-from datetime import datetime
-from settings import dbase, spare_parts_db
+from settings import dbase, root_logger  # settings
 
+# -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
+sys.stderr.write = root_logger.error
+sys.stdout.write = root_logger.info
+print(f"{100 * '*'}\n\t\t\t\t\t\t\t\t\t\tFILE {__name__}")
 
 try:
     import Tkinter as tk
@@ -28,29 +29,6 @@ except ImportError:
     import tkinter.ttk as ttk
 
     py3 = True
-
-import add_copier_support
-
-# -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE------------------
-today = datetime.today().strftime("%d %m %Y")
-log_dir = "logs" + "\\" + today + "\\"
-if not os.path.exists(log_dir):
-    os.makedirs(log_dir)
-else:
-    pass
-
-log_file_name = "Service Book " + datetime.now().strftime("%d %m %Y") + ".log"
-log_file = os.path.join(log_dir, log_file_name)
-
-# log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-root_logger = logging.getLogger()
-root_logger.setLevel(logging.DEBUG)  # or whatever
-handler = logging.FileHandler(log_file, 'a', 'utf-8')  # or whatever
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')  # or whatever
-handler.setFormatter(formatter)  # Pass handler as a parameter, not assign
-root_logger.addHandler(handler)
-sys.stderr.write = root_logger.error
-sys.stdout.write = root_logger.info
 
 
 def vp_start_gui():
