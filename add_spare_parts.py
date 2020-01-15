@@ -291,7 +291,6 @@ class Toplevel1:
         for item in selected_items:
             info = self.spare_parts_treeview.set(item)
             items_to_add.append(info)
-        messagebox.showinfo("items_to_add", f'{items_to_add}')
         service_con = sqlite3.connect(dbase)
         service_cursor = service_con.cursor()
         # # sql_insert = "INSERT INTO  " + table + "(" + culumns + ")" + "VALUES(NULL, ?, ?, ?, ?, ?, ?, ?);"

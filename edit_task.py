@@ -307,15 +307,12 @@ class edit_task_window:
         self.date_label.configure(relief="groove")
         self.date_label.configure(text='''Προγραμ. Ημερομ.''')
         self.date = StringVar(self.service_frame, value=today)
-        self.start_date_entry = tk.Entry(self.service_frame)
-        self.start_date_entry.place(relx=0.27, rely=0.085, height=31, relwidth=0.593)
-        self.start_date_entry.configure(textvariable=self.date)
-        self.start_date_entry.configure(background="white")
-        self.start_date_entry.configure(disabledforeground="#a3a3a3")
-        self.start_date_entry.configure(font="TkFixedFont")
-        self.start_date_entry.configure(foreground="#000000")
-        self.start_date_entry.configure(insertbackground="black")
-        # self.start_date_entry.configure(state="readonly")
+
+        # year=self.year, month=self.month, day=self.day,
+        self.start_date = DateEntry(self.service_frame, width=12, background='gray20', selectmode='day',
+                                    foreground='white', borderwidth=5, locale="el_GR", font=("Calibri", 10, 'bold'),
+                                    date_pattern='dd/mm/yyyy')
+        self.start_date.place(relx=0.27, rely=0.085, height=31, relwidth=0.593)
 
         self.customer_label = tk.Label(self.service_frame)
         self.customer_label.place(relx=0.025, rely=0.152, height=29, relwidth=0.230)
@@ -420,7 +417,6 @@ class edit_task_window:
         self.actions_combobox = ttk.Combobox(self.service_frame)
         self.actions_combobox.place(relx=0.27, rely=0.420, relheight=0.048, relwidth=0.593)
         self.actions_combobox.configure(values=self.actions_list)
-        # self.actions_combobox.configure(textvariable=edit_service_window_support.combobox)
         self.actions_combobox.configure(takefocus="")
 
         self.add_to_service_data_btn2 = tk.Button(self.service_frame)
@@ -752,11 +748,12 @@ class edit_task_window:
         on_color = "green"
 
         if self.completed_var.get():  # if (get current checkbutton state) is "1" then....
-
-            self.completed_Checkbutton1.configure(fg=on_color)
+            self.completed_Checkbutton1.configure(bg=on_color)
+            self.completed_Checkbutton1.configure(fg="blue")
             self.completed_Checkbutton1.configure(text=' Ναι')
         else:
-            self.completed_Checkbutton1.configure(fg=off_color)
+            self.completed_Checkbutton1.configure(bg=off_color)
+            self.completed_Checkbutton1.configure(fg="blue")
             self.completed_Checkbutton1.configure(text=" Oxi")
 
     def add_to_service_data(self, column):
@@ -865,7 +862,7 @@ class edit_task_window:
         if not self.selected_copier:
             self.selected_copier = self.copiers_combobox.get()
 
-        data = [self.date.get(), self.customer_combobox.get(), self.selected_copier, self.purpose_entry.get(),
+        data = [self.start_date.get(), self.customer_combobox.get(), self.selected_copier, self.purpose_entry.get(),
                 self.technician.get(), "", self.urgent.get(), self.phone_var.get(),
                 self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, "", 1]
         mail.send_mail(data)
@@ -883,7 +880,8 @@ class edit_task_window:
         cursor.execute("SELECT * FROM Calendar WHERE ID =?", (self.selected_calendar_id,))
         data = cursor.fetchall()
         date = StringVar(self.service_frame, value=data[0][1])
-        self.start_date_entry.configure(textvariable=date)
+        self.start_date.set_date(date=date.get())
+        # self.start_date_entry.configure(textvariable=date)
         customer_combobox = StringVar(w, value=data[0][2])
         self.customer_combobox.set(customer_combobox.get())
         self.customer_combobox.configure(values=self.customers_list)
@@ -925,11 +923,11 @@ class edit_task_window:
         self.next_service_entry.configure(textvariable=next_service)
 
         if not data[0][-1]:  # αν η κατάσταση δεν είναι 1 ==>  δλδ δεν ολοκληρόθηκε
-            self.completed_Checkbutton1.configure(fg="green")
+            self.completed_Checkbutton1.configure(bg="green")
             self.completed_Checkbutton1.configure(text=' Ναι')
             self.completed_Checkbutton1.select()
         else:
-            self.completed_Checkbutton1.configure(fg="red")
+            self.completed_Checkbutton1.configure(bg="red")
             self.completed_Checkbutton1.configure(text=' Οχι')
 
         cursor.close()
@@ -1047,7 +1045,7 @@ class edit_task_window:
                 self.top.focus()
                 return
             # Το  0 => ανενεργό δλδ ολοκληρόθηκε
-            data = [self.start_date_entry.get(), self.customer_combobox.get(), self.copiers_combobox.get(),
+            data = [self.start_date.get(), self.customer_combobox.get(), self.copiers_combobox.get(),
                     self.purpose_entry.get(), self.actions_combobox.get(), self.technician_entry.get(),
                     self.compl_date_entry.get(), self.urgent, self.phone_entry.get(),
                     self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, self.dte_entry.get(),
@@ -1055,7 +1053,7 @@ class edit_task_window:
                     self.selected_calendar_id]
         else:
             # Το  1 => ανενεργό δλδ δεν ολοκληρόθηκε
-            data = [self.start_date_entry.get(), self.customer_combobox.get(), self.copiers_combobox.get(),
+            data = [self.start_date.get(), self.customer_combobox.get(), self.copiers_combobox.get(),
                     self.purpose_entry.get(), self.actions_combobox.get(), self.technician_entry.get(),
                     self.compl_date_entry.get(), self.urgent, self.phone_entry.get(),
                     self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, self.dte_entry.get(),

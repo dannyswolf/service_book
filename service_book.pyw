@@ -10,14 +10,11 @@
 todo αν ο χρήστης πατήση ακυρο κατα την προσθήκη επισκευής τι θα γίνει με τα ανταλλακτικα που έχουν οριστεί με νεο service_id
 todo προβολή όλων των εικόνων
 todo start day to binary file
-todo Αποθήκη για τα ανταλλακτικά που εισάγουμε
+todo Αποθήκη για τα ανταλλακτικά που εισάγουμε στο local version
 
 
-======================= Ενήμερωση βάσης δεδομένων =======================================
------------------------Προσθήκη Ενέργειες στο Calendar μετά απο Σκοπός ------------------
------------------------Προσθήκη Service_ID στο Calendar μετά απο ΔΤΕ - ------------------
----------------------- Προσθήκη Μετρητής στο Calendar μετά το Service_ID ---------------
------------------------Προσθήκη Επ_Service στο Calendar μετά το Μετρητής ---------------
+V1.3.0 Ημερολόγιο στην επεξεργασία κλήσης ==== --------------------------------------------15/01/2020
+στο αρχειο edit_task
 
 V1.2.9 Δυνατότητα αλλαγών στο edit_task ==== ------------------------------------------------14/01/2020
 
@@ -538,10 +535,10 @@ class Toplevel1:
         self.del_customer_btn.configure(highlightcolor="black")
         self.del_customer_btn.configure(pady="0")
         self.del_customer_btn.configure(command=self.del_customer)
-        # self.del_customer_btn.configure(text="Εισαγωγή ιστορικού")
+        self.del_customer_btn.configure(text="Απενεργοποίηση πελάτη")
         self.del_customer_btn_img = PhotoImage(file="icons/delete_customer.png")
         self.del_customer_btn.configure(image=self.del_customer_btn_img)
-        self.del_customer_btn.configure(compound="left")
+        self.del_customer_btn.configure(compound="top")
 
         self.company_label = tk.Label(self.customer_frame)
         self.company_label.place(relx=0.021, rely=0.100, height=20, relwidth=0.200)
@@ -960,10 +957,10 @@ class Toplevel1:
         self.del_copier_btn.configure(highlightcolor="black")
         self.del_copier_btn.configure(pady="0")
         self.del_copier_btn.configure(command=self.del_copier)
-        # self.del_customer_btn.configure(text="Εισαγωγή ιστορικού")
+        self.del_copier_btn.configure(text="Απενεργοποίηση φωτοτυπικού")
         self.del_copier_btn_img = PhotoImage(file="icons/Delete_copier.png")
         self.del_copier_btn.configure(image=self.del_copier_btn_img)
-        self.del_copier_btn.configure(compound="left")
+        self.del_copier_btn.configure(compound="top")
 
         # Ενημέρωση φωτοτυπικού
         self.update_copier_btn = tk.Button(self.copier_frame)
@@ -1248,7 +1245,6 @@ class Toplevel1:
         self.calendar_treeview.place(relx=0.300, rely=0.680, relheight=0.300, relwidth=0.685)
         self.calendar_treeview.configure(show="headings", style="mystyle.Treeview")
         self.calendar_treeview.bind("<<TreeviewSelect>>", self.edit_scheduled_tasks)
-
 
         self.today = datetime.strptime(today, "%d %m %Y")
         self.day = self.today.day
