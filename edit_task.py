@@ -900,7 +900,8 @@ class edit_task_window:
         else:
             self.compl_date_entry.set_date(compl_date.get())
 
-        self.urgent = StringVar(w, value=data[0][8])
+        urgent = StringVar(w, value=data[0][8])
+        self.urgent = urgent.get()
         phone = StringVar(w, value=data[0][9])
         self.phone_entry.configure(textvariable=phone)
         notes = StringVar(w, value=data[0][10])
@@ -1040,7 +1041,7 @@ class edit_task_window:
             # Το  0 => ανενεργό δλδ ολοκληρόθηκε
             data = [self.start_date.get(), self.customer_combobox.get(), self.copiers_combobox.get(),
                     self.purpose_combobox.get(), self.actions_combobox.get(), self.technician_entry.get(),
-                    self.compl_date_entry.get(), self.urgent, self.phone_entry.get(),
+                    str(self.compl_date_entry.get()), self.urgent, self.phone_entry.get(),
                     self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, self.dte_entry.get(),
                     self.service_id, self.counter_entry.get(), self.next_service_entry.get(), 0,
                     self.selected_calendar_id]
@@ -1048,11 +1049,12 @@ class edit_task_window:
             # Το  1 => ανενεργό δλδ δεν ολοκληρόθηκε
             data = [self.start_date.get(), self.customer_combobox.get(), self.copiers_combobox.get(),
                     self.purpose_combobox.get(), self.actions_combobox.get(), self.technician_entry.get(),
-                    self.compl_date_entry.get(), self.urgent, self.phone_entry.get(),
+                    str(self.compl_date_entry.get()), self.urgent, self.phone_entry.get(),
                     self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, self.dte_entry.get(),
                     self.service_id, self.counter_entry.get(), self.next_service_entry.get(), 1,
                     self.selected_calendar_id]
-
+        for d in data:
+            messagebox.showinfo("type", f'{d,type(d)}')
         cursor.execute("UPDATE Calendar  SET " + edited_columns + " WHERE ID=? ", (tuple(data,)))
         conn.commit()
         conn.close()
