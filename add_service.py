@@ -573,7 +573,7 @@ class add_service_window():
                 print("file_size", file_size)
                 cu.execute("INSERT INTO Service_images(Service_ID, Filename, Type, File_size, File, Copier_ID)"
                            "VALUES(?,?,?,?,?,?)", (self.service_id, filename, ext, file_size, sqlite3.Binary(file),
-                                                self.selected_copier_id))
+                                                   self.selected_copier_id))
 
         con.commit()
         con.close()

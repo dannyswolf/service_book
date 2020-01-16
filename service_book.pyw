@@ -12,9 +12,12 @@ todo προβολή όλων των εικόνων
 todo start day to binary file
 todo Αποθήκη για τα ανταλλακτικά που εισάγουμε στο local version
 todo να μπει στις σημειώσεις πότε ενεργοποίθηκε/απενεργοποίθηκε φωτοτυπικό και πελάτης
-todo fix on image_viewer
 
-V1.3.1 Ενα αρχεία log file στο settings = ==== --------------------------------------------15/01/2020
+
+V1.3.2 Εμφάνηση ολοκληρωμένων εργασίων σε επιλεγμένες εργασίες ----------------------------16/01/2020
+todo fix on image_viewer ---- Done
+
+V1.3.1 log file και today στο settings  = ==== --------------------------------------------15/01/2020
 
 V1.3.0 Ημερολόγιο στην επεξεργασία κλήσης ==== --------------------------------------------15/01/2020
 στο αρχειο edit_task
@@ -348,6 +351,10 @@ class Toplevel1:
         self.service_headers = []
         self.tasks_headers = []
         self.spare_parts_headers = []
+        self.today = datetime.strptime(today, "%d %m %Y")
+        self.year = self.today.year
+        self.month = self.today.month
+        self.day = self.today.day
 
         self.remaining_days = days_left()
         if self.remaining_days < 10:
@@ -377,7 +384,7 @@ class Toplevel1:
         top.bind('<F1>', self.add_customer_event)
         top.bind('<Escape>', self.quit)
         top.bind('<F2>', self.add_copier)
-        # top.iconbitmap("icons/icon.ico")
+        top.iconbitmap("icons/icon.ico")
 
         # ---------------------------------------Menu-----------------------------------------
         self.menubar = tk.Menu(top, font=("Calibri", 10, "bold"), bg=_bgcolor, fg=_fgcolor)
@@ -421,7 +428,6 @@ class Toplevel1:
         # self.info_menu.add_command(label="Πληροφορίες", command=get_info)
 
         top.configure(menu=self.menubar)
-
 
 
         #  Modify the font of the body
@@ -1066,6 +1072,8 @@ class Toplevel1:
         self.refresh_btn.configure(image=self.refresh_img)
         self.refresh_btn.configure(command=lambda: (self.service_click(event=None)))
 
+
+
         # Αναζήτηση στο επιλεγμένο φωτοτυπικό
         self.search_selected_copier_service_data = StringVar()
         self.search_selected_copier_service_entry = tk.Entry(self.service_frame, textvariable=self.search_selected_copier_service_data)
@@ -1163,7 +1171,7 @@ class Toplevel1:
 
         # Προσθήκη Ημερολόγιο εργασιών
         self.add_task_btn = tk.Button(top)
-        self.add_task_btn.place(relx=0.300, rely=0.630, height=30, relwidth=0.200)
+        self.add_task_btn.place(relx=0.300, rely=0.630, height=30, relwidth=0.150)
         self.add_task_btn.configure(activebackground="#6b6b6b")
         self.add_task_btn.configure(activeforeground="#000000")
         self.add_task_btn.configure(background="#6b6b6b")
@@ -1180,15 +1188,29 @@ class Toplevel1:
 
         # Ανανέωση μετα απο Προσθήκη εγρασίας
         self.refresh_task_btn = tk.Button(top)
-        self.refresh_task_btn.place(relx=0.520, rely=0.630, height=30, relwidth=0.030)
+        self.refresh_task_btn.place(relx=0.455, rely=0.630, height=30, relwidth=0.030)
         self.refresh_task_btn.configure(background="#0685c4")
         self.refresh_task_img = PhotoImage(file="icons/refresh.png")
         self.refresh_task_btn.configure(image=self.refresh_task_img)
         self.refresh_task_btn.configure(command=self.get_calendar)
 
+        self.completed_jobs = DateEntry(top, width=12, year=self.year, month=self.month, day=self.day,
+                                        background='gray20', selectmode='day', foreground='white', borderwidth=5,
+                                        locale="el_GR", font=("Calibri", 10, 'bold'), date_pattern='dd/mm/yyyy')
+        self.completed_jobs.place(relx=0.520, rely=0.630, height=30, relwidth=0.130)
+        self.completed_jobs.bind('<<DateEntrySelected>>', self.get_completed_jobs)
+        self.completed_jobs_label = tk.Label(top)
+        self.completed_jobs_label.place(relx=0.520, rely=0.610, height=20, relwidth=0.130)
+        self.completed_jobs_label.configure(font=("Calibri", 10, "bold"))
+        self.completed_jobs_label.configure(background="#5fa15f")
+        self.completed_jobs_label.configure(disabledforeground="#a3a3a3")
+        self.completed_jobs_label.configure(foreground="#ffffff")
+        self.completed_jobs_label.configure(relief="groove")
+        self.completed_jobs_label.configure(text="Ολοκληρωμένες εργασίες")
+
         self.search_tasks_data = StringVar()
         self.search_tasks_entry = tk.Entry(top)
-        self.search_tasks_entry.place(relx=0.675, rely=0.630, height=30, relwidth=0.180)
+        self.search_tasks_entry.place(relx=0.750, rely=0.630, height=30, relwidth=0.100)
         self.search_tasks_entry.configure(background="white")
         self.search_tasks_entry.configure(disabledforeground="#a3a3a3")
         self.search_tasks_entry.configure(font=("Calibri", 12))
@@ -1197,7 +1219,7 @@ class Toplevel1:
         self.search_tasks_entry.configure(textvariable=self.search_tasks_data)
 
         self.search_tasks_btn = tk.Button(top)
-        self.search_tasks_btn.place(relx=0.865, rely=0.630, height=30, relwidth=0.120)
+        self.search_tasks_btn.place(relx=0.855, rely=0.630, height=30, relwidth=0.120)
         self.search_tasks_btn.configure(background="#6b6b6b")
         self.search_tasks_btn_img = PhotoImage(file="icons/search_tasks.png")
         self.search_tasks_btn.configure(image=self.search_tasks_btn_img)
@@ -1214,7 +1236,7 @@ class Toplevel1:
         self.calendar_treeview.configure(show="headings", style="mystyle.Treeview")
         self.calendar_treeview.bind("<<TreeviewSelect>>", self.edit_scheduled_tasks)
 
-        self.today = datetime.strptime(today, "%d %m %Y")
+
         self.day = self.today.day
         self.year = self.today.year
         self.month = self.today.month
@@ -1292,6 +1314,21 @@ class Toplevel1:
             self.spare_parts_treeview.column(head, width=platos, anchor="center")
         for d in data:
             self.spare_parts_treeview.insert("", "end", values=d)
+
+    def get_completed_jobs(self, event=None):
+
+        selected_date = self.completed_jobs.get_date()
+        formated_date = selected_date.strftime("%d/%m/%Y")
+        # Αδειάζουμε πρώτα το tree
+        self.calendar_treeview.delete(*self.calendar_treeview.get_children())
+
+        conn = sqlite3.connect(dbase)
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM Calendar WHERE Ημερομηνία =? AND Κατάσταση = 0", (formated_date,))
+        fetch = cursor.fetchall()  # Δεδομένα απο Service
+        conn.close()
+        for item in fetch:
+            self.calendar_treeview.insert("", "end", values=item)
 
     def get_calendar(self, event=None):
 
@@ -1865,6 +1902,7 @@ class Toplevel1:
         # Εμφάνηση κουμπιού αναζήτησης ανταλλακτικών
         self.get_spare_parts()  # Πρώτα να πάρουμε τα ανταλλακτικά
         self.search_spare_parts_btn.configure(text=f"Αναζήτηση ανταλλακτικών του πελάτη {self.selected_customer}")
+
     # Επεξεργασία του επιλεγμένου ιστορικού συντηρησης φωτοτυπικού
     def edit_service(self, event):
         """ Επεξεργασία του επιλεγμένου ιστορικού συντηρησης φωτοτυπικού
@@ -1903,6 +1941,8 @@ class Toplevel1:
                 cursor.execute("SELECT Εταιρεία FROM Φωτοτυπικά WHERE ID=?", (self.selected_copier_id,))
                 copier = cursor.fetchall()  # Εδώ πέρνουμε το Φωτοτυπικό
                 selected_copier = copier[0][0]
+                cursor.close()
+                con.close()
                 self.top.wm_state('iconic')
                 create_edit_service_window(root, selected_service_id, selected_copier, self.selected_customer)
                 # ==============================  Notebook style  =============
@@ -2199,7 +2239,6 @@ class Toplevel1:
             except UnboundLocalError as error:
                 print(f"Η σύνδεση με {backup_file} δεν έγινε ποτέ Line 1670 {error}")
                 messagebox.showinfo(f"Η σύνδεση με {backup_file} δεν έγινε ποτέ  {error}")
-
 
 
 # The following code is added to facilitate the Scrolled widgets you specified.
