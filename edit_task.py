@@ -500,12 +500,14 @@ class edit_task_window:
         self.dte_entry.configure(foreground="#000000")
         self.dte_entry.configure(insertbackground="black")
 
-        self.send_mail_btn = tk.Button(self.service_frame)
-        self.send_mail_btn.place(relx=0.880, rely=0.635, relheight=0.060, relwidth=0.080)
-        self.send_mail_btn.configure(background="#6b6b6b")
+        self.send_mail_btn = tk.Button(top)
+        # self.save_btn.place(relx=0.296, rely=0.932, height=34, width=147)
+        self.send_mail_btn.place(relx=0.550, rely=0.932, relheight=0.055, relwidth=0.080)
+        self.send_mail_btn.configure(background="#006291")
         self.send_mail_btn_img1 = PhotoImage(file="icons/send_mail.png")
         self.send_mail_btn.configure(image=self.send_mail_btn_img1)
         self.send_mail_btn.configure(command=self.send_mail)
+
 
         self.TSeparator1 = ttk.Separator(self.service_frame)
         self.TSeparator1.place(relx=0.025, rely=0.700, relwidth=0.938)
@@ -846,10 +848,17 @@ class edit_task_window:
         # Αν γράψουμε νέο φωτοτυπικό και όχι απο την λίστα
         if not self.selected_copier:
             self.selected_copier = self.copiers_combobox.get()
+        added_spare_parts = []
+
+        for child in self.spare_parts_treeview.get_children():
+            added_spare_parts.append(self.spare_parts_treeview.item(child)["values"][2:4])
+        # spare_parts = self.spare_parts_treeview.get_children("")
 
         data = [self.start_date.get(), self.customer_combobox.get(), self.selected_copier, self.purpose_combobox.get(),
-                self.technician.get(), "", self.urgent.get(), self.phone_var.get(),
-                self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, "", 1]
+                self.technician_entry.get(), self.actions_combobox.get(), self.counter_entry.get(), self.next_service_entry.get(),
+                self.files, added_spare_parts, self.urgent.get(), self.phone_entry.get(),
+                self.notes_scrolledtext.get('1.0', 'end-1c'), self.dte_entry.get(),
+                self.copier_id, self.compl_date_entry.get(), 1]
         mail.send_mail(data)
 
     # Να πάρουμε Δεδομένα
@@ -891,8 +900,7 @@ class edit_task_window:
         else:
             self.compl_date_entry.set_date(compl_date.get())
 
-        urgent = StringVar(w, value=data[0][8])
-        self.urgent = urgent.get()
+        self.urgent = StringVar(w, value=data[0][8])
         phone = StringVar(w, value=data[0][9])
         self.phone_entry.configure(textvariable=phone)
         notes = StringVar(w, value=data[0][10])
@@ -1004,9 +1012,8 @@ class edit_task_window:
             c.close()
             con.close()
             if len(tasks) > 5:
-                messagebox.showerror("Demo",
-                                         "Λυπούμαστε η εκδοση αυτή είναι demo και δεν μπορείτε να προσθέσεται νέες"
-                                         " εργασίες")
+                messagebox.showerror("Demo", "Λυπούμαστε η εκδοση αυτή είναι demo και δεν μπορείτε να προσθέσεται νέες"
+                                             " εργασίες")
 
                 self.top.focus()
                 return
