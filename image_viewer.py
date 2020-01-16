@@ -203,11 +203,11 @@ class Toplevel1:
 
     def get_size_of_files(self):
         # Μέγεθος αρχείου
+        self.image = self.filenames[self.index][:-4]
         con = sqlite3.connect(dbase)
         c = con.cursor()
         c.execute("SELECT File_size FROM Service_images WHERE Filename =?", (self.image,))
         size = c.fetchall()
-        messagebox.showinfo("self.image + size", f'{self.image, size}')
         con.close()
         try:
             self.image_size = convert_bytes(float(size[0][0]))
@@ -251,8 +251,6 @@ class Toplevel1:
     def show_next(self):
         self.index = self.index + 1
 
-
-
         try:
             file_ext = self.filenames[self.index][-3:]
 
@@ -288,7 +286,6 @@ class Toplevel1:
                                                      "  Μέγεθος: " + self.image_size)
 
                 subprocess.Popen([self.images_path + self.filenames[self.index]], shell=True)
-
 
         except FileNotFoundError:
             messagebox.showinfo("Προσοχή", "Το αρχείο δεν βρέθηκε")
@@ -343,7 +340,6 @@ class Toplevel1:
 
                 self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index] +
                                                      "  Μέγεθος: " + self.image_size)
-
 
                 subprocess.Popen([self.images_path + self.filenames[self.index]], shell=True)
 
