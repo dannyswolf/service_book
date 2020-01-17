@@ -856,7 +856,7 @@ class edit_task_window:
 
         data = [self.start_date.get(), self.customer_combobox.get(), self.selected_copier, self.purpose_combobox.get(),
                 self.technician_entry.get(), self.actions_combobox.get(), self.counter_entry.get(), self.next_service_entry.get(),
-                self.files, added_spare_parts, self.urgent.get(), self.phone_entry.get(),
+                self.files, added_spare_parts, self.urgent, self.phone_entry.get(),
                 self.notes_scrolledtext.get('1.0', 'end-1c'), self.dte_entry.get(),
                 self.copier_id, self.compl_date_entry.get(), 1]
         mail.send_mail(data)
@@ -1053,8 +1053,6 @@ class edit_task_window:
                     self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, self.dte_entry.get(),
                     self.service_id, self.counter_entry.get(), self.next_service_entry.get(), 1,
                     self.selected_calendar_id]
-        for d in data:
-            messagebox.showinfo("type", f'{d,type(d)}')
         cursor.execute("UPDATE Calendar  SET " + edited_columns + " WHERE ID=? ", (tuple(data,)))
         conn.commit()
         conn.close()

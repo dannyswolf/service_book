@@ -86,7 +86,6 @@ def send_mail(data):
             dte = data[10]
             status = data[11]
 
-
             html = f"""\
                 <html>
                     <body>
@@ -128,7 +127,7 @@ def send_mail(data):
 
     send_btn = ttk.Button(root, text="Αποστολή", command=set_receiver)
     send_btn.pack()
-    send_to_mlcopier_btn = ttk.Button(root, text="Αποστολή Στο mlcopier", command=lambda:set_receiver("mlcopier@mail.com"))
+    send_to_mlcopier_btn = ttk.Button(root, text="Αποστολή στο mlcopier", command=lambda:set_receiver("mlcopier@mail.com"))
     send_to_mlcopier_btn.pack()
 
 

@@ -227,14 +227,6 @@ class add_task_window:
         self.customer_combobox.configure(takefocus="")
         self.customer_combobox.bind("<<ComboboxSelected>>", self.get_copier)
         self.customer_combobox.configure(state="readonly")
-        # Ανανέωση μετα απο Προσθήκη Φωτοτυπικού
-        self.refresh_task_btn = tk.Button(top)
-        self.refresh_task_btn.place(relx=0.880, rely=0.172, height=30, relwidth=0.060)
-        self.refresh_task_btn.configure(background="#0685c4")
-        self.refresh_task_img = PhotoImage(file="icons/refresh.png")
-        self.refresh_task_btn.configure(image=self.refresh_task_img)
-        self.refresh_task_btn.configure(command=self.get_copier)
-
 
         self.phone_label = tk.Label(top)
         self.phone_label.place(relx=0.025, rely=0.248, height=31, relwidth=0.230)
@@ -277,12 +269,18 @@ class add_task_window:
         self.copiers_combobox.configure(takefocus="")
         self.copiers_combobox.bind('<<ComboboxSelected>>', self.get_copier_id)
         self.add_copier_btn1 = tk.Button(top)
-        self.add_copier_btn1.place(relx=0.880, rely=0.324, height=29, relwidth=0.060)
+        self.add_copier_btn1.place(relx=0.875, rely=0.324, height=29, relwidth=0.060)
         self.add_copier_btn1.configure(background="#006291")
         self.add_copier_btn1_img1 = PhotoImage(file="icons/add_to_service_data1.png")
         self.add_copier_btn1.configure(image=self.add_copier_btn1_img1)
         self.add_copier_btn1.configure(command=self.add_copier)
-
+        # Ανανέωση μετα απο Προσθήκη Φωτοτυπικού
+        self.refresh_task_btn = tk.Button(top)
+        self.refresh_task_btn.place(relx=0.940, rely=0.324, height=30, relwidth=0.050)
+        self.refresh_task_btn.configure(background="#0685c4")
+        self.refresh_task_img = PhotoImage(file="icons/refresh.png")
+        self.refresh_task_btn.configure(image=self.refresh_task_img)
+        self.refresh_task_btn.configure(command=self.get_copier)
 
 
         self.purpose_label = tk.Label(top)
