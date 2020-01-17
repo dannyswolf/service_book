@@ -13,6 +13,8 @@ todo start day to binary file
 todo Αποθήκη για τα ανταλλακτικά που εισάγουμε στο local version
 todo να μπει στις σημειώσεις πότε ενεργοποίθηκε/απενεργοποίθηκε φωτοτυπικό και πελάτης
 
+V1.3.5 Διορθόσης add_task και edit_task όταν κάνουμε αλλαγές στα στοιχεία πελάτη ---------17/01/202
+
 V1.3.5 Διορθόσης στην ημερομηνία == ========================== ----------------------------17/01/202
 
 V1.3.4 fix send email    ========== ========================== ----------------------------17/01/202
@@ -1362,7 +1364,7 @@ class Toplevel1:
 
     def add_scheduled_tasks(self):
 
-        add_task.create_add_task_window(root, self.selected_customer)
+        add_task.create_add_task_window(root, self.selected_customer_id)
 
     def view_scheduled_tasks(self, event=None):
 
@@ -1395,11 +1397,10 @@ class Toplevel1:
         # Αυτή είναι συνάρτηση του αρχείου edi_service_windows
         create_edit_service_window(root, service_id, selected_copier, self.selected_customer)
 
-
     def edit_scheduled_tasks(self, event=None):
 
-        selected_task_id = (self.calendar_treeview.set(self.calendar_treeview.selection(), '#1'))
-        edit_task.create_edit_task_window(root, selected_task_id, self.selected_customer_id)
+        selected_calendar_id = (self.calendar_treeview.set(self.calendar_treeview.selection(), '#1'))
+        edit_task.create_edit_task_window(root, selected_calendar_id, self.selected_customer_id)
 
     def search_tasks(self, data=None):
 
@@ -1763,7 +1764,6 @@ class Toplevel1:
         # Εμφάνηση κουμπιού αναζήτησης ανταλλακτικών
         self.get_spare_parts()  # Πρώτα να πάρουμε τα ανταλλακτικά
         self.search_spare_parts_btn.configure(text=f"Αναζήτηση ανταλλακτικών του πελάτη {self.selected_customer}")
-
 
     # Εμφάνισει ιστορικού επισκευών επιλεγμένου φωτοτυπικού
     def service_click(self, event):
@@ -2160,8 +2160,16 @@ class Toplevel1:
         up_conn = sqlite3.connect(dbase)
         up_cursor = up_conn.cursor()
         # sqlite_update_query = """Update new_developers set salary = ?, email = ? where id = ?
+
         sql = "UPDATE Πελάτες SET " + culumns + "WHERE ID = ? "
-        up_cursor.execute(sql, tuple(new_data), )
+
+        try:
+            up_cursor.execute(sql, tuple(new_data), )
+        except sqlite3.IntegrityError:
+            messagebox.showerror("Σφάλμα!", f'Το όνομα {self.company_name_entry.get()} υπάρχει παρακαλώ διαλέξτε διαφορετικό')
+            self.top.focus()
+            return
+
         up_conn.commit()
         up_cursor.close()
         up_conn.close()

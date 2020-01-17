@@ -107,18 +107,30 @@ def vp_start_gui():
 
 w = None
 
+selected_customer_id = ""
 selected_customer = ""
 
 def create_add_task_window(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
-    global w, w_win, rt, selected_customer
+    global w, w_win, rt, selected_customer_id, selected_customer
     rt = root
-    selected_customer = args[0]
+    selected_customer_id = args[0]
+    con = sqlite3.connect(dbase)
+    c = con.cursor()
+    c.execute("SELECT Επωνυμία_Επιχείρησης FROM Πελάτες WHERE ID =?", (selected_customer_id,))
+    name = c.fetchall()
+    try:
+        selected_customer = name[0][0]
+    except IndexError: # όταν δέν εχουμε επιλεξει πελάτη
+        pass
+    c.close()
+    con.close()
     w = tk.Toplevel(root)
     add_copier_support.set_Tk_var()
     top = add_task_window(w)
     add_copier_support.init(w, top, *args, **kwargs)
     return (w, top)
+
 
 
 def destroy_add_task_window():
@@ -152,6 +164,7 @@ class add_task_window:
         self.customers_list, self.serials = get_copiers_data()
         self.purpose_list, self.actions_list = get_service_data()
         self.selected_customer = selected_customer  # Επιλεγμένος πελάτης απο το service_book_colors
+        self.selected_customer_id = selected_customer_id
         self.service_id = get_service_id()
         self.customer_id = ""
         self.copiers = []  # Τα φωτοτυπικά του επιλεγμένου πελάτη

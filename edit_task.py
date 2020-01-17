@@ -873,10 +873,16 @@ class edit_task_window:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM Calendar WHERE ID =?", (self.selected_calendar_id,))
         data = cursor.fetchall()
+        # Τα στοιχεία του πελάτη να τα πάρουμε απο τον πίνακα του πελάτη γιατί μπορεί να τα αλλάξουμε
+        cursor.execute("SELECT Επωνυμία_Επιχείρησης, Τηλέφωνο FROM Πελάτες WHERE ID=?", (self.customer_id,))
+        customer_data = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
         date = StringVar(self.service_frame, value=data[0][1])
         self.start_date.set_date(date=date.get())
         # self.start_date_entry.configure(textvariable=date)
-        customer_combobox = StringVar(w, value=data[0][2])
+        customer_combobox = StringVar(w, value=customer_data[0][0])
         self.customer_combobox.set(customer_combobox.get())
         self.customer_combobox.configure(values=self.customers_list)
         self.customer_combobox.bind("<<ComboboxSelected>>", self.get_copier)
@@ -901,8 +907,10 @@ class edit_task_window:
 
         urgent = StringVar(w, value=data[0][8])
         self.urgent = urgent.get()
-        phone = StringVar(w, value=data[0][9])
+        # στοιχείο πελάτη
+        phone = StringVar(w, value=customer_data[0][1])
         self.phone_entry.configure(textvariable=phone)
+
         notes = StringVar(w, value=data[0][10])
         self.old_notes = notes.get()
         self.notes_scrolledtext.insert('1.0', notes.get())
@@ -915,7 +923,7 @@ class edit_task_window:
         self.counter_entry.configure(textvariable=counter_entry)
         next_service = StringVar(w, value=data[0][15])
         self.next_service_entry.configure(textvariable=next_service)
-
+        # data[0][-1] == κατάσταση
         if not data[0][-1]:  # αν η κατάσταση δεν είναι 1 ==>  δλδ δεν ολοκληρόθηκε
             self.completed_Checkbutton1.configure(bg="green")
             self.completed_Checkbutton1.configure(text=' Ναι')
@@ -924,8 +932,7 @@ class edit_task_window:
             self.completed_Checkbutton1.configure(bg="red")
             self.completed_Checkbutton1.configure(text='')
 
-        cursor.close()
-        conn.close()
+
 
     def get_copier(self, event=None):
         # να πάρουμε το id του πελάτη απο το ονομα του
