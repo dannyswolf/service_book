@@ -13,6 +13,8 @@ todo start day to binary file
 todo Αποθήκη για τα ανταλλακτικά που εισάγουμε στο local version
 todo να μπει στις σημειώσεις πότε ενεργοποίθηκε/απενεργοποίθηκε φωτοτυπικό και πελάτης
 
+V1.3.5 Διορθόσης στην ημερομηνία == ========================== ----------------------------17/01/202
+
 V1.3.4 fix send email    ========== ========================== ----------------------------17/01/202
 
 V1.3.3 Τροποποίηση αποστολής email =========================== ----------------------------16/01/2020
@@ -1327,7 +1329,7 @@ class Toplevel1:
 
         conn = sqlite3.connect(dbase)
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM Calendar WHERE Ημερομηνία =? AND Κατάσταση = 0", (formated_date,))
+        cursor.execute("SELECT * FROM Calendar WHERE Ημ_Ολοκλ =? AND Κατάσταση = 0", (formated_date,))
         fetch = cursor.fetchall()  # Δεδομένα απο Service
         conn.close()
         for item in fetch:

@@ -517,10 +517,12 @@ class add_task_window:
         # Αν ο χρήστης εισάγει νέο μηχάνημα που δεν είναι στην βάση
         if not self.copiers_combobox.get() in self.copiers:
             self.copier_id = "0"
-        # "", "", ==>> Μετρητής και Επώμενο service
-        data = [self.start_date.get(), self.customer_combobox.get(), self.copiers_combobox.get(), self.purpose_combobox.get(), "",
-                self.technician.get(), "", self.urgent.get(), self.phone_var.get(),
-                self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, "", self.service_id, "", "", 1]
+        # "", "", ==>> Actions, Ημερομηνία ολοκήροσης, ΔΤΕ, Μετρητής και Επώμενο service
+
+        data = [self.start_date.get(), self.customer_combobox.get(), self.copiers_combobox.get(),
+                self.purpose_combobox.get(), "", self.technician_entry.get(), "", self.urgent.get(),
+                self.phone_var.get(), self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, "",
+                self.service_id, "", "", 1]
 
         sql_insert = "INSERT INTO Calendar (" + culumns + ")" + "VALUES(" + values + ");"
 

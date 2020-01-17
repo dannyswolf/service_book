@@ -893,8 +893,7 @@ class edit_task_window:
 
         if data[0][7] == "":
 
-
-            today_data = StringVar(w, value=today)
+            today_data = StringVar(w, value=today.replace(" ", "/"))
             self.compl_date_entry.set_date(today_data.get())
 
         else:
@@ -1033,26 +1032,14 @@ class edit_task_window:
                 values.append("?")
         values = ", ".join(values)
 
-        if completed:  # Αν ολοκληρώθηκε
-            if len(self.compl_date_entry.get()) != 10:  # Ελεγχος ημερομηνίας ολοκλήροσης
-                messagebox.showwarning("Προσοχή", "Η ημερομηνία ολοκλήρωσης πρέπει να έχει την μορφή ΄01/01/2020΄")
-                self.top.focus()
-                return
-            # Το  0 => ανενεργό δλδ ολοκληρόθηκε
-            data = [self.start_date.get(), self.customer_combobox.get(), self.copiers_combobox.get(),
-                    self.purpose_combobox.get(), self.actions_combobox.get(), self.technician_entry.get(),
-                    str(self.compl_date_entry.get()), self.urgent, self.phone_entry.get(),
-                    self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, self.dte_entry.get(),
-                    self.service_id, self.counter_entry.get(), self.next_service_entry.get(), 0,
-                    self.selected_calendar_id]
-        else:
-            # Το  1 => ανενεργό δλδ δεν ολοκληρόθηκε
-            data = [self.start_date.get(), self.customer_combobox.get(), self.copiers_combobox.get(),
-                    self.purpose_combobox.get(), self.actions_combobox.get(), self.technician_entry.get(),
-                    str(self.compl_date_entry.get()), self.urgent, self.phone_entry.get(),
-                    self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, self.dte_entry.get(),
-                    self.service_id, self.counter_entry.get(), self.next_service_entry.get(), 1,
-                    self.selected_calendar_id]
+        # Το  0 => ανενεργό δλδ ολοκληρόθηκε ( 0 if self.completed_var.get() else 1 )
+        data = [self.start_date.get(), self.customer_combobox.get(), self.copiers_combobox.get(),
+                self.purpose_combobox.get(), self.actions_combobox.get(), self.technician_entry.get(),
+                self.compl_date_entry.get(), self.urgent, self.phone_entry.get(),
+                self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, self.dte_entry.get(),
+                self.service_id, self.counter_entry.get(), self.next_service_entry.get(),
+                0 if self.completed_var.get() else 1, self.selected_calendar_id]
+
         cursor.execute("UPDATE Calendar  SET " + edited_columns + " WHERE ID=? ", (tuple(data,)))
         conn.commit()
         conn.close()
