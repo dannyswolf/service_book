@@ -7,7 +7,7 @@
 
 import sys
 import sqlite3
-from tkinter import StringVar, messagebox
+from tkinter import StringVar, messagebox, PhotoImage
 from settings import dbase, demo, root_logger  # settings
 
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
@@ -77,7 +77,7 @@ class Toplevel1:
         self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#69ab3a")])
         self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
         self.top = top
-        top.geometry("581x400+480+276")
+        top.geometry("681x400+480+276")
         top.minsize(120, 1)
         top.maxsize(1604, 881)
         top.resizable(1, 1)
@@ -89,7 +89,7 @@ class Toplevel1:
         top.focus()
 
         self.Label1 = tk.Label(top)
-        self.Label1.place(relx=0.017, rely=0.146, height=20, relwidth=0.244)
+        self.Label1.place(relx=0.007, rely=0.146, height=20, relwidth=0.244)
         self.Label1.configure(activebackground="#f9f9f9")
         self.Label1.configure(activeforeground="black")
         self.Label1.configure(background="#84f29c")
@@ -100,10 +100,10 @@ class Toplevel1:
         self.Label1.configure(relief="groove")
         self.Label1.configure(text='''Εμφανιζόμενο όνομα''')
 
-        self.company_name_entry = tk.Entry(top)
-        self.company_name_entry.place(relx=0.275, rely=0.146, height=20
-                                      , relwidth=0.280)
         self.company_name = StringVar()
+        self.company_name.trace('w', self.check_customer_name)
+        self.company_name_entry = tk.Entry(top)
+        self.company_name_entry.place(relx=0.290, rely=0.146, height=20, relwidth=0.260)
         self.company_name_entry.configure(textvariable=self.company_name)
         self.company_name_entry.configure(background="white")
         self.company_name_entry.configure(disabledforeground="#a3a3a3")
@@ -114,9 +114,14 @@ class Toplevel1:
         self.company_name_entry.configure(insertbackground="black")
         self.company_name_entry.configure(selectbackground="#c4c4c4")
         self.company_name_entry.configure(selectforeground="black")
+        self.company_name_warning = ttk.Label(top)
+        self.company_name_warning.configure(background="#f6f6ee")
+        self.company_name_warning_img = PhotoImage(file="icons/lamp.png")
+        self.company_name_warning.configure(image=self.company_name_warning_img)
+        self.company_name_warning.configure(compound='top')
 
         self.Label2 = tk.Label(top)
-        self.Label2.place(relx=0.017, rely=0.322, height=20, relwidth=0.244)
+        self.Label2.place(relx=0.007, rely=0.322, height=20, relwidth=0.244)
         self.Label2.configure(activebackground="#f9f9f9")
         self.Label2.configure(activeforeground="black")
         self.Label2.configure(background="#84f29c")
@@ -128,7 +133,7 @@ class Toplevel1:
         self.Label2.configure(text='''Διεύθυνση''')
 
         self.Label3 = tk.Label(top)
-        self.Label3.place(relx=0.017, rely=0.234, height=20, relwidth=0.244)
+        self.Label3.place(relx=0.007, rely=0.234, height=20, relwidth=0.244)
         self.Label3.configure(activebackground="#f9f9f9")
         self.Label3.configure(activeforeground="black")
         self.Label3.configure(background="#84f29c")
@@ -190,7 +195,7 @@ class Toplevel1:
         self.Label6.configure(text='''Περιοχή''')
 
         self.name_entry = tk.Entry(top)
-        self.name_entry.place(relx=0.275, rely=0.234, height=20, relwidth=0.280)
+        self.name_entry.place(relx=0.290, rely=0.234, height=20, relwidth=0.260)
         self.name = StringVar()
         self.name_entry.configure(textvariable=self.name)
         self.name_entry.configure(background="white")
@@ -204,8 +209,9 @@ class Toplevel1:
         self.name_entry.configure(selectforeground="black")
 
         self.mobile_entry = tk.Entry(top)
-        self.mobile_entry.place(relx=0.275, rely=0.497, height=20, relwidth=0.280)
+        self.mobile_entry.place(relx=0.290, rely=0.497, height=20, relwidth=0.260)
         self.mobile = StringVar()
+        self.mobile.trace('w', self.check_mobile)
         self.mobile_entry.configure(textvariable=self.mobile)
         self.mobile_entry.configure(background="white")
         self.mobile_entry.configure(disabledforeground="#a3a3a3")
@@ -216,6 +222,10 @@ class Toplevel1:
         self.mobile_entry.configure(insertbackground="black")
         self.mobile_entry.configure(selectbackground="#c4c4c4")
         self.mobile_entry.configure(selectforeground="black")
+        self.mobile_warning = ttk.Label(top)
+        self.mobile_warning_img = PhotoImage(file="icons/lamp.png")
+        self.mobile_warning.configure(image=self.mobile_warning_img)
+        self.mobile_warning.configure(compound='left')
 
         self.email_entry = tk.Entry(top)
         self.email_entry.place(relx=0.757, rely=0.409, height=20, relwidth=0.217)
@@ -246,7 +256,7 @@ class Toplevel1:
         self.city_entry.configure(selectforeground="black")
 
         self.Label7 = tk.Label(top)
-        self.Label7.place(relx=0.017, rely=0.409, height=20, relwidth=0.244)
+        self.Label7.place(relx=0.007, rely=0.409, height=20, relwidth=0.244)
         self.Label7.configure(activebackground="#f9f9f9")
         self.Label7.configure(activeforeground="black")
         self.Label7.configure(background="#84f29c")
@@ -258,7 +268,7 @@ class Toplevel1:
         self.Label7.configure(text='''Τηλέφωνο''')
 
         self.Label8 = tk.Label(top)
-        self.Label8.place(relx=0.017, rely=0.497, height=20, relwidth=0.244)
+        self.Label8.place(relx=0.007, rely=0.497, height=20, relwidth=0.244)
         self.Label8.configure(activebackground="#f9f9f9")
         self.Label8.configure(activeforeground="black")
         self.Label8.configure(background="#84f29c")
@@ -294,7 +304,7 @@ class Toplevel1:
         self.Label10.configure(text='''e-mail''')
 
         self.address_entry = tk.Entry(top)
-        self.address_entry.place(relx=0.275, rely=0.322, height=20, relwidth=0.280)
+        self.address_entry.place(relx=0.290, rely=0.322, height=20, relwidth=0.260)
         self.address = StringVar()
         self.address_entry.configure(textvariable=self.address)
         self.address_entry.configure(background="white")
@@ -308,8 +318,9 @@ class Toplevel1:
         self.address_entry.configure(selectforeground="black")
 
         self.phone_entry = tk.Entry(top)
-        self.phone_entry.place(relx=0.275, rely=0.409, height=20, relwidth=0.280)
+        self.phone_entry.place(relx=0.290, rely=0.409, height=20, relwidth=0.260)
         self.phone = StringVar()
+        self.phone.trace('w', self.phone_check)
         self.phone_entry.configure(textvariable=self.phone)
         self.phone_entry.configure(background="white")
         self.phone_entry.configure(disabledforeground="#a3a3a3")
@@ -320,6 +331,10 @@ class Toplevel1:
         self.phone_entry.configure(insertbackground="black")
         self.phone_entry.configure(selectbackground="#c4c4c4")
         self.phone_entry.configure(selectforeground="black")
+        self.phone_warning = ttk.Label(top)
+        self.phone_warning_img = PhotoImage(file="icons/lamp.png")
+        self.phone_warning.configure(image=self.phone_warning_img)
+        self.phone_warning.configure(compound='left')
 
         self.post_code_entry = tk.Entry(top)
         self.post_code_entry.place(relx=0.757, rely=0.322, height=20
@@ -351,7 +366,7 @@ class Toplevel1:
         self.place_entry.configure(selectforeground="black")
 
         self.Label13 = tk.Label(top)
-        self.Label13.place(relx=0.017, rely=0.614, height=21, relwidth=0.244)
+        self.Label13.place(relx=0.007, rely=0.614, height=21, relwidth=0.244)
         self.Label13.configure(activebackground="#f9f9f9")
         self.Label13.configure(activeforeground="black")
         self.Label13.configure(background="#2f42f0")
@@ -419,10 +434,10 @@ class Toplevel1:
         self.add_btn.configure(command=self.add_to_db)
 
         self.TSeparator1 = ttk.Separator(top)
-        self.TSeparator1.place(relx=0.017, rely=0.585, relwidth=0.955)
+        self.TSeparator1.place(relx=0.007, rely=0.585, relwidth=0.955)
 
         self.Label11 = tk.Label(top)
-        self.Label11.place(relx=0.017, rely=0.058, height=21, relwidth=0.955)
+        self.Label11.place(relx=0.007, rely=0.058, height=21, relwidth=0.955)
         self.Label11.configure(background="#994d33")
         self.Label11.configure(disabledforeground="#a3a3a3")
         self.Label11.configure(foreground="#ffffff")
@@ -490,6 +505,68 @@ class Toplevel1:
         messagebox.showinfo("Info", f"Ο πελάτης {self.company_name.get()} προστέθηκε επιτυχώς")
         self.top.destroy()
 
+    # Ελεγχος αν το όνομα του πελάτη υπάρχει
+    def check_customer_name(self, name, index, mode):
+        self.company_name_warning.place_forget()
+        all_names = []
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT Επωνυμία_Επιχείρησης FROM Πελάτες WHERE Κατάσταση = 1;")
+        customers_names = c.fetchall()
+        con.close()
+
+        for name in customers_names:
+            all_names.append(name[0])
+
+        if self.company_name_entry.get() in all_names:
+            self.company_name_entry.configure(foreground="red")
+            # self.company_name_entry.place(relx=0.290, rely=0.146, height=20, relwidth=0.260)
+            self.company_name_warning.place(relx=0.250, rely=0.146, relheight=0.060, relwidth=0.030)
+        else:
+            self.company_name_entry.configure(foreground="green")
+            self.company_name_warning.place_forget()
+
+    # Ελεγχος αν το τηλ υπάρχει
+    def phone_check(self, name, index, mode):
+        self.phone_warning.place_forget()
+        all_phones = []
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT Τηλέφωνο FROM Πελάτες WHERE Κατάσταση = 1;")
+        phones = c.fetchall()
+        con.close()
+
+        for phone in phones:
+            all_phones.append(phone[0])
+
+        if self.phone_entry.get() in all_phones:
+            self.phone_entry.configure(foreground="red")
+            # self.phone_entry.place(relx=0.275, rely=0.409, height=20, relwidth=0.280)
+            self.phone_warning.place(relx=0.250, rely=0.409, relheight=0.060, relwidth=0.030)
+        else:
+            self.phone_entry.configure(foreground="green")
+            self.phone_warning.place_forget()
+
+    # Ελεγχος αν το κινιτό υπάρχει
+    def check_mobile(self, name, index, mode):
+        self.mobile_warning.place_forget()
+
+        all_mobiles = []
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT Κινητό FROM Πελάτες WHERE Κατάσταση = 1;")
+        mobiles = c.fetchall()
+        con.close()
+        for mobile in mobiles:
+            all_mobiles.append(mobile[0])
+
+        if self.mobile_entry.get() in all_mobiles:
+            self.mobile_entry.configure(foreground="red")
+            # self.mobile_entry.place(relx=0.275, rely=0.497, height=20, relwidth=0.280)
+            self.mobile_warning.place(relx=0.250, rely=0.497, relheight=0.060, relwidth=0.030)
+        else:
+            self.mobile_entry.configure(foreground="green")
+            self.mobile_warning.place_forget()
 
 
 if __name__ == '__main__':

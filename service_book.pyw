@@ -13,9 +13,13 @@ todo start day to binary file
 todo Αποθήκη για τα ανταλλακτικά που εισάγουμε στο local version
 todo να μπει στις σημειώσεις πότε ενεργοποίθηκε/απενεργοποίθηκε φωτοτυπικό και πελάτης
 
+V1.3.7 check name phone mobile serial    -------------------------------------------------18/01/202
+
+V1.3.6 Διαγραφή πεδίων μετα απο αναζήτηση-------------------------------------------------18/01/202
+
 V1.3.5 Fix bug on edit_task --------------------------------------------------------------17/01/202
 
-V1.3.5 Διορθόσης add_task και edit_task όταν κάνουμε αλλαγές στα στοιχεία πελάτη ---------17/01/202
+V1.3.5 Διορθώσης add_task και edit_task όταν κάνουμε αλλαγές στα στοιχεία πελάτη ---------17/01/202
 
 V1.3.5 Διορθόσης στην ημερομηνία == ========================== ----------------------------17/01/202
 
@@ -535,6 +539,8 @@ class Toplevel1:
         self.company_label.configure(relief="groove")
         self.company_label.configure(text="Εμφανιζόμενο όνομα")
 
+        self.customer_name = StringVar()
+        self.customer_name.trace('w', self.check_customer_name)
         self.company_name_entry = tk.Entry(self.customer_frame)
         self.company_name_entry.place(relx=0.225, rely=0.100, height=20, relwidth=0.250)
         self.company_name_entry.configure(background="white")
@@ -546,6 +552,11 @@ class Toplevel1:
         self.company_name_entry.configure(insertbackground="black")
         self.company_name_entry.configure(selectbackground="#c4c4c4")
         self.company_name_entry.configure(selectforeground="black")
+        self.company_name_entry.configure(textvariable=self.customer_name)
+        self.company_name_warning = ttk.Label(self.customer_frame)
+        self.company_name_warning_img = PhotoImage(file="icons/lamp.png")
+        self.company_name_warning.configure(image=self.company_name_warning_img)
+        self.company_name_warning.configure(compound='left')
 
         self.address_label = tk.Label(self.customer_frame)
         self.address_label.place(relx=0.021, rely=0.260, height=20, relwidth=0.200)
@@ -641,6 +652,8 @@ class Toplevel1:
         self.Label6.configure(relief="groove")
         self.Label6.configure(text='''Περιοχή''')
 
+        self.mobile = StringVar()
+        self.mobile.trace('w', self.check_mobile)
         self.mobile_entry = tk.Entry(self.customer_frame)
         self.mobile_entry.place(relx=0.225, rely=0.420, height=20, relwidth=0.250)
         self.mobile_entry.configure(background="white")
@@ -652,6 +665,11 @@ class Toplevel1:
         self.mobile_entry.configure(insertbackground="black")
         self.mobile_entry.configure(selectbackground="#c4c4c4")
         self.mobile_entry.configure(selectforeground="black")
+        self.mobile_entry.configure(textvariable=self.mobile)
+        self.mobile_warning = ttk.Label(self.customer_frame)
+        self.mobile_warning_img = PhotoImage(file="icons/lamp.png")
+        self.mobile_warning.configure(image=self.mobile_warning_img)
+        self.mobile_warning.configure(compound='left')
 
         self.email_entry = tk.Entry(self.customer_frame)
         self.email_entry.place(relx=0.655, rely=0.340, height=20, relwidth=0.15)
@@ -688,6 +706,8 @@ class Toplevel1:
         self.Label7.configure(highlightcolor="black")
         self.Label7.configure(relief="groove")
         self.Label7.configure(text='''Τηλέφωνο''')
+        self.phone = StringVar()
+        self.phone.trace('w', self.phone_check)
         self.phone_entry = tk.Entry(self.customer_frame)
         self.phone_entry.place(relx=0.225, rely=0.340, height=20, relwidth=0.250)
         self.phone_entry.configure(background="white")
@@ -699,6 +719,12 @@ class Toplevel1:
         self.phone_entry.configure(insertbackground="black")
         self.phone_entry.configure(selectbackground="#c4c4c4")
         self.phone_entry.configure(selectforeground="black")
+        self.phone_entry.configure(textvariable=self.phone)
+        self.phone_warning = ttk.Label(self.customer_frame)
+        self.phone_warning_img = PhotoImage(file="icons/lamp.png")
+        self.phone_warning.configure(image=self.phone_warning_img)
+        self.phone_warning.configure(compound='left')
+
 
         self.Label8 = tk.Label(self.customer_frame)
         self.Label8.place(relx=0.021, rely=0.420, height=20, relwidth=0.200)
@@ -1081,8 +1107,6 @@ class Toplevel1:
         self.refresh_btn.configure(image=self.refresh_img)
         self.refresh_btn.configure(command=lambda: (self.service_click(event=None)))
 
-
-
         # Αναζήτηση στο επιλεγμένο φωτοτυπικό
         self.search_selected_copier_service_data = StringVar()
         self.search_selected_copier_service_entry = tk.Entry(self.service_frame, textvariable=self.search_selected_copier_service_data)
@@ -1151,7 +1175,6 @@ class Toplevel1:
         self.spare_parts_treeview.place(relx=0.021, rely=0.240, relheight=0.700, relwidth=0.960)
         self.spare_parts_treeview.configure(show="headings", style="mystyle.Treeview")
         self.spare_parts_treeview.bind("<<TreeviewSelect>>", self.view_service_from_spare_parts)
-
 
         self.TSeparator1 = ttk.Separator(top)
         self.TSeparator1.place(relx=0.022, rely=0.555, relwidth=0.965)
@@ -1226,6 +1249,7 @@ class Toplevel1:
         self.search_tasks_entry.configure(foreground="#000000")
         self.search_tasks_entry.configure(insertbackground="black")
         self.search_tasks_entry.configure(textvariable=self.search_tasks_data)
+        self.search_tasks_entry.bind('<Return>', self.search_tasks)
 
         self.search_tasks_btn = tk.Button(top)
         self.search_tasks_btn.place(relx=0.855, rely=0.630, height=30, relwidth=0.120)
@@ -1245,7 +1269,6 @@ class Toplevel1:
         self.calendar_treeview.configure(show="headings", style="mystyle.Treeview")
         self.calendar_treeview.bind("<<TreeviewSelect>>", self.edit_scheduled_tasks)
 
-
         self.day = self.today.day
         self.year = self.today.year
         self.month = self.today.month
@@ -1260,7 +1283,68 @@ class Toplevel1:
 
         self.get_calendar()
 
+    # Ελεγχος αν το όνομα του πελάτη υπάρχει
+    def check_customer_name(self, name, index, mode):
+        self.company_name_warning.place_forget()
+        all_names = []
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT Επωνυμία_Επιχείρησης FROM Πελάτες WHERE Κατάσταση = 1;")
+        customers_names = c.fetchall()
+        con.close()
 
+        for name in customers_names:
+            all_names.append(name[0])
+
+        if self.company_name_entry.get() in all_names:
+            self.company_name_entry.configure(foreground="red")
+            # self.company_name_entry.place(relx=0.225, rely=0.100, height=20, relwidth=0.250)
+            self.company_name_warning.place(relx=0.475, rely=0.100, relheight=0.060, relwidth=0.020)
+        else:
+            self.company_name_entry.configure(foreground="green")
+            self.company_name_warning.place_forget()
+
+    # Ελεγχος αν το τηλ υπάρχει
+    def phone_check(self, name, index, mode):
+        self.phone_warning.place_forget()
+        all_phones = []
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT Τηλέφωνο FROM Πελάτες WHERE Κατάσταση = 1;")
+        phones = c.fetchall()
+        con.close()
+
+        for phone in phones:
+            all_phones.append(phone[0])
+
+        if self.phone_entry.get() in all_phones:
+            self.phone_entry.configure(foreground="red")
+            # self.phone_entry.place(relx=0.225, rely=0.340, height=20, relwidth=0.250)
+            self.phone_warning.place(relx=0.475, rely=0.340, relheight=0.060, relwidth=0.020)
+        else:
+            self.phone_entry.configure(foreground="green")
+            self.phone_warning.place_forget()
+
+    # Ελεγχος αν το κινιτό υπάρχει
+    def check_mobile(self, name, index, mode):
+        self.mobile_warning.place_forget()
+
+        all_mobiles = []
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT Κινητό FROM Πελάτες WHERE Κατάσταση = 1;")
+        mobiles = c.fetchall()
+        con.close()
+        for mobile in mobiles:
+            all_mobiles.append(mobile[0])
+
+        if self.mobile_entry.get() in all_mobiles:
+            self.mobile_entry.configure(foreground="red")
+            # self.mobile_entry.place(relx=0.225, rely=0.420, height=20, relwidth=0.250)
+            self.mobile_warning.place(relx=0.475, rely=0.420, relheight=0.060, relwidth=0.020)
+        else:
+            self.mobile_entry.configure(foreground="green")
+            self.mobile_warning.place_forget()
 
     def search_tasks_of_selected_copier(self):
 
@@ -1357,6 +1441,10 @@ class Toplevel1:
                 platos = 200
             elif head == "Φωτοτυπικό":
                 platos = 200
+            elif head == "Σκοπός":
+                platos = 150
+            elif head == "Τεχνικός":
+                platos = 150
             else:
                 platos = 80
             self.calendar_treeview.heading(head, text=head, anchor="center")
@@ -1404,7 +1492,7 @@ class Toplevel1:
         selected_calendar_id = (self.calendar_treeview.set(self.calendar_treeview.selection(), '#1'))
         edit_task.create_edit_task_window(root, selected_calendar_id)
 
-    def search_tasks(self, data=None):
+    def search_tasks(self, event=None, data=None):
 
         if not data:  # data είναι η ημερομηνία που στέλνει όταν πατήσουμε στο ημερολόγιο
             data_to_search = self.search_tasks_data.get()
@@ -1435,6 +1523,7 @@ class Toplevel1:
         conn.close()
         for item in fetch:
             self.calendar_treeview.insert("", "end", values=item)
+        self.search_tasks_data.set(value="")
 
     def show_licence(self):
 
@@ -1685,7 +1774,9 @@ class Toplevel1:
             self.copiers_treeview.insert("", "end", values=copier)
 
     # Εμφάνηση φωτοτυπικών του επιλεγμένου πελάτη
+    # Οταν πατάμε στον πελάτη
     def view_copiers(self, event=None):
+        self.phone_warning.place_forget()
         self.notebook.select(tab_id=0)
         # Απενεργοποιηση του κουμπιου προσθήκης ιστορικού
         self.add_service_btn.place_forget()
@@ -1739,8 +1830,9 @@ class Toplevel1:
         customers_conn.close()
         # Κατασκευή tree το up_index -1 == το τελος ("end")
         # todo πρέπει να γίνει σε for loop και να μπούν σε λίστα
-        var = StringVar(root, value=customers_data[0][1])
-        self.company_name_entry.configure(textvariable=var)
+        self.customer_name.set(value=customers_data[0][1])
+        self.company_name_entry.configure(textvariable=self.customer_name)
+
         var = StringVar(root, value=customers_data[0][2])
         self.name_entry.configure(textvariable=var)
         var = StringVar(root, value=customers_data[0][3])
@@ -1751,10 +1843,13 @@ class Toplevel1:
         self.post_code_entry.configure(textvariable=var)
         var = StringVar(root, value=customers_data[0][6])
         self.place_entry.configure(textvariable=var)
-        var = StringVar(root, value=customers_data[0][7])
-        self.phone_entry.configure(textvariable=var)
-        var = StringVar(root, value=customers_data[0][8])
-        self.mobile_entry.configure(textvariable=var)
+
+        self.phone.set(value=customers_data[0][7])
+        self.phone_entry.configure(textvariable=self.phone)
+
+        self.mobile.set(value=customers_data[0][8])
+        self.mobile_entry.configure(textvariable=self.mobile)
+
         var = StringVar(root, value=customers_data[0][9])
         self.fax_entry.configure(textvariable=var)
         var = StringVar(root, value=customers_data[0][10])
@@ -1817,8 +1912,10 @@ class Toplevel1:
         # todo πρέπει να γίνει σε for loop και να μπούν σε λίστα
         self.selected_customer_id = customers_data[0][0]    # ορισμός ID πελάτη
         self.selected_customer = customers_data[0][1]       # ορισμός πελάτη
-        var = StringVar(root, value=customers_data[0][1])
-        self.company_name_entry.configure(textvariable=var)
+
+        self.customer_name.set(value=customers_data[0][1])
+        self.company_name_entry.configure(textvariable=self.customer_name)
+
         var = StringVar(root, value=customers_data[0][2])
         self.name_entry.configure(textvariable=var)
         var = StringVar(root, value=customers_data[0][3])
@@ -1829,10 +1926,13 @@ class Toplevel1:
         self.post_code_entry.configure(textvariable=var)
         var = StringVar(root, value=customers_data[0][6])
         self.place_entry.configure(textvariable=var)
-        var = StringVar(root, value=customers_data[0][7])
-        self.phone_entry.configure(textvariable=var)
-        var = StringVar(root, value=customers_data[0][8])
-        self.mobile_entry.configure(textvariable=var)
+
+        self.phone.set(value=customers_data[0][7])
+        self.phone_entry.configure(textvariable=self.phone)
+
+        self.mobile(value=customers_data[0][8])
+        self.mobile_entry.configure(textvariable=self.mobile)
+
         var = StringVar(root, value=customers_data[0][9])
         self.fax_entry.configure(textvariable=var)
         var = StringVar(root, value=customers_data[0][10])
@@ -2001,7 +2101,7 @@ class Toplevel1:
             # fetch[n][-1] => Κατάσταση πελάτη 1=Ενεργός 0=Ανενεργός
             if fetch[n][-1]:  # Αν η κατάσταση του πελάτη είναι 1 επιστρεφει true και τον εμφανίζει ποιο κάτω
                 self.customers_treeview.insert("", "end", values=fetch[n])
-
+        self.search_data.set(value="")
     # Αναζήτηση φωτοτυπικού
     def search_copier(self, event=None):
         """
