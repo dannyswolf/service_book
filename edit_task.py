@@ -97,7 +97,6 @@ def create_edit_task_window(root, *args, **kwargs):
     rt = root
     w = tk.Toplevel(root)
     selected_calendar_id = args[0]  # Απο το service_book
-    selected_customer_id = args[1]  # Απο το service_book
     add_copier_support.set_Tk_var()
     top = edit_task_window(w)
     add_copier_support.init(w, top, *args, **kwargs)
@@ -217,7 +216,7 @@ class edit_task_window:
         self.selected_calendar_id = selected_calendar_id
         self.purpose_list, self.actions_list = get_service_data()
         self.service_id = ""
-        self.customer_id = selected_customer_id
+        self.customer_id = ""
         self.customers_list, self.serials = get_copiers_data()
         self.mobile = ""
         self.copiers = []  # Τα φωτοτυπικά του επιλεγμένου πελάτη
@@ -873,16 +872,17 @@ class edit_task_window:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM Calendar WHERE ID =?", (self.selected_calendar_id,))
         data = cursor.fetchall()
+        # todo
         # Τα στοιχεία του πελάτη να τα πάρουμε απο τον πίνακα του πελάτη γιατί μπορεί να τα αλλάξουμε
-        cursor.execute("SELECT Επωνυμία_Επιχείρησης, Τηλέφωνο FROM Πελάτες WHERE ID=?", (self.customer_id,))
-        customer_data = cursor.fetchall()
+        # cursor.execute("SELECT Επωνυμία_Επιχείρησης, Τηλέφωνο FROM Πελάτες WHERE ID=?", ,))
+        # customer_data = cursor.fetchall()
         cursor.close()
         conn.close()
 
         date = StringVar(self.service_frame, value=data[0][1])
         self.start_date.set_date(date=date.get())
         # self.start_date_entry.configure(textvariable=date)
-        customer_combobox = StringVar(w, value=customer_data[0][0])
+        customer_combobox = StringVar(w, value=data[0][2])
         self.customer_combobox.set(customer_combobox.get())
         self.customer_combobox.configure(values=self.customers_list)
         self.customer_combobox.bind("<<ComboboxSelected>>", self.get_copier)
@@ -908,7 +908,7 @@ class edit_task_window:
         urgent = StringVar(w, value=data[0][8])
         self.urgent = urgent.get()
         # στοιχείο πελάτη
-        phone = StringVar(w, value=customer_data[0][1])
+        phone = StringVar(w, value=data[0][9])
         self.phone_entry.configure(textvariable=phone)
 
         notes = StringVar(w, value=data[0][10])

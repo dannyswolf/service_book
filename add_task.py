@@ -172,7 +172,7 @@ class add_task_window:
         self.selected_serial = ""
         self.copier_id = ""
         self.top = top
-        top.geometry("505x524+10+10")
+        top.geometry("505x524+400+100")
         top.minsize(120, 1)
         top.maxsize(1604, 881)
         top.resizable(1, 1)

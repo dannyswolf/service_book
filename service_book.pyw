@@ -13,6 +13,8 @@ todo start day to binary file
 todo Αποθήκη για τα ανταλλακτικά που εισάγουμε στο local version
 todo να μπει στις σημειώσεις πότε ενεργοποίθηκε/απενεργοποίθηκε φωτοτυπικό και πελάτης
 
+V1.3.5 Fix bug on edit_task --------------------------------------------------------------17/01/202
+
 V1.3.5 Διορθόσης add_task και edit_task όταν κάνουμε αλλαγές στα στοιχεία πελάτη ---------17/01/202
 
 V1.3.5 Διορθόσης στην ημερομηνία == ========================== ----------------------------17/01/202
@@ -1400,7 +1402,7 @@ class Toplevel1:
     def edit_scheduled_tasks(self, event=None):
 
         selected_calendar_id = (self.calendar_treeview.set(self.calendar_treeview.selection(), '#1'))
-        edit_task.create_edit_task_window(root, selected_calendar_id, self.selected_customer_id)
+        edit_task.create_edit_task_window(root, selected_calendar_id)
 
     def search_tasks(self, data=None):
 
