@@ -572,7 +572,6 @@ class add_task_window:
 
         data = [self.start_date.get(), self.purpose_combobox.get(), "", self.notes_scrolledtext.get('1.0', 'end-1c'),
                 "", "", self.copier_id, ""]
-
         sql_insert = "INSERT INTO Service (" + culumns + ")" + "VALUES(" + values + ");"
 
         cursor.execute(sql_insert, tuple(data))

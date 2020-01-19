@@ -12,6 +12,9 @@ todo προβολή όλων των εικόνων
 todo start day to binary file
 todo Αποθήκη για τα ανταλλακτικά που εισάγουμε στο local version
 todo να μπει στις σημειώσεις πότε ενεργοποίθηκε/απενεργοποίθηκε φωτοτυπικό και πελάτης
+todo μετα απο προσθήκη φωτοτυπικού και εργασία απο το προσθήκη εργασίας δεν εμφανίζει το ιστορικό του φωτοτυπικού
+
+V1.3.8 Αναζήτηση ΔΤΕ                     -------------------------------------------------19/01/202
 
 V1.3.7 check name phone mobile serial    -------------------------------------------------18/01/202
 
@@ -383,7 +386,7 @@ class Toplevel1:
         self.style.configure('.',font=("Calibri", 10))
         # self.style.map('.',background=[('selected', _compcolor), ('active',_ana2color)])
         self.top = top
-        top.geometry("1324x768+150+50")
+        top.geometry("1324x800+150+50")
         top.minsize(120, 1)
         top.maxsize(1980, 1980)
         top.resizable(1, 1)
@@ -1229,7 +1232,7 @@ class Toplevel1:
         self.completed_jobs = DateEntry(top, width=12, year=self.year, month=self.month, day=self.day,
                                         background='gray20', selectmode='day', foreground='white', borderwidth=5,
                                         locale="el_GR", font=("Calibri", 10, 'bold'), date_pattern='dd/mm/yyyy')
-        self.completed_jobs.place(relx=0.520, rely=0.630, height=30, relwidth=0.130)
+        self.completed_jobs.place(relx=0.520, rely=0.630, relheight=0.035, relwidth=0.130)
         self.completed_jobs.bind('<<DateEntrySelected>>', self.get_completed_jobs)
         self.completed_jobs_label = tk.Label(top)
         self.completed_jobs_label.place(relx=0.520, rely=0.610, height=20, relwidth=0.130)
@@ -1240,9 +1243,28 @@ class Toplevel1:
         self.completed_jobs_label.configure(relief="groove")
         self.completed_jobs_label.configure(text="Ολοκληρωμένες εργασίες")
 
+        self.search_dte_entry = ttk.Entry(top, width=12, font=("Calibri", 10, 'bold'))
+        self.search_dte_entry.place(relx=0.655, rely=0.630, relheight=0.035, relwidth=0.040)
+        self.search_dte_entry.bind('<Return>', self.search_dte)
+        self.dte_label = tk.Label(top)
+        self.dte_label.place(relx=0.655, rely=0.610, relheight=0.020, relwidth=0.073)
+        self.dte_label.configure(font=("Calibri", 10, "bold"))
+        self.dte_label.configure(background="#5fa15f")
+        self.dte_label.configure(disabledforeground="#a3a3a3")
+        self.dte_label.configure(foreground="#ffffff")
+        self.dte_label.configure(relief="groove")
+        self.dte_label.configure(text="Αναζήτηση ΔΤΕ")
+        self.search_dte_btn = tk.Button(top)
+        self.search_dte_btn.place(relx=0.697, rely=0.630, relheight=0.035, relwidth=0.030)
+        self.search_dte_btn.configure(background="#6b6b6b")
+        self.search_dte_btn_img = PhotoImage(file="icons/search_tasks.png")
+        self.search_dte_btn.configure(image=self.search_dte_btn_img)
+        self.search_dte_btn.configure(compound='left')
+        self.search_dte_btn.configure(command=self.search_dte)
+
         self.search_tasks_data = StringVar()
         self.search_tasks_entry = tk.Entry(top)
-        self.search_tasks_entry.place(relx=0.750, rely=0.630, height=30, relwidth=0.100)
+        self.search_tasks_entry.place(relx=0.760, rely=0.630, relheight=0.035, relwidth=0.100)
         self.search_tasks_entry.configure(background="white")
         self.search_tasks_entry.configure(disabledforeground="#a3a3a3")
         self.search_tasks_entry.configure(font=("Calibri", 12))
@@ -1250,9 +1272,8 @@ class Toplevel1:
         self.search_tasks_entry.configure(insertbackground="black")
         self.search_tasks_entry.configure(textvariable=self.search_tasks_data)
         self.search_tasks_entry.bind('<Return>', self.search_tasks)
-
         self.search_tasks_btn = tk.Button(top)
-        self.search_tasks_btn.place(relx=0.855, rely=0.630, height=30, relwidth=0.120)
+        self.search_tasks_btn.place(relx=0.865, rely=0.630, height=30, relwidth=0.120)
         self.search_tasks_btn.configure(background="#6b6b6b")
         self.search_tasks_btn_img = PhotoImage(file="icons/search_tasks.png")
         self.search_tasks_btn.configure(image=self.search_tasks_btn_img)
@@ -1263,7 +1284,6 @@ class Toplevel1:
         self.search_tasks_btn.configure(command=self.search_tasks)
 
         # Πίνακας Ημερολόγιο εργασιών
-
         self.calendar_treeview = ScrolledTreeView(top)
         self.calendar_treeview.place(relx=0.300, rely=0.680, relheight=0.300, relwidth=0.685)
         self.calendar_treeview.configure(show="headings", style="mystyle.Treeview")
@@ -1345,6 +1365,19 @@ class Toplevel1:
         else:
             self.mobile_entry.configure(foreground="green")
             self.mobile_warning.place_forget()
+
+    # Αναζήτηση ΔΤΕ
+    def search_dte(self, event=None):
+        self.calendar_treeview.delete(*self.calendar_treeview.get_children())
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT * FROM Calendar WHERE ΔΤΕ =?", (self.search_dte_entry.get(),))
+        data = c.fetchall()
+        c.close()
+        con.close()
+
+        for task in data:
+            self.calendar_treeview.insert("", "end", values=task)
 
     def search_tasks_of_selected_copier(self):
 
@@ -1432,23 +1465,26 @@ class Toplevel1:
         self.tasks_headers = list(map(lambda x: x[0], c.description))
         data = c.fetchall()
         con.close()
+        no_need_heads = ['Τηλέφωνο', 'Σημειώσεις', 'Copier_ID', 'ΔΤΕ', 'Service_ID', 'Μετρητής', 'Επ_Service', 'Κατάσταση']
+        needed_heads = [head for head in self.tasks_headers if head not in no_need_heads]
+        self.calendar_treeview["columns"] = [head for head in self.tasks_headers if head not in no_need_heads]
 
-        self.calendar_treeview["columns"] = [head for head in self.tasks_headers]
-        for head in self.tasks_headers:
+        for head in needed_heads:
             if head == "id" or head == "ID" or head == "Id":
                 platos = 1
             elif head == "Πελάτης":
-                platos = 200
+                platos = 250
             elif head == "Φωτοτυπικό":
-                platos = 200
+                platos = 260
             elif head == "Σκοπός":
-                platos = 150
+                platos = 200
             elif head == "Τεχνικός":
-                platos = 150
+                platos = 200
             else:
-                platos = 80
+                platos = 100
             self.calendar_treeview.heading(head, text=head, anchor="center")
             self.calendar_treeview.column(head, width=platos, anchor="center")
+
         for d in data:
             self.calendar_treeview.insert("", "end", values=d)
 
@@ -1880,7 +1916,6 @@ class Toplevel1:
             self.add_service_btn.configure(background="#6b6b6b")
             self.add_service_btn.place(relx=0.021, rely=0.100, height=25, relwidth=0.200)
 
-
         # αδιάζουμε πρώτα το tree του ιστορικού
         for i in self.service_treeview.get_children():
             self.service_treeview.delete(i)
@@ -1930,7 +1965,7 @@ class Toplevel1:
         self.phone.set(value=customers_data[0][7])
         self.phone_entry.configure(textvariable=self.phone)
 
-        self.mobile(value=customers_data[0][8])
+        self.mobile.set(value=customers_data[0][8])
         self.mobile_entry.configure(textvariable=self.mobile)
 
         var = StringVar(root, value=customers_data[0][9])
