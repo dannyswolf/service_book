@@ -400,7 +400,7 @@ class Toplevel1:
         top.bind('<F1>', self.add_customer_event)
         top.bind('<Escape>', self.quit)
         top.bind('<F2>', self.add_copier)
-        top.iconbitmap("icons/icon.ico")
+        # top.iconbitmap("icons/icon.ico")
 
         # ---------------------------------------Menu-----------------------------------------
         self.menubar = tk.Menu(top, font=("Calibri", 10, "bold"), bg=_bgcolor, fg=_fgcolor)

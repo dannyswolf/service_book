@@ -11,14 +11,14 @@ mlshop = 1
 
 if mlshop:
     # ML Shop dbases
-    dbase = "\\\\192.168.1.200\\Public\\DROPBOX\\ΕΓΓΡΑΦΑ\\6.  ΒΙΒΛΙΟ SERVICE\\Service_book.db"
-    spare_parts_db = "\\\\192.168.1.200\\Public\\DROPBOX\\ΕΓΓΡΑΦΑ\\2.  ΑΠΟΘΗΚΗ\\3. ΚΑΙΝΟΥΡΙΑ_ΑΠΟΘΗΚΗ.db"
+    dbase = "/home/dannys/qnap/DROPBOX/ΕΓΓΡΑΦΑ/6.  ΒΙΒΛΙΟ SERVICE/Service_book.db"
+    spare_parts_db = "/home/dannys/qnap/DROPBOX/ΕΓΓΡΑΦΑ/2.  ΑΠΟΘΗΚΗ/3. ΚΑΙΝΟΥΡΙΑ_ΑΠΟΘΗΚΗ.db"
 
 else:
     spare_parts_db = "3. ΚΑΙΝΟΥΡΙΑ_ΑΠΟΘΗΚΗ.db"
     dbase = "Service_book.db"  # Local Dbase
 
-service_book_version = "V 1.3.5 ML Shop"
+service_book_version = "V 1.3.8 ML Shop"
 
 demo = 0  # 0 Demo Disabled 1 Demo enabled
 
@@ -45,7 +45,7 @@ except:
 
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE και Ημερομηνία ------------------
 
-log_dir = "logs" + "\\" + today + "\\"
+log_dir = "logs" + "/" + today + "/"
 if not os.path.exists(log_dir):
     os.makedirs(log_dir)
 else:
