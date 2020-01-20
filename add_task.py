@@ -16,6 +16,8 @@ from tkcalendar import DateEntry
 from settings import dbase,  root_logger, demo, today  # settings
 
 
+
+
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
@@ -587,10 +589,11 @@ class add_task_window:
         # Αν γράψουμε νέο φωτοτυπικό και όχι απο την λίστα
         if not self.selected_copier:
             self.selected_copier = self.copiers_combobox.get()
-
+        self.get_copier_id()
         data = [self.start_date.get(), self.customer_combobox.get(), self.copiers_combobox.get(), self.purpose_combobox.get(),
                 self.technician.get(), self.urgent.get(), self.phone_var.get(),
                 self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id]
+
         mail.send_mail(data)
 
     def add_to_service_data(self, column):
