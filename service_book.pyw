@@ -12,21 +12,25 @@ todo προβολή όλων των εικόνων
 todo start day to binary file
 todo Αποθήκη για τα ανταλλακτικά που εισάγουμε στο local version
 todo να μπει στις σημειώσεις πότε ενεργοποίθηκε/απενεργοποίθηκε φωτοτυπικό και πελάτης
-todo μετα απο προσθήκη φωτοτυπικού και εργασία απο το προσθήκη εργασίας δεν εμφανίζει το ιστορικό του φωτοτυπικού
 
-V1.3.8 Αναζήτηση ΔΤΕ                     -------------------------------------------------19/01/202
 
-V1.3.7 check name phone mobile serial    -------------------------------------------------18/01/202
+V1.4.0 Αποστολή αρχείων με email ---------------------------------------------------------20/01/2020
+Προσθήκη Customer_ID στο Calendar
+todo εμφάνηση αρχείων όταν προσθέτουμε αρχεία --- Done
 
-V1.3.6 Διαγραφή πεδίων μετα απο αναζήτηση-------------------------------------------------18/01/202
+V1.3.8 Αναζήτηση ΔΤΕ                     -------------------------------------------------19/01/2020
 
-V1.3.5 Fix bug on edit_task --------------------------------------------------------------17/01/202
+V1.3.7 check name phone mobile serial    -------------------------------------------------18/01/2020
 
-V1.3.5 Διορθώσης add_task και edit_task όταν κάνουμε αλλαγές στα στοιχεία πελάτη ---------17/01/202
+V1.3.6 Διαγραφή πεδίων μετα απο αναζήτηση-------------------------------------------------18/01/2020
 
-V1.3.5 Διορθόσης στην ημερομηνία == ========================== ----------------------------17/01/202
+V1.3.5 Fix bug on edit_task --------------------------------------------------------------17/01/2020
 
-V1.3.4 fix send email    ========== ========================== ----------------------------17/01/202
+V1.3.5 Διορθώσης add_task και edit_task όταν κάνουμε αλλαγές στα στοιχεία πελάτη ---------17/01/2020
+
+V1.3.5 Διορθόσης στην ημερομηνία == ========================== ----------------------------17/01/2020
+
+V1.3.4 fix send email    ========== ========================== ----------------------------17/01/2020
 
 V1.3.3 Τροποποίηση αποστολής email =========================== ----------------------------16/01/2020
 
@@ -1406,7 +1410,8 @@ class Toplevel1:
         except IndexError:
             self.task_notifier_btn.place_forget()
             return
-        #messagebox.showwarning("data notifier", f"{calendar_id}")
+
+        # messagebox.showwarning("data notifier", f"{calendar_id}")
         if status:
             self.task_notifier_btn.configure(text="Εργασίες σε\n εκκρεμότητα", foreground='white')
             self.task_notifier_btn.configure(compound='left')
@@ -1465,7 +1470,8 @@ class Toplevel1:
         self.tasks_headers = list(map(lambda x: x[0], c.description))
         data = c.fetchall()
         con.close()
-        no_need_heads = ['Τηλέφωνο', 'Σημειώσεις', 'Copier_ID', 'ΔΤΕ', 'Service_ID', 'Μετρητής', 'Επ_Service', 'Κατάσταση']
+        no_need_heads = ['Τηλέφωνο', 'Σημειώσεις', 'Copier_ID', 'ΔΤΕ', 'Service_ID', 'Μετρητής', 'Επ_Service',
+                         'Customer_ID', 'Κατάσταση']
         needed_heads = [head for head in self.tasks_headers if head not in no_need_heads]
         self.calendar_treeview["columns"] = [head for head in self.tasks_headers if head not in no_need_heads]
 
@@ -1555,7 +1561,7 @@ class Toplevel1:
         conn = sqlite3.connect(dbase)
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM Calendar WHERE " + search_headers, operators)
-        fetch = cursor.fetchall()  # Δεδομένα απο Service
+        fetch = cursor.fetchall()  # Δεδομένα απο Calendar
         conn.close()
         for item in fetch:
             self.calendar_treeview.insert("", "end", values=item)

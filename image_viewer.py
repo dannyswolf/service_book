@@ -196,7 +196,6 @@ class Toplevel1:
 
         self.get_size_of_files()
 
-
     def quit(self, event=None):
         self.del_files()
         self.top.destroy()

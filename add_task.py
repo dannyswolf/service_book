@@ -119,12 +119,13 @@ def create_add_task_window(root, *args, **kwargs):
     c = con.cursor()
     c.execute("SELECT Επωνυμία_Επιχείρησης FROM Πελάτες WHERE ID =?", (selected_customer_id,))
     name = c.fetchall()
-    try:
-        selected_customer = name[0][0]
-    except IndexError: # όταν δέν εχουμε επιλεξει πελάτη
-        pass
     c.close()
     con.close()
+    try:
+        selected_customer = name[0][0]
+    except IndexError:  # όταν δέν εχουμε επιλεξει πελάτη
+        pass
+
     w = tk.Toplevel(root)
     add_copier_support.set_Tk_var()
     top = add_task_window(w)
@@ -495,7 +496,7 @@ class add_task_window:
             con.close()
             if len(tasks) > 4:
                 messagebox.showerror("Demo",
-                                    "Λυπούμαστε η εκδοση αυτή είναι demo και δεν μπορείτε να προσθέσεται νέες εργασίες")
+                                     "Λυπούμαστε η εκδοση αυτή είναι demo και δεν μπορείτε να προσθέσεται νέες εργασίες")
 
                 self.top.focus()
                 return
@@ -503,10 +504,10 @@ class add_task_window:
         self.get_copier_id()  # Να πάρουμε το id του μηχανήματος
         conn = sqlite3.connect(dbase)
         cursor = conn.cursor()
-        # Δημιουργία culumns για της εργασίες
+        # Δημιουργία columns για της εργασίες
         cursor.execute("SELECT * FROM Calendar")
         headers = list(map(lambda x: x[0], cursor.description))
-        culumns = ", ".join(headers)
+        columns = ", ".join(headers)
         values = []
         for head in headers:
             if head == "ID":
@@ -535,20 +536,20 @@ class add_task_window:
         data = [self.start_date.get(), self.customer_combobox.get(), self.copiers_combobox.get(),
                 self.purpose_combobox.get(), "", self.technician_entry.get(), "", self.urgent.get(),
                 self.phone_var.get(), self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, "",
-                self.service_id, "", "", 1]
+                self.service_id, "", "", self.customer_id, 1]
 
-        sql_insert = "INSERT INTO Calendar (" + culumns + ")" + "VALUES(" + values + ");"
+        sql_insert = "INSERT INTO Calendar (" + columns + ")" + "VALUES(" + values + ");"
 
         cursor.execute(sql_insert, tuple(data))
         conn.commit()
         conn.close()
 
-        # Δημιουργία culumns για το Service
+        # Δημιουργία columns για το Service
         conn = sqlite3.connect(dbase)
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM Service")
         headers = list(map(lambda x: x[0], cursor.description))
-        culumns = ", ".join(headers)
+        columns = ", ".join(headers)
         values = []
         for head in headers:
             if head == "ID":
@@ -572,7 +573,7 @@ class add_task_window:
 
         data = [self.start_date.get(), self.purpose_combobox.get(), "", self.notes_scrolledtext.get('1.0', 'end-1c'),
                 "", "", self.copier_id, ""]
-        sql_insert = "INSERT INTO Service (" + culumns + ")" + "VALUES(" + values + ");"
+        sql_insert = "INSERT INTO Service (" + columns + ")" + "VALUES(" + values + ");"
 
         cursor.execute(sql_insert, tuple(data))
         conn.commit()
@@ -588,8 +589,8 @@ class add_task_window:
             self.selected_copier = self.copiers_combobox.get()
 
         data = [self.start_date.get(), self.customer_combobox.get(), self.copiers_combobox.get(), self.purpose_combobox.get(),
-                self.technician.get(), "", self.urgent.get(), self.phone_var.get(),
-                self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, "", 1]
+                self.technician.get(), self.urgent.get(), self.phone_var.get(),
+                self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id]
         mail.send_mail(data)
 
     def add_to_service_data(self, column):
@@ -616,7 +617,7 @@ class add_task_window:
                 messagebox.showinfo("Info", f"Ο σκοπός {self.purpose_combobox.get()} προστέθηκε επιτυχώς")
                 self.top.focus()
 
- # Προσθήκη Φωτοτυπικού
+    # Προσθήκη Φωτοτυπικού
     def add_copier(self, event=None):
         """ Προσθήκη φωτοτυπικού
         Καλει την συνάρτηση create_Topelevel1 του αρχείου add_copier

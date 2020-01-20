@@ -1,12 +1,16 @@
 #  -*- coding: utf-8 -*-
 import sys
+import os
 import smtplib
 import ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from settings import smtp_server, port, sender_email, password, ssl_port, user, root_logger  # settings
+from email.mime.application import MIMEApplication
+from os.path import basename
+from settings import smtp_server, port, sender_email, password, ssl_port, user, root_logger, dbase  # settings
 from tkinter import Tk, ttk, messagebox
-
+import sqlite3
+import shutil  # για διαγραφη των φακέλων με τις εικόνες
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
@@ -31,9 +35,9 @@ def send_mail(data):
         if not receiver_email:
             receiver_email = str(email_entry.get())
 
-        message = MIMEMultipart("alternative")
+        message = MIMEMultipart()
 
-        if len(data) == 17:
+        if len(data) > 10:
             date = data[0]
             customer = data[1]
             copier = data[2]
@@ -53,19 +57,62 @@ def send_mail(data):
             dte = data[13]
             copier_id = data[14]
             finish_date = data[15]
-            if data[16] == 1:
-                status = "Ολοκληρώθηκε"
-            else:
+            customer_id = data[17]
+            service_id = data[18]
+            if data[16] == 0:
                 status = "Δεν έχει ολοκληρωθεί"
+                finish_date = ""
+            else:
+                status = "Ολοκληρώθηκε"
+
+                # Προσθήκη αρχείων
+            if files:
+                for file in files:
+                    with open(file, "rb") as fil:
+                        ext = file.split('.')[-1:]
+                        attached_file = MIMEApplication(fil.read(), _subtype=ext)
+                        attached_file.add_header('content-disposition', 'attachment', filename=basename(file))
+                        message.attach(attached_file)
+
+            # get_images_from_db():
+            con = sqlite3.connect(dbase)
+            cursor = con.cursor()
+            cursor.execute("SELECT * FROM Service_images WHERE Service_ID =?", (service_id,))
+            images = cursor.fetchall()
+            cursor.close()
+            con.close()
+            if images:
+                files = []
+                images_path = "Service images/Service_ID_" + str(service_id) + "/"
+                if not os.path.exists(images_path):
+                    os.makedirs(images_path)
+                # Δημιουργεία εικόνων
+                # images[num][4] ==> Η εικόνα σε sqlite3.Binary
+                # images[num][2 ] =>> Ονομα αρχείου
+                for num, i in enumerate(images):
+                    with open(images_path + images[num][1] + images[num][2], 'wb') as image_file:
+                        image_file.write(images[num][4])
+                images = os.listdir(images_path)
+
+                for img in images:
+                    files.append(img)
+                    ext = img.split('.')[-1:]
+                    img = images_path + img
+                    with open(img, "rb") as file:
+                        attached_file = MIMEApplication(file.read(), _subtype=ext)
+                        attached_file.add_header('content-disposition', 'attachment', filename=basename(img))
+                        message.attach(attached_file)
+
             html = f"""\
                             <html>
                                 <body>
-<p><b>Ημερομηνία:  </b>  {date} <br> <b>Πελάτης: </b>  {customer}  <br> <b>Φωτοτυπικό: </b>  {copier}  
-<br><b>Copier_ID: </b>   {copier_id} <br><b>Σκοπός: </b> {purpose} <br><b>Τεχνικός : </b>  {technician} 
-<br><b>Ενέργιες:  </b>{actions} <br><b>Επείγων: </b>  {urgent} <br><b>Τηλέφωνο:  </b> {phone} 
-<br><b>ΔΤΕ:  </b>{dte} <br><b>Κατάσταση:  </b>{status}<br> <br><b>Ημ_Ολοκλ: </b>   {finish_date}   
-<br><b>Μετρητής:  </b>{counter} <br><b>Επόμενο Service:  </b>{next_service}<br> <br><b>Αρχεία: </b>   {files}   
-<br><b>Ανταλλακτικά:  </b>{spare_parts}<br> <br><b>Σημειώσεις: </b>  {notes} <b><br>Χρήστης:  </b>{user}
+<p><b>Ημερομηνία:  </b>  {date} <br> <b>Πελάτης: </b>  {customer}  <br><b>Customer_id</b> {customer_id} 
+<br> <b>Φωτοτυπικό: </b>  {copier} <br><b>Copier_ID: </b>   {copier_id} <br><b>Σκοπός: </b> {purpose} 
+<br><b>Τεχνικός : </b>  {technician} <br><b>Ενέργιες:  </b>{actions} <br><b>Επείγων: </b>  {urgent} 
+<br><b>Τηλέφωνο:  </b> {phone} <br><b>ΔΤΕ:  </b>{dte} <br><b>Κατάσταση:  </b>{status}<br> 
+<br><b>Ημ_Ολοκλ: </b>   {finish_date}  <br><b>Μετρητής:  </b>{counter} <br><b>Επόμενο Service:  </b>{next_service}
+<br> <br><b>Αρχεία: </b>   {files} <br><b>Ανταλλακτικά:  </b>{spare_parts}<br> <br><b>Σημειώσεις: </b>  {notes} <b>
+<br>Χρήστης:  </b>{user}
                                 </body>
                             </html>
                             """
@@ -73,26 +120,22 @@ def send_mail(data):
             date = data[0]
             customer = data[1]
             copier = data[2]
-            message["Subject"] = "Service Book " + customer + copier
+            message["Subject"] = "Service Book " + " " + customer + " " + copier
             message["From"] = sender_email
             message["To"] = receiver_email
             purpose = data[3]
             technician = data[4]
-            finish_date = data[5]
-            urgent = data[6]
-            phone = data[7]
-            notes = data[8]
-            copier_id = data[9]
-            dte = data[10]
-            status = data[11]
+            urgent = data[5]
+            phone = data[5]
+            notes = data[7]
+            copier_id = data[8]
 
             html = f"""\
                 <html>
                     <body>
             <p><b>Ημερομηνία:  </b>  {date} <br> <b>Πελάτης: </b>  {customer}  <br> <b>Φωτοτυπικό: </b>  {copier}  
-            <br><b>Σκοπός: </b> {purpose} <br><b>Τεχνικός : </b>  {technician} <br><b>Ημ_Ολοκλ:  </b>{finish_date}
-             <br><b>Επείγων: </b>  {urgent} <br><b>Τηλέφωνο:  </b> {phone} <br><b>Σημειώσεις: </b>  {notes} 
-             <br><b>Copier_ID: </b>   {copier_id}   <br><b>ΔΤΕ:  </b>{dte} <br><b>Κατάσταση:  </b>{status}<br>
+            <br><b>Σκοπός: </b> {purpose} <br><b>Τεχνικός : </b>  {technician}<br><b>Επείγων: </b>  {urgent} 
+            <br><b>Τηλέφωνο:  </b> {phone} <br><b>Σημειώσεις: </b>  {notes}  <br><b>Copier_ID: </b>   {copier_id} 
             <b>Χρήστης:  </b>{user}
                     </body>
                 </html>
@@ -104,6 +147,8 @@ def send_mail(data):
         # The email client will try to render the last part first
         message.attach(part2)
         # message.attach(part1)
+
+
 
         # Create a secure SSL context
         context = ssl.create_default_context()
@@ -122,7 +167,16 @@ def send_mail(data):
             print(f'{__name__}', e)
         finally:
             server.quit()
+
+            try:
+                # Διαγραφή αρχείων μετά το κλείσημο του παραθύρου
+                if os.path.exists(images_path):
+                    shutil.rmtree(images_path, ignore_errors=True)
+            except UnboundLocalError:  # Δεν υπάρχουν αρχεία για διαγραφή
+                pass
+
             root.destroy()
+
     email_entry.focus()
 
     send_btn = ttk.Button(root, text="Αποστολή", command=set_receiver)

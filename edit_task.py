@@ -216,7 +216,7 @@ class edit_task_window:
         self.selected_calendar_id = selected_calendar_id
         self.purpose_list, self.actions_list = get_service_data()
         self.service_id = ""
-        self.customer_id = ""
+        self.customer_id = self.get_customer_id()
         self.customers_list, self.serials = get_copiers_data()
         self.mobile = ""
         self.copiers = []  # Τα φωτοτυπικά του επιλεγμένου πελάτη
@@ -227,6 +227,7 @@ class edit_task_window:
         self.urgent = StringVar()
         self.old_notes = ""
         self.columns = None
+        self.len_images = 0
         self.top = top
         top.geometry("600x654+444+228")
         top.minsize(120, 1)
@@ -663,7 +664,7 @@ class edit_task_window:
 
         # Αρχεία
         self.show_files_btn = tk.Button(self.spare_parts_frame)
-        self.show_files_btn.place(relx=0.575, rely=0.700, height=50, relwidth=0.250)
+        self.show_files_btn.place(relx=0.575, rely=0.700, height=50, relwidth=0.380)
         self.show_files_btn.configure(activebackground="#ececec")
         self.show_files_btn.configure(activeforeground="#000000")
         self.show_files_btn.configure(background="#6b6b6b")
@@ -672,12 +673,12 @@ class edit_task_window:
         self.show_files_btn.configure(highlightbackground="#d9d9d9")
         self.show_files_btn.configure(highlightcolor="black")
         self.show_files_btn.configure(pady="0")
-        self.show_files_btn.configure(text='''Προβολή \nαρχείων''')
+        self.show_files_btn.configure(text=f'Προβολή {self.len_images} αρχείων')
+
         self.show_files_btn.configure(command=self.show_files)
         self.show_files_btn_img = PhotoImage(file="icons/view_files.png")
         self.show_files_btn.configure(image=self.show_files_btn_img)
         self.show_files_btn.configure(compound="left")
-
 
         self.spare_parts_treeview = ScrolledTreeView(self.spare_parts_frame)
         self.spare_parts_treeview.place(relx=0.017, rely=0.200, relheight=0.400, relwidth=0.970)
@@ -707,13 +708,24 @@ class edit_task_window:
         cursor = con.cursor()
         cursor.execute("SELECT * FROM Service_images WHERE Service_id =?", (self.service_id,))
         images = cursor.fetchall()
+        self.len_images = len(images)
+        self.show_files_btn.configure(text=f'Προβολή {self.len_images}\nαρχείων')
         cursor.close()
         con.close()
-        if not images:  # αδεια λιστα δλδ δεν υπάρχουν αρχεια και απενεργοποιουμε το κουμπί προβολή αρχείων
+        if self.files:
+            self.show_files_btn.place(relx=0.575, rely=0.700, height=50, relwidth=0.380)
+            self.show_files_btn.configure(text=f'{len(self.files)}\n Αρχεία για προσθήκη')
+            self.show_files_btn.configure(command=self.show_files_to_add)
+        elif not images:  # αδεια λιστα δλδ δεν υπάρχουν αρχεια και απενεργοποιουμε το κουμπί προβολή αρχείων
             self.show_files_btn.place_forget()
+
+    def show_files_to_add(self):
+        messagebox.showwarning('Προσοχή', 'Δεν μπορείτε να δείτε τα αρχεία αν δεν πατήσετε Αποθήκευση')
+        self.top.focus()
 
     # Προβολή αρχείων
     def show_files(self):
+
         image_viewer.create_Toplevel1(w, self.service_id)
 
     # Προσθήκη αρχείων
@@ -725,7 +737,9 @@ class edit_task_window:
         if self.files == "":  # αν ο χρήστης επιλεξει ακυρο
             self.top.focus()
             return
-
+        else:
+            self.show_files_btn.configure(text=f'{len(self.files)} Αρχεία για προσθήκη')
+            self.check_if_files_exists()
         self.top.focus()
 
     # αλαγή χρώματος κουμπιού ολοκλήρωσης this function will run on click on checkbutton
@@ -785,13 +799,7 @@ class edit_task_window:
 
     # Προσθήκη ανταλλακτικών
     def add_spare_parts(self):
-        self.top.focus()
-        con = sqlite3.connect(dbase)
-        c = con.cursor()
-        c.execute("SELECT ID FROM Πελάτες WHERE Επωνυμία_Επιχείρησης =?", (self.customer_combobox.get(),))
-        data = c.fetchall()
-        con.close()
-        self.customer_id = data[0]
+
         if spare_parts_db:
             add_spare_parts.create_Toplevel1(self.top, self.service_id, self.customer_id, self.copiers_combobox.get())
         else:
@@ -852,12 +860,13 @@ class edit_task_window:
         for child in self.spare_parts_treeview.get_children():
             added_spare_parts.append(self.spare_parts_treeview.item(child)["values"][2:4])
         # spare_parts = self.spare_parts_treeview.get_children("")
-
+        print("line 870 self.completed_var.get()", self.completed_var.get())
         data = [self.start_date.get(), self.customer_combobox.get(), self.selected_copier, self.purpose_combobox.get(),
                 self.technician_entry.get(), self.actions_combobox.get(), self.counter_entry.get(), self.next_service_entry.get(),
                 self.files, added_spare_parts, self.urgent, self.phone_entry.get(),
                 self.notes_scrolledtext.get('1.0', 'end-1c'), self.dte_entry.get(),
-                self.copier_id, self.compl_date_entry.get(), 1]
+                self.copier_id, self.compl_date_entry.get(), self.completed_var.get(), self.customer_id, self.service_id]
+
         mail.send_mail(data)
 
     # Να πάρουμε Δεδομένα
@@ -932,8 +941,6 @@ class edit_task_window:
             self.completed_Checkbutton1.configure(bg="red")
             self.completed_Checkbutton1.configure(text='')
 
-
-
     def get_copier(self, event=None):
         # να πάρουμε το id του πελάτη απο το ονομα του
         customer = self.customer_combobox.get()
@@ -941,9 +948,9 @@ class edit_task_window:
 
         con = sqlite3.connect(dbase)
         cursor = con.cursor()
-        cursor.execute("SELECT ID, Τηλέφωνο, Κινητό, Διεύθυνση FROM Πελάτες WHERE  Επωνυμία_Επιχείρησης =?", (customer,))
+        cursor.execute("SELECT ID, Τηλέφωνο, Κινητό, Διεύθυνση FROM Πελάτες WHERE  ID =?", (self.customer_id,))
         customer_data = cursor.fetchall()  # ==> [(4,)] αρα θέλουμε το customer_id[0][0]
-        self.customer_id = customer_data[0][0]
+        # self.customer_id = customer_data[0][0]
 
         self.phone_var = StringVar(w, value=customer_data[0][1])
         self.phone_entry.configure(textvariable=self.phone_var)
@@ -1044,7 +1051,7 @@ class edit_task_window:
                 self.purpose_combobox.get(), self.actions_combobox.get(), self.technician_entry.get(),
                 self.compl_date_entry.get(), self.urgent, self.phone_entry.get(),
                 self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, self.dte_entry.get(),
-                self.service_id, self.counter_entry.get(), self.next_service_entry.get(),
+                self.service_id, self.counter_entry.get(), self.next_service_entry.get(), self.customer_id,
                 0 if self.completed_var.get() else 1, self.selected_calendar_id]
 
         cursor.execute("UPDATE Calendar  SET " + edited_columns + " WHERE ID=? ", (tuple(data,)))
@@ -1085,8 +1092,17 @@ class edit_task_window:
         self.add_files_to_db()
         messagebox.showinfo("Info", f"H εργασία αποθηκεύτηκε επιτυχώς στον πελάτη {self.customer_combobox.get()}")
         self.top.destroy()
-
         return None
+
+    def get_customer_id(self):
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT Customer_ID FROM Calendar WHERE ID =?", (self.selected_calendar_id,))
+        data = c.fetchall()
+        con.close()
+        customer_id = data[0][0]
+
+        return customer_id
 
     def quit(self, event):
         self.top.destroy()
