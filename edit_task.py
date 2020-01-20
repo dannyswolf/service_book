@@ -860,7 +860,6 @@ class edit_task_window:
         for child in self.spare_parts_treeview.get_children():
             added_spare_parts.append(self.spare_parts_treeview.item(child)["values"][2:4])
         # spare_parts = self.spare_parts_treeview.get_children("")
-        print("line 870 self.completed_var.get()", self.completed_var.get())
         data = [self.start_date.get(), self.customer_combobox.get(), self.selected_copier, self.purpose_combobox.get(),
                 self.technician_entry.get(), self.actions_combobox.get(), self.counter_entry.get(), self.next_service_entry.get(),
                 self.files, added_spare_parts, self.urgent, self.phone_entry.get(),

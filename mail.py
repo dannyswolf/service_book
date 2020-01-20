@@ -9,6 +9,8 @@ from email.mime.application import MIMEApplication
 from os.path import basename
 from settings import smtp_server, port, sender_email, password, ssl_port, user, root_logger, dbase  # settings
 from tkinter import Tk, ttk, messagebox
+from tkinter.ttk import Progressbar
+import time
 import sqlite3
 import shutil  # για διαγραφη των φακέλων με τις εικόνες
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
@@ -24,19 +26,30 @@ print(f"{100 * '*'}\n\t\t\t\t\t\t\t\t\t\tFILE {__name__}")
 def send_mail(data):
 
     root = Tk()
-    root.geometry("250x100+50+50")
+    root.geometry("350x150+50+50")
     root.title("Αποστολή e-mail")
     email_label = ttk.Label(root, text="Εισάγεται e-mail")
     email_label.pack()
     email_entry = ttk.Entry(root, width=30)
     email_entry.pack()
 
+    # Progress bar widget
+
+    progress = Progressbar(root, orient='horizontal', length=100, mode='determinate')
+    progress["maximum"] = 100
+    # Function responsible for the updation
+    # of the progress bar value
+
     def set_receiver(receiver_email=None):
+
         if not receiver_email:
             receiver_email = str(email_entry.get())
 
         message = MIMEMultipart()
 
+        progress.start()
+        progress['value'] = 20
+        progress.update()
         if len(data) > 10:
             date = data[0]
             customer = data[1]
@@ -142,13 +155,13 @@ def send_mail(data):
                 """
         # Turn these into plain/html MIMEText objects
         # part1 = MIMEText(text, "plain")
+        progress['value'] = 40
+        progress.update()
         part2 = MIMEText(html, "html")
         # Add HTML/plain-text parts to MIMEMultipart message
         # The email client will try to render the last part first
         message.attach(part2)
         # message.attach(part1)
-
-
 
         # Create a secure SSL context
         context = ssl.create_default_context()
@@ -160,7 +173,10 @@ def send_mail(data):
             server.starttls(context=context)  # Secure the connection
             server.ehlo()  # Can be omitted
             server.login(sender_email, password)
+            progress['value'] = 80
+            progress.update()
             server.sendmail(sender_email, receiver_email, message.as_bytes())  # Send email here
+
         except Exception as e:
             # Print any error messages to stdout
             messagebox.showerror("Σφάλμα", f'{e}')
@@ -174,14 +190,21 @@ def send_mail(data):
                     shutil.rmtree(images_path, ignore_errors=True)
             except UnboundLocalError:  # Δεν υπάρχουν αρχεία για διαγραφή
                 pass
-
+            progress['value'] = 100
+            progress.update()
+            progress.stop()
             root.destroy()
 
     email_entry.focus()
 
     send_btn = ttk.Button(root, text="Αποστολή", command=set_receiver)
     send_btn.pack()
-    send_to_mlcopier_btn = ttk.Button(root, text="Αποστολή στο mlcopier", command=lambda:set_receiver("mlcopier@mail.com"))
+
+    send_to_mlcopier_btn = ttk.Button(root, text="Αποστολή στο mlcopier", command=lambda: set_receiver("mlcopier@mail.com"))
     send_to_mlcopier_btn.pack()
+    progress.pack(pady=10)
+
+
+
 
 
