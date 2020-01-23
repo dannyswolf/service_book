@@ -7,12 +7,15 @@
 
 """
 
+
 todo αν ο χρήστης πατήση ακυρο κατα την προσθήκη επισκευής τι θα γίνει με τα ανταλλακτικα που έχουν οριστεί με νεο service_id
 todo προβολή όλων των εικόνων
 todo start day to binary file
 todo Αποθήκη για τα ανταλλακτικά που εισάγουμε στο local version
 todo να μπει στις σημειώσεις πότε ενεργοποίθηκε/απενεργοποίθηκε φωτοτυπικό και πελάτης
+todo fix # Σειριακός αριθμός warning
 
+V1.4.2 Print to pdf Added       ---------------------------------------------------------22/01/2020
 
 V1.4.1 Progressbar on email     ---------------------------------------------------------20/01/2020
 
@@ -232,6 +235,7 @@ from datetime import date, timedelta
 import sys  # Για τα αρχεία log files
 from settings import dbase, demo, service_book_version, root_logger, today  # settings
 
+
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
 
@@ -382,7 +386,7 @@ class Toplevel1:
         if self.remaining_days < 10:
             messagebox.showwarning("Προσοχή", f"Η εφαρμογή θα στματατήσει σε {self.remaining_days} μέρες")
         elif self.remaining_days < 0:
-            messagebox.showwarning("Προσοχή", f"Η εφαρμογή έληξε παρακαλώ ανανεώστε την υποστήριξη συντηρησης")
+            messagebox.showwarning("Προσοχή", f"Η εφαρμογή έληξε παρακαλώ ανανεώστε την υποστήριξη συντήρησης")
             return
         self.style = ttk.Style()
         if sys.platform == "win32":
@@ -450,7 +454,6 @@ class Toplevel1:
         # self.info_menu.add_command(label="Πληροφορίες", command=get_info)
 
         top.configure(menu=self.menubar)
-
 
         #  Modify the font of the body
         self.style.theme_create("mystyle.Treeview", parent="clam")
@@ -865,7 +868,10 @@ class Toplevel1:
         self.serial_label.configure(highlightcolor="black")
         self.serial_label.configure(relief="groove")
         self.serial_label.configure(text="Σειριακός αριθμός")
+        self.serial = StringVar()
+        self.serial.trace('w', self.check_serial)
         self.serial_entry = tk.Entry(self.copier_frame)
+        self.serial_entry.configure(textvariable=self.serial)
         self.serial_entry.place(relx=0.225, rely=0.100, height=20, relwidth=0.2)
         self.serial_entry.configure(background="white")
         self.serial_entry.configure(disabledforeground="#a3a3a3")
@@ -876,6 +882,12 @@ class Toplevel1:
         self.serial_entry.configure(insertbackground="black")
         self.serial_entry.configure(selectbackground="#c4c4c4")
         self.serial_entry.configure(selectforeground="black")
+        self.serial_entry_warning = ttk.Label(self.copier_frame)
+        self.serial_entry_warning_img = PhotoImage(file="icons/lamp.png")
+        self.serial_entry_warning.configure(image=self.serial_entry_warning_img)
+        self.serial_entry_warning.configure(compound='left')
+        # self.serial_entry_warning.place(relx=0.425, rely=0.100, relheight=0.060, relwidth=0.03)
+
         # Μετρητής Εναρξης
         self.Label12 = tk.Label(self.copier_frame)
         self.Label12.place(relx=0.021, rely=0.180, height=21, relwidth=0.200)
@@ -1308,6 +1320,27 @@ class Toplevel1:
         self.service_calendar.bind('<<CalendarSelected>> ', self.view_scheduled_tasks)
 
         self.get_calendar()
+
+    # Ελεγχος αν το serial  υπάρχει
+    def check_serial(self, name, index, mode):
+        self.serial_entry_warning.place_forget()
+        all_serials = []
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT Serial FROM Φωτοτυπικά WHERE Κατάσταση = 1;")
+        selials = c.fetchall()
+        con.close()
+
+        for serial in selials:
+            all_serials.append(serial[0])
+
+        if self.serial_entry.get() in all_serials:
+            self.serial_entry.configure(foreground="red")
+            # self.serial_entry.place(relx=0.225, rely=0.100, height=20, relwidth=0.2)
+            self.serial_entry_warning.place(relx=0.425, rely=0.100, relheight=0.060, relwidth=0.03)
+        else:
+            self.serial_entry.configure(foreground="green")
+            self.serial_entry_warning.place_forget()
 
     # Ελεγχος αν το όνομα του πελάτη υπάρχει
     def check_customer_name(self, name, index, mode):
@@ -1837,7 +1870,8 @@ class Toplevel1:
         var = StringVar(root, value="")
         self.start_counter_entry.configure(textvariable=var)
         self.start_entry.configure(textvariable=var)
-        self.serial_entry.configure(textvariable=var)
+        self.serial.set(value="")
+        self.serial_entry.configure(textvariable=self.serial)
         self.copiers_title_label.configure(text="Στοιχεία φωτοτυπικού")
         self.copier_notes_scrolledtext.delete('1.0', 'end-1c')
         self.Label16.configure(text='''Ιστορικό''')
@@ -2000,8 +2034,8 @@ class Toplevel1:
             # Το selected_item == string
             if int(selected_item) == int(copiers[n][0]):
                 self.selected_copier_id = int(selected_item)
-                var = StringVar(root, value=copiers[n][2])  # Σειριακός αριθμός
-                self.serial_entry.configure(textvariable=var)
+                self.serial.set(value=copiers[n][2])  # Σειριακός αριθμός
+                self.serial_entry.configure(textvariable=self.serial.get())
                 var = StringVar(root, value=copiers[n][3])  # Εναρξη
                 self.start_entry.configure(textvariable=var)
                 var = StringVar(root, value=copiers[n][4])  # Μετρητής έναρξης
@@ -2189,7 +2223,8 @@ class Toplevel1:
         var = StringVar(root, value="")
         self.start_counter_entry.configure(textvariable=var)
         self.start_entry.configure(textvariable=var)
-        self.serial_entry.configure(textvariable=var)
+        self.serial.set(value="")
+        self.serial_entry.configure(textvariable=self.serial)
         self.copiers_title_label.configure(text="Στοιχεία φωτοτυπικού")
         self.copier_notes_scrolledtext.delete('1.0', 'end-1c')
         try:

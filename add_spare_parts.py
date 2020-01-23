@@ -117,7 +117,7 @@ class Toplevel1:
         self.headers = []
         self.selected_company = ""
         self.service_ID = service_id
-        self.customer_id = customer_id[0]
+        self.customer_id = customer_id
         self.copier = copier_name
         self.select_company_label = tk.Label(top)
         self.select_company_label.place(relx=0.025, rely=0.200, relheight=0.060, relwidth=0.260)

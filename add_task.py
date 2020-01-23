@@ -5,8 +5,10 @@
 #  in conjunction with Tcl version 8.6
 #    Dec 22, 2019 12:31:44 AM EET  platform: Windows NT
 
+from xhtml2pdf import pisa
 import add_copier_support
 import sys
+import os
 from tkinter import PhotoImage, messagebox, StringVar
 import sqlite3
 from datetime import datetime
@@ -14,9 +16,7 @@ import mail
 import add_copier
 from tkcalendar import DateEntry
 from settings import dbase,  root_logger, demo, today  # settings
-
-
-
+import subprocess
 
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
 sys.stderr.write = root_logger.error
@@ -345,6 +345,13 @@ class add_task_window:
         self.technician_entry.configure(foreground="#000000")
         self.technician_entry.configure(insertbackground="black")
 
+        self.print_btn = tk.Button(top)
+        self.print_btn.place(relx=0.700, rely=0.936, relheight=0.060, relwidth=0.070)
+        # self.print_btn.configure(background="#6b6b6b")
+        self.print_btn_img = PhotoImage(file="icons/print.png")
+        self.print_btn.configure(image=self.print_btn_img)
+        self.print_btn.configure(command=self.print_to_pdf)
+
         self.urgent_label = tk.Label(top)
         self.urgent_label.place(relx=0.025, rely=0.553, height=31, relwidth=0.230)
         self.urgent_label.configure(activebackground="#f9f9f9")
@@ -368,7 +375,7 @@ class add_task_window:
         self.urgent_entry.configure(insertbackground="black")
 
         self.send_mail_btn = tk.Button(top)
-        self.send_mail_btn.place(relx=0.880, rely=0.553, relheight=0.060, relwidth=0.070)
+        self.send_mail_btn.place(relx=0.620, rely=0.936, relheight=0.060, relwidth=0.070)
         self.send_mail_btn.configure(background="#6b6b6b")
         self.send_mail_btn_img1 = PhotoImage(file="icons/send_mail.png")
         self.send_mail_btn.configure(image=self.send_mail_btn_img1)
@@ -584,6 +591,167 @@ class add_task_window:
         self.top.destroy()
         return None
 
+    # Print to pdf
+    def print_to_pdf(self):
+        # Define your data
+        prints_dir = f'prints/{today}'
+        if not os.path.exists(prints_dir):
+            os.makedirs(prints_dir)
+        outputFilename = f"{prints_dir}/Service Book {self.customer_combobox.get()}  {today}  .pdf"
+
+        # Utility function
+        def convertHtmlToPdf(sourceHtml, outputFilename):
+            # open output file for writing (truncated binary)
+            resultFile = open(outputFilename, "w+b")
+
+            # convert HTML to PDF
+
+            pisaStatus = pisa.CreatePDF(sourceHtml.encode('utf-8'), dest=resultFile, encoding='utf8')
+
+            # close output file
+            resultFile.close()  # close output file
+
+            # return True on success and False on errors
+            return pisaStatus.err
+
+        data = [self.start_date.get(), self.customer_combobox.get(), self.phone_var.get(), self.copiers_combobox.get(),
+                self.purpose_combobox.get(), self.technician.get(), self.urgent.get(),
+                self.notes_scrolledtext.get('1.0', 'end-1c')]
+
+        names = ["Ημερομηνία", "Πελάτης", "Μηχάνημα", "Σκοπός", "Τεχνικός", "Επίγων", "Τηλέφωνο", "Σημειώσεις"]
+
+        images = ['icons/date.png', 'icons/customer.png', 'icons/phone.png', 'icons/copier.png', 'icons/purpose.png',
+                  'icons/technician.png', 'icons/urgent.png', 'icons/notes.png']
+
+
+
+        font = """{
+        font-family: Calibri;
+        src: url('../fonts/Calibrib.ttf');
+        }
+
+        body {
+        font-family: Calibri;
+        }
+        h1 {
+        font-family: Calibri;
+        }
+        h2 {
+        font-family: Calibri;
+        }
+        h3 {
+        font-family: Calibri;
+        }
+        h4 {
+        font-family: Calibri;
+        }
+        """
+
+        sourceHtml = f"""<html>
+        
+        <meta http-equiv=Content-Type content="text/html;charset=utf-8"></meta>
+        <style>
+        @font-face {font}
+        </style> 
+        <h1 style="text-align: center;"><img style="float: right;" src="../icons/logo-small-orange.png" alt="" width="200" height="143" /></h1>
+<h1 style="text-align: center;">&nbsp;</h1>
+<h1 style="text-align: center;"><span style="text-decoration: underline;">&Delta;&epsilon;&lambda;&tau;ί&omicron;&nbsp;&tau;&epsilon;&chi;&nu;&iota;&kappa;ή&sigmaf;&nbsp;&epsilon;&xi;&upsilon;&pi;&eta;&rho;έ&tau;&eta;&sigma;&eta;&sigmaf;</span></h1>
+<table style="width: 765px; height: 177px; border-color: black; margin-left: auto; margin-right: auto;" border="1">
+<tbody>
+<tr style="text-align: center; height: 54px;">
+<td style="width: 273px; height: 54px;">
+<h3 style="text-align: center;"><strong>&Eta;&mu;&epsilon;&rho;&omicron;&mu;&eta;&nu;ί&alpha;</strong>:</h3>
+</td>
+<td style="width: 476px; height: 54px; text-align: left;"><strong>&nbsp;&nbsp;&nbsp;&nbsp;{self.start_date.get()}</strong></td>
+</tr>
+<tr style="height: 54px;">
+<td style="width: 273px; text-align: center; height: 54px;">
+<h3><strong>&Pi;&epsilon;&lambda;ά&tau;&eta;&sigmaf;</strong>:</h3>
+</td>
+<td style="width: 476px; height: 54px; text-align: left;">&nbsp;<strong>&nbsp;&nbsp;&nbsp;&nbsp;{self.customer_combobox.get()}</strong></td>
+</tr>
+<tr style="height: 54px;">
+<td style="width: 273px; height: 54px;">
+<h3 style="text-align: center;"><strong>&Tau;&eta;&lambda;έ&phi;&omega;&nu;&omicron;</strong>:</h3>
+</td>
+<td style="width: 476px; height: 54px; text-align: left;"><strong>&nbsp;&nbsp;&nbsp;&nbsp;{self.phone_var.get()}</strong></td>
+</tr>
+<tr style="height: 54px;">
+<td style="width: 273px; text-align: center; height: 54px;">
+<h3>&Mu;&eta;&chi;ά&nu;&eta;&mu;&alpha;:</h3>
+</td>
+<td style="width: 476px; height: 54px; text-align: left;">&nbsp;<strong>&nbsp;&nbsp;&nbsp;&nbsp;{self.copiers_combobox.get()}</strong></td>
+</tr>
+<tr style="height: 54px;">
+<td style="width: 273px; text-align: center; height: 54px;">
+<h3>&Pi;&epsilon;&rho;&iota;&gamma;&rho;&alpha;&phi;ή &pi;&rho;&omicron;&beta;&lambda;ή&mu;&alpha;&tau;&omicron;&sigmaf;:</h3>
+</td>
+<td style="width: 476px; height: 54px; text-align: left;">&nbsp;<strong>&nbsp;&nbsp;&nbsp;&nbsp;{self.purpose_combobox.get()}</strong></td>
+</tr>
+<tr style="height: 54px;">
+<td style="width: 273px; text-align: center; height: 54px;">
+<h3>&Tau;&epsilon;&chi;&nu;&iota;&kappa;ό&sigmaf;:</h3>
+</td>
+<td style="width: 476px; height: 54px; text-align: left;">&nbsp;<strong>&nbsp;&nbsp;&nbsp;&nbsp;{self.technician.get()}</strong></td>
+</tr>
+<tr style="height: 54px;">
+<td style="width: 273px; text-align: center; height: 54px;">
+<h3>&Epsilon;&pi;ί&gamma;&omega;&nu;:</h3>
+</td>
+<td style="width: 476px; height: 54px; text-align: left;">&nbsp;<strong>&nbsp;&nbsp;&nbsp;&nbsp;{self.urgent.get()}</strong></td>
+</tr>
+<tr style="height: 47.75px;">
+<td style="width: 273px; text-align: center; height: 47.75px;">
+<h4>&Sigma;&eta;&mu;&epsilon;&iota;ώ&sigma;&epsilon;&iota;&sigmaf;:</h4>
+</td>
+<td style="width: 476px; height: 147.75px; align: left">
+<hr />
+<h4>&nbsp;&nbsp;&nbsp;&nbsp;{self.notes_scrolledtext.get('1.0', 'end-1c')}</h4>
+<hr />
+<p>&nbsp;</p>
+<hr />
+<p>&nbsp;</p>
+<hr />
+<p>&nbsp;</p>
+<hr />
+<p>&nbsp;&nbsp;</p>
+</td>
+</tr>
+<p>&nbsp;</p>
+</table>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<table style="width: 765px; height: 300px; margin-left: auto; margin-right: auto;" border="1">
+
+<td style="width: 273.5px; height: 20px; text-align: center;"><strong>&Epsilon;&nu;&eta;&mu;&epsilon;&rho;ώ&theta;&eta;&kappa;&epsilon;:</strong></td>
+<td style="width: 496.5px; height: 20px;">&nbsp;</td>
+</tr>
+<tr style="height: 20px;">
+<td style="width: 282.5px; text-align: center; height: 20px;"><strong>&Omicron;&lambda;&omicron;&kappa;&lambda;&eta;&rho;ώ&theta;&eta;&kappa;&epsilon;:</strong></td>
+<td style="width: 496.5px; height: 20px;">&nbsp;</td>
+</tr>
+<tr style="height: 25px;">
+<td style="width: 282.5px; text-align: center; height: 25px;"><strong>&Pi;&alpha;&rho;&alpha;&delta;ό&theta;&eta;&kappa;&epsilon;:</strong></td>
+<td style="width: 496.5px; height: 20px;">&nbsp;</td>
+</tr>
+<tr style="height: 22px;">
+<td style="width: 282.5px; text-align: center; height: 22px;"><strong>&Eta;&mu;&epsilon;&rho;. &Pi;&alpha;&rho;ά&delta;&omega;&sigma;&eta;&sigmaf; :</strong></td>
+<td style="width: 496.5px; height: 20px;">&nbsp;</td>
+</tr>
+<tr style="height: 20.75px;">
+<td style="width: 282.5px; text-align: center; height: 20.75px;"><strong>&Upsilon;&pi;&omicron;&gamma;&rho;&alpha;&phi;ή &Tau;&epsilon;&chi;&nu;&iota;&kappa;&omicron;ύ</strong></td>
+<td style="width: 496.5px; height: 20.75px;">&nbsp;</td>
+</tr>
+</tbody>
+</table>
+
+        </html>
+        """
+
+        convertHtmlToPdf(sourceHtml, outputFilename)
+
+        subprocess.Popen(outputFilename, shell=True)
+
     # Αποστολή email
     def send_mail(self):
         # Αν γράψουμε νέο φωτοτυπικό και όχι απο την λίστα
@@ -593,6 +761,7 @@ class add_task_window:
         data = [self.start_date.get(), self.customer_combobox.get(), self.copiers_combobox.get(), self.purpose_combobox.get(),
                 self.technician.get(), self.urgent.get(), self.phone_var.get(),
                 self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id]
+        names = ["Ημερομηνία", "Πελάτης", "Μηχάνημα", "Σκοπός", "Τεχνικός", "Επίγων", "Τηλέφωνο", "Σημειώσεις"]
 
         mail.send_mail(data)
 
