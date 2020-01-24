@@ -15,7 +15,7 @@ from datetime import datetime
 import mail
 import add_copier
 from tkcalendar import DateEntry
-from settings import dbase,  root_logger, demo, today  # settings
+from settings import dbase, root_logger, demo, today, user  # settings
 import subprocess
 
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
@@ -112,6 +112,7 @@ w = None
 selected_customer_id = ""
 selected_customer = ""
 
+
 def create_add_task_window(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
     global w, w_win, rt, selected_customer_id, selected_customer
@@ -133,7 +134,6 @@ def create_add_task_window(root, *args, **kwargs):
     top = add_task_window(w)
     add_copier_support.init(w, top, *args, **kwargs)
     return (w, top)
-
 
 
 def destroy_add_task_window():
@@ -168,12 +168,14 @@ class add_task_window:
         self.purpose_list, self.actions_list = get_service_data()
         self.selected_customer = selected_customer  # Επιλεγμένος πελάτης απο το service_book_colors
         self.selected_customer_id = selected_customer_id
+        self.mobile = ""
         self.service_id = get_service_id()
         self.customer_id = ""
         self.copiers = []  # Τα φωτοτυπικά του επιλεγμένου πελάτη
         self.selected_copier = ""  # το επιλεγμένο φωτοτυπικό
         self.selected_serial = ""
         self.copier_id = ""
+        self.printed = 0
         self.top = top
         top.geometry("505x524+400+100")
         top.minsize(120, 1)
@@ -217,10 +219,10 @@ class add_task_window:
         self.date_label.configure(relief="groove")
         self.date_label.configure(text='''Ημερομηνία''')
 
-
         self.start_date = DateEntry(top, width=12, year=self.year, month=self.month, day=self.day,
-                             background='gray20', selectmode='day', foreground='white', borderwidth=5, locale="el_GR",
-                             font=("Calibri", 10, 'bold'), date_pattern='dd/mm/yyyy')
+                                    background='gray20', selectmode='day', foreground='white', borderwidth=5,
+                                    locale="el_GR",
+                                    font=("Calibri", 10, 'bold'), date_pattern='dd/mm/yyyy')
         self.start_date.place(relx=0.27, rely=0.095, height=31, relwidth=0.593)
 
         self.customer_label = tk.Label(top)
@@ -297,7 +299,6 @@ class add_task_window:
         self.refresh_task_img = PhotoImage(file="icons/refresh.png")
         self.refresh_task_btn.configure(image=self.refresh_task_img)
         self.refresh_task_btn.configure(command=self.get_copier)
-
 
         self.purpose_label = tk.Label(top)
         self.purpose_label.place(relx=0.025, rely=0.400, height=31, relwidth=0.230)
@@ -457,7 +458,8 @@ class add_task_window:
 
         con = sqlite3.connect(dbase)
         cursor = con.cursor()
-        cursor.execute("SELECT ID, Τηλέφωνο, Κινητό, Διεύθυνση FROM Πελάτες WHERE  Επωνυμία_Επιχείρησης =?", (customer,))
+        cursor.execute("SELECT ID, Τηλέφωνο, Κινητό, Διεύθυνση FROM Πελάτες WHERE  Επωνυμία_Επιχείρησης =?",
+                       (customer,))
         customer_data = cursor.fetchall()  # ==> [(4,)] αρα θέλουμε το customer_id[0][0]
         self.customer_id = customer_data[0][0]
 
@@ -469,13 +471,17 @@ class add_task_window:
         self.notes_scrolledtext.insert("1.0", self.mobile.get())
         self.notes = StringVar(w, value="Διεύθυνση : " + customer_data[0][3] + "\n")
         self.notes_scrolledtext.insert("2.0", self.notes.get())
+        line = 40 * "-"
+        self.notes_scrolledtext.insert("3.0", line + user + line + "\n")
+        self.notes_scrolledtext.insert("4.0", " ")
 
         self.technician = StringVar(w, value="Ιορδάνης ")
         self.technician_entry.delete(0, 'end')
         self.technician_entry.insert(0, self.technician.get())
 
         # Εμφάνιση φωτοτυπικών σύμφονα με το customer_id
-        cursor.execute("SELECT Εταιρεία, Serial FROM Φωτοτυπικά WHERE Πελάτη_ID = ? AND Κατάσταση = 1 ", (self.customer_id,))
+        cursor.execute("SELECT Εταιρεία, Serial FROM Φωτοτυπικά WHERE Πελάτη_ID = ? AND Κατάσταση = 1 ",
+                       (self.customer_id,))
         copiers = cursor.fetchall()
         self.copiers = []
         for copier in copiers:
@@ -494,6 +500,10 @@ class add_task_window:
         self.top.destroy()
 
     def add_task(self):
+        if not self.printed:
+            answer = messagebox.askyesno("Προσοχή!", f'Η κλήση δεν έχει εκτυπωθεί\nΘέλετε να γίνει εκτύπωση;')
+            if answer:
+                self.print_to_pdf()
 
         # Demo
         if demo:
@@ -595,9 +605,10 @@ class add_task_window:
     def print_to_pdf(self):
         # Define your data
         prints_dir = f'prints/{today}'
+
         if not os.path.exists(prints_dir):
             os.makedirs(prints_dir)
-        outputFilename = f"{prints_dir}/Service Book {self.customer_combobox.get()}  {today}  .pdf"
+        outputFilename = f"{prints_dir}/Service Book {self.customer_combobox.get()} {today}.pdf"
 
         # Utility function
         def convertHtmlToPdf(sourceHtml, outputFilename):
@@ -623,8 +634,6 @@ class add_task_window:
         images = ['icons/date.png', 'icons/customer.png', 'icons/phone.png', 'icons/copier.png', 'icons/purpose.png',
                   'icons/technician.png', 'icons/urgent.png', 'icons/notes.png']
 
-
-
         font = """{
         font-family: Calibri;
         src: url('../fonts/Calibrib.ttf');
@@ -632,18 +641,24 @@ class add_task_window:
 
         body {
         font-family: Calibri;
+        font-weight: bold;
         }
         h1 {
         font-family: Calibri;
+        font-weight: bold;
         }
         h2 {
         font-family: Calibri;
+        font-weight: bold;
         }
         h3 {
         font-family: Calibri;
+        font-weight: bold;
         }
         h4 {
         font-family: Calibri;
+        font-weight: bold;
+        
         }
         """
 
@@ -652,11 +667,12 @@ class add_task_window:
         <meta http-equiv=Content-Type content="text/html;charset=utf-8"></meta>
         <style>
         @font-face {font}
-        </style> 
-        <h1 style="text-align: center;"><img style="float: right;" src="../icons/logo-small-orange.png" alt="" width="200" height="143" /></h1>
-<h1 style="text-align: center;">&nbsp;</h1>
-<h1 style="text-align: center;"><span style="text-decoration: underline;">&Delta;&epsilon;&lambda;&tau;ί&omicron;&nbsp;&tau;&epsilon;&chi;&nu;&iota;&kappa;ή&sigmaf;&nbsp;&epsilon;&xi;&upsilon;&pi;&eta;&rho;έ&tau;&eta;&sigma;&eta;&sigmaf;</span></h1>
-<table style="width: 765px; height: 177px; border-color: black; margin-left: auto; margin-right: auto;" border="1">
+        </style>
+        <body>
+        <font size = "5"> 
+        <img style="float: right;" src="../icons/logo-small-orange.png" alt="" width="200" height="143" />
+<h2 style="text-align: center;"><span style="text-decoration: underline;">&Delta;&epsilon;&lambda;&tau;ί&omicron;&nbsp;&tau;&epsilon;&chi;&nu;&iota;&kappa;ή&sigmaf;&nbsp;&epsilon;&xi;&upsilon;&pi;&eta;&rho;έ&tau;&eta;&sigma;&eta;&sigmaf;</span></h2>
+<table style="width: 765px; height: 120px; border-color: black; margin-left: auto; margin-right: auto;" border="1">
 <tbody>
 <tr style="text-align: center; height: 54px;">
 <td style="width: 273px; height: 54px;">
@@ -704,10 +720,10 @@ class add_task_window:
 <td style="width: 273px; text-align: center; height: 47.75px;">
 <h4>&Sigma;&eta;&mu;&epsilon;&iota;ώ&sigma;&epsilon;&iota;&sigmaf;:</h4>
 </td>
-<td style="width: 476px; height: 147.75px; align: left">
+<td style="width: 476px; height: 260px; align: left;">
 <hr />
-<h4>&nbsp;&nbsp;&nbsp;&nbsp;{self.notes_scrolledtext.get('1.0', 'end-1c')}</h4>
-<hr />
+<strong><h3>&nbsp;&nbsp;&nbsp;&nbsp;{self.notes_scrolledtext.get('1.0', 'end-1c')}</h3>
+
 <p>&nbsp;</p>
 <hr />
 <p>&nbsp;</p>
@@ -719,38 +735,39 @@ class add_task_window:
 </tr>
 <p>&nbsp;</p>
 </table>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<table style="width: 765px; height: 300px; margin-left: auto; margin-right: auto;" border="1">
 
-<td style="width: 273.5px; height: 20px; text-align: center;"><strong>&Epsilon;&nu;&eta;&mu;&epsilon;&rho;ώ&theta;&eta;&kappa;&epsilon;:</strong></td>
-<td style="width: 496.5px; height: 20px;">&nbsp;</td>
+<table style="width: 765px; height: 300px;" border="1";>
+
+<td style="width: 273px; text-align: center;" valign="middle"><strong>&Epsilon;&nu;&eta;&mu;&epsilon;&rho;ώ&theta;&eta;&kappa;&epsilon;:</strong></td>
+<td style="width: 476px; height: 20px;">&nbsp;</td>
 </tr>
 <tr style="height: 20px;">
-<td style="width: 282.5px; text-align: center; height: 20px;"><strong>&Omicron;&lambda;&omicron;&kappa;&lambda;&eta;&rho;ώ&theta;&eta;&kappa;&epsilon;:</strong></td>
-<td style="width: 496.5px; height: 20px;">&nbsp;</td>
+<td style="width: 273px; text-align: center; height: 25px;"><strong>&Omicron;&lambda;&omicron;&kappa;&lambda;&eta;&rho;ώ&theta;&eta;&kappa;&epsilon;:</strong></td>
+<td style="width: 476px; height: 20px;">&nbsp;</td>
 </tr>
 <tr style="height: 25px;">
-<td style="width: 282.5px; text-align: center; height: 25px;"><strong>&Pi;&alpha;&rho;&alpha;&delta;ό&theta;&eta;&kappa;&epsilon;:</strong></td>
-<td style="width: 496.5px; height: 20px;">&nbsp;</td>
+<td style="width: 273px; text-align: center; height: 25px;"><strong>&Pi;&alpha;&rho;&alpha;&delta;ό&theta;&eta;&kappa;&epsilon;:</strong></td>
+<td style="width: 476px; height: 20px;">&nbsp;</td>
 </tr>
 <tr style="height: 22px;">
-<td style="width: 282.5px; text-align: center; height: 22px;"><strong>&Eta;&mu;&epsilon;&rho;. &Pi;&alpha;&rho;ά&delta;&omega;&sigma;&eta;&sigmaf; :</strong></td>
-<td style="width: 496.5px; height: 20px;">&nbsp;</td>
+<td style="width: 273px; text-align: center; height: 25px;"><strong>&Eta;&mu;&epsilon;&rho;. &Pi;&alpha;&rho;ά&delta;&omega;&sigma;&eta;&sigmaf; :</strong></td>
+<td style="width: 476px; height: 20px;">&nbsp;</td>
 </tr>
 <tr style="height: 20.75px;">
-<td style="width: 282.5px; text-align: center; height: 20.75px;"><strong>&Upsilon;&pi;&omicron;&gamma;&rho;&alpha;&phi;ή &Tau;&epsilon;&chi;&nu;&iota;&kappa;&omicron;ύ</strong></td>
-<td style="width: 496.5px; height: 20.75px;">&nbsp;</td>
+<td style="width: 273px; text-align: center;height: 25px;"><strong>&Upsilon;&pi;&omicron;&gamma;&rho;&alpha;&phi;ή &Tau;&epsilon;&chi;&nu;&iota;&kappa;&omicron;ύ</strong></td>
+<td style="width: 476px; height: 20.75px;">&nbsp;</td>
 </tr>
 </tbody>
 </table>
-
+</font>
+</body>
         </html>
         """
 
         convertHtmlToPdf(sourceHtml, outputFilename)
 
         subprocess.Popen(outputFilename, shell=True)
+        self.printed = 1
 
     # Αποστολή email
     def send_mail(self):
@@ -758,7 +775,8 @@ class add_task_window:
         if not self.selected_copier:
             self.selected_copier = self.copiers_combobox.get()
         self.get_copier_id()
-        data = [self.start_date.get(), self.customer_combobox.get(), self.copiers_combobox.get(), self.purpose_combobox.get(),
+        data = [self.start_date.get(), self.customer_combobox.get(), self.copiers_combobox.get(),
+                self.purpose_combobox.get(),
                 self.technician.get(), self.urgent.get(), self.phone_var.get(),
                 self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id]
         names = ["Ημερομηνία", "Πελάτης", "Μηχάνημα", "Σκοπός", "Τεχνικός", "Επίγων", "Τηλέφωνο", "Σημειώσεις"]

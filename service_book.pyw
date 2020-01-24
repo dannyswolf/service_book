@@ -15,6 +15,9 @@ todo Αποθήκη για τα ανταλλακτικά που εισάγουμ
 todo να μπει στις σημειώσεις πότε ενεργοποίθηκε/απενεργοποίθηκε φωτοτυπικό και πελάτης
 todo fix # Σειριακός αριθμός warning
 
+V1.4.3 Warning fixed  -------------------------------------------------------------------24/01/2020
+Biger sizes on print
+
 V1.4.2 Print to pdf Added       ---------------------------------------------------------22/01/2020
 
 V1.4.1 Progressbar on email     ---------------------------------------------------------20/01/2020
@@ -551,6 +554,7 @@ class Toplevel1:
         self.company_label.configure(relief="groove")
         self.company_label.configure(text="Εμφανιζόμενο όνομα")
 
+
         self.customer_name = StringVar()
         self.customer_name.trace('w', self.check_customer_name)
         self.company_name_entry = tk.Entry(self.customer_frame)
@@ -868,6 +872,7 @@ class Toplevel1:
         self.serial_label.configure(highlightcolor="black")
         self.serial_label.configure(relief="groove")
         self.serial_label.configure(text="Σειριακός αριθμός")
+
         self.serial = StringVar()
         self.serial.trace('w', self.check_serial)
         self.serial_entry = tk.Entry(self.copier_frame)
@@ -886,7 +891,7 @@ class Toplevel1:
         self.serial_entry_warning_img = PhotoImage(file="icons/lamp.png")
         self.serial_entry_warning.configure(image=self.serial_entry_warning_img)
         self.serial_entry_warning.configure(compound='left')
-        # self.serial_entry_warning.place(relx=0.425, rely=0.100, relheight=0.060, relwidth=0.03)
+
 
         # Μετρητής Εναρξης
         self.Label12 = tk.Label(self.copier_frame)
@@ -1324,17 +1329,22 @@ class Toplevel1:
     # Ελεγχος αν το serial  υπάρχει
     def check_serial(self, name, index, mode):
         self.serial_entry_warning.place_forget()
+        current_copier_id = (self.copiers_treeview.set(self.copiers_treeview.selection(), '#1'))
+
         all_serials = []
         con = sqlite3.connect(dbase)
         c = con.cursor()
         c.execute("SELECT Serial FROM Φωτοτυπικά WHERE Κατάσταση = 1;")
-        selials = c.fetchall()
+        serials = c.fetchall()
+        c.execute("SELECT Serial FROM Φωτοτυπικά WHERE ID = ?", (current_copier_id,))
+        current_serial = c.fetchall()
         con.close()
 
-        for serial in selials:
+        for serial in serials:
+
             all_serials.append(serial[0])
 
-        if self.serial_entry.get() in all_serials:
+        if self.serial_entry.get() in all_serials and self.serial_entry.get() != current_serial[0][0]:
             self.serial_entry.configure(foreground="red")
             # self.serial_entry.place(relx=0.225, rely=0.100, height=20, relwidth=0.2)
             self.serial_entry_warning.place(relx=0.425, rely=0.100, relheight=0.060, relwidth=0.03)
@@ -1345,17 +1355,20 @@ class Toplevel1:
     # Ελεγχος αν το όνομα του πελάτη υπάρχει
     def check_customer_name(self, name, index, mode):
         self.company_name_warning.place_forget()
+
         all_names = []
         con = sqlite3.connect(dbase)
         c = con.cursor()
         c.execute("SELECT Επωνυμία_Επιχείρησης FROM Πελάτες WHERE Κατάσταση = 1;")
         customers_names = c.fetchall()
+        c.execute("SELECT Επωνυμία_Επιχείρησης FROM Πελάτες WHERE Κατάσταση = 1 AND ID=?", (self.selected_customer_id,))
+        current_customer = c.fetchall()
         con.close()
 
         for name in customers_names:
             all_names.append(name[0])
 
-        if self.company_name_entry.get() in all_names:
+        if self.company_name_entry.get() in all_names and self.company_name_entry.get() != current_customer[0][0]:
             self.company_name_entry.configure(foreground="red")
             # self.company_name_entry.place(relx=0.225, rely=0.100, height=20, relwidth=0.250)
             self.company_name_warning.place(relx=0.475, rely=0.100, relheight=0.060, relwidth=0.020)
@@ -1371,12 +1384,14 @@ class Toplevel1:
         c = con.cursor()
         c.execute("SELECT Τηλέφωνο FROM Πελάτες WHERE Κατάσταση = 1;")
         phones = c.fetchall()
+        c.execute("SELECT Τηλέφωνο FROM Πελάτες WHERE ID=? AND Κατάσταση =1", (self.selected_customer_id,))
+        current_phone = c.fetchall()
         con.close()
 
         for phone in phones:
             all_phones.append(phone[0])
 
-        if self.phone_entry.get() in all_phones:
+        if self.phone_entry.get() in all_phones and self.phone_entry.get() != current_phone[0][0]:
             self.phone_entry.configure(foreground="red")
             # self.phone_entry.place(relx=0.225, rely=0.340, height=20, relwidth=0.250)
             self.phone_warning.place(relx=0.475, rely=0.340, relheight=0.060, relwidth=0.020)
@@ -1393,11 +1408,13 @@ class Toplevel1:
         c = con.cursor()
         c.execute("SELECT Κινητό FROM Πελάτες WHERE Κατάσταση = 1;")
         mobiles = c.fetchall()
+        c.execute("SELECT Κινητό FROM Πελάτες WHERE ID=? AND Κατάσταση =1", (self.selected_customer_id,))
+        current_mobile = c.fetchall()
         con.close()
         for mobile in mobiles:
             all_mobiles.append(mobile[0])
 
-        if self.mobile_entry.get() in all_mobiles:
+        if self.mobile_entry.get() in all_mobiles and self.mobile_entry.get() != current_mobile[0][0]:
             self.mobile_entry.configure(foreground="red")
             # self.mobile_entry.place(relx=0.225, rely=0.420, height=20, relwidth=0.250)
             self.mobile_warning.place(relx=0.475, rely=0.420, relheight=0.060, relwidth=0.020)
@@ -1910,6 +1927,8 @@ class Toplevel1:
         # todo πρέπει να γίνει σε for loop και να μπούν σε λίστα
         self.customer_name.set(value=customers_data[0][1])
         self.company_name_entry.configure(textvariable=self.customer_name)
+        self.current_customer_name = customers_data[0][1]
+
 
         var = StringVar(root, value=customers_data[0][2])
         self.name_entry.configure(textvariable=var)
@@ -1992,6 +2011,8 @@ class Toplevel1:
 
         self.customer_name.set(value=customers_data[0][1])
         self.company_name_entry.configure(textvariable=self.customer_name)
+        self.current_customer_name = customers_data[0][1]
+
 
         var = StringVar(root, value=customers_data[0][2])
         self.name_entry.configure(textvariable=var)
@@ -2035,7 +2056,8 @@ class Toplevel1:
             if int(selected_item) == int(copiers[n][0]):
                 self.selected_copier_id = int(selected_item)
                 self.serial.set(value=copiers[n][2])  # Σειριακός αριθμός
-                self.serial_entry.configure(textvariable=self.serial.get())
+                self.serial_entry.configure(textvariable=self.serial)
+
                 var = StringVar(root, value=copiers[n][3])  # Εναρξη
                 self.start_entry.configure(textvariable=var)
                 var = StringVar(root, value=copiers[n][4])  # Μετρητής έναρξης
@@ -2418,7 +2440,7 @@ class Toplevel1:
                 messagebox.showinfo('Αποτέλεσμα αντιγράφου ασφαλείας', result)
         except FileNotFoundError as file_error:
             messagebox.showwarning("Σφάλμα...", "{}".format(file_error))
-            print("File Error Line 641", file_error)
+            print(f"File {__name__} Error Line 2440", file_error)
 
         except sqlite3.Error as error:
             if not os.path.exists(backup_file):
@@ -2430,8 +2452,8 @@ class Toplevel1:
                     back_conn.close()
                     print("Δημιουργία αντιγράφου ασφαλείας στο αρχείο  ", backup_file, " ολοκληρώθηκε")
             except UnboundLocalError as error:
-                print(f"Η σύνδεση με {backup_file} δεν έγινε ποτέ Line 1670 {error}")
-                messagebox.showinfo(f"Η σύνδεση με {backup_file} δεν έγινε ποτέ  {error}")
+                print(f"Η σύνδεση με {backup_file} δεν έγινε ποτέ Line 2452 {error}")
+                messagebox.showerror("Σφάλμα", f"Η σύνδεση με {backup_file} δεν έγινε ποτέ  {error}")
 
 
 # The following code is added to facilitate the Scrolled widgets you specified.

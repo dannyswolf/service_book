@@ -248,7 +248,7 @@ class edit_task_window:
         self.copier_id = ""
         self.files = ""
         self.urgent = StringVar()
-        self.old_notes = ""
+
         self.columns = None
         self.len_images = 0
         self.top = top
@@ -939,26 +939,32 @@ class edit_task_window:
                       'icons/technician.png', 'icons/urgent.png', 'icons/notes.png']
 
         font = """{
-            font-family: Calibri;
-            src: url('../fonts/Calibrib.ttf');
-            }
+                font-family: Calibri;
+                src: url('../fonts/Calibrib.ttf');
+                }
 
-            body {
-            font-family: Calibri;
-            }
-            h1 {
-            font-family: Calibri;
-            }
-            h2 {
-            font-family: Calibri;
-            }
-            h3 {
-            font-family: Calibri;
-            }
-            h4 {
-            font-family: Calibri;
-            }
-            """
+                body {
+                font-family: Calibri;
+                font-weight: bold;
+                }
+                h1 {
+                font-family: Calibri;
+                font-weight: bold;
+                }
+                h2 {
+                font-family: Calibri;
+                font-weight: bold;
+                }
+                h3 {
+                font-family: Calibri;
+                font-weight: bold;
+                }
+                h4 {
+                font-family: Calibri;
+                font-weight: bold;
+
+                }
+                """
 
         sourceHtml = f"""<html>
 
@@ -966,6 +972,7 @@ class edit_task_window:
             <style>
             @font-face {font}
             </style> 
+<font size = "5">
             <h1 style="text-align: center;"><img style="float: right;" src="../icons/logo-small-orange.png" alt="" width="200" height="143" /></h1>
             <h1 style="text-align: center;"><span style="text-decoration: underline;">&Delta;&epsilon;&lambda;&tau;ί&omicron; &tau;&epsilon;&chi;&nu;&iota;&kappa;ή&sigmaf;&nbsp;&epsilon;&xi;&upsilon;&pi;&eta;&rho;έ&tau;&eta;&sigma;&eta;&sigmaf;&nbsp;</h1>
             
@@ -1047,7 +1054,7 @@ class edit_task_window:
 </tr>
 </tbody>
 </table>
-<p>&nbsp;</p>
+
 <table style="height: 28px; width: 663px;" border="1">
 <tbody>
 <tr style="height: 118.5px;">
@@ -1079,7 +1086,7 @@ class edit_task_window:
 </tr>
 </tbody>
 </table>
-
+</font>
             </html>
             """
 
@@ -1156,8 +1163,8 @@ class edit_task_window:
         self.phone_entry.configure(textvariable=phone)
 
         notes = StringVar(w, value=data[0][10])
-        self.old_notes = notes.get()
         self.notes_scrolledtext.insert('1.0', notes.get())
+
         self.copier_id = data[0][11]
         dte = StringVar(w, value=data[0][12])
         self.dte_entry.configure(textvariable=dte)
@@ -1195,6 +1202,7 @@ class edit_task_window:
         self.notes_scrolledtext.insert("1.0", self.mobile.get())
         self.notes = StringVar(w, value="Διεύθυνση : " + customer_data[0][3] + "\n")
         self.notes_scrolledtext.insert("2.0", self.notes.get())
+
 
         # Εμφάνιση φωτοτυπικών σύμφονα με το customer_id
         cursor.execute("SELECT Εταιρεία, Serial FROM Φωτοτυπικά WHERE Πελάτη_ID = ? AND Κατάσταση = 1 ", (self.customer_id,))
