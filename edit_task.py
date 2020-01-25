@@ -605,6 +605,22 @@ class edit_task_window:
         self.counter_entry.configure(insertbackground="black")
         self.counter_entry.configure(selectbackground="#c4c4c4")
         self.counter_entry.configure(selectforeground="black")
+        # Εισαγωγή ανταλλακτικών εκτός αποθήκης
+        self.insert_spare_parts_btn = tk.Button(self.spare_parts_frame)
+        self.insert_spare_parts_btn.place(relx=0.600, rely=0.070, height=50, relwidth=0.380)
+        self.insert_spare_parts_btn.configure(activebackground="#ececec")
+        self.insert_spare_parts_btn.configure(activeforeground="#000000")
+        self.insert_spare_parts_btn.configure(background="#3268a8")
+        self.insert_spare_parts_btn.configure(disabledforeground="#a3a3a3")
+        self.insert_spare_parts_btn.configure(foreground="#ffffff")
+        self.insert_spare_parts_btn.configure(highlightbackground="#d9d9d9")
+        self.insert_spare_parts_btn.configure(highlightcolor="black")
+        self.insert_spare_parts_btn.configure(pady="0")
+        self.insert_spare_parts_btn.configure(text='''    Προσθήκη\n    ανταλλακτικών\nεκτός αποθήκης''')
+        self.insert_spare_parts_btn.configure(command=self.insert_spare_part_outside_of_repository)
+        self.insert_spare_parts_btn_img = PhotoImage(file="icons/add_spare_parts.png")
+        self.insert_spare_parts_btn.configure(image=self.insert_spare_parts_btn_img)
+        self.insert_spare_parts_btn.configure(compound="left")
 
         # Επόμενο Service
         self.next_service_label = tk.Label(self.spare_parts_frame)
@@ -848,7 +864,12 @@ class edit_task_window:
 
             add_spare_parts.create_Toplevel1(self.top, self.service_id, self.customer_id, self.copiers_combobox.get())
         else:
-            insert_spare_parts.create_insert_spare_parts_window(self.top, self.service_id, self.customer_id, self.copiers_combobox.get())
+            insert_spare_parts.create_insert_spare_parts_window(self.top, self.service_id, self.customer_id,
+                                                                self.copiers_combobox.get())
+
+    def insert_spare_part_outside_of_repository(self):
+        insert_spare_parts.create_insert_spare_parts_window(self.top, self.service_id, self.customer_id,
+                                                            self.copiers_combobox.get())
 
     # Διαγραφή ανταλλακτικών
     def del_spare_parts(self):

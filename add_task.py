@@ -590,6 +590,16 @@ class add_task_window:
         # Δεδομένα για το Calendar
         # "" ==> Ενέργειες
         # Αν ο χρήστης εισάγει νέο μηχάνημα που δεν είναι στην βάση
+        # Εμφάνιση φωτοτυπικών σύμφονα με το customer_id
+
+        cursor.execute("SELECT Εταιρεία, Serial FROM Φωτοτυπικά WHERE Πελάτη_ID = ? AND Κατάσταση = 1 ",
+                       (self.customer_id,))
+        copiers = cursor.fetchall()
+
+        self.copiers = []
+        for copier in copiers:
+            self.copiers.append("   Σειριακός: ".join(copier))
+
         if not self.copiers_combobox.get() in self.copiers:
             self.copier_id = "0"
         # "", "", ==>> Actions, Ημερομηνία ολοκήροσης, ΔΤΕ, Μετρητής και Επώμενο service

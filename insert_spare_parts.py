@@ -42,13 +42,17 @@ def vp_start_gui():
 
 
 w = None
-
+service_id = None
+customer_id = None
+copier = None
 
 def create_insert_spare_parts_window(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
-    global w, w_win, rt, service_id
+    global w, w_win, rt, service_id, customer_id, copier
     rt = root
     service_id = args[0]  # Το Service_ID απο το add_service.py και edit_service_windows
+    customer_id = args[1]  # Το customer_id απο το add_service.py και edit_service_windows
+    copier = args[2]    # self.copiers_combobox.get() απο το add_service.py και edit_service_windows
     w = tk.Toplevel(root)
     add_copier_support.set_Tk_var()
     top = add_copier_window(w)
@@ -84,8 +88,9 @@ class add_copier_window:
         self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#69ab3a")])
         self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
 
-
         self.service_id = service_id
+        self.customer_id = customer_id
+        self.copier = copier
         self.top = top
         top.geometry("505x524+444+228")
         top.minsize(120, 1)
@@ -290,7 +295,8 @@ class add_copier_window:
                 values.append("?")
         values = ", ".join(values)
         data = [self.parts_nr.get(), self.description.get(), self.code.get(),
-                self.pieces.get(),self.notes_scrolledtext.get('1.0', 'end-1c'), self.service_id]
+                self.pieces.get(), self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier, self.service_id,
+                self.customer_id]
 
         sql_insert = "INSERT INTO Ανταλλακτικά (" + culumns + ")" + "VALUES(" + values + ");"
 
@@ -298,6 +304,12 @@ class add_copier_window:
         conn.commit()
         conn.close()
         messagebox.showinfo("Info", f"Το  {data[0]} προστέθηκε επιτυχώς.\n Μπορείτε να εισάγετε νέο ανταλλακτικό")
+        self.parts_nr.set(value="")
+        self.description.set(value="")
+        self.code.set(value="")
+        self.pieces.set(value="")
+        self.notes_scrolledtext.delete("1.0", "end-1c")
+
         self.top.focus()
         return None
 

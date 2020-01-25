@@ -15,8 +15,10 @@ todo Αποθήκη για τα ανταλλακτικά που εισάγουμ
 todo να μπει στις σημειώσεις πότε ενεργοποίθηκε/απενεργοποίθηκε φωτοτυπικό και πελάτης
 
 
-V1.4.6 Προσθήκη αποθήκης στο κεντρικό παράθυρο  ----------------------------------------25/01/2020
+V1.4.7 Προσθήκη ανταλλακτικών εκτός αποθήκης  ----------------------------------------25/01/2020
 
+
+V1.4.6 Προσθήκη αποθήκης στο κεντρικό παράθυρο  ----------------------------------------25/01/2020
 
 V1.4.5 Προσθήκη πελάτη στο παράθυρο add_task  ------------------------------------------25/01/2020
 Fix εμφάνηση φωτοτυπικών όταν αλλάζουμε πελάτη στο edit_task
@@ -577,7 +579,7 @@ class Toplevel1:
         self.search_on_repository_btn.configure(command=self.search_on_repository)
 
         self.repository_treeview = ScrolledTreeView(self.repository_frame)
-        self.repository_treeview.place(relx=0.017, rely=0.367, relheight=0.59, relwidth=0.967)
+        self.repository_treeview.place(relx=0.017, rely=0.300, relheight=0.59, relwidth=0.967)
         self.repository_treeview.configure(show="headings", style="mystyle.Treeview", selectmode="browse")
 
         self.customer_title_label = tk.Label(self.customer_frame)
@@ -1701,7 +1703,7 @@ class Toplevel1:
         selected_copier = copier_name[0][0]
         con.close()
         # Αυτή είναι συνάρτηση του αρχείου edi_service_windows
-        create_edit_service_window(root, service_id, selected_copier, self.selected_customer)
+        create_edit_service_window(root, service_id, selected_copier, self.selected_customer, self.selected_customer_id)
 
     def edit_scheduled_tasks(self, event=None):
 
@@ -2256,8 +2258,13 @@ class Toplevel1:
         if heading == "Φωτοτυπικό":
             selected_copier = (self.service_treeview.set(self.service_treeview.selection(), "#3"))
             selected_customer = (self.service_treeview.set(self.service_treeview.selection(), "#4"))
+            con = sqlite3.connect(dbase)
+            c = con.cursor()
+            c.execute("SELECT ID FROM Πελάτες WHERE Επωνυμία_Επιχείρησης =?", (selected_customer,))
+            selected_customer_id = c.fetchall()
+            con.close()
             # Αυτή είναι συνάρτηση του αρχείου edi_service_windows
-            create_edit_service_window(root, selected_service_id, selected_copier, selected_customer)
+            create_edit_service_window(root, selected_service_id, selected_copier, selected_customer, selected_customer_id[0][0])
 
             # ==============================  Notebook style  =============
             self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#69ab3a")])
@@ -2272,7 +2279,7 @@ class Toplevel1:
                 cursor.close()
                 con.close()
                 self.top.wm_state('iconic')
-                create_edit_service_window(root, selected_service_id, selected_copier, self.selected_customer)
+                create_edit_service_window(root, selected_service_id, selected_copier, self.selected_customer, self.selected_customer_id)
                 # ==============================  Notebook style  =============
                 self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#69ab3a")])
                 self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])

@@ -24,6 +24,7 @@ print(f"{100 * '*'}\n\t\t\t\t\t\t\t\t\t\tFILE {__name__}")
 selected_service_id = None
 selected_copier = None
 selected_customer = None
+selected_customer_id = None
 try:
     import Tkinter as tk
 except ImportError:
@@ -151,9 +152,10 @@ w = None
 
 def create_edit_service_window(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
-    global w, w_win, rt, selected_service_id, selected_copier, selected_customer
+    global w, w_win, rt, selected_service_id, selected_copier, selected_customer, selected_customer_id
     selected_service_id = args[0]  # Επιλεγμένο Service  περνουμε το selected_service_id απο το service_book.pyw
     try:
+        selected_customer_id = args[3]  # Επιλεγμένο id πελάτη περνουμε το selected_customer_id απο το service_book.pyw
         selected_copier = args[1]      # Επιλεγμένο Φωτοτυπικό περνουμε το selected_copier απο το service_book.pyw
         selected_customer = args[2]    # Επιλεγμένο πελάτης περνουμε το selected_customer απο το service_book.pyw
     except IndexError as error:
@@ -180,9 +182,10 @@ class edit_service_window():
         # Αρχικοποιηση του selected_service_id σαν self.selected_service_id
         self.selected_service_id = selected_service_id
         self.copier_id = ""
-        self.customer_id = ""
+        self.customer_id = selected_customer_id
         self.selected_copier = selected_copier
         self.selected_customer = selected_customer
+
         self.purpose_list, self.actions_list = get_service_data()
         self.files = []
         self.len_images = 0
@@ -279,6 +282,24 @@ class edit_service_window():
                                     foreground='white', borderwidth=5, locale="el_GR", font=("Calibri", 10, 'bold'),
                                     date_pattern='dd/mm/yyyy')
         self.date_entry.place(relx=0.37, rely=0.030, height=25, relwidth=0.331)
+
+        # Εισαγωγή ανταλλακτικών εκτός αποθήκης
+        self.insert_spare_parts_btn = tk.Button(self.service_frame)
+        self.insert_spare_parts_btn.place(relx=0.720, rely=0.030, height=50, relwidth=0.280)
+        self.insert_spare_parts_btn.configure(activebackground="#ececec")
+        self.insert_spare_parts_btn.configure(activeforeground="#000000")
+        self.insert_spare_parts_btn.configure(background="#3268a8")
+        self.insert_spare_parts_btn.configure(disabledforeground="#a3a3a3")
+        self.insert_spare_parts_btn.configure(foreground="#ffffff")
+        self.insert_spare_parts_btn.configure(highlightbackground="#d9d9d9")
+        self.insert_spare_parts_btn.configure(highlightcolor="black")
+        self.insert_spare_parts_btn.configure(pady="0")
+        self.insert_spare_parts_btn.configure(text='''    Προσθήκη\n    ανταλλακτικών\nεκτός αποθήκης''')
+        self.insert_spare_parts_btn.configure(command=self.insert_spare_part_outside_of_repository)
+        self.insert_spare_parts_btn_img = PhotoImage(file="icons/add_spare_parts.png")
+        self.insert_spare_parts_btn.configure(image=self.insert_spare_parts_btn_img)
+        self.insert_spare_parts_btn.configure(compound="left")
+
         # Counter
         self.counter_label = tk.Label(self.service_frame)
         self.counter_label.place(relx=0.025, rely=0.100, height=25, relwidth=0.331)
@@ -588,7 +609,7 @@ class edit_service_window():
                 if culumn != "ID":
                     edited_culumns.append(culumn + "=?")
             edited_culumns = ",".join(edited_culumns)
-            data_to_add = [date.get(), self.purpose_combobox.get(), self.actions_combobox.get(),
+            data_to_add = [self.date_entry.get(), self.purpose_combobox.get(), self.actions_combobox.get(),
                            self.notes_scrolledtext.get("1.0", "end-1c"), counter.get(), next_service.get(),
                            self.copier_id, dte.get(), self.selected_service_id]
 
@@ -662,6 +683,10 @@ class edit_service_window():
     def quit(self, event):
         self.top.destroy()
 
+    def insert_spare_part_outside_of_repository(self):
+        insert_spare_parts.create_insert_spare_parts_window(self.top, self.selected_service_id, self.customer_id,
+                                                            self.selected_copier)
+
     def get_spare_parts(self, event=None):
         self.spare_parts_treeview.delete(*self.spare_parts_treeview.get_children())
         con = sqlite3.connect(dbase)
@@ -691,7 +716,13 @@ class edit_service_window():
         c.execute("SELECT ID FROM Πελάτες WHERE Επωνυμία_Επιχείρησης =?", (self.selected_customer,))
         data = c.fetchall()
         con.close()
-        self.customer_id = data[0]
+
+        if int(data[0][0]) == int(self.customer_id):
+            pass
+        else:
+            messagebox.showerror("Σφάλμα!", f'O Πελάτης {self.selected_customer} υπάρχει παραπάνω απο μία φορά')
+            return
+
         if spare_parts_db:
             add_spare_parts.create_Toplevel1(self.top, self.selected_service_id, self.customer_id, self.selected_copier)
         else:
