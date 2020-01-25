@@ -499,7 +499,7 @@ class add_task_window:
                        (customer,))
         customer_data = cursor.fetchall()  # ==> [(4,)] αρα θέλουμε το customer_id[0][0]
         self.customer_id = customer_data[0][0]
-        messagebox.showinfo("self.customer_id", f'{self.customer_id}')
+
         self.phone_var = StringVar(w, value=customer_data[0][1])
         self.phone_entry.configure(textvariable=self.phone_var)
 
@@ -520,7 +520,7 @@ class add_task_window:
         cursor.execute("SELECT Εταιρεία, Serial FROM Φωτοτυπικά WHERE Πελάτη_ID = ? AND Κατάσταση = 1 ",
                        (self.customer_id,))
         copiers = cursor.fetchall()
-        messagebox.showinfo("copiers", f'{copiers}')
+
         self.copiers = []
         for copier in copiers:
             self.copiers.append("   Σειριακός: ".join(copier))
@@ -528,8 +528,10 @@ class add_task_window:
         con.close()
         # Αν επιλέξουμε φωτοτυπικό του πελάτη απο τα περασμένα στην βάση φωτοτυπικά
         emtpy_value = f"Ο {customer} δεν έχει μηχάνημα"
-        self.copiers_combobox.configure(values=emtpy_value)
+        self.copiers_combobox.configure(foreground="red")
+        self.copiers_combobox.set(value=emtpy_value)
         if copiers:
+            self.copiers_combobox.configure(foreground="")
             self.copiers_combobox.configure(values=self.copiers)
             self.copiers_combobox.set(value=self.copiers[0])
         # Διαφορετικά μπορούμε να εισάγουμε νέο μηχάνημα

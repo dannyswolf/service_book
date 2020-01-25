@@ -1225,7 +1225,11 @@ class edit_task_window:
         cursor.close()
         con.close()
         # Αν επιλέξουμε φωτοτυπικό του πελάτη απο τα περασμένα στην βάση φωτοτυπικά
+        emtpy_value = f"Ο {customer} δεν έχει μηχάνημα"
+        self.copiers_combobox.configure(foreground="red")
+        self.copiers_combobox.set(value=emtpy_value)
         if copiers:
+            self.copiers_combobox.configure(foreground="")
             self.copiers_combobox.configure(values=self.copiers)
             self.copiers_combobox.set(value=self.copiers[0])
         # Διαφορετικά μπορούμε να εισάγουμε νέο μηχάνημα
