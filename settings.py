@@ -18,7 +18,7 @@ else:
     spare_parts_db = "3. ΚΑΙΝΟΥΡΙΑ_ΑΠΟΘΗΚΗ.db"
     dbase = "Service_book.db"  # Local Dbase
 
-service_book_version = "V 1.4.3 ML Shop"
+service_book_version = "V 1.4.6 ML Shop"
 
 demo = 0  # 0 Demo Disabled 1 Demo enabled
 

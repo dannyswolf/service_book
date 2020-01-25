@@ -14,6 +14,10 @@ todo start day to binary file
 todo Αποθήκη για τα ανταλλακτικά που εισάγουμε στο local version
 todo να μπει στις σημειώσεις πότε ενεργοποίθηκε/απενεργοποίθηκε φωτοτυπικό και πελάτης
 
+
+V1.4.6 Προσθήκη αποθήκης στο κεντρικό παράθυρο  ----------------------------------------25/01/2020
+
+
 V1.4.5 Προσθήκη πελάτη στο παράθυρο add_task  ------------------------------------------25/01/2020
 Fix εμφάνηση φωτοτυπικών όταν αλλάζουμε πελάτη στο edit_task
 
@@ -303,23 +307,19 @@ def get_tables():
     """
         Αποκόμιση  πινάκων απο την βάση δεδομένων
     """
+    no_needed_tables = ['ΠΡΩΤΟΣ_ΟΡΟΦΟΣ']
+    con = sqlite3.connect(spare_parts_db)
+    c = con.cursor()
+    c.execute("SELECT name FROM sqlite_sequence ORDER BY name")
+    tables = c.fetchall()
+    c.close()
+    con.close()
+    companies = []
+    for table in tables:
+        if table[0] not in no_needed_tables:
+            companies.append(table[0])
 
-    tables = []  # Πρέπει να αδειάσουμε πρώτα την λίστα με τους πίνακες για να κάνουμε νέα σύμφονα με την βάση
-    # =======================Ανάγνωριση πίνακα δεδομένων=============
-    conn = sqlite3.connect(dbase)
-    cursor = conn.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;")
-    table_name = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    dont_used_tables = ["sqlite_master", "sqlite_sequence", "sqlite_temp_master"]  # Πινακες που δεν θέλουμε
-    for name in table_name:
-        if name[0] not in dont_used_tables:
-            tables.append(name[0])
-
-        else:
-            continue
-
-    return tables
+    return companies
 
 
 def vp_start_gui():
@@ -378,6 +378,9 @@ class Toplevel1:
         self.selected_copier_id = ""
         self.selected_customer = ""
         self.selected_copier = ""
+        self.companies = get_tables()
+        self.selected_repository_company = ""
+        self.repository_headers = ""
         # self.service_calendar = DateEntry
 
         self.customers_headers = []
@@ -520,6 +523,62 @@ class Toplevel1:
         self.spare_parts_frame.configure(background="#d9d9d9")
         self.spare_parts_frame.configure(highlightbackground="#d9d9d9")
         self.spare_parts_frame.configure(highlightcolor="black")
+
+        self.repository_frame = tk.Frame(self.notebook)
+        self.notebook.add(self.repository_frame, padding=3)
+        self.notebook.tab(5, text="Αποθήκη", compound="left", underline="-1", )
+        self.repository_frame.configure(background="#d9d9d9")
+        self.repository_frame.configure(highlightbackground="#d9d9d9")
+        self.repository_frame.configure(highlightcolor="black")
+
+        self.select_repository_company_label = tk.Label(self.repository_frame)
+        self.select_repository_company_label.place(relx=0.025, rely=0.050, relheight=0.060, relwidth=0.260)
+        self.select_repository_company_label.configure(activebackground="#f9f9f9")
+        self.select_repository_company_label.configure(activeforeground="black")
+        self.select_repository_company_label.configure(background="#6b6b6b")
+        self.select_repository_company_label.configure(disabledforeground="#a3a3a3")
+        self.select_repository_company_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.select_repository_company_label.configure(foreground="#ffffff")
+        self.select_repository_company_label.configure(highlightbackground="#d9d9d9")
+        self.select_repository_company_label.configure(highlightcolor="black")
+        self.select_repository_company_label.configure(relief="groove")
+        self.select_repository_company_label.configure(text='''Επιλογή εταιρείας''')
+        self.repository_company_combobox = ttk.Combobox(self.repository_frame)
+        self.repository_company_combobox.place(relx=0.29, rely=0.050, relheight=0.060, relwidth=0.200)
+        self.repository_company_combobox.configure(values=self.companies)
+        self.repository_company_combobox.configure(takefocus="")
+        self.repository_company_combobox.bind("<<ComboboxSelected>>", self.get_repository)
+
+        self.search_on_repository_stringvar = StringVar()
+        self.search_on_repository_entry = tk.Entry(self.repository_frame, textvariable=self.search_on_repository_stringvar)
+        self.search_on_repository_entry.place(relx=0.29, rely=0.150, height=25, relwidth=0.200)
+        self.search_on_repository_entry.configure(background="white")
+        self.search_on_repository_entry.configure(disabledforeground="#a3a3a3")
+        self.search_on_repository_entry.configure(font=("Calibri", 10, "bold"))
+        self.search_on_repository_entry.configure(foreground="#000000")
+        self.search_on_repository_entry.configure(insertbackground="black")
+        self.search_on_repository_entry.bind('<Return>', self.search_on_repository)
+
+        self.search_on_repository_btn = tk.Button(self.repository_frame)
+        self.search_on_repository_btn.place(relx=0.500, rely=0.150, height=25, width=145)
+        self.search_on_repository_btn.configure(activebackground="#ececec")
+        self.search_on_repository_btn.configure(activeforeground="#000000")
+        self.search_on_repository_btn.configure(background="#006291")
+        self.search_on_repository_btn.configure(compound='left')
+        self.search_on_repository_btn.configure(disabledforeground="#a3a3a3")
+        self.search_on_repository_btn.configure(font=("Calibri", 10, "bold"))
+        self.search_on_repository_btn.configure(foreground="#ffffff")
+        self.search_on_repository_btn.configure(highlightbackground="#d9d9d9")
+        self.search_on_repository_btn.configure(highlightcolor="black")
+        self.search_on_repository_btn.configure(pady="0")
+        self.search_on_repository_btn_img = PhotoImage(file="icons/search.png")
+        self.search_on_repository_btn.configure(image=self.search_on_repository_btn_img)
+        self.search_on_repository_btn.configure(text='''Αναζήτηση''')
+        self.search_on_repository_btn.configure(command=self.search_on_repository)
+
+        self.repository_treeview = ScrolledTreeView(self.repository_frame)
+        self.repository_treeview.place(relx=0.017, rely=0.367, relheight=0.59, relwidth=0.967)
+        self.repository_treeview.configure(show="headings", style="mystyle.Treeview", selectmode="browse")
 
         self.customer_title_label = tk.Label(self.customer_frame)
         self.customer_title_label.place(relx=0.021, rely=0.005, height=30, relwidth=0.847)
@@ -1330,6 +1389,63 @@ class Toplevel1:
         self.service_calendar.bind('<<CalendarSelected>> ', self.view_scheduled_tasks)
 
         self.get_calendar()
+
+    # Εμφάνηση αποθήκης
+    def get_repository(self, event=None):
+
+        self.selected_repository_company = self.repository_company_combobox.get()
+        if self.selected_repository_company != "":
+            self.repository_treeview.delete(*self.repository_treeview.get_children())
+
+        con = sqlite3.connect(spare_parts_db)
+        c = con.cursor()
+        c.execute("SELECT * FROM " + self.selected_repository_company + ";")
+        self.repository_headers = list(map(lambda x: x[0], c.description))
+        data = c.fetchall()
+        con.close()
+        self.repository_treeview["columns"] = [head for head in self.repository_headers]
+        for head in self.repository_headers:
+            if head == "id" or head == "ID" or head == "Id":
+                platos = 1
+            elif head == "ΠΕΡΙΓΡΑΦΗ" and len(self.repository_headers) > 6:
+                platos = 300
+            elif head == "ΠΕΡΙΓΡΑΦΗ" and len(self.repository_headers) < 7:
+                platos = 400
+            elif head == "PARTS_NR":
+                platos = 200
+            else:
+                platos = 120
+            self.repository_treeview.heading(head, text=head, anchor="center")
+            self.repository_treeview.column(head, width=platos, anchor="center")
+        for d in data:
+            self.repository_treeview.insert("", "end", values=d)
+
+    # Αναζήτηση αποθήκης
+    def search_on_repository(self, event=None):
+        self.repository_treeview.delete(*self.repository_treeview.get_children())
+        data_to_search = self.search_on_repository_entry.get()
+        search_headers = []
+        no_neded_headers = ["id", "ID", "Id"]
+        operators = []
+        for header in self.repository_headers:
+
+            if header not in no_neded_headers:
+                search_headers.append(header + " LIKE ?")
+                operators.append('%' + str(data_to_search) + '%')
+        search_headers = " OR ".join(search_headers)
+        # ΕΤΑΙΡΕΙΑ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
+
+        # search_cursor.execute("SELECT * FROM " + table + " WHERE \
+        # ΤΟΝΕΡ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
+        # ('%' + str(search_data.get()) + '%', '%' + str(search_data.get()) + '%', '%' + str(search_data.get())...
+
+        conn = sqlite3.connect(spare_parts_db)
+        cusror = conn.cursor()
+        cusror.execute("SELECT * FROM " + self.selected_repository_company + " WHERE " + search_headers, operators)
+        fetch = cusror.fetchall()  # Δεδομένα απο Service
+        conn.close()
+        for item in fetch:
+            self.repository_treeview.insert("", "end", values=item)
 
     # Ελεγχος αν το serial  υπάρχει
     def check_serial(self, name, index, mode):

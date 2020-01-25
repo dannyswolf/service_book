@@ -38,6 +38,24 @@ except ImportError:
     py3 = True
 
 
+def get_service_id():
+    con = sqlite3.connect(dbase)
+    cu = con.cursor()
+    # Να πάρουμε πρώτα το τελευταίο ID απο τον πίνακα sqlite_sequence το πεδία Service
+    # για να προσθέσουμε τις εικόνες στο νέο service
+    # νεο service_ID == τελευταίο ID απο τον πίνακα Service +1
+    cu.execute("SELECT * FROM sqlite_sequence")
+    names = cu.fetchall()
+
+    for name in names:
+        if name[0] == "Service":
+            services_ID = name[1]
+
+            new_service_id = int(services_ID) + 1
+            cu.close()
+            con.close()
+            return new_service_id
+
 # Να πάρουμε Φωτοτυπικά και πελάτη
 def get_copiers_data():
     customers_list = []
@@ -58,27 +76,8 @@ def get_copiers_data():
 
     cursor.close()
     conn.close()
+
     return sorted(customers_list), serials
-
-
-def get_service_id():
-    con = sqlite3.connect(dbase)
-    cu = con.cursor()
-    # Να πάρουμε πρώτα το τελευταίο ID απο τον πίνακα sqlite_sequence το πεδία Service
-    # για να προσθέσουμε τις εικόνες στο νέο service
-    # νεο service_ID == τελευταίο ID απο τον πίνακα Service +1
-    cu.execute("SELECT * FROM sqlite_sequence")
-    names = cu.fetchall()
-
-    for name in names:
-        if name[0] == "Service":
-            services_ID = name[1]
-
-            new_service_id = int(services_ID) + 1
-            cu.close()
-            con.close()
-            return new_service_id
-
 
 def get_service_data():
     purpose_list = []
@@ -251,6 +250,13 @@ class add_task_window:
         self.add_customer_btn1_img1 = PhotoImage(file="icons/add_customer.png")
         self.add_customer_btn1.configure(image=self.add_customer_btn1_img1)
         self.add_customer_btn1.configure(command=self.add_customer)
+        # Ανανέωση μετα απο Προσθήκη πελάτη
+        self.refresh_customers_btn = tk.Button(top)
+        self.refresh_customers_btn.place(relx=0.940, rely=0.172, height=30, relwidth=0.050)
+        self.refresh_customers_btn.configure(background="#0685c4")
+        self.refresh_customers_btn_img = PhotoImage(file="icons/refresh.png")
+        self.refresh_customers_btn.configure(image=self.refresh_customers_btn_img)
+        self.refresh_customers_btn.configure(command=self.get_copiers_data)
 
         self.phone_label = tk.Label(top)
         self.phone_label.place(relx=0.025, rely=0.248, height=31, relwidth=0.230)
@@ -435,7 +441,7 @@ class add_task_window:
             self.get_copier_id()
 
     def get_copier_id(self, event=None):
-        self.customers_list, self.serials = get_copiers_data()
+        self.customers_list, self.serials = self.get_copiers_data()
         copier = self.copiers_combobox.get()
         list_data_of_copier = copier.split()
         try:
@@ -457,6 +463,31 @@ class add_task_window:
         con.close()
         return
 
+    # Να πάρουμε Φωτοτυπικά και πελάτη
+    def get_copiers_data(self):
+        customers_list = []
+
+        conn = sqlite3.connect(dbase)
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM Πελάτες WHERE Κατάσταση =1")
+        customers = cursor.fetchall()
+        for n in range(len(customers)):
+            if customers[n][1] != "" and customers[n][1] is not None:
+                customers_list.append(customers[n][1])
+
+        cursor.execute("SELECT * FROM Φωτοτυπικά WHERE Κατάσταση = 1")
+        copiers_data = cursor.fetchall()
+        serials = []
+        for n in range(len(copiers_data)):
+            serials.append(copiers_data[n][2])
+
+        cursor.close()
+        conn.close()
+
+        self.customers_list = sorted(customers_list)
+        self.customer_combobox.configure(values=self.customers_list)
+        return sorted(customers_list), serials
+
     def get_copier(self, event=None):
         # να πάρουμε το id του πελάτη απο το ονομα του
         customer = self.customer_combobox.get()
@@ -468,7 +499,7 @@ class add_task_window:
                        (customer,))
         customer_data = cursor.fetchall()  # ==> [(4,)] αρα θέλουμε το customer_id[0][0]
         self.customer_id = customer_data[0][0]
-
+        messagebox.showinfo("self.customer_id", f'{self.customer_id}')
         self.phone_var = StringVar(w, value=customer_data[0][1])
         self.phone_entry.configure(textvariable=self.phone_var)
 
@@ -489,12 +520,15 @@ class add_task_window:
         cursor.execute("SELECT Εταιρεία, Serial FROM Φωτοτυπικά WHERE Πελάτη_ID = ? AND Κατάσταση = 1 ",
                        (self.customer_id,))
         copiers = cursor.fetchall()
+        messagebox.showinfo("copiers", f'{copiers}')
         self.copiers = []
         for copier in copiers:
             self.copiers.append("   Σειριακός: ".join(copier))
         cursor.close()
         con.close()
         # Αν επιλέξουμε φωτοτυπικό του πελάτη απο τα περασμένα στην βάση φωτοτυπικά
+        emtpy_value = f"Ο {customer} δεν έχει μηχάνημα"
+        self.copiers_combobox.configure(values=emtpy_value)
         if copiers:
             self.copiers_combobox.configure(values=self.copiers)
             self.copiers_combobox.set(value=self.copiers[0])
