@@ -13,10 +13,13 @@ todo προβολή όλων των εικόνων
 todo start day to binary file
 todo Αποθήκη για τα ανταλλακτικά που εισάγουμε στο local version
 todo να μπει στις σημειώσεις πότε ενεργοποίθηκε/απενεργοποίθηκε φωτοτυπικό και πελάτης
-todo fix # Σειριακός αριθμός warning
+
+
+V1.4.4 Διαγραφή εργασίων  --------------------------------------------------------------25/01/2020
 
 V1.4.3 Warning fixed  -------------------------------------------------------------------24/01/2020
 Biger sizes on print
+todo fix # Σειριακός αριθμός warning   ---- Done
 
 V1.4.2 Print to pdf Added       ---------------------------------------------------------22/01/2020
 
@@ -1309,7 +1312,7 @@ class Toplevel1:
         # Πίνακας Ημερολόγιο εργασιών
         self.calendar_treeview = ScrolledTreeView(top)
         self.calendar_treeview.place(relx=0.300, rely=0.680, relheight=0.300, relwidth=0.685)
-        self.calendar_treeview.configure(show="headings", style="mystyle.Treeview")
+        self.calendar_treeview.configure(show="headings", style="mystyle.Treeview", selectmode="browse")
         self.calendar_treeview.bind("<<TreeviewSelect>>", self.edit_scheduled_tasks)
 
         self.day = self.today.day

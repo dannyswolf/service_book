@@ -185,6 +185,7 @@ class edit_service_window():
         self.selected_customer = selected_customer
         self.purpose_list, self.actions_list = get_service_data()
         self.files = []
+        self.len_images = 0
         self.culumns = None
 
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -305,7 +306,7 @@ class edit_service_window():
 
         # Αρχεία
         self.show_files_btn = tk.Button(self.spare_parts_frame)
-        self.show_files_btn.place(relx=0.600, rely=0.750, height=50, relwidth=0.250)
+        self.show_files_btn.place(relx=0.600, rely=0.750, height=50, relwidth=0.300)
         self.show_files_btn.configure(activebackground="#ececec")
         self.show_files_btn.configure(activeforeground="#000000")
         self.show_files_btn.configure(background="#6b6b6b")
@@ -532,10 +533,20 @@ class edit_service_window():
         cursor = con.cursor()
         cursor.execute("SELECT * FROM Service_images WHERE Service_ID =?", (self.selected_service_id,))
         images = cursor.fetchall()
+        self.len_images = len(images)
+        self.show_files_btn.configure(text=f'Προβολή {self.len_images}\nαρχείων')
         cursor.close()
         con.close()
-        if not images:  # αδεια λιστα δλδ δεν υπάρχουν αρχεια και απενεργοποιουμε το κουμπί προβολή αρχείων
+        if self.files:
+            self.show_files_btn.place(relx=0.600, rely=0.750, height=50, relwidth=0.300)
+            self.show_files_btn.configure(text=f'{len(self.files)}\n Αρχεία για προσθήκη')
+            self.show_files_btn.configure(command=self.show_files_to_add)
+        elif not images:  # αδεια λιστα δλδ δεν υπάρχουν αρχεια και απενεργοποιουμε το κουμπί προβολή αρχείων
             self.show_files_btn.place_forget()
+
+    def show_files_to_add(self):
+        messagebox.showwarning('Προσοχή', 'Δεν μπορείτε να δείτε τα αρχεία αν δεν πατήσετε Αποθήκευση')
+        self.top.focus()
 
     # Προβολή αρχείων
     def show_files(self):
@@ -612,7 +623,9 @@ class edit_service_window():
         if self.files == "":  # αν ο χρήστης επιλεξει ακυρο
             self.top.focus()
             return
-
+        else:
+            self.show_files_btn.configure(text=f'{len(self.files)} Αρχεία για προσθήκη')
+            self.check_if_files_exists()
         self.top.focus()
 
     def add_files_to_db(self):

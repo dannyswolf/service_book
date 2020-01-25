@@ -287,6 +287,14 @@ class edit_task_window:
         self.spare_parts_frame.configure(highlightbackground="#d9d9d9")
         self.spare_parts_frame.configure(highlightcolor="black")
 
+        self.delete_task_btn = tk.Button(self.top)
+        self.delete_task_btn.place(relx=0.706, rely=0.004, relheight=0.060, relwidth=0.250)
+        self.delete_task_btn.configure(text="Διαγραφή εγρασίας")
+        self.delete_task_btn.configure(compound="left")
+        self.delete_task_btn_img = PhotoImage(file="icons/delete_task.png")
+        self.delete_task_btn.configure(image=self.delete_task_btn_img)
+        self.delete_task_btn.configure(command=self.delete_task)
+
         self.Label2 = tk.Label(self.service_frame)
         self.Label2.place(relx=0.025, rely=0.019, height=31, relwidth=0.938)
         self.Label2.configure(activebackground="#f9f9f9")
@@ -1325,7 +1333,7 @@ class edit_task_window:
         # 	"ΔΤΕ"	TEXT,               # ------------    self.dte_entry.get()
         # 	FOREIGN KEY("Copier_ID") REFERENCES "Φωτοτυπικά"("ID")
         # )
-        data = [self.date.get(), self.purpose_combobox.get(), self.actions_combobox.get(),
+        data = [self.compl_date_entry.get(), self.purpose_combobox.get(), self.actions_combobox.get(),
                 self.notes_scrolledtext.get('1.0', 'end-1c'), self.counter_entry.get(), self.next_service_entry.get(),
                 self.copier_id, self.dte_entry.get(), self.service_id]
 
@@ -1346,6 +1354,23 @@ class edit_task_window:
         customer_id = data[0][0]
 
         return customer_id
+
+    def delete_task(self):
+        answer = messagebox.askyesno("Προσοχή", 'Είστε σήγουρος για την διαγραφή;')
+        if not answer:
+            self.top.focus()
+            return
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("DELETE FROM Calendar WHERE ID=?", (self.selected_calendar_id,))
+        con.commit()
+        c.execute("DELETE FROM Service WHERE ID=?", (self.service_id,))
+        con.commit()
+        c.close()
+        con.close()
+        print(f"Η εργασία {selected_calendar_id} διαγράφηκε με επιτυχία!")
+        messagebox.showwarning("Προσοχή", "Η εργασία διαγράφηκε με επιτυχία!\nΠαρακαλώ ανανεώστε το ημερολόγιο")
+        self.top.destroy()
 
     def quit(self, event):
         self.top.destroy()
