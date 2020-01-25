@@ -461,7 +461,7 @@ class add_task_window:
             self.copier_id = 0
             self.selected_copier = self.copiers_combobox.get() + "  Σειριακός : " + self.selected_serial
         con.close()
-        return
+        return self.copier_id
 
     # Να πάρουμε Φωτοτυπικά και πελάτη
     def get_copiers_data(self):
@@ -592,10 +592,10 @@ class add_task_window:
         # Αν ο χρήστης εισάγει νέο μηχάνημα που δεν είναι στην βάση
         # Εμφάνιση φωτοτυπικών σύμφονα με το customer_id
 
-        cursor.execute("SELECT Εταιρεία, Serial FROM Φωτοτυπικά WHERE Πελάτη_ID = ? AND Κατάσταση = 1 ",
+        cursor.execute("SELECT  Εταιρεία, Serial FROM Φωτοτυπικά WHERE Πελάτη_ID = ? AND Κατάσταση = 1 ",
                        (self.customer_id,))
         copiers = cursor.fetchall()
-
+        self.copier_id = self.get_copier_id()
         self.copiers = []
         for copier in copiers:
             self.copiers.append("   Σειριακός: ".join(copier))
