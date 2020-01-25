@@ -39,7 +39,7 @@ import add_spare_parts
 import insert_spare_parts
 import image_viewer
 from tkcalendar import DateEntry
-from settings import dbase, spare_parts_db, root_logger, demo, today  # settings
+from settings import dbase, spare_parts_db, root_logger, demo, today, user  # settings
 
 
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
@@ -290,6 +290,7 @@ class edit_task_window:
         self.delete_task_btn = tk.Button(self.top)
         self.delete_task_btn.place(relx=0.706, rely=0.004, relheight=0.060, relwidth=0.250)
         self.delete_task_btn.configure(text="Διαγραφή εγρασίας")
+        self.delete_task_btn.configure(background="#CFD5CE")
         self.delete_task_btn.configure(compound="left")
         self.delete_task_btn_img = PhotoImage(file="icons/delete_task.png")
         self.delete_task_btn.configure(image=self.delete_task_btn_img)
@@ -341,6 +342,7 @@ class edit_task_window:
         self.customer_label.configure(relief="groove")
         self.customer_label.configure(text='''Πελάτης''')
         self.customer_combobox = ttk.Combobox(self.service_frame)
+        self.customer_combobox.bind("<<ComboboxSelected>>", self.get_copier)
         self.customer_combobox.place(relx=0.27, rely=0.152, relheight=0.048, relwidth=0.593)
         self.customer_combobox.configure(takefocus="")
         # self.customer_combobox.configure(state="readonly")
@@ -1198,9 +1200,9 @@ class edit_task_window:
 
         con = sqlite3.connect(dbase)
         cursor = con.cursor()
-        cursor.execute("SELECT ID, Τηλέφωνο, Κινητό, Διεύθυνση FROM Πελάτες WHERE  ID =?", (self.customer_id,))
+        cursor.execute("SELECT ID, Τηλέφωνο, Κινητό, Διεύθυνση FROM Πελάτες WHERE  Επωνυμία_Επιχείρησης =?", (customer,))
         customer_data = cursor.fetchall()  # ==> [(4,)] αρα θέλουμε το customer_id[0][0]
-        # self.customer_id = customer_data[0][0]
+        self.customer_id = customer_data[0][0]
 
         self.phone_var = StringVar(w, value=customer_data[0][1])
         self.phone_entry.configure(textvariable=self.phone_var)
@@ -1210,7 +1212,9 @@ class edit_task_window:
         self.notes_scrolledtext.insert("1.0", self.mobile.get())
         self.notes = StringVar(w, value="Διεύθυνση : " + customer_data[0][3] + "\n")
         self.notes_scrolledtext.insert("2.0", self.notes.get())
-
+        line = 40 * "-"
+        self.notes_scrolledtext.insert("3.0", line + user + line + "\n")
+        self.notes_scrolledtext.insert("4.0", " ")
 
         # Εμφάνιση φωτοτυπικών σύμφονα με το customer_id
         cursor.execute("SELECT Εταιρεία, Serial FROM Φωτοτυπικά WHERE Πελάτη_ID = ? AND Κατάσταση = 1 ", (self.customer_id,))

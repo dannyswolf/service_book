@@ -14,6 +14,8 @@ todo start day to binary file
 todo Αποθήκη για τα ανταλλακτικά που εισάγουμε στο local version
 todo να μπει στις σημειώσεις πότε ενεργοποίθηκε/απενεργοποίθηκε φωτοτυπικό και πελάτης
 
+V1.4.5 Προσθήκη πελάτη στο παράθυρο add_task  ------------------------------------------25/01/2020
+Fix εμφάνηση φωτοτυπικών όταν αλλάζουμε πελάτη στο edit_task
 
 V1.4.4 Διαγραφή εργασίων  --------------------------------------------------------------25/01/2020
 
@@ -1389,6 +1391,7 @@ class Toplevel1:
         phones = c.fetchall()
         c.execute("SELECT Τηλέφωνο FROM Πελάτες WHERE ID=? AND Κατάσταση =1", (self.selected_customer_id,))
         current_phone = c.fetchall()
+
         con.close()
 
         for phone in phones:

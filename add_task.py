@@ -17,7 +17,7 @@ import add_copier
 from tkcalendar import DateEntry
 from settings import dbase, root_logger, demo, today, user  # settings
 import subprocess
-
+import add_customers
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
@@ -245,6 +245,12 @@ class add_task_window:
         self.customer_combobox.configure(takefocus="")
         self.customer_combobox.bind("<<ComboboxSelected>>", self.get_copier)
         self.customer_combobox.configure(state="readonly")
+        self.add_customer_btn1 = tk.Button(top)
+        self.add_customer_btn1.place(relx=0.875, rely=0.172, height=29, relwidth=0.060)
+        self.add_customer_btn1.configure(background="#006291")
+        self.add_customer_btn1_img1 = PhotoImage(file="icons/add_customer.png")
+        self.add_customer_btn1.configure(image=self.add_customer_btn1_img1)
+        self.add_customer_btn1.configure(command=self.add_customer)
 
         self.phone_label = tk.Label(top)
         self.phone_label.place(relx=0.025, rely=0.248, height=31, relwidth=0.230)
@@ -818,6 +824,13 @@ class add_task_window:
         self.top.focus()
         add_copier.create_add_copier_window(w, self.customer_id)
 
+    # Προσθήκη πελάτη
+    def add_customer(self):
+        """Προσθήκη πελάτη
+        καλει την συνάρτηση create_Topelevel1 του αρχείου add_customers
+        :return:
+        """
+        add_customers.create_Toplevel1(self.top)
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):
