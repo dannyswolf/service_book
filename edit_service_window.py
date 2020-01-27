@@ -7,15 +7,18 @@
 import os
 import sys
 import sqlite3
+import time
 from tkinter import StringVar, filedialog, messagebox, PhotoImage
 import edit_service_window_support
 import image_viewer
 import add_spare_parts
 import insert_spare_parts
 from tkcalendar import DateEntry
-from settings import dbase, spare_parts_db, root_logger  # settings
-
-
+from settings import dbase, spare_parts_db, root_logger, today  # settings
+import pyscreenshot as ImageGrab
+from PIL import Image
+import subprocess
+from xhtml2pdf import pisa
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
@@ -548,6 +551,24 @@ class edit_service_window():
         self.spare_parts_treeview.configure(show="headings", style="mystyle.Treeview", selectmode="browse")
         self.get_spare_parts()
 
+        # get screen shot
+        self.print = tk.Button(top)
+        self.print.place(relx=0.580, rely=0.914, height=34, width=147)
+        self.print.configure(activebackground="#ececec")
+        self.print.configure(activeforeground="#000000")
+        self.print.configure(background="green")
+        self.print.configure(disabledforeground="#a3a3a3")
+        self.print.configure(font=("Calibri", 12, "bold"))
+        self.print.configure(foreground="#ffffff")
+        self.print.configure(highlightbackground="#d9d9d9")
+        self.print.configure(highlightcolor="black")
+        self.print.configure(pady="2")
+        self.print.configure(text="Στιγμιότυπο pdf")
+        self.print.configure(command=self.get_screen_shot)
+        self.print_img = PhotoImage(file="icons/grab_screen.png")
+        self.print.configure(image=self.print_img)
+        self.print.configure(compound="left")
+
     # Ελεγχος αν υπάρχουν αρχεία για προβολή
     def check_if_files_exists(self):
         con = sqlite3.connect(dbase)
@@ -634,6 +655,98 @@ class edit_service_window():
         self.save_btn.configure(pady="2")
         self.save_btn.configure(text="Αποθήκευση")
         self.save_btn.configure(command=add_to_db)
+
+    def get_screen_shot(self, index=None):
+        if not index:
+            index = 0
+        width = self.top.winfo_x() + self.top.winfo_width() + 9
+        height = self.top.winfo_y() + self.top.winfo_height() + 15
+        # part of the screen
+        im = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height), childprocess=False)  # X1,Y1,X2,Y2
+        im.save(f"prints/screen_shot/screen_shot{index}.png")
+        self.notebook.select(tab_id=1)
+        if not index:
+            answer = messagebox.askyesno("Προσοχή", 'Θα θέλατε και τα ανταλλακτικά;')
+            if answer:
+                time.sleep(0.5)
+                self.get_screen_shot(1)
+        # scree_shot = Image.open("prints/screen_shot.png")
+        # # screen_rgb = scree_shot.convert('RGB')
+        # scree_shot.save("prints/screen_shot.png")
+
+        # logo = Image.open("icons/logo-small-orange.png")
+        # # logo_rgb = logo.convert('RGB')
+        # logo.save("prints/logo-small-orange.png")
+
+        # Define your data
+        prints_dir = f'prints/{today}'
+        if not os.path.exists(prints_dir):
+            os.makedirs(prints_dir)
+        outputFilename = f"{prints_dir}/Service Book {self.selected_customer}  {today}  .pdf"
+
+        # Utility function
+        def convertHtmlToPdf(sourceHtml, outputFilename):
+            # open output file for writing (truncated binary)
+            resultFile = open(outputFilename, "w+b")
+
+            # convert HTML to PDF
+
+            pisaStatus = pisa.CreatePDF(sourceHtml.encode('utf-8'), dest=resultFile, encoding='utf8')
+
+            # close output file
+            resultFile.close()  # close output file
+
+            # return True on success and False on errors
+            return pisaStatus.err
+            # Αν γράψουμε νέο φωτοτυπικό και όχι απο την λίστα
+
+        font = """{
+                    font-family: Calibri;
+                    src: url('../fonts/Calibrib.ttf');
+                    }
+
+                    body {
+                    font-family: Calibri;
+                    font-weight: bold;
+                    }
+                    h1 {
+                    font-family: Calibri;
+                    font-weight: bold;
+                    }
+                    h2 {
+                    font-family: Calibri;
+                    font-weight: bold;
+                    }
+                    h3 {
+                    font-family: Calibri;
+                    font-weight: bold;
+                    }
+                    h4 {
+                    font-family: Calibri;
+                    font-weight: bold;
+
+                    }
+                    """
+
+        sourceHtml = f"""<html>
+
+                <meta http-equiv=Content-Type content="text/html;charset=utf-8"></meta>
+                <style>
+                @font-face {font}
+                </style> 
+    <font size = "5">
+                <h1 style="text-align: center;"><img style="float: right;" src="../icons/logo-small-orange.png" alt="" width="200" height="143" /></h1>
+                <h1 style="text-align: center;"><img style="float: right;" src="../prints/screen_shot/screen_shot0.png" alt="" /></h1>
+                <h1 style="text-align: center;"><img style="float: right;" src="../prints/screen_shot/screen_shot1.png" alt="" /></h1>
+
+    
+    </font>
+                </html>
+                """
+
+        convertHtmlToPdf(sourceHtml, outputFilename)
+        subprocess.Popen(outputFilename, shell=True)
+
 
     # Προσθήκη αρχείων
     def add_files(self):
@@ -750,28 +863,44 @@ class edit_service_window():
         for table in c.execute("SELECT name FROM sqlite_sequence").fetchall():
             try:
                 c.execute("SELECT * FROM " + str(table[0]) + " WHERE ΚΩΔΙΚΟΣ =? ", (selected_part_code,))
-            except sqlite3.OperationalError:  # sqlite3.OperationalError: no such table: ΠΡΩΤΟΣ_ΟΡΟΦΟΣ todo
+            except sqlite3.OperationalError:  # sqlite3.OperationalError: no such table: ΠΡΩΤΟΣ_ΟΡΟΦΟΣ
                 continue
             data = c.fetchall()
             if data:  # αφου το βρούμε πέρνουμε μόνο τον πίνακα
                 part_table = table[0]
                 break
-        # Πέρνουμε τα τεμάχια που έχουν απομείνει
-        c.execute("SELECT ΤΕΜΑΧΙΑ FROM " + part_table + " WHERE ΚΩΔΙΚΟΣ =?", (selected_part_code,))
-        old_part_pieces = c.fetchall()
-        # και προσθέτουμε σε αυτά τα τεμάχια που έχουμε εισάγει στο Service
-        new_pieces = str(int(old_part_pieces[0][0]) + int(selected_part_pieces))
+        try:
+            # Πέρνουμε τα τεμάχια που έχουν απομείνει
+            c.execute("SELECT ΤΕΜΑΧΙΑ FROM " + part_table + " WHERE ΚΩΔΙΚΟΣ =?", (selected_part_code,))
+            old_part_pieces = c.fetchall()
+            # και προσθέτουμε σε αυτά τα τεμάχια που έχουμε εισάγει στο Service
+            new_pieces = str(int(old_part_pieces[0][0]) + int(selected_part_pieces))
 
-        # ενημερώνουμε το προιόν στον πίνακα
-        c.execute("UPDATE " + part_table + " SET ΤΕΜΑΧΙΑ =?  WHERE ΚΩΔΙΚΟΣ =?", (new_pieces, selected_part_code))
+            # ενημερώνουμε το προιόν στον πίνακα
+            c.execute("UPDATE " + part_table + " SET ΤΕΜΑΧΙΑ =?  WHERE ΚΩΔΙΚΟΣ =?", (new_pieces, selected_part_code))
+            con.commit()
 
-        messagebox.showinfo("Πληροφορία!", f"Το προιόν με κωδικό {selected_part_code}  της εταιρείας {part_table}"
-                                           f" ενημερώθηκε")
-        con.commit()
+        except (UnboundLocalError, ValueError):  # Όταν το ανταλλακτικό δεν είναι στην αποθήκη
+            pass
+        try:
+            c.execute("SELECT ΤΙΜΗ FROM " + part_table + " WHERE ΚΩΔΙΚΟΣ =?", (selected_part_code,))
+            price = c.fetchall()
+            price = price[0][0]
+            total = float(new_pieces) * float(price[:-1])
+            str_total = str("{:0.2f}".format(total)) + " €"
+            c.execute("UPDATE " + part_table + " SET ΣΥΝΟΛΟ =? WHERE ΚΩΔΙΚΟΣ =?",
+                      (str_total, selected_part_code))
+            con.commit()
+            messagebox.showinfo("Πληροφορία!", f"Το προιόν με κωδικό {selected_part_code}  της εταιρείας {part_table}"
+                                               f" ενημερώθηκε")
+        except sqlite3.OperationalError:  # όταν δεν έχει τιμή
+            pass
+
         c.close()
         con.close()
 
         self.spare_parts_treeview.delete(self.spare_parts_treeview.selection())
+        self.top.focus()
 
 
 # The following code is added to facilitate the Scrolled widgets you specified.

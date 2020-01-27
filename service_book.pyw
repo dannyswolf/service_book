@@ -14,6 +14,10 @@ todo start day to binary file
 todo Αποθήκη για τα ανταλλακτικά που εισάγουμε στο local version
 todo να μπει στις σημειώσεις πότε ενεργοποίθηκε/απενεργοποίθηκε φωτοτυπικό και πελάτης
 
+V1.4.9 Ενημέρωση συνόλου στην αποθήκη όταν υπάρχει τιμή στα ανταλλακτικά -------------27/01/2020
+
+
+V1.4.8 Screen Shot to Pdf  -----------------  ----------------------------------------26/01/2020
 
 V1.4.7 Προσθήκη ανταλλακτικών εκτός αποθήκης  ----------------------------------------25/01/2020
 fix bug οταν προσθέταμε νέο φωτοτυπικό απο add_task
@@ -231,7 +235,7 @@ V 0.1.1 Προσθήκη επεξεργασία ιστορικού φωτοτυ�
 v 0.0.1 Ενας πελάτης με πολλά φωτοτυπικά το κάθε φωτοτυπικό με πολλά Service ------------------------14/12/2019
         Η ημερομηνία εναρξης και Μετρητής εναρξης είναι πεδία του φωτοτυπικού γιατί πάνε με το φωτοτυπικό
 """
-
+import add_spare_parts_to_repository
 import service_book_colors_support
 from edit_service_window import *  # Δημιουργία παραθύρου επεξεργασίας ιστορικού επισκευής
 import add_customers  # Δημιουργία παραθύρου προσθήκης πελάτη
@@ -550,6 +554,7 @@ class Toplevel1:
         self.repository_company_combobox.configure(values=self.companies)
         self.repository_company_combobox.configure(takefocus="")
         self.repository_company_combobox.bind("<<ComboboxSelected>>", self.get_repository)
+        self.repository_company_combobox.configure(state="readonly")
 
         self.search_on_repository_stringvar = StringVar()
         self.search_on_repository_entry = tk.Entry(self.repository_frame, textvariable=self.search_on_repository_stringvar)
@@ -577,6 +582,24 @@ class Toplevel1:
         self.search_on_repository_btn.configure(image=self.search_on_repository_btn_img)
         self.search_on_repository_btn.configure(text='''Αναζήτηση''')
         self.search_on_repository_btn.configure(command=self.search_on_repository)
+
+        self.add_spare_part_on_repository_btn = tk.Button(self.repository_frame)
+        # self.add_spare_part_on_repository_btn.place(relx=0.025, rely=0.150, height=35, relwidth=0.200)
+        self.add_spare_part_on_repository_btn.configure(activebackground="#ececec")
+        self.add_spare_part_on_repository_btn.configure(activeforeground="#000000")
+        self.add_spare_part_on_repository_btn.configure(background="#5fa15f")
+        self.add_spare_part_on_repository_btn.configure(compound='left')
+        self.add_spare_part_on_repository_btn.configure(disabledforeground="#a3a3a3")
+        self.add_spare_part_on_repository_btn.configure(font=("Calibri", 10, "bold"))
+        self.add_spare_part_on_repository_btn.configure(foreground="#ffffff")
+        self.add_spare_part_on_repository_btn.configure(highlightbackground="#d9d9d9")
+        self.add_spare_part_on_repository_btn.configure(highlightcolor="black")
+        self.add_spare_part_on_repository_btn.configure(pady="0")
+        self.add_spare_part_on_repository_btn_img = PhotoImage(file="icons/add_spare_part_on_repository.png")
+        self.add_spare_part_on_repository_btn.configure(image=self.add_spare_part_on_repository_btn_img)
+        self.add_spare_part_on_repository_btn.configure(text='''Προσθήκη ανταλλακτικού''')
+        self.add_spare_part_on_repository_btn.configure(command=self.add_spare_part_on_repository)
+        # self.add_spare_part_on_repository_btn.place_forget()
 
         self.repository_treeview = ScrolledTreeView(self.repository_frame)
         self.repository_treeview.place(relx=0.017, rely=0.300, relheight=0.59, relwidth=0.967)
@@ -1392,9 +1415,17 @@ class Toplevel1:
 
         self.get_calendar()
 
+    def add_spare_part_on_repository(self):
+        selected_table = self.repository_company_combobox.get()
+        if selected_table != "":
+            add_spare_parts_to_repository.create_insert_spare_parts_window(self.top, selected_table)
+        else:
+            messagebox.showinfo("Προσοχή!", "Παρακαλώ επιλέξτε πρώτα εταιρεία")
+            pass
+
     # Εμφάνηση αποθήκης
     def get_repository(self, event=None):
-
+        self.add_spare_part_on_repository_btn.place(relx=0.025, rely=0.150, height=35, relwidth=0.200)
         self.selected_repository_company = self.repository_company_combobox.get()
         if self.selected_repository_company != "":
             self.repository_treeview.delete(*self.repository_treeview.get_children())
@@ -1709,6 +1740,7 @@ class Toplevel1:
 
         selected_calendar_id = (self.calendar_treeview.set(self.calendar_treeview.selection(), '#1'))
         edit_task.create_edit_task_window(root, selected_calendar_id)
+        self.top.wm_state('iconic')
 
     def search_tasks(self, event=None, data=None):
 

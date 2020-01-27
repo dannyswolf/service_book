@@ -317,11 +317,22 @@ class Toplevel1:
                         # Ενημέρωση αποθήκης  -1 στα προιόντα
                         c.execute("SELECT ΤΕΜΑΧΙΑ FROM " + self.selected_company + " WHERE ΚΩΔΙΚΟΣ =?", (value,))
                         old_pieces = c.fetchall()
-                        print("old_pieces of code ", old_pieces, value)
+                        print("Παλιά τεμάχια ", old_pieces, "Κωδικός", value)
                         new_pieces = int(old_pieces[0][0]) - 1
                         c.execute("UPDATE " + self.selected_company + " SET ΤΕΜΑΧΙΑ =? WHERE ΚΩΔΙΚΟΣ =?",
                                   (new_pieces, value))
                         con.commit()
+                        try:
+                            c.execute("SELECT ΤΙΜΗ FROM " + self.selected_company + " WHERE ΚΩΔΙΚΟΣ =?", (value,))
+                            price = c.fetchall()
+                            price = price[0][0]
+                            total = float(new_pieces) * float(price[:-1])
+                            str_total = str("{:0.2f}".format(total)) + " €"
+                            c.execute("UPDATE " + self.selected_company + " SET ΣΥΝΟΛΟ =? WHERE ΚΩΔΙΚΟΣ =?",
+                                      (str_total, value))
+                            con.commit()
+                        except sqlite3.OperationalError:
+                            pass
                         print("line 302"
                             f"Οι κωδικοί {added_codes} αφερέθηκαν απο την αποθήκη {self.selected_company} με επιτυχία ")
                         c.close()
@@ -393,6 +404,17 @@ class Toplevel1:
             new_pieces = int(old_pieces[0][0]) - 1
             c.execute("UPDATE " + self.selected_company + " SET ΤΕΜΑΧΙΑ =? WHERE ΚΩΔΙΚΟΣ =?", (new_pieces, code))
             con.commit()
+            try:
+                c.execute("SELECT ΤΙΜΗ FROM " + self.selected_company + " WHERE ΚΩΔΙΚΟΣ =?", (code,))
+                price = c.fetchall()
+                price = price[0][0]
+                total = float(new_pieces) * float(price[:-1])
+                str_total = str("{:0.2f}".format(total)) + " €"
+                c.execute("UPDATE " + self.selected_company + " SET ΣΥΝΟΛΟ =? WHERE ΚΩΔΙΚΟΣ =?",
+                          (str_total, code))
+                con.commit()
+            except sqlite3.OperationalError:
+                pass
         print(f" Line 362 Οι κωδικοί {added_codes} αφερέθηκαν απο την αποθήκη {self.selected_company} με επιτυχία ")
         c.close()
         con.close()
