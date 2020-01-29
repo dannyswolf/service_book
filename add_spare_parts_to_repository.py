@@ -168,6 +168,7 @@ class add_copier_window:
         self.code_label.configure(relief="groove")
         self.code_label.configure(text='''Κωδικός''')
         self.code = StringVar()
+        self.code.trace('w', self.check_code)
         self.code_entry = tk.Entry(top)
         self.code_entry.place(relx=0.260, rely=0.248, height=31, relwidth=0.593)
         self.code_entry.configure(textvariable=self.code)
@@ -180,6 +181,11 @@ class add_copier_window:
         self.code_entry.configure(insertbackground="black")
         self.code_entry.configure(selectbackground="#c4c4c4")
         self.code_entry.configure(selectforeground="black")
+        self.code_entry_warning = ttk.Label(top)
+        self.code_entry_warning_img = tk.PhotoImage(file="icons/lamp.png")
+        self.code_entry_warning.configure(image=self.code_entry_warning_img)
+        self.code_entry_warning.configure(compound='left')
+        self.code_entry_warning.configure(background="#ffffff")
 
         # self.add_code_btn = tk.Button(top)
         # self.add_code_btn.place(relx=0.885, rely=0.248, height=30, relwidth=0.060)
@@ -275,37 +281,58 @@ class add_copier_window:
     def quit(self, event):
         self.top.destroy()
 
+    # Ελεγχος αν το serial  υπάρχει
+    def check_code(self, name, index, mode):
+        self.code_entry_warning.place_forget()
+        # current_copier_id = (self.copiers_treeview.set(self.copiers_treeview.selection(), '#1'))
+
+        all_codes = []
+        con = sqlite3.connect(spare_parts_db)
+        c = con.cursor()
+        c.execute("SELECT ΚΩΔΙΚΟΣ FROM " + self.table + ";")
+        codes = c.fetchall()
+        # c.execute("SELECT Serial FROM Φωτοτυπικά WHERE ID = ?", (current_copier_id,))
+        # current_serial = c.fetchall()
+        con.close()
+
+        for code in codes:
+            all_codes.append(code[0])
+
+        if self.code.get() in all_codes :
+            self.code_entry.configure(foreground="red")
+            # self.code_entry.place(relx=0.260, rely=0.248, height=31, relwidth=0.593)
+            self.code_entry_warning.place(relx=0.860, rely=0.248, relheight=0.060, relwidth=0.060)
+        else:
+            self.code_entry.configure(foreground="green")
+            self.code_entry_warning.place_forget()
+
+
     def add_spare_part(self):
 
         conn = sqlite3.connect(spare_parts_db)
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM Ανταλλακτικά;")
-        headers = list(map(lambda x:x[0], cursor.description))
-        culumns = ", ".join(headers)
+        cursor.execute("SELECT * FROM " + self.table + ";")
+        headers = list(map(lambda x: x[0], cursor.description))
+        columns = ", ".join(headers)
         values = []
         for head in headers:
-            if head == "ID":
+            if head == "ID" or head == "Id" or head == "id":
                 values.append("Null")
             else:
                 values.append("?")
         values = ", ".join(values)
         data = [self.parts_nr.get(), self.description.get(), self.code.get(),
-                self.pieces.get(), self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier, self.service_id,
-                self.customer_id]
+                self.pieces.get(), self.notes_scrolledtext.get('1.0', 'end-1c')]
 
-        sql_insert = "INSERT INTO Ανταλλακτικά (" + culumns + ")" + "VALUES(" + values + ");"
-
+        sql_insert = "INSERT INTO " + self.table + "(" + columns + ")" + "VALUES(" + values + ");"
+        print("columns", columns)
+        print("data", data)
         cursor.execute(sql_insert, tuple(data))
         conn.commit()
         conn.close()
-        messagebox.showinfo("Info", f"Το  {data[0]} προστέθηκε επιτυχώς.\n Μπορείτε να εισάγετε νέο ανταλλακτικό")
-        self.parts_nr.set(value="")
-        self.description.set(value="")
-        self.code.set(value="")
-        self.pieces.set(value="")
-        self.notes_scrolledtext.delete("1.0", "end-1c")
+        messagebox.showinfo("Info", f"Το  {self.code.get()} προστέθηκε επιτυχώς στο {self.table}")
 
-        self.top.focus()
+        self.top.destroy()
         return None
 
 

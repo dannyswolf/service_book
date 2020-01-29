@@ -569,6 +569,15 @@ class edit_service_window():
         self.print.configure(image=self.print_img)
         self.print.configure(compound="left")
 
+        self.delete_task_btn = tk.Button(top)
+        self.delete_task_btn.place(relx=0.706, rely=0.200, relheight=0.060, relwidth=0.250)
+        self.delete_task_btn.configure(text="Διαγραφή")
+        self.delete_task_btn.configure(background="#CFD5CE")
+        self.delete_task_btn.configure(compound="left")
+        self.delete_task_btn_img = PhotoImage(file="icons/delete_task.png")
+        self.delete_task_btn.configure(image=self.delete_task_btn_img)
+        self.delete_task_btn.configure(command=self.delete_task)
+
     # Ελεγχος αν υπάρχουν αρχεία για προβολή
     def check_if_files_exists(self):
         con = sqlite3.connect(dbase)
@@ -747,7 +756,6 @@ class edit_service_window():
         convertHtmlToPdf(sourceHtml, outputFilename)
         subprocess.Popen(outputFilename, shell=True)
 
-
     # Προσθήκη αρχείων
     def add_files(self):
 
@@ -844,7 +852,7 @@ class edit_service_window():
 
     # Διαγραφή ανταλλακτικών
     def del_spare_parts(self):
-        selected_spare_part = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#1'))
+        selected_spare_part_id = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#1'))
         selected_part_code = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#4'))
         selected_part_pieces = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#5'))
         answer = messagebox.askokcancel("Προσοχή!", f"Ειστε σήγουρος για την διαγραφή προϊόντος με κωδικό {selected_part_code};")
@@ -853,7 +861,7 @@ class edit_service_window():
             return
         con = sqlite3.connect(dbase)
         c = con.cursor()
-        c.execute("DELETE FROM Ανταλλακτικά WHERE ID=?", (selected_spare_part,))
+        c.execute("DELETE FROM Ανταλλακτικά WHERE ID=?", (selected_spare_part_id,))
         con.commit()
         con.close()
         # Προσθήκη πίσω στην αποθήκη
@@ -893,7 +901,7 @@ class edit_service_window():
             con.commit()
             messagebox.showinfo("Πληροφορία!", f"Το προιόν με κωδικό {selected_part_code}  της εταιρείας {part_table}"
                                                f" ενημερώθηκε")
-        except sqlite3.OperationalError:  # όταν δεν έχει τιμή
+        except (sqlite3.OperationalError, UnboundLocalError):  # όταν δεν έχει τιμή και  Όταν το ανταλλακτικό δεν είναι στην αποθήκη
             pass
 
         c.close()
@@ -902,6 +910,32 @@ class edit_service_window():
         self.spare_parts_treeview.delete(self.spare_parts_treeview.selection())
         self.top.focus()
 
+    def delete_task(self):
+        spare_parts = self.spare_parts_treeview.get_children()
+        if spare_parts:
+            messagebox.showerror("Σφάλμα!", "Διαγράψτε πρώτα τα ανταλλακτικά")
+            self.top.focus()
+            return
+        self.check_if_files_exists()
+        if self.len_images:
+            messagebox.showerror("Σφάλμα!", "Διαγράψτε πρώτα τα αρχεία")
+            self.top.focus()
+            return
+        answer = messagebox.askyesno("Προσοχή", 'Είστε σήγουρος για την διαγραφή;')
+        if not answer:
+            self.top.focus()
+            return
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("DELETE FROM Service WHERE ID=?", (self.selected_service_id,))
+        con.commit()
+        c.execute("DELETE FROM Service_images WHERE Service_ID=?", (self.selected_service_id,))
+        con.commit()
+        c.close()
+        con.close()
+        print(f"Η εργασία {self.selected_service_id} διαγράφηκε με επιτυχία!")
+        messagebox.showwarning("Προσοχή", "Η εργασία διαγράφηκε με επιτυχία!\nΠαρακαλώ ανανεώστε")
+        self.top.destroy()
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):

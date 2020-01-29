@@ -31,7 +31,7 @@ except ImportError:
 
 
 def get_tables():
-    no_needed_tables = ['ΠΡΩΤΟΣ_ΟΡΟΦΟΣ']
+    no_needed_tables = ['ΠΡΩΤΟΣ_ΟΡΟΦΟΣ', "ΧΧΧ"]
     con = sqlite3.connect(spare_parts_db)
     c = con.cursor()
     c.execute("SELECT name FROM sqlite_sequence ORDER BY name")
@@ -137,6 +137,7 @@ class Toplevel1:
         # self.actions_combobox.configure(textvariable=edit_service_window_support.combobox)
         self.company_combobox.configure(takefocus="")
         self.company_combobox.bind("<<ComboboxSelected>>", self.get_spare_parts)
+        self.company_combobox.configure(state="readonly")
 
         self.entry = StringVar()
         self.Entry1 = tk.Entry(top, textvariable=self.entry)
@@ -318,7 +319,10 @@ class Toplevel1:
                         c.execute("SELECT ΤΕΜΑΧΙΑ FROM " + self.selected_company + " WHERE ΚΩΔΙΚΟΣ =?", (value,))
                         old_pieces = c.fetchall()
                         print("Παλιά τεμάχια ", old_pieces, "Κωδικός", value)
-                        new_pieces = int(old_pieces[0][0]) - 1
+                        try:
+                            new_pieces = int(old_pieces[0][0]) - 1
+                        except ValueError:  # Όταν τα τεμάχια δεν ειναι αριθμός αλλά γράμματα
+                            new_pieces = old_pieces[0][0]
                         c.execute("UPDATE " + self.selected_company + " SET ΤΕΜΑΧΙΑ =? WHERE ΚΩΔΙΚΟΣ =?",
                                   (new_pieces, value))
                         con.commit()
@@ -400,8 +404,10 @@ class Toplevel1:
         for code in added_codes:
             c.execute("SELECT ΤΕΜΑΧΙΑ FROM " + self.selected_company + " WHERE ΚΩΔΙΚΟΣ =?", (code,))
             old_pieces = c.fetchall()
-
-            new_pieces = int(old_pieces[0][0]) - 1
+            try:
+                new_pieces = int(old_pieces[0][0]) - 1
+            except ValueError: # όταν τα τεμάχια δεν έιναι αριθμός αλλα έχουμε γραμματα
+                new_pieces = old_pieces[0][0]
             c.execute("UPDATE " + self.selected_company + " SET ΤΕΜΑΧΙΑ =? WHERE ΚΩΔΙΚΟΣ =?", (new_pieces, code))
             con.commit()
             try:

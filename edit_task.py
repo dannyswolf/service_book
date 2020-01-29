@@ -895,17 +895,17 @@ class edit_task_window:
 
     # Διαγραφή ανταλλακτικών
     def del_spare_parts(self):
-        selected_spare_part = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#1'))  # ID
+        selected_spare_part_id = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#1'))  # ID
         selected_part_nr = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#2'))  # Parts Nr
         selected_part_code = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#4'))  # Κωδικός
         selected_part_pieces = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#5'))  # Τεμάχια
-        answer = messagebox.askokcancel("Προσοχή!", f"Ειστε σήγουρος για την διαγραφή του {selected_part_nr};")
+        answer = messagebox.askokcancel("Προσοχή!", f"Ειστε σήγουρος για την διαγραφή του {selected_part_code};")
         if not answer:
             self.top.focus()
             return
         con = sqlite3.connect(dbase)
         c = con.cursor()
-        c.execute("DELETE FROM Ανταλλακτικά WHERE ID=?", (selected_spare_part,))
+        c.execute("DELETE FROM Ανταλλακτικά WHERE ID=?", (selected_spare_part_id,))
         con.commit()
         con.close()
         # Προσθήκη πίσω στην αποθήκη
@@ -915,7 +915,7 @@ class edit_task_window:
         for table in c.execute("SELECT name FROM sqlite_sequence").fetchall():
             try:
                 c.execute("SELECT * FROM " + str(table[0]) + " WHERE ΚΩΔΙΚΟΣ =? ", (selected_part_code,))
-            except sqlite3.OperationalError:  # sqlite3.OperationalError: no such table: ΠΡΩΤΟΣ_ΟΡΟΦΟΣ todo
+            except sqlite3.OperationalError:  # sqlite3.OperationalError: no such table: ΠΡΩΤΟΣ_ΟΡΟΦΟΣ
                 continue
             data = c.fetchall()
             if data:  # αφου το βρούμε πέρνουμε μόνο τον πίνακα
@@ -936,7 +936,7 @@ class edit_task_window:
             c.execute("SELECT ΤΙΜΗ FROM " + part_table + " WHERE ΚΩΔΙΚΟΣ =?", (selected_part_code,))
             price = c.fetchall()
             price = price[0][0]
-            total = float(new_pieces) * float(price[:-1])
+            total = float(new_pieces) * float(price[:-1])   # για να μήν πάρει το €
             str_total = str("{:0.2f}".format(total)) + " €"
             c.execute("UPDATE " + part_table + " SET ΣΥΝΟΛΟ =? WHERE ΚΩΔΙΚΟΣ =?",
                       (str_total, selected_part_code))
@@ -1259,7 +1259,6 @@ class edit_task_window:
         convertHtmlToPdf(sourceHtml, outputFilename)
         subprocess.Popen(outputFilename, shell=True)
 
-
     # Αποστολή email
     def send_mail(self):
         # Αν γράψουμε νέο φωτοτυπικό και όχι απο την λίστα
@@ -1521,6 +1520,16 @@ class edit_task_window:
         return customer_id
 
     def delete_task(self):
+        spare_parts = self.spare_parts_treeview.get_children()
+        if spare_parts:
+            messagebox.showerror("Σφάλμα!", "Διαγράψτε πρώτα τα ανταλλακτικά")
+            self.top.focus()
+            return
+        self.check_if_files_exists()
+        if self.len_images:
+            messagebox.showerror("Σφάλμα!", "Διαγράψτε πρώτα τα αρχεία")
+            self.top.focus()
+            return
         answer = messagebox.askyesno("Προσοχή", 'Είστε σήγουρος για την διαγραφή;')
         if not answer:
             self.top.focus()
@@ -1530,6 +1539,7 @@ class edit_task_window:
         c.execute("DELETE FROM Calendar WHERE ID=?", (self.selected_calendar_id,))
         con.commit()
         c.execute("DELETE FROM Service WHERE ID=?", (self.service_id,))
+        c.execute("DELETE FROM Service_images WHERE Service_ID=?", (self.service_id,))
         con.commit()
         c.close()
         con.close()

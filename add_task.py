@@ -479,6 +479,7 @@ class add_task_window:
             self.copier_id = 0
             self.selected_copier = self.copiers_combobox.get() + "  Σειριακός : " + self.selected_serial
         con.close()
+        self.get_copier()
         return self.copier_id
 
     # Να πάρουμε Φωτοτυπικά και πελάτη
@@ -504,12 +505,13 @@ class add_task_window:
 
         self.customers_list = sorted(customers_list)
         self.customer_combobox.configure(values=self.customers_list)
+        self.get_copier()
         return sorted(customers_list), serials
 
     def get_copier(self, event=None):
         # να πάρουμε το id του πελάτη απο το ονομα του
         customer = self.customer_combobox.get()
-        self.copiers_combobox.set(value="")
+        self.copiers_combobox.configure(values="")
 
         con = sqlite3.connect(dbase)
         cursor = con.cursor()
@@ -843,7 +845,7 @@ class add_task_window:
         width = self.top.winfo_x() + self.top.winfo_width() + 9
         height = self.top.winfo_y() + self.top.winfo_height() + 20
         # part of the screen
-        im = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height))  # X1,Y1,X2,Y2
+        im = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height), childprocess=False)  # X1,Y1,X2,Y2
         im.save("prints/screen_shot.png")
         # scree_shot = Image.open("prints/screen_shot.png")
         # # screen_rgb = scree_shot.convert('RGB')

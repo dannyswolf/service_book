@@ -8,6 +8,8 @@
 import sys
 import sqlite3
 from tkinter import StringVar, messagebox, PhotoImage
+from tkinter.scrolledtext import ScrolledText
+
 from settings import dbase, demo, root_logger  # settings
 
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
@@ -390,8 +392,8 @@ class Toplevel1:
         self.Label14.configure(text='''Κόστος Πακέτου''')
 
         self.page_package_entry = tk.Entry(top)
-        self.page_package_entry.place(relx=0.275, rely=0.614, height=20
-                                      , relwidth=0.280)
+        self.page_package_entry.place(relx=0.290, rely=0.614, height=20
+                                      , relwidth=0.260)
         self.package = StringVar()
         self.page_package_entry.configure(textvariable=self.package)
         self.page_package_entry.configure(background="white")
@@ -419,8 +421,33 @@ class Toplevel1:
         self.package_cost_entry.configure(selectbackground="#c4c4c4")
         self.package_cost_entry.configure(selectforeground="black")
 
+        self.notes_label = tk.Label(top)
+        self.notes_label.place(relx=0.025, rely=0.700, height=31, relwidth=0.940)
+        self.notes_label.configure(activebackground="#f9f9f9")
+        self.notes_label.configure(activeforeground="black")
+        self.notes_label.configure(background="#6b6b6b")
+        self.notes_label.configure(disabledforeground="#a3a3a3")
+        self.notes_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.notes_label.configure(foreground="#ffffff")
+        self.notes_label.configure(highlightbackground="#d9d9d9")
+        self.notes_label.configure(highlightcolor="black")
+        self.notes_label.configure(relief="groove")
+        self.notes_label.configure(text='''Σημειώσεις''')
+        self.notes_scrolledtext = ScrolledText(top)
+        self.notes_scrolledtext.place(relx=0.025, rely=0.780, relheight=0.100, relwidth=0.941)
+        self.notes_scrolledtext.configure(background="white")
+        self.notes_scrolledtext.configure(font="TkTextFont")
+        self.notes_scrolledtext.configure(foreground="black")
+        self.notes_scrolledtext.configure(highlightbackground="#d9d9d9")
+        self.notes_scrolledtext.configure(highlightcolor="black")
+        self.notes_scrolledtext.configure(insertbackground="black")
+        self.notes_scrolledtext.configure(insertborderwidth="3")
+        self.notes_scrolledtext.configure(selectbackground="#c4c4c4")
+        self.notes_scrolledtext.configure(selectforeground="black")
+        self.notes_scrolledtext.configure(wrap="none")
+
         self.add_btn = tk.Button(top)
-        self.add_btn.place(relx=0.344, rely=0.750, height=34, relwidth=0.194)
+        self.add_btn.place(relx=0.344, rely=0.910, height=34, relwidth=0.194)
         self.add_btn.configure(activebackground="#ececec")
         self.add_btn.configure(activeforeground="#000000")
         self.add_btn.configure(background="#339933")
@@ -471,7 +498,7 @@ class Toplevel1:
 
         data = [self.company_name.get(), self.name.get(), self.address.get(), self.city.get(), self.post.get(),
                 self.place.get(), self.phone.get(), self.mobile.get(), self.fax.get(), self.email.get(),
-                self.package.get(), self.cost.get(), 1]  # Το 1 είναι ενεργός πελάτης 0 ανενεργός
+                self.package.get(), self.cost.get(), self.notes_scrolledtext.get("1.0", "end-1c"), 1]  # Το 1 είναι ενεργός πελάτης 0 ανενεργός
         conn = sqlite3.connect(dbase)
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM Πελάτες")  # Για να πάρουμε τα πεδία του πίνακα

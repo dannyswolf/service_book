@@ -13,6 +13,16 @@ todo προβολή όλων των εικόνων
 todo start day to binary file
 todo Αποθήκη για τα ανταλλακτικά που εισάγουμε στο local version
 todo να μπει στις σημειώσεις πότε ενεργοποίθηκε/απενεργοποίθηκε φωτοτυπικό και πελάτης
+todo στην αφαίρεση ανταλλακτικών να λεει για τον κωδικο προιοντος οχι για το part_nr
+todo uniq (στα πεδία των πινακων στην βαση) στους κωδικους και part_nr serial ονοματεπωνυμο τηλ
+todo στην προσθήκη πίνακα να βγάζει αν υπάρχει ο πήνακας (δλδ εταιρεία)
+
+V1.5.1 Προσθήκη πίνακα στην  αποθήκη ---------------------------------- -------------29/01/2020
+
+V1.5.0 Προσθήκη ανταλλακτικών στην αποθήκη και υπολογισμός συνόλου ----- -------------28/01/2020
+todo add_spare_parts_to_repository  ---------- Done
+todo edit_spare_parts_to_repository line 349 ---------- Done
+todo  ελεγχος κωδικού οταν εισαγουμε νεο προιον στην αποθήκη  -- Done
 
 V1.4.9 Ενημέρωση συνόλου στην αποθήκη όταν υπάρχει τιμή στα ανταλλακτικά -------------27/01/2020
 
@@ -236,6 +246,7 @@ v 0.0.1 Ενας πελάτης με πολλά φωτοτυπικά το κάθ
         Η ημερομηνία εναρξης και Μετρητής εναρξης είναι πεδία του φωτοτυπικού γιατί πάνε με το φωτοτυπικό
 """
 import add_spare_parts_to_repository
+import edit_spare_parts_to_repository
 import service_book_colors_support
 from edit_service_window import *  # Δημιουργία παραθύρου επεξεργασίας ιστορικού επισκευής
 import add_customers  # Δημιουργία παραθύρου προσθήκης πελάτη
@@ -313,10 +324,10 @@ def get_tables():
     """
         Αποκόμιση  πινάκων απο την βάση δεδομένων
     """
-    no_needed_tables = ['ΠΡΩΤΟΣ_ΟΡΟΦΟΣ']
+    no_needed_tables = ['ΠΡΩΤΟΣ_ΟΡΟΦΟΣ', "ΧΧΧ", "sqlite_sequence"]
     con = sqlite3.connect(spare_parts_db)
     c = con.cursor()
-    c.execute("SELECT name FROM sqlite_sequence ORDER BY name")
+    c.execute("select name from sqlite_master where type = 'table' ORDER BY name;")
     tables = c.fetchall()
     c.close()
     con.close()
@@ -555,6 +566,43 @@ class Toplevel1:
         self.repository_company_combobox.configure(takefocus="")
         self.repository_company_combobox.bind("<<ComboboxSelected>>", self.get_repository)
         self.repository_company_combobox.configure(state="readonly")
+        self.company_image = tk.Label(self.repository_frame)
+
+        self.add_table_to_repository_btn = tk.Button(self.repository_frame)
+        self.add_table_to_repository_btn.place(relx=0.815, rely=0.005, relheight=0.070, relwidth=0.200)
+        self.add_table_to_repository_btn.configure(background="#5fa15f")
+        self.add_table_to_repository_btn.configure(foreground="white")
+        self.add_table_to_repository_btn_img = PhotoImage(file="icons/add_table_to_repository.png")
+        self.add_table_to_repository_btn.configure(image=self.add_table_to_repository_btn_img)
+        self.add_table_to_repository_btn.configure(text="Προσθήκη εταιρείας")
+        self.add_table_to_repository_btn.configure(compound="left")
+        self.add_table_to_repository_btn.configure(command=self.add_table)
+
+        self.add_table_entry = tk.Entry(self.repository_frame)
+        self.add_table_entry.place(relx=0.815, rely=0.080, relheight=0.065, relwidth=0.200)
+        self.add_table_entry.configure(background="white")
+        self.add_table_entry.configure(disabledforeground="#a3a3a3")
+        self.add_table_entry.configure(font=("Calibri", 12))
+        self.add_table_entry.configure(foreground="#000000")
+        self.add_table_entry.configure(insertbackground="black")
+        #self.add_table_entry.configure(textvariable=self.search_tasks_data)
+
+        # Διαγραφή επιλεγμένου ανταλλακτικών
+        self.del_spare_parts_btn = tk.Button(self.repository_frame)
+        self.del_spare_parts_btn.place(relx=0.815, rely=0.140, height=50, relwidth=0.200)
+        self.del_spare_parts_btn.configure(activebackground="#ececec")
+        self.del_spare_parts_btn.configure(activeforeground="#000000")
+        self.del_spare_parts_btn.configure(background="#6b6b6b")
+        self.del_spare_parts_btn.configure(disabledforeground="#a3a3a3")
+        self.del_spare_parts_btn.configure(foreground="#ffffff")
+        self.del_spare_parts_btn.configure(highlightbackground="#d9d9d9")
+        self.del_spare_parts_btn.configure(highlightcolor="black")
+        self.del_spare_parts_btn.configure(pady="0")
+        self.del_spare_parts_btn.configure(text='''   Διαγραφή επιλεγμένου\n   ανταλλακτικού''')
+        # self.del_spare_parts_btn.configure(command=self.del_spare_parts)
+        self.del_spare_parts_btn_img = PhotoImage(file="icons/delete_spare_parts.png")
+        self.del_spare_parts_btn.configure(image=self.del_spare_parts_btn_img)
+        self.del_spare_parts_btn.configure(compound="left")
 
         self.search_on_repository_stringvar = StringVar()
         self.search_on_repository_entry = tk.Entry(self.repository_frame, textvariable=self.search_on_repository_stringvar)
@@ -567,7 +615,7 @@ class Toplevel1:
         self.search_on_repository_entry.bind('<Return>', self.search_on_repository)
 
         self.search_on_repository_btn = tk.Button(self.repository_frame)
-        self.search_on_repository_btn.place(relx=0.500, rely=0.150, height=25, width=145)
+        self.search_on_repository_btn.place(relx=0.500, rely=0.150, height=25, relwidth=0.145)
         self.search_on_repository_btn.configure(activebackground="#ececec")
         self.search_on_repository_btn.configure(activeforeground="#000000")
         self.search_on_repository_btn.configure(background="#006291")
@@ -582,6 +630,12 @@ class Toplevel1:
         self.search_on_repository_btn.configure(image=self.search_on_repository_btn_img)
         self.search_on_repository_btn.configure(text='''Αναζήτηση''')
         self.search_on_repository_btn.configure(command=self.search_on_repository)
+        self.refresh_repository_btn = tk.Button(self.repository_frame)
+        self.refresh_repository_btn.place(relx=0.650, rely=0.150, height=25, relwidth=0.030)
+        self.refresh_repository_btn.configure(background="#0685c4")
+        self.refresh_repository_btn_img = PhotoImage(file="icons/refresh.png")
+        self.refresh_repository_btn.configure(image=self.refresh_repository_btn_img)
+        self.refresh_repository_btn.configure(command=self.get_repository)
 
         self.add_spare_part_on_repository_btn = tk.Button(self.repository_frame)
         # self.add_spare_part_on_repository_btn.place(relx=0.025, rely=0.150, height=35, relwidth=0.200)
@@ -597,13 +651,17 @@ class Toplevel1:
         self.add_spare_part_on_repository_btn.configure(pady="0")
         self.add_spare_part_on_repository_btn_img = PhotoImage(file="icons/add_spare_part_on_repository.png")
         self.add_spare_part_on_repository_btn.configure(image=self.add_spare_part_on_repository_btn_img)
-        self.add_spare_part_on_repository_btn.configure(text='''Προσθήκη ανταλλακτικού''')
+
         self.add_spare_part_on_repository_btn.configure(command=self.add_spare_part_on_repository)
         # self.add_spare_part_on_repository_btn.place_forget()
+
+
 
         self.repository_treeview = ScrolledTreeView(self.repository_frame)
         self.repository_treeview.place(relx=0.017, rely=0.300, relheight=0.59, relwidth=0.967)
         self.repository_treeview.configure(show="headings", style="mystyle.Treeview", selectmode="browse")
+        self.repository_treeview.bind("<Double-1>", self.edit_spare_part_on_repository)
+
 
         self.customer_title_label = tk.Label(self.customer_frame)
         self.customer_title_label.place(relx=0.021, rely=0.005, height=30, relwidth=0.847)
@@ -937,6 +995,30 @@ class Toplevel1:
         self.place_entry.configure(selectbackground="#c4c4c4")
         self.place_entry.configure(selectforeground="black")
 
+        self.notes_label = tk.Label(self.customer_frame)
+        self.notes_label.place(relx=0.025, rely=0.600, height=31, relwidth=0.940)
+        self.notes_label.configure(activebackground="#f9f9f9")
+        self.notes_label.configure(activeforeground="black")
+        self.notes_label.configure(background="#6b6b6b")
+        self.notes_label.configure(disabledforeground="#a3a3a3")
+        self.notes_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.notes_label.configure(foreground="#ffffff")
+        self.notes_label.configure(highlightbackground="#d9d9d9")
+        self.notes_label.configure(highlightcolor="black")
+        self.notes_label.configure(relief="groove")
+        self.notes_label.configure(text='''Σημειώσεις''')
+        self.customer_notes_scrolledtext = ScrolledText(self.customer_frame)
+        self.customer_notes_scrolledtext.place(relx=0.025, rely=0.680, relheight=0.300, relwidth=0.941)
+        self.customer_notes_scrolledtext.configure(background="white")
+        self.customer_notes_scrolledtext.configure(font="TkTextFont")
+        self.customer_notes_scrolledtext.configure(foreground="black")
+        self.customer_notes_scrolledtext.configure(highlightbackground="#d9d9d9")
+        self.customer_notes_scrolledtext.configure(highlightcolor="black")
+        self.customer_notes_scrolledtext.configure(insertbackground="black")
+        self.customer_notes_scrolledtext.configure(insertborderwidth="3")
+        self.customer_notes_scrolledtext.configure(selectbackground="#c4c4c4")
+        self.customer_notes_scrolledtext.configure(selectforeground="black")
+        self.customer_notes_scrolledtext.configure(wrap="none")
         # self.TSeparator1 = ttk.Separator(top)
         # self.TSeparator1.place(relx=0.221, rely=0.355, relwidth=0.647)
 
@@ -1318,7 +1400,7 @@ class Toplevel1:
 
         # Προσθήκη Ημερολόγιο εργασιών
         self.add_task_btn = tk.Button(top)
-        self.add_task_btn.place(relx=0.300, rely=0.630, height=30, relwidth=0.150)
+        self.add_task_btn.place(relx=0.225, rely=0.630, height=30, relwidth=0.150)
         self.add_task_btn.configure(activebackground="#6b6b6b")
         self.add_task_btn.configure(activeforeground="#000000")
         self.add_task_btn.configure(background="#6b6b6b")
@@ -1335,7 +1417,7 @@ class Toplevel1:
 
         # Ανανέωση μετα απο Προσθήκη εγρασίας
         self.refresh_task_btn = tk.Button(top)
-        self.refresh_task_btn.place(relx=0.455, rely=0.630, height=30, relwidth=0.030)
+        self.refresh_task_btn.place(relx=0.375, rely=0.630, height=30, relwidth=0.030)
         self.refresh_task_btn.configure(background="#0685c4")
         self.refresh_task_img = PhotoImage(file="icons/refresh.png")
         self.refresh_task_btn.configure(image=self.refresh_task_img)
@@ -1397,7 +1479,7 @@ class Toplevel1:
 
         # Πίνακας Ημερολόγιο εργασιών
         self.calendar_treeview = ScrolledTreeView(top)
-        self.calendar_treeview.place(relx=0.300, rely=0.680, relheight=0.300, relwidth=0.685)
+        self.calendar_treeview.place(relx=0.225, rely=0.680, relheight=0.300, relwidth=0.760)
         self.calendar_treeview.configure(show="headings", style="mystyle.Treeview", selectmode="browse")
         self.calendar_treeview.bind("<<TreeviewSelect>>", self.edit_scheduled_tasks)
 
@@ -1410,10 +1492,28 @@ class Toplevel1:
                         background='gray20', selectmode='day', foreground='white', borderwidth=5, locale="el_GR",
                                          font=("Calibri", 10, 'bold'))
         #self.service_calendar.drop_down()
-        self.service_calendar.place(relx=0.021, rely=0.630, relheight=0.350, relwidth=0.270)
+        self.service_calendar.place(relx=0.021, rely=0.680, relheight=0.300, relwidth=0.200)
         self.service_calendar.bind('<<CalendarSelected>> ', self.view_scheduled_tasks)
 
         self.get_calendar()
+
+    def add_table(self):
+        table_to_add = self.add_table_entry.get()
+        con = sqlite3.connect(spare_parts_db)
+        c = con.cursor()
+        try:
+            c.execute(" CREATE TABLE IF NOT EXISTS " + table_to_add +
+                   " (ID INTEGER PRIMARY KEY, PARTS_NR TEXT, ΠΕΡΙΓΡΑΦΗ TEXT, ΚΩΔΙΚΟΣ TEXT, ΤΕΜΑΧΙΑ TEXT, "
+                   "ΠΑΡΑΤΗΡΗΣΗΣ text); ")
+        except sqlite3.OperationalError:
+            messagebox.showerror("Σφάλμα!", "Το όνομα της εταιρείας πρέπει να είναι χωρίς κενά")
+            return
+        con.commit()
+        con.close()
+        messagebox.showinfo("Info", f'Ο {table_to_add} Δημιουργήθηκε')
+        self.companies = get_tables()
+        self.repository_company_combobox.configure(values=self.companies)
+        return
 
     def add_spare_part_on_repository(self):
         selected_table = self.repository_company_combobox.get()
@@ -1423,10 +1523,45 @@ class Toplevel1:
             messagebox.showinfo("Προσοχή!", "Παρακαλώ επιλέξτε πρώτα εταιρεία")
             pass
 
+    def edit_spare_part_on_repository(self, event=None):
+        selected_table = self.repository_company_combobox.get()
+        if selected_table != "":
+
+            # id ==> το ιδ του επιλεγμένου ανταλλακτικου
+            spare_part_id = (self.repository_treeview.set(self.repository_treeview.selection(), '#1'))
+            # Αν ο κωδικός είναι το τεταρτο πεδίο του πίνακα
+            heading = self.repository_treeview.heading("#4", "text")
+
+            # Αν ο κωδικός είναι το τεταρτο πεδίο του πίνακα δεν είναι TONER φωτοτυπικά κτλπ o πήνακας
+            if heading == "ΚΩΔΙΚΟΣ":
+                spare_part_code = (self.repository_treeview.set(self.repository_treeview.selection(), "#4"))
+
+            else:  # αν δεν είναι ΚΩΔΙΚΟΣ το #4 πεδίο τότε είναι το #6
+                heading = self.repository_treeview.heading("#6", "text")
+                spare_part_code = (self.repository_treeview.set(self.repository_treeview.selection(), "#6"))
+
+            edit_spare_parts_to_repository.create_insert_spare_parts_window(self.top, selected_table, spare_part_id,
+                                                                            spare_part_code)
+
+        else:
+            messagebox.showinfo("Προσοχή!", "Παρακαλώ επιλέξτε πρώτα εταιρεία")
+            pass
+
     # Εμφάνηση αποθήκης
     def get_repository(self, event=None):
-        self.add_spare_part_on_repository_btn.place(relx=0.025, rely=0.150, height=35, relwidth=0.200)
+        self.add_spare_part_on_repository_btn.configure(
+            text=f'''Προσθήκη ανταλλακτικού {self.repository_company_combobox.get()}''')
+        self.add_spare_part_on_repository_btn.place(relx=0.025, rely=0.150, height=35, relwidth=0.260)
         self.selected_repository_company = self.repository_company_combobox.get()
+        self.company_image.place(relx=0.690, rely=0.050, height=78, width=120)
+        try:
+            self.company_image_img = PhotoImage(file="icons/" + self.repository_company_combobox.get() + ".png")
+            self.company_image.configure(image=self.company_image_img)
+        except TclError:  # couldn't open "icons/.png": no such file or directory
+            self.company_image_img = PhotoImage(file="icons/no_image.png")
+            self.company_image.configure(image=self.company_image_img)
+            pass
+
         if self.selected_repository_company != "":
             self.repository_treeview.delete(*self.repository_treeview.get_children())
 
@@ -2111,6 +2246,9 @@ class Toplevel1:
         self.page_package_entry.configure(textvariable=var)
         var = StringVar(root, value=customers_data[0][12])
         self.package_cost_entry.configure(textvariable=var)
+        self.customer_notes_scrolledtext.delete("1.0", 'end-1c')
+        var = StringVar(root, value=customers_data[0][13])
+        self.customer_notes_scrolledtext.insert("1.0", var.get())
         # Εμφάνηση κουμπιού αναζήτησης ανταλλακτικών
         self.get_spare_parts()  # Πρώτα να πάρουμε τα ανταλλακτικά
         self.search_spare_parts_btn.configure(text=f"Αναζήτηση ανταλλακτικών του πελάτη {self.selected_customer}")
@@ -2518,7 +2656,7 @@ class Toplevel1:
                     self.post_code_entry.get(), self.place_entry.get(), self.phone_entry.get(), self.mobile_entry.get(),
                     self.fax_entry.get(), self.email_entry.get(), self.page_package_entry.get(),
                     self.package_cost_entry.get() + " €" if " €" not in self.package_cost_entry.get() else
-                    self.package_cost_entry.get(), 1, self.selected_customer_id]  # 1 είναι η κατάσταση
+                    self.package_cost_entry.get(), self.customer_notes_scrolledtext.get("1.0", "end-1c"), 1, self.selected_customer_id]  # 1 είναι η κατάσταση
 
         up_conn = sqlite3.connect(dbase)
         up_cursor = up_conn.cursor()
