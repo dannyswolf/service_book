@@ -587,23 +587,6 @@ class Toplevel1:
         self.add_table_entry.configure(insertbackground="black")
         #self.add_table_entry.configure(textvariable=self.search_tasks_data)
 
-        # Διαγραφή επιλεγμένου ανταλλακτικών
-        self.del_spare_parts_btn = tk.Button(self.repository_frame)
-        self.del_spare_parts_btn.place(relx=0.815, rely=0.140, height=50, relwidth=0.200)
-        self.del_spare_parts_btn.configure(activebackground="#ececec")
-        self.del_spare_parts_btn.configure(activeforeground="#000000")
-        self.del_spare_parts_btn.configure(background="#6b6b6b")
-        self.del_spare_parts_btn.configure(disabledforeground="#a3a3a3")
-        self.del_spare_parts_btn.configure(foreground="#ffffff")
-        self.del_spare_parts_btn.configure(highlightbackground="#d9d9d9")
-        self.del_spare_parts_btn.configure(highlightcolor="black")
-        self.del_spare_parts_btn.configure(pady="0")
-        self.del_spare_parts_btn.configure(text='''   Διαγραφή επιλεγμένου\n   ανταλλακτικού''')
-        # self.del_spare_parts_btn.configure(command=self.del_spare_parts)
-        self.del_spare_parts_btn_img = PhotoImage(file="icons/delete_spare_parts.png")
-        self.del_spare_parts_btn.configure(image=self.del_spare_parts_btn_img)
-        self.del_spare_parts_btn.configure(compound="left")
-
         self.search_on_repository_stringvar = StringVar()
         self.search_on_repository_entry = tk.Entry(self.repository_frame, textvariable=self.search_on_repository_stringvar)
         self.search_on_repository_entry.place(relx=0.29, rely=0.150, height=25, relwidth=0.200)
