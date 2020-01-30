@@ -15,7 +15,11 @@ todo Αποθήκη για τα ανταλλακτικά που εισάγουμ
 todo να μπει στις σημειώσεις πότε ενεργοποίθηκε/απενεργοποίθηκε φωτοτυπικό και πελάτης
 todo στην αφαίρεση ανταλλακτικών να λεει για τον κωδικο προιοντος οχι για το part_nr
 todo uniq (στα πεδία των πινακων στην βαση) στους κωδικους και part_nr serial ονοματεπωνυμο τηλ
-todo στην προσθήκη πίνακα να βγάζει αν υπάρχει ο πήνακας (δλδ εταιρεία)
+
+
+V1.5.2 Τροποποιήσης στην διαγραφή ιστορικού και εργασιών -------------- -------------30/01/2020
+Τροποποιήσης στην εισαγωγεί πίνακα
+todo στην προσθήκη πίνακα να βγάζει αν υπάρχει ο πήνακας (δλδ εταιρεία)  ---- Done
 
 V1.5.1 Προσθήκη πίνακα στην  αποθήκη ---------------------------------- -------------29/01/2020
 
@@ -578,6 +582,8 @@ class Toplevel1:
         self.add_table_to_repository_btn.configure(compound="left")
         self.add_table_to_repository_btn.configure(command=self.add_table)
 
+        self.repository_table = StringVar()
+        self.repository_table.trace("w", self.check_table)
         self.add_table_entry = tk.Entry(self.repository_frame)
         self.add_table_entry.place(relx=0.815, rely=0.080, relheight=0.065, relwidth=0.200)
         self.add_table_entry.configure(background="white")
@@ -585,7 +591,12 @@ class Toplevel1:
         self.add_table_entry.configure(font=("Calibri", 12))
         self.add_table_entry.configure(foreground="#000000")
         self.add_table_entry.configure(insertbackground="black")
-        #self.add_table_entry.configure(textvariable=self.search_tasks_data)
+        self.add_table_entry.configure(textvariable=self.repository_table)
+        self.add_table_entry_warning = ttk.Label(self.repository_frame)
+        self.add_table_entry_warning_img = PhotoImage(file="icons/lamp.png")
+        self.add_table_entry_warning.configure(image=self.add_table_entry_warning_img)
+        self.add_table_entry_warning.configure(text=f"{self.add_table_entry.get()} υπάρχει")
+        self.add_table_entry_warning.configure(compound='left')
 
         self.search_on_repository_stringvar = StringVar()
         self.search_on_repository_entry = tk.Entry(self.repository_frame, textvariable=self.search_on_repository_stringvar)
@@ -1597,6 +1608,31 @@ class Toplevel1:
         conn.close()
         for item in fetch:
             self.repository_treeview.insert("", "end", values=item)
+
+    def check_table(self, name, index, mode):
+        self.add_table_entry_warning.place_forget()
+        current_table = self.repository_table
+
+        no_needed_tables = ['ΠΡΩΤΟΣ_ΟΡΟΦΟΣ', "ΧΧΧ", "sqlite_sequence"]
+        con = sqlite3.connect(spare_parts_db)
+        c = con.cursor()
+        c.execute("select name from sqlite_master where type = 'table' ORDER BY name;")
+        tables = c.fetchall()
+        # messagebox.showwarning("tables", f'{tables}')
+        c.close()
+        con.close()
+        companies = []
+        for table in tables:
+            if table[0] not in no_needed_tables:
+                companies.append(table[0])
+
+        if self.add_table_entry.get() in companies and self.add_table_entry.get() != current_table:
+            self.add_table_entry.configure(foreground="red")
+            # self.add_table_entry.place(relx=0.815, rely=0.080, relheight=0.065, relwidth=0.200)
+            self.add_table_entry_warning.place(relx=0.850, rely=0.150, relheight=0.060, relwidth=0.150)
+        else:
+            self.add_table_entry.configure(foreground="green")
+            self.add_table_entry_warning.place_forget()
 
     # Ελεγχος αν το serial  υπάρχει
     def check_serial(self, name, index, mode):
