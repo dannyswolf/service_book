@@ -909,6 +909,10 @@ class edit_task_window:
         con.commit()
         con.close()
         # Προσθήκη πίσω στην αποθήκη
+        answer = messagebox.askquestion("Προσοχή!", f'Θέλετε το προιόν να προστεθεί πίσω στην αποθήκή;')
+        if answer != "yes":
+            self.top.focus()
+            return
         con = sqlite3.connect(spare_parts_db)
         c = con.cursor()
         # ευρεση προίοντος στην αποθήκη ψάχνοντας όλους τους πίνακες σύμφονα με part_nr και κωδικό
