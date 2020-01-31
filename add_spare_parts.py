@@ -31,7 +31,7 @@ except ImportError:
 
 
 def get_tables():
-    no_needed_tables = ['ΠΡΩΤΟΣ_ΟΡΟΦΟΣ']
+    no_needed_tables = ['ΠΡΩΤΟΣ_ΟΡΟΦΟΣ', "ΧΧΧ"]
     con = sqlite3.connect(spare_parts_db)
     c = con.cursor()
     c.execute("SELECT name FROM sqlite_sequence ORDER BY name")
@@ -117,7 +117,7 @@ class Toplevel1:
         self.headers = []
         self.selected_company = ""
         self.service_ID = service_id
-        self.customer_id = customer_id[0]
+        self.customer_id = customer_id
         self.copier = copier_name
         self.select_company_label = tk.Label(top)
         self.select_company_label.place(relx=0.025, rely=0.200, relheight=0.060, relwidth=0.260)
@@ -137,6 +137,7 @@ class Toplevel1:
         # self.actions_combobox.configure(textvariable=edit_service_window_support.combobox)
         self.company_combobox.configure(takefocus="")
         self.company_combobox.bind("<<ComboboxSelected>>", self.get_spare_parts)
+        self.company_combobox.configure(state="readonly")
 
         self.entry = StringVar()
         self.Entry1 = tk.Entry(top, textvariable=self.entry)
@@ -317,11 +318,25 @@ class Toplevel1:
                         # Ενημέρωση αποθήκης  -1 στα προιόντα
                         c.execute("SELECT ΤΕΜΑΧΙΑ FROM " + self.selected_company + " WHERE ΚΩΔΙΚΟΣ =?", (value,))
                         old_pieces = c.fetchall()
-                        print("old_pieces of code ", old_pieces, value)
-                        new_pieces = int(old_pieces[0][0]) - 1
+                        print("Παλιά τεμάχια ", old_pieces, "Κωδικός", value)
+                        try:
+                            new_pieces = int(old_pieces[0][0]) - 1
+                        except ValueError:  # Όταν τα τεμάχια δεν ειναι αριθμός αλλά γράμματα
+                            new_pieces = old_pieces[0][0]
                         c.execute("UPDATE " + self.selected_company + " SET ΤΕΜΑΧΙΑ =? WHERE ΚΩΔΙΚΟΣ =?",
                                   (new_pieces, value))
                         con.commit()
+                        try:
+                            c.execute("SELECT ΤΙΜΗ FROM " + self.selected_company + " WHERE ΚΩΔΙΚΟΣ =?", (value,))
+                            price = c.fetchall()
+                            price = price[0][0]
+                            total = float(new_pieces) * float(price[:-1])
+                            str_total = str("{:0.2f}".format(total)) + " €"
+                            c.execute("UPDATE " + self.selected_company + " SET ΣΥΝΟΛΟ =? WHERE ΚΩΔΙΚΟΣ =?",
+                                      (str_total, value))
+                            con.commit()
+                        except sqlite3.OperationalError:
+                            pass
                         print("line 302"
                             f"Οι κωδικοί {added_codes} αφερέθηκαν απο την αποθήκη {self.selected_company} με επιτυχία ")
                         c.close()
@@ -389,10 +404,23 @@ class Toplevel1:
         for code in added_codes:
             c.execute("SELECT ΤΕΜΑΧΙΑ FROM " + self.selected_company + " WHERE ΚΩΔΙΚΟΣ =?", (code,))
             old_pieces = c.fetchall()
-
-            new_pieces = int(old_pieces[0][0]) - 1
+            try:
+                new_pieces = int(old_pieces[0][0]) - 1
+            except ValueError: # όταν τα τεμάχια δεν έιναι αριθμός αλλα έχουμε γραμματα
+                new_pieces = old_pieces[0][0]
             c.execute("UPDATE " + self.selected_company + " SET ΤΕΜΑΧΙΑ =? WHERE ΚΩΔΙΚΟΣ =?", (new_pieces, code))
             con.commit()
+            try:
+                c.execute("SELECT ΤΙΜΗ FROM " + self.selected_company + " WHERE ΚΩΔΙΚΟΣ =?", (code,))
+                price = c.fetchall()
+                price = price[0][0]
+                total = float(new_pieces) * float(price[:-1])
+                str_total = str("{:0.2f}".format(total)) + " €"
+                c.execute("UPDATE " + self.selected_company + " SET ΣΥΝΟΛΟ =? WHERE ΚΩΔΙΚΟΣ =?",
+                          (str_total, code))
+                con.commit()
+            except sqlite3.OperationalError:
+                pass
         print(f" Line 362 Οι κωδικοί {added_codes} αφερέθηκαν απο την αποθήκη {self.selected_company} με επιτυχία ")
         c.close()
         con.close()

@@ -150,15 +150,15 @@ class add_service_window():
         self.files = ""
         self.service_id = self.get_service_id()
         self.customer_id = ""
+        self.copier = ""
         self.customer = StringVar()
         self.today = datetime.strptime(today, "%d %m %Y")
         self.day = self.today.day
         self.year = self.today.year
         self.month = self.today.month
 
-
         # Εμφάνιση πελάτη
-        self.customer_label = tk.Label(w)
+        self.customer_label = tk.Label(top)
         self.customer_label.place(relx=0.025, rely=0.060, height=25, relwidth=0.938)
         self.customer_label.configure(activebackground="#f9f9f9")
         self.customer_label.configure(background="brown")
@@ -178,6 +178,23 @@ class add_service_window():
         self.date_label.configure(highlightcolor="black")
         self.date_label.configure(relief="groove")
         self.date_label.configure(text='''Ημερομηνία''')
+
+        # Εισαγωγή ανταλλακτικών εκτός αποθήκης
+        self.insert_spare_parts_btn = tk.Button(top)
+        self.insert_spare_parts_btn.place(relx=0.650, rely=0.150, height=50, relwidth=0.280)
+        self.insert_spare_parts_btn.configure(activebackground="#ececec")
+        self.insert_spare_parts_btn.configure(activeforeground="#000000")
+        self.insert_spare_parts_btn.configure(background="#3268a8")
+        self.insert_spare_parts_btn.configure(disabledforeground="#a3a3a3")
+        self.insert_spare_parts_btn.configure(foreground="#ffffff")
+        self.insert_spare_parts_btn.configure(highlightbackground="#d9d9d9")
+        self.insert_spare_parts_btn.configure(highlightcolor="black")
+        self.insert_spare_parts_btn.configure(pady="0")
+        self.insert_spare_parts_btn.configure(text='''    Προσθήκη\n    ανταλλακτικών\nεκτός αποθήκης''')
+        self.insert_spare_parts_btn.configure(command=self.insert_spare_part_outside_of_repository)
+        self.insert_spare_parts_btn_img = PhotoImage(file="icons/add_spare_parts.png")
+        self.insert_spare_parts_btn.configure(image=self.insert_spare_parts_btn_img)
+        self.insert_spare_parts_btn.configure(compound="left")
 
         self.date_entry = DateEntry(top, width=12, year=self.year, month=self.month, day=self.day,
                                     background='gray20', selectmode='day', foreground='white', borderwidth=5,
@@ -222,7 +239,7 @@ class add_service_window():
 
         # Ανταλλακτικά
         self.add_spare_parts_btn = tk.Button(top)
-        self.add_spare_parts_btn.place(relx=0.525, rely=0.450, height=31, relwidth=0.300)
+        self.add_spare_parts_btn.place(relx=0.525, rely=0.450, height=35, relwidth=0.420)
         self.add_spare_parts_btn.configure(activebackground="#ececec")
         self.add_spare_parts_btn.configure(activeforeground="#000000")
         self.add_spare_parts_btn.configure(background="green")
@@ -231,7 +248,7 @@ class add_service_window():
         self.add_spare_parts_btn.configure(highlightbackground="#d9d9d9")
         self.add_spare_parts_btn.configure(highlightcolor="black")
         self.add_spare_parts_btn.configure(pady="0")
-        self.add_spare_parts_btn.configure(text='''Προσθήκη ανταλλακτικών''')
+        self.add_spare_parts_btn.configure(text='''Προσθήκη ανταλλακτικών απο αποθήκη''')
         self.add_spare_parts_btn.configure(command=self.add_spare_parts)
         self.add_spare_parts_btn_img = PhotoImage(file="icons/add_spare_parts.png")
         self.add_spare_parts_btn.configure(image=self.add_spare_parts_btn_img)
@@ -320,7 +337,6 @@ class add_service_window():
 
         self.TSeparator1 = ttk.Separator(top)
         self.TSeparator1.place(relx=0.025, rely=0.520, relwidth=0.938)
-
 
 
         self.counter_entry = tk.Entry(top)
@@ -467,7 +483,7 @@ class add_service_window():
         self.selected_copier_label.configure(foreground="#ffffff")
         self.selected_copier_label.configure(relief="groove")
         self.selected_copier_label.configure(text=selected_copier_data[0][1])
-
+        self.copier = selected_copier_data[0][1] + " Σειριακός: " + selected_copier_data[0][2]
         edit_conn = sqlite3.connect(dbase)
         edit_corsor = edit_conn.cursor()
         edit_corsor.execute("SELECT * FROM Service")
@@ -602,10 +618,13 @@ class add_service_window():
     def add_spare_parts(self):
 
         if spare_parts_db:
-            add_spare_parts.create_Toplevel1(self.top, self.service_id, self.customer_id, self.customer.get())
+            add_spare_parts.create_Toplevel1(self.top, self.service_id, self.customer_id, self.copier)
         else:
-            insert_spare_parts.create_insert_spare_parts_window(self.top, self.service_id, self.customer_id)
+            insert_spare_parts.create_insert_spare_parts_window(self.top, self.service_id, self.customer_id, self.copier)
 
+    def insert_spare_part_outside_of_repository(self):
+        insert_spare_parts.create_insert_spare_parts_window(self.top, self.service_id, self.customer_id,
+                                                            self.copier)
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):

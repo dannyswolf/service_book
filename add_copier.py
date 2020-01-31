@@ -400,7 +400,7 @@ class add_copier_window:
             copiers = c.fetchall()
             c.close()
             con.close()
-            if len(copiers) > 4:
+            if len(copiers) > 5:
                 messagebox.showerror("Demo",
                                     "Λυπούμαστε η εκδοση αυτή είναι demo και δεν μπορείτε να προσθέσεται νέα φωτοτυπικά")
 

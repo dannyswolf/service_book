@@ -7,26 +7,71 @@
 
 """
 
+
 todo αν ο χρήστης πατήση ακυρο κατα την προσθήκη επισκευής τι θα γίνει με τα ανταλλακτικα που έχουν οριστεί με νεο service_id
 todo προβολή όλων των εικόνων
 todo start day to binary file
 todo Αποθήκη για τα ανταλλακτικά που εισάγουμε στο local version
 todo να μπει στις σημειώσεις πότε ενεργοποίθηκε/απενεργοποίθηκε φωτοτυπικό και πελάτης
-todo μετα απο προσθήκη φωτοτυπικού και εργασία απο το προσθήκη εργασίας δεν εμφανίζει το ιστορικό του φωτοτυπικού
+todo uniq (στα πεδία των πινακων στην βαση) στους κωδικους και part_nr serial ονοματεπωνυμο τηλ
 
-V1.3.8 Αναζήτηση ΔΤΕ                     -------------------------------------------------19/01/202
+V1.5.5 Backup Αποθήκης ------------- ------------------ -------------- -------------31/01/2020
 
-V1.3.7 check name phone mobile serial    -------------------------------------------------18/01/202
+V1.5.4 Αναζήτηση ΔΤΕ και στο Service ------------------ -------------- -------------31/01/2020
 
-V1.3.6 Διαγραφή πεδίων μετα απο αναζήτηση-------------------------------------------------18/01/202
+V1.5.3 Fix bug on add_task ---------------------------- -------------- -------------30/01/2020
 
-V1.3.5 Fix bug on edit_task --------------------------------------------------------------17/01/202
+V1.5.2 Τροποποιήσης στην διαγραφή ιστορικού και εργασιών -------------- -------------30/01/2020
+Τροποποιήσης στην εισαγωγεί πίνακα
+todo στην προσθήκη πίνακα να βγάζει αν υπάρχει ο πήνακας (δλδ εταιρεία)  ---- Done
 
-V1.3.5 Διορθώσης add_task και edit_task όταν κάνουμε αλλαγές στα στοιχεία πελάτη ---------17/01/202
+V1.5.1 Προσθήκη πίνακα στην  αποθήκη ---------------------------------- -------------29/01/2020
 
-V1.3.5 Διορθόσης στην ημερομηνία == ========================== ----------------------------17/01/202
+V1.5.0 Προσθήκη ανταλλακτικών στην αποθήκη και υπολογισμός συνόλου ----- -------------28/01/2020
+todo add_spare_parts_to_repository  ---------- Done
+todo edit_spare_parts_to_repository line 349 ---------- Done
+todo  ελεγχος κωδικού οταν εισαγουμε νεο προιον στην αποθήκη  -- Done
 
-V1.3.4 fix send email    ========== ========================== ----------------------------17/01/202
+V1.4.9 Ενημέρωση συνόλου στην αποθήκη όταν υπάρχει τιμή στα ανταλλακτικά -------------27/01/2020
+
+
+V1.4.8 Screen Shot to Pdf  -----------------  ----------------------------------------26/01/2020
+
+V1.4.7 Προσθήκη ανταλλακτικών εκτός αποθήκης  ----------------------------------------25/01/2020
+fix bug οταν προσθέταμε νέο φωτοτυπικό απο add_task
+
+V1.4.6 Προσθήκη αποθήκης στο κεντρικό παράθυρο  ----------------------------------------25/01/2020
+
+V1.4.5 Προσθήκη πελάτη στο παράθυρο add_task  ------------------------------------------25/01/2020
+Fix εμφάνηση φωτοτυπικών όταν αλλάζουμε πελάτη στο edit_task
+
+V1.4.4 Διαγραφή εργασίων  --------------------------------------------------------------25/01/2020
+
+V1.4.3 Warning fixed  -------------------------------------------------------------------24/01/2020
+Biger sizes on print
+todo fix # Σειριακός αριθμός warning   ---- Done
+
+V1.4.2 Print to pdf Added       ---------------------------------------------------------22/01/2020
+
+V1.4.1 Progressbar on email     ---------------------------------------------------------20/01/2020
+
+V1.4.0 Αποστολή αρχείων με email ---------------------------------------------------------20/01/2020
+Προσθήκη Customer_ID στο Calendar
+todo εμφάνηση αρχείων όταν προσθέτουμε αρχεία --- Done
+
+V1.3.8 Αναζήτηση ΔΤΕ                     -------------------------------------------------19/01/2020
+
+V1.3.7 check name phone mobile serial    -------------------------------------------------18/01/2020
+
+V1.3.6 Διαγραφή πεδίων μετα απο αναζήτηση-------------------------------------------------18/01/2020
+
+V1.3.5 Fix bug on edit_task --------------------------------------------------------------17/01/2020
+
+V1.3.5 Διορθώσης add_task και edit_task όταν κάνουμε αλλαγές στα στοιχεία πελάτη ---------17/01/2020
+
+V1.3.5 Διορθόσης στην ημερομηνία == ========================== ----------------------------17/01/2020
+
+V1.3.4 fix send email    ========== ========================== ----------------------------17/01/2020
 
 V1.3.3 Τροποποίηση αποστολής email =========================== ----------------------------16/01/2020
 
@@ -208,7 +253,9 @@ V 0.1.1 Προσθήκη επεξεργασία ιστορικού φωτοτυ�
 v 0.0.1 Ενας πελάτης με πολλά φωτοτυπικά το κάθε φωτοτυπικό με πολλά Service ------------------------14/12/2019
         Η ημερομηνία εναρξης και Μετρητής εναρξης είναι πεδία του φωτοτυπικού γιατί πάνε με το φωτοτυπικό
 """
-
+from babel import Locale
+import add_spare_parts_to_repository
+import edit_spare_parts_to_repository
 import service_book_colors_support
 from edit_service_window import *  # Δημιουργία παραθύρου επεξεργασίας ιστορικού επισκευής
 import add_customers  # Δημιουργία παραθύρου προσθήκης πελάτη
@@ -224,7 +271,8 @@ import edit_task
 from tkcalendar import Calendar, DateEntry
 from datetime import date, timedelta
 import sys  # Για τα αρχεία log files
-from settings import dbase, demo, service_book_version, root_logger, today  # settings
+from settings import dbase, demo, service_book_version, root_logger, today, spare_parts_db  # settings
+
 
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
@@ -285,23 +333,19 @@ def get_tables():
     """
         Αποκόμιση  πινάκων απο την βάση δεδομένων
     """
+    no_needed_tables = ['ΠΡΩΤΟΣ_ΟΡΟΦΟΣ', "ΧΧΧ", "sqlite_sequence"]
+    con = sqlite3.connect(spare_parts_db)
+    c = con.cursor()
+    c.execute("select name from sqlite_master where type = 'table' ORDER BY name;")
+    tables = c.fetchall()
+    c.close()
+    con.close()
+    companies = []
+    for table in tables:
+        if table[0] not in no_needed_tables:
+            companies.append(table[0])
 
-    tables = []  # Πρέπει να αδειάσουμε πρώτα την λίστα με τους πίνακες για να κάνουμε νέα σύμφονα με την βάση
-    # =======================Ανάγνωριση πίνακα δεδομένων=============
-    conn = sqlite3.connect(dbase)
-    cursor = conn.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;")
-    table_name = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    dont_used_tables = ["sqlite_master", "sqlite_sequence", "sqlite_temp_master"]  # Πινακες που δεν θέλουμε
-    for name in table_name:
-        if name[0] not in dont_used_tables:
-            tables.append(name[0])
-
-        else:
-            continue
-
-    return tables
+    return companies
 
 
 def vp_start_gui():
@@ -360,6 +404,9 @@ class Toplevel1:
         self.selected_copier_id = ""
         self.selected_customer = ""
         self.selected_copier = ""
+        self.companies = get_tables()
+        self.selected_repository_company = ""
+        self.repository_headers = ""
         # self.service_calendar = DateEntry
 
         self.customers_headers = []
@@ -376,7 +423,7 @@ class Toplevel1:
         if self.remaining_days < 10:
             messagebox.showwarning("Προσοχή", f"Η εφαρμογή θα στματατήσει σε {self.remaining_days} μέρες")
         elif self.remaining_days < 0:
-            messagebox.showwarning("Προσοχή", f"Η εφαρμογή έληξε παρακαλώ ανανεώστε την υποστήριξη συντηρησης")
+            messagebox.showwarning("Προσοχή", f"Η εφαρμογή έληξε παρακαλώ ανανεώστε την υποστήριξη συντήρησης")
             return
         self.style = ttk.Style()
         if sys.platform == "win32":
@@ -429,7 +476,10 @@ class Toplevel1:
 
         self.backup_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Backup", menu=self.backup_menu)
-        self.backup_menu.add_command(label="Δημιουργία αντίγραφο ασφαλείας!", command=self.backup)
+        self.backup_menu.add_command(label="Backup Service Book", command=self.backup)
+        self.backup_menu.add_command(label="Backup Αποθήκη", command=self.backup_repository)
+
+
 
         self.licence_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Αδεια", menu=self.licence_menu)
@@ -444,7 +494,6 @@ class Toplevel1:
         # self.info_menu.add_command(label="Πληροφορίες", command=get_info)
 
         top.configure(menu=self.menubar)
-
 
         #  Modify the font of the body
         self.style.theme_create("mystyle.Treeview", parent="clam")
@@ -504,6 +553,118 @@ class Toplevel1:
         self.spare_parts_frame.configure(highlightbackground="#d9d9d9")
         self.spare_parts_frame.configure(highlightcolor="black")
 
+        self.repository_frame = tk.Frame(self.notebook)
+        self.notebook.add(self.repository_frame, padding=3)
+        self.notebook.tab(5, text="Αποθήκη", compound="left", underline="-1", )
+        self.repository_frame.configure(background="#d9d9d9")
+        self.repository_frame.configure(highlightbackground="#d9d9d9")
+        self.repository_frame.configure(highlightcolor="black")
+
+        self.select_repository_company_label = tk.Label(self.repository_frame)
+        self.select_repository_company_label.place(relx=0.025, rely=0.050, relheight=0.060, relwidth=0.260)
+        self.select_repository_company_label.configure(activebackground="#f9f9f9")
+        self.select_repository_company_label.configure(activeforeground="black")
+        self.select_repository_company_label.configure(background="#6b6b6b")
+        self.select_repository_company_label.configure(disabledforeground="#a3a3a3")
+        self.select_repository_company_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.select_repository_company_label.configure(foreground="#ffffff")
+        self.select_repository_company_label.configure(highlightbackground="#d9d9d9")
+        self.select_repository_company_label.configure(highlightcolor="black")
+        self.select_repository_company_label.configure(relief="groove")
+        self.select_repository_company_label.configure(text='''Επιλογή εταιρείας''')
+        self.repository_company_combobox = ttk.Combobox(self.repository_frame)
+        self.repository_company_combobox.place(relx=0.29, rely=0.050, relheight=0.060, relwidth=0.200)
+        self.repository_company_combobox.configure(values=self.companies)
+        self.repository_company_combobox.configure(takefocus="")
+        self.repository_company_combobox.bind("<<ComboboxSelected>>", self.get_repository)
+        self.repository_company_combobox.configure(state="readonly")
+        self.company_image = tk.Label(self.repository_frame)
+
+        self.add_table_to_repository_btn = tk.Button(self.repository_frame)
+        self.add_table_to_repository_btn.place(relx=0.815, rely=0.005, relheight=0.070, relwidth=0.200)
+        self.add_table_to_repository_btn.configure(background="#5fa15f")
+        self.add_table_to_repository_btn.configure(foreground="white")
+        self.add_table_to_repository_btn_img = PhotoImage(file="icons/add_table_to_repository.png")
+        self.add_table_to_repository_btn.configure(image=self.add_table_to_repository_btn_img)
+        self.add_table_to_repository_btn.configure(text="Προσθήκη εταιρείας")
+        self.add_table_to_repository_btn.configure(compound="left")
+        self.add_table_to_repository_btn.configure(command=self.add_table)
+
+        self.repository_table = StringVar()
+        self.repository_table.trace("w", self.check_table)
+        self.add_table_entry = tk.Entry(self.repository_frame)
+        self.add_table_entry.place(relx=0.815, rely=0.080, relheight=0.065, relwidth=0.200)
+        self.add_table_entry.configure(background="white")
+        self.add_table_entry.configure(disabledforeground="#a3a3a3")
+        self.add_table_entry.configure(font=("Calibri", 12))
+        self.add_table_entry.configure(foreground="#000000")
+        self.add_table_entry.configure(insertbackground="black")
+        self.add_table_entry.configure(textvariable=self.repository_table)
+        self.add_table_entry_warning = ttk.Label(self.repository_frame)
+        self.add_table_entry_warning_img = PhotoImage(file="icons/lamp.png")
+        self.add_table_entry_warning.configure(image=self.add_table_entry_warning_img)
+        self.add_table_entry_warning.configure(text=f"{self.add_table_entry.get()} υπάρχει")
+        self.add_table_entry_warning.configure(compound='left')
+
+        self.search_on_repository_stringvar = StringVar()
+        self.search_on_repository_entry = tk.Entry(self.repository_frame, textvariable=self.search_on_repository_stringvar)
+        self.search_on_repository_entry.place(relx=0.29, rely=0.150, height=25, relwidth=0.200)
+        self.search_on_repository_entry.configure(background="white")
+        self.search_on_repository_entry.configure(disabledforeground="#a3a3a3")
+        self.search_on_repository_entry.configure(font=("Calibri", 10, "bold"))
+        self.search_on_repository_entry.configure(foreground="#000000")
+        self.search_on_repository_entry.configure(insertbackground="black")
+        self.search_on_repository_entry.bind('<Return>', self.search_on_repository)
+
+        self.search_on_repository_btn = tk.Button(self.repository_frame)
+        self.search_on_repository_btn.place(relx=0.500, rely=0.150, height=25, relwidth=0.145)
+        self.search_on_repository_btn.configure(activebackground="#ececec")
+        self.search_on_repository_btn.configure(activeforeground="#000000")
+        self.search_on_repository_btn.configure(background="#006291")
+        self.search_on_repository_btn.configure(compound='left')
+        self.search_on_repository_btn.configure(disabledforeground="#a3a3a3")
+        self.search_on_repository_btn.configure(font=("Calibri", 10, "bold"))
+        self.search_on_repository_btn.configure(foreground="#ffffff")
+        self.search_on_repository_btn.configure(highlightbackground="#d9d9d9")
+        self.search_on_repository_btn.configure(highlightcolor="black")
+        self.search_on_repository_btn.configure(pady="0")
+        self.search_on_repository_btn_img = PhotoImage(file="icons/search.png")
+        self.search_on_repository_btn.configure(image=self.search_on_repository_btn_img)
+        self.search_on_repository_btn.configure(text='''Αναζήτηση''')
+        self.search_on_repository_btn.configure(command=self.search_on_repository)
+        self.refresh_repository_btn = tk.Button(self.repository_frame)
+        self.refresh_repository_btn.place(relx=0.650, rely=0.150, height=25, relwidth=0.030)
+        self.refresh_repository_btn.configure(background="#0685c4")
+        self.refresh_repository_btn_img = PhotoImage(file="icons/refresh.png")
+        self.refresh_repository_btn.configure(image=self.refresh_repository_btn_img)
+        self.refresh_repository_btn.configure(command=self.get_repository)
+
+        self.add_spare_part_on_repository_btn = tk.Button(self.repository_frame)
+        # self.add_spare_part_on_repository_btn.place(relx=0.025, rely=0.150, height=35, relwidth=0.200)
+        self.add_spare_part_on_repository_btn.configure(activebackground="#ececec")
+        self.add_spare_part_on_repository_btn.configure(activeforeground="#000000")
+        self.add_spare_part_on_repository_btn.configure(background="#5fa15f")
+        self.add_spare_part_on_repository_btn.configure(compound='left')
+        self.add_spare_part_on_repository_btn.configure(disabledforeground="#a3a3a3")
+        self.add_spare_part_on_repository_btn.configure(font=("Calibri", 10, "bold"))
+        self.add_spare_part_on_repository_btn.configure(foreground="#ffffff")
+        self.add_spare_part_on_repository_btn.configure(highlightbackground="#d9d9d9")
+        self.add_spare_part_on_repository_btn.configure(highlightcolor="black")
+        self.add_spare_part_on_repository_btn.configure(pady="0")
+        self.add_spare_part_on_repository_btn_img = PhotoImage(file="icons/add_spare_part_on_repository.png")
+        self.add_spare_part_on_repository_btn.configure(image=self.add_spare_part_on_repository_btn_img)
+
+        self.add_spare_part_on_repository_btn.configure(command=self.add_spare_part_on_repository)
+        # self.add_spare_part_on_repository_btn.place_forget()
+
+
+
+        self.repository_treeview = ScrolledTreeView(self.repository_frame)
+        self.repository_treeview.place(relx=0.017, rely=0.300, relheight=0.59, relwidth=0.967)
+        self.repository_treeview.configure(show="headings", style="mystyle.Treeview", selectmode="browse")
+        self.repository_treeview.bind("<Double-1>", self.edit_spare_part_on_repository)
+
+
         self.customer_title_label = tk.Label(self.customer_frame)
         self.customer_title_label.place(relx=0.021, rely=0.005, height=30, relwidth=0.847)
         self.customer_title_label.configure(font=("Calibri", 11, "bold"))
@@ -541,6 +702,7 @@ class Toplevel1:
         self.company_label.configure(highlightcolor="black")
         self.company_label.configure(relief="groove")
         self.company_label.configure(text="Εμφανιζόμενο όνομα")
+
 
         self.customer_name = StringVar()
         self.customer_name.trace('w', self.check_customer_name)
@@ -835,6 +997,30 @@ class Toplevel1:
         self.place_entry.configure(selectbackground="#c4c4c4")
         self.place_entry.configure(selectforeground="black")
 
+        self.notes_label = tk.Label(self.customer_frame)
+        self.notes_label.place(relx=0.025, rely=0.600, height=31, relwidth=0.940)
+        self.notes_label.configure(activebackground="#f9f9f9")
+        self.notes_label.configure(activeforeground="black")
+        self.notes_label.configure(background="#6b6b6b")
+        self.notes_label.configure(disabledforeground="#a3a3a3")
+        self.notes_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.notes_label.configure(foreground="#ffffff")
+        self.notes_label.configure(highlightbackground="#d9d9d9")
+        self.notes_label.configure(highlightcolor="black")
+        self.notes_label.configure(relief="groove")
+        self.notes_label.configure(text='''Σημειώσεις''')
+        self.customer_notes_scrolledtext = ScrolledText(self.customer_frame)
+        self.customer_notes_scrolledtext.place(relx=0.025, rely=0.680, relheight=0.300, relwidth=0.941)
+        self.customer_notes_scrolledtext.configure(background="white")
+        self.customer_notes_scrolledtext.configure(font="TkTextFont")
+        self.customer_notes_scrolledtext.configure(foreground="black")
+        self.customer_notes_scrolledtext.configure(highlightbackground="#d9d9d9")
+        self.customer_notes_scrolledtext.configure(highlightcolor="black")
+        self.customer_notes_scrolledtext.configure(insertbackground="black")
+        self.customer_notes_scrolledtext.configure(insertborderwidth="3")
+        self.customer_notes_scrolledtext.configure(selectbackground="#c4c4c4")
+        self.customer_notes_scrolledtext.configure(selectforeground="black")
+        self.customer_notes_scrolledtext.configure(wrap="none")
         # self.TSeparator1 = ttk.Separator(top)
         # self.TSeparator1.place(relx=0.221, rely=0.355, relwidth=0.647)
 
@@ -859,7 +1045,11 @@ class Toplevel1:
         self.serial_label.configure(highlightcolor="black")
         self.serial_label.configure(relief="groove")
         self.serial_label.configure(text="Σειριακός αριθμός")
+
+        self.serial = StringVar()
+        self.serial.trace('w', self.check_serial)
         self.serial_entry = tk.Entry(self.copier_frame)
+        self.serial_entry.configure(textvariable=self.serial)
         self.serial_entry.place(relx=0.225, rely=0.100, height=20, relwidth=0.2)
         self.serial_entry.configure(background="white")
         self.serial_entry.configure(disabledforeground="#a3a3a3")
@@ -870,6 +1060,12 @@ class Toplevel1:
         self.serial_entry.configure(insertbackground="black")
         self.serial_entry.configure(selectbackground="#c4c4c4")
         self.serial_entry.configure(selectforeground="black")
+        self.serial_entry_warning = ttk.Label(self.copier_frame)
+        self.serial_entry_warning_img = PhotoImage(file="icons/lamp.png")
+        self.serial_entry_warning.configure(image=self.serial_entry_warning_img)
+        self.serial_entry_warning.configure(compound='left')
+
+
         # Μετρητής Εναρξης
         self.Label12 = tk.Label(self.copier_frame)
         self.Label12.place(relx=0.021, rely=0.180, height=21, relwidth=0.200)
@@ -1206,7 +1402,7 @@ class Toplevel1:
 
         # Προσθήκη Ημερολόγιο εργασιών
         self.add_task_btn = tk.Button(top)
-        self.add_task_btn.place(relx=0.300, rely=0.630, height=30, relwidth=0.150)
+        self.add_task_btn.place(relx=0.225, rely=0.630, height=30, relwidth=0.150)
         self.add_task_btn.configure(activebackground="#6b6b6b")
         self.add_task_btn.configure(activeforeground="#000000")
         self.add_task_btn.configure(background="#6b6b6b")
@@ -1223,7 +1419,7 @@ class Toplevel1:
 
         # Ανανέωση μετα απο Προσθήκη εγρασίας
         self.refresh_task_btn = tk.Button(top)
-        self.refresh_task_btn.place(relx=0.455, rely=0.630, height=30, relwidth=0.030)
+        self.refresh_task_btn.place(relx=0.375, rely=0.630, height=30, relwidth=0.030)
         self.refresh_task_btn.configure(background="#0685c4")
         self.refresh_task_img = PhotoImage(file="icons/refresh.png")
         self.refresh_task_btn.configure(image=self.refresh_task_img)
@@ -1285,8 +1481,8 @@ class Toplevel1:
 
         # Πίνακας Ημερολόγιο εργασιών
         self.calendar_treeview = ScrolledTreeView(top)
-        self.calendar_treeview.place(relx=0.300, rely=0.680, relheight=0.300, relwidth=0.685)
-        self.calendar_treeview.configure(show="headings", style="mystyle.Treeview")
+        self.calendar_treeview.place(relx=0.225, rely=0.680, relheight=0.300, relwidth=0.760)
+        self.calendar_treeview.configure(show="headings", style="mystyle.Treeview", selectmode="browse")
         self.calendar_treeview.bind("<<TreeviewSelect>>", self.edit_scheduled_tasks)
 
         self.day = self.today.day
@@ -1298,25 +1494,197 @@ class Toplevel1:
                         background='gray20', selectmode='day', foreground='white', borderwidth=5, locale="el_GR",
                                          font=("Calibri", 10, 'bold'))
         #self.service_calendar.drop_down()
-        self.service_calendar.place(relx=0.021, rely=0.630, relheight=0.350, relwidth=0.270)
+        self.service_calendar.place(relx=0.021, rely=0.680, relheight=0.300, relwidth=0.200)
         self.service_calendar.bind('<<CalendarSelected>> ', self.view_scheduled_tasks)
 
         self.get_calendar()
 
+    def add_table(self):
+        table_to_add = self.add_table_entry.get()
+        con = sqlite3.connect(spare_parts_db)
+        c = con.cursor()
+        try:
+            c.execute(" CREATE TABLE IF NOT EXISTS " + table_to_add +
+                   " (ID INTEGER PRIMARY KEY, PARTS_NR TEXT, ΠΕΡΙΓΡΑΦΗ TEXT, ΚΩΔΙΚΟΣ TEXT, ΤΕΜΑΧΙΑ TEXT, "
+                   "ΠΑΡΑΤΗΡΗΣΗΣ text); ")
+        except sqlite3.OperationalError:
+            messagebox.showerror("Σφάλμα!", "Το όνομα της εταιρείας πρέπει να είναι χωρίς κενά")
+            return
+        con.commit()
+        con.close()
+        messagebox.showinfo("Info", f'Ο {table_to_add} Δημιουργήθηκε')
+        self.companies = get_tables()
+        self.repository_company_combobox.configure(values=self.companies)
+        return
+
+    def add_spare_part_on_repository(self):
+        selected_table = self.repository_company_combobox.get()
+        if selected_table != "":
+            add_spare_parts_to_repository.create_insert_spare_parts_window(self.top, selected_table)
+        else:
+            messagebox.showinfo("Προσοχή!", "Παρακαλώ επιλέξτε πρώτα εταιρεία")
+            pass
+
+    def edit_spare_part_on_repository(self, event=None):
+        selected_table = self.repository_company_combobox.get()
+        if selected_table != "":
+
+            # id ==> το ιδ του επιλεγμένου ανταλλακτικου
+            spare_part_id = (self.repository_treeview.set(self.repository_treeview.selection(), '#1'))
+            # Αν ο κωδικός είναι το τεταρτο πεδίο του πίνακα
+            heading = self.repository_treeview.heading("#4", "text")
+
+            # Αν ο κωδικός είναι το τεταρτο πεδίο του πίνακα δεν είναι TONER φωτοτυπικά κτλπ o πήνακας
+            if heading == "ΚΩΔΙΚΟΣ":
+                spare_part_code = (self.repository_treeview.set(self.repository_treeview.selection(), "#4"))
+
+            else:  # αν δεν είναι ΚΩΔΙΚΟΣ το #4 πεδίο τότε είναι το #6
+                heading = self.repository_treeview.heading("#6", "text")
+                spare_part_code = (self.repository_treeview.set(self.repository_treeview.selection(), "#6"))
+
+            edit_spare_parts_to_repository.create_insert_spare_parts_window(self.top, selected_table, spare_part_id,
+                                                                            spare_part_code)
+
+        else:
+            messagebox.showinfo("Προσοχή!", "Παρακαλώ επιλέξτε πρώτα εταιρεία")
+            pass
+
+    # Εμφάνηση αποθήκης
+    def get_repository(self, event=None):
+        self.add_spare_part_on_repository_btn.configure(
+            text=f'''Προσθήκη ανταλλακτικού {self.repository_company_combobox.get()}''')
+        self.add_spare_part_on_repository_btn.place(relx=0.025, rely=0.150, height=35, relwidth=0.260)
+        self.selected_repository_company = self.repository_company_combobox.get()
+        self.company_image.place(relx=0.690, rely=0.050, height=78, width=120)
+        try:
+            self.company_image_img = PhotoImage(file="icons/" + self.repository_company_combobox.get() + ".png")
+            self.company_image.configure(image=self.company_image_img)
+        except TclError:  # couldn't open "icons/.png": no such file or directory
+            self.company_image_img = PhotoImage(file="icons/no_image.png")
+            self.company_image.configure(image=self.company_image_img)
+            pass
+
+        if self.selected_repository_company != "":
+            self.repository_treeview.delete(*self.repository_treeview.get_children())
+
+        con = sqlite3.connect(spare_parts_db)
+        c = con.cursor()
+        c.execute("SELECT * FROM " + self.selected_repository_company + ";")
+        self.repository_headers = list(map(lambda x: x[0], c.description))
+        data = c.fetchall()
+        con.close()
+        self.repository_treeview["columns"] = [head for head in self.repository_headers]
+        for head in self.repository_headers:
+            if head == "id" or head == "ID" or head == "Id":
+                platos = 1
+            elif head == "ΠΕΡΙΓΡΑΦΗ" and len(self.repository_headers) > 6:
+                platos = 300
+            elif head == "ΠΕΡΙΓΡΑΦΗ" and len(self.repository_headers) < 7:
+                platos = 400
+            elif head == "PARTS_NR":
+                platos = 200
+            else:
+                platos = 120
+            self.repository_treeview.heading(head, text=head, anchor="center")
+            self.repository_treeview.column(head, width=platos, anchor="center")
+        for d in data:
+            self.repository_treeview.insert("", "end", values=d)
+
+    # Αναζήτηση αποθήκης
+    def search_on_repository(self, event=None):
+        self.repository_treeview.delete(*self.repository_treeview.get_children())
+        data_to_search = self.search_on_repository_entry.get()
+        search_headers = []
+        no_neded_headers = ["id", "ID", "Id"]
+        operators = []
+        for header in self.repository_headers:
+
+            if header not in no_neded_headers:
+                search_headers.append(header + " LIKE ?")
+                operators.append('%' + str(data_to_search) + '%')
+        search_headers = " OR ".join(search_headers)
+        # ΕΤΑΙΡΕΙΑ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
+
+        # search_cursor.execute("SELECT * FROM " + table + " WHERE \
+        # ΤΟΝΕΡ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
+        # ('%' + str(search_data.get()) + '%', '%' + str(search_data.get()) + '%', '%' + str(search_data.get())...
+
+        conn = sqlite3.connect(spare_parts_db)
+        cusror = conn.cursor()
+        cusror.execute("SELECT * FROM " + self.selected_repository_company + " WHERE " + search_headers, operators)
+        fetch = cusror.fetchall()  # Δεδομένα απο Service
+        conn.close()
+        for item in fetch:
+            self.repository_treeview.insert("", "end", values=item)
+
+    def check_table(self, name, index, mode):
+        self.add_table_entry_warning.place_forget()
+        current_table = self.repository_table
+
+        no_needed_tables = ['ΠΡΩΤΟΣ_ΟΡΟΦΟΣ', "ΧΧΧ", "sqlite_sequence"]
+        con = sqlite3.connect(spare_parts_db)
+        c = con.cursor()
+        c.execute("select name from sqlite_master where type = 'table' ORDER BY name;")
+        tables = c.fetchall()
+        # messagebox.showwarning("tables", f'{tables}')
+        c.close()
+        con.close()
+        companies = []
+        for table in tables:
+            if table[0] not in no_needed_tables:
+                companies.append(table[0])
+
+        if self.add_table_entry.get() in companies and self.add_table_entry.get() != current_table:
+            self.add_table_entry.configure(foreground="red")
+            # self.add_table_entry.place(relx=0.815, rely=0.080, relheight=0.065, relwidth=0.200)
+            self.add_table_entry_warning.place(relx=0.850, rely=0.150, relheight=0.060, relwidth=0.150)
+        else:
+            self.add_table_entry.configure(foreground="green")
+            self.add_table_entry_warning.place_forget()
+
+    # Ελεγχος αν το serial  υπάρχει
+    def check_serial(self, name, index, mode):
+        self.serial_entry_warning.place_forget()
+        current_copier_id = (self.copiers_treeview.set(self.copiers_treeview.selection(), '#1'))
+
+        all_serials = []
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT Serial FROM Φωτοτυπικά WHERE Κατάσταση = 1;")
+        serials = c.fetchall()
+        c.execute("SELECT Serial FROM Φωτοτυπικά WHERE ID = ?", (current_copier_id,))
+        current_serial = c.fetchall()
+        con.close()
+
+        for serial in serials:
+
+            all_serials.append(serial[0])
+
+        if self.serial_entry.get() in all_serials and self.serial_entry.get() != current_serial[0][0]:
+            self.serial_entry.configure(foreground="red")
+            # self.serial_entry.place(relx=0.225, rely=0.100, height=20, relwidth=0.2)
+            self.serial_entry_warning.place(relx=0.425, rely=0.100, relheight=0.060, relwidth=0.03)
+        else:
+            self.serial_entry.configure(foreground="green")
+            self.serial_entry_warning.place_forget()
+
     # Ελεγχος αν το όνομα του πελάτη υπάρχει
     def check_customer_name(self, name, index, mode):
         self.company_name_warning.place_forget()
+
         all_names = []
         con = sqlite3.connect(dbase)
         c = con.cursor()
         c.execute("SELECT Επωνυμία_Επιχείρησης FROM Πελάτες WHERE Κατάσταση = 1;")
         customers_names = c.fetchall()
+        c.execute("SELECT Επωνυμία_Επιχείρησης FROM Πελάτες WHERE Κατάσταση = 1 AND ID=?", (self.selected_customer_id,))
+        current_customer = c.fetchall()
         con.close()
 
         for name in customers_names:
             all_names.append(name[0])
 
-        if self.company_name_entry.get() in all_names:
+        if self.company_name_entry.get() in all_names and self.company_name_entry.get() != current_customer[0][0]:
             self.company_name_entry.configure(foreground="red")
             # self.company_name_entry.place(relx=0.225, rely=0.100, height=20, relwidth=0.250)
             self.company_name_warning.place(relx=0.475, rely=0.100, relheight=0.060, relwidth=0.020)
@@ -1332,12 +1700,15 @@ class Toplevel1:
         c = con.cursor()
         c.execute("SELECT Τηλέφωνο FROM Πελάτες WHERE Κατάσταση = 1;")
         phones = c.fetchall()
+        c.execute("SELECT Τηλέφωνο FROM Πελάτες WHERE ID=? AND Κατάσταση =1", (self.selected_customer_id,))
+        current_phone = c.fetchall()
+
         con.close()
 
         for phone in phones:
             all_phones.append(phone[0])
 
-        if self.phone_entry.get() in all_phones:
+        if self.phone_entry.get() in all_phones and self.phone_entry.get() != current_phone[0][0]:
             self.phone_entry.configure(foreground="red")
             # self.phone_entry.place(relx=0.225, rely=0.340, height=20, relwidth=0.250)
             self.phone_warning.place(relx=0.475, rely=0.340, relheight=0.060, relwidth=0.020)
@@ -1354,11 +1725,13 @@ class Toplevel1:
         c = con.cursor()
         c.execute("SELECT Κινητό FROM Πελάτες WHERE Κατάσταση = 1;")
         mobiles = c.fetchall()
+        c.execute("SELECT Κινητό FROM Πελάτες WHERE ID=? AND Κατάσταση =1", (self.selected_customer_id,))
+        current_mobile = c.fetchall()
         con.close()
         for mobile in mobiles:
             all_mobiles.append(mobile[0])
 
-        if self.mobile_entry.get() in all_mobiles:
+        if self.mobile_entry.get() in all_mobiles and self.mobile_entry.get() != current_mobile[0][0]:
             self.mobile_entry.configure(foreground="red")
             # self.mobile_entry.place(relx=0.225, rely=0.420, height=20, relwidth=0.250)
             self.mobile_warning.place(relx=0.475, rely=0.420, relheight=0.060, relwidth=0.020)
@@ -1372,12 +1745,19 @@ class Toplevel1:
         con = sqlite3.connect(dbase)
         c = con.cursor()
         c.execute("SELECT * FROM Calendar WHERE ΔΤΕ =?", (self.search_dte_entry.get(),))
-        data = c.fetchall()
+        data_from_calendar = c.fetchall()
+        try:
+            if self.search_dte_entry.get() in data_from_calendar[0]:
+                for task in data_from_calendar:
+                    self.calendar_treeview.insert("", "end", values=task)
+        except IndexError:  # Όταν δεν βρήσκει στο calendar ψάχνει  στο service και αν βρει να σε παει στο search_error
+            c.execute("SELECT * FROM Service WHERE ΔΤΕ =?", (self.search_dte_entry.get(),))
+            data_from_service = c.fetchall()
+            if self.search_dte_entry.get() in data_from_service[0]:
+                self.search_error(event, 1)
+                self.notebook.select(tab_id=3)
         c.close()
         con.close()
-
-        for task in data:
-            self.calendar_treeview.insert("", "end", values=task)
 
     def search_tasks_of_selected_copier(self):
 
@@ -1406,7 +1786,8 @@ class Toplevel1:
         except IndexError:
             self.task_notifier_btn.place_forget()
             return
-        #messagebox.showwarning("data notifier", f"{calendar_id}")
+
+        # messagebox.showwarning("data notifier", f"{calendar_id}")
         if status:
             self.task_notifier_btn.configure(text="Εργασίες σε\n εκκρεμότητα", foreground='white')
             self.task_notifier_btn.configure(compound='left')
@@ -1465,7 +1846,8 @@ class Toplevel1:
         self.tasks_headers = list(map(lambda x: x[0], c.description))
         data = c.fetchall()
         con.close()
-        no_need_heads = ['Τηλέφωνο', 'Σημειώσεις', 'Copier_ID', 'ΔΤΕ', 'Service_ID', 'Μετρητής', 'Επ_Service', 'Κατάσταση']
+        no_need_heads = ['Τηλέφωνο', 'Σημειώσεις', 'Copier_ID', 'ΔΤΕ', 'Service_ID', 'Μετρητής', 'Επ_Service',
+                         'Customer_ID', 'Κατάσταση']
         needed_heads = [head for head in self.tasks_headers if head not in no_need_heads]
         self.calendar_treeview["columns"] = [head for head in self.tasks_headers if head not in no_need_heads]
 
@@ -1521,12 +1903,13 @@ class Toplevel1:
         selected_copier = copier_name[0][0]
         con.close()
         # Αυτή είναι συνάρτηση του αρχείου edi_service_windows
-        create_edit_service_window(root, service_id, selected_copier, self.selected_customer)
+        create_edit_service_window(root, service_id, selected_copier, self.selected_customer, self.selected_customer_id)
 
     def edit_scheduled_tasks(self, event=None):
 
         selected_calendar_id = (self.calendar_treeview.set(self.calendar_treeview.selection(), '#1'))
         edit_task.create_edit_task_window(root, selected_calendar_id)
+        self.top.wm_state('iconic')
 
     def search_tasks(self, event=None, data=None):
 
@@ -1555,7 +1938,7 @@ class Toplevel1:
         conn = sqlite3.connect(dbase)
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM Calendar WHERE " + search_headers, operators)
-        fetch = cursor.fetchall()  # Δεδομένα απο Service
+        fetch = cursor.fetchall()  # Δεδομένα απο Calendar
         conn.close()
         for item in fetch:
             self.calendar_treeview.insert("", "end", values=item)
@@ -1635,8 +2018,9 @@ class Toplevel1:
         copiers_log.create_Toplevel1(root)
 
     # Αναζήτηση σφαλμάτων
-    def search_error(self, event=None):
-
+    def search_error(self, event=None, search_from_dte=None):
+        if search_from_dte:
+            self.search_errors_data.set(value=self.search_dte_entry.get())
         if self.search_errors_data.get() != "":  # Αν έχουμε γράψει κάτι στην αναζήτηση στο search_errors_entry
 
             # Αδειάζουμε το tree  δλδ το self.service_treeview
@@ -1829,7 +2213,8 @@ class Toplevel1:
         var = StringVar(root, value="")
         self.start_counter_entry.configure(textvariable=var)
         self.start_entry.configure(textvariable=var)
-        self.serial_entry.configure(textvariable=var)
+        self.serial.set(value="")
+        self.serial_entry.configure(textvariable=self.serial)
         self.copiers_title_label.configure(text="Στοιχεία φωτοτυπικού")
         self.copier_notes_scrolledtext.delete('1.0', 'end-1c')
         self.Label16.configure(text='''Ιστορικό''')
@@ -1868,6 +2253,8 @@ class Toplevel1:
         # todo πρέπει να γίνει σε for loop και να μπούν σε λίστα
         self.customer_name.set(value=customers_data[0][1])
         self.company_name_entry.configure(textvariable=self.customer_name)
+        self.current_customer_name = customers_data[0][1]
+
 
         var = StringVar(root, value=customers_data[0][2])
         self.name_entry.configure(textvariable=var)
@@ -1894,6 +2281,9 @@ class Toplevel1:
         self.page_package_entry.configure(textvariable=var)
         var = StringVar(root, value=customers_data[0][12])
         self.package_cost_entry.configure(textvariable=var)
+        self.customer_notes_scrolledtext.delete("1.0", 'end-1c')
+        var = StringVar(root, value=customers_data[0][13])
+        self.customer_notes_scrolledtext.insert("1.0", var.get())
         # Εμφάνηση κουμπιού αναζήτησης ανταλλακτικών
         self.get_spare_parts()  # Πρώτα να πάρουμε τα ανταλλακτικά
         self.search_spare_parts_btn.configure(text=f"Αναζήτηση ανταλλακτικών του πελάτη {self.selected_customer}")
@@ -1950,6 +2340,8 @@ class Toplevel1:
 
         self.customer_name.set(value=customers_data[0][1])
         self.company_name_entry.configure(textvariable=self.customer_name)
+        self.current_customer_name = customers_data[0][1]
+
 
         var = StringVar(root, value=customers_data[0][2])
         self.name_entry.configure(textvariable=var)
@@ -1992,8 +2384,9 @@ class Toplevel1:
             # Το selected_item == string
             if int(selected_item) == int(copiers[n][0]):
                 self.selected_copier_id = int(selected_item)
-                var = StringVar(root, value=copiers[n][2])  # Σειριακός αριθμός
-                self.serial_entry.configure(textvariable=var)
+                self.serial.set(value=copiers[n][2])  # Σειριακός αριθμός
+                self.serial_entry.configure(textvariable=self.serial)
+
                 var = StringVar(root, value=copiers[n][3])  # Εναρξη
                 self.start_entry.configure(textvariable=var)
                 var = StringVar(root, value=copiers[n][4])  # Μετρητής έναρξης
@@ -2070,8 +2463,13 @@ class Toplevel1:
         if heading == "Φωτοτυπικό":
             selected_copier = (self.service_treeview.set(self.service_treeview.selection(), "#3"))
             selected_customer = (self.service_treeview.set(self.service_treeview.selection(), "#4"))
+            con = sqlite3.connect(dbase)
+            c = con.cursor()
+            c.execute("SELECT ID FROM Πελάτες WHERE Επωνυμία_Επιχείρησης =?", (selected_customer,))
+            selected_customer_id = c.fetchall()
+            con.close()
             # Αυτή είναι συνάρτηση του αρχείου edi_service_windows
-            create_edit_service_window(root, selected_service_id, selected_copier, selected_customer)
+            create_edit_service_window(root, selected_service_id, selected_copier, selected_customer, selected_customer_id[0][0])
 
             # ==============================  Notebook style  =============
             self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#69ab3a")])
@@ -2086,7 +2484,7 @@ class Toplevel1:
                 cursor.close()
                 con.close()
                 self.top.wm_state('iconic')
-                create_edit_service_window(root, selected_service_id, selected_copier, self.selected_customer)
+                create_edit_service_window(root, selected_service_id, selected_copier, self.selected_customer, self.selected_customer_id)
                 # ==============================  Notebook style  =============
                 self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#69ab3a")])
                 self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
@@ -2181,7 +2579,8 @@ class Toplevel1:
         var = StringVar(root, value="")
         self.start_counter_entry.configure(textvariable=var)
         self.start_entry.configure(textvariable=var)
-        self.serial_entry.configure(textvariable=var)
+        self.serial.set(value="")
+        self.serial_entry.configure(textvariable=self.serial)
         self.copiers_title_label.configure(text="Στοιχεία φωτοτυπικού")
         self.copier_notes_scrolledtext.delete('1.0', 'end-1c')
         try:
@@ -2218,6 +2617,7 @@ class Toplevel1:
             cu.close()
             con.close()
             self.customers_treeview.delete(*self.customers_treeview.get_children())
+            self.selected_customer_id = ""
             self.get_customers()
         else:
             messagebox.showinfo("Προσοχή", "Παρακαλώ επιλέξτε πελάτη για διαγραφή")
@@ -2292,7 +2692,7 @@ class Toplevel1:
                     self.post_code_entry.get(), self.place_entry.get(), self.phone_entry.get(), self.mobile_entry.get(),
                     self.fax_entry.get(), self.email_entry.get(), self.page_package_entry.get(),
                     self.package_cost_entry.get() + " €" if " €" not in self.package_cost_entry.get() else
-                    self.package_cost_entry.get(), 1, self.selected_customer_id]  # 1 είναι η κατάσταση
+                    self.package_cost_entry.get(), self.customer_notes_scrolledtext.get("1.0", "end-1c"), 1, self.selected_customer_id]  # 1 είναι η κατάσταση
 
         up_conn = sqlite3.connect(dbase)
         up_cursor = up_conn.cursor()
@@ -2342,7 +2742,7 @@ class Toplevel1:
         up_conn.close()
         messagebox.showinfo("Info", f"Τα στοιχεία του Φωτοτυπικού {self.selected_copier} του πελάτη {self.selected_customer} ενημερώθηκαν επιτυχώς")
 
-    # Αντίγραφα ασφαλείας
+    # Αντίγραφα ασφαλείας Service Book
     def backup(self):
 
         def progress(status, remainig, total):
@@ -2351,7 +2751,7 @@ class Toplevel1:
         try:
             now = datetime.now().strftime("%d %m %Y %H %M %S")
 
-            back_dir = "backups" + "\\" + today + "\\"
+            back_dir = "backups" + "/" + today + "/"
 
             backup_file = os.path.join(back_dir, os.path.basename(dbase[:-3]) + " " + now + ".db")
             # print("============BACKUP FILE===========Line 542=\n", backup_file, "\n")
@@ -2373,9 +2773,10 @@ class Toplevel1:
                 # print("=====Αποτέλεσμα ====Line 558\n", result)
                 # Ειναι ενοχλητικο να εμφανιζει καθε φορα μηνυμα οτι εγινε backup
                 messagebox.showinfo('Αποτέλεσμα αντιγράφου ασφαλείας', result)
+
         except FileNotFoundError as file_error:
             messagebox.showwarning("Σφάλμα...", "{}".format(file_error))
-            print("File Error Line 641", file_error)
+            print(f"File {__name__} Error Line 2440", file_error)
 
         except sqlite3.Error as error:
             if not os.path.exists(backup_file):
@@ -2387,8 +2788,57 @@ class Toplevel1:
                     back_conn.close()
                     print("Δημιουργία αντιγράφου ασφαλείας στο αρχείο  ", backup_file, " ολοκληρώθηκε")
             except UnboundLocalError as error:
-                print(f"Η σύνδεση με {backup_file} δεν έγινε ποτέ Line 1670 {error}")
-                messagebox.showinfo(f"Η σύνδεση με {backup_file} δεν έγινε ποτέ  {error}")
+                print(f"Η σύνδεση με {backup_file} δεν έγινε ποτέ Line 2452 {error}")
+                messagebox.showerror("Σφάλμα", f"Η σύνδεση με {backup_file} δεν έγινε ποτέ  {error}")
+
+    # Αντίγραφα ασφαλείας spare_parts_db
+    def backup_repository(self):
+
+        def progress(status, remainig, total):
+            print(f"{status} Αντιγράφηκαν {total - remainig} απο {total} σελίδες...")
+
+        try:
+            now = datetime.now().strftime("%d %m %Y %H %M %S")
+
+            back_dir = "backups" + "/" + today + "/"
+
+            backup_file = os.path.join(back_dir, os.path.basename(spare_parts_db[:-3]) + " " + now + ".db")
+            # print("============BACKUP FILE===========Line 542=\n", backup_file, "\n")
+            if not os.path.exists(back_dir):
+                os.makedirs(back_dir)
+            else:
+                pass
+            # Υπάρχουσα βάση
+            conn = sqlite3.connect(spare_parts_db)
+            print("===========Υπάρχουσα βάση===========Line 744\n ", spare_parts_db, "\n")
+
+            # Δημιουργία νέας βάσης και αντίγραφο ασφαλείας
+            back_conn = sqlite3.connect(backup_file)
+            with back_conn:
+                conn.backup(back_conn, pages=10, progress=progress)
+                back_conn.close()
+                text = "Η βάση αντιγράφηκε :  "
+                result = text + os.path.realpath(backup_file)
+                # print("=====Αποτέλεσμα ====Line 558\n", result)
+                # Ειναι ενοχλητικο να εμφανιζει καθε φορα μηνυμα οτι εγινε backup
+                messagebox.showinfo('Αποτέλεσμα αντιγράφου ασφαλείας', result)
+
+        except FileNotFoundError as file_error:
+            messagebox.showwarning("Σφάλμα...", "{}".format(file_error))
+            print(f"File {__name__} Error Line 2440", file_error)
+
+        except sqlite3.Error as error:
+            if not os.path.exists(backup_file):
+                result = "Σφάλμα κατα την αντιγραφή : ", error
+                messagebox.showwarning("Σφάλμα...", "{}".format(result))
+        finally:
+            try:
+                if back_conn:
+                    back_conn.close()
+                    print("Δημιουργία αντιγράφου ασφαλείας στο αρχείο  ", backup_file, " ολοκληρώθηκε")
+            except UnboundLocalError as error:
+                print(f"Η σύνδεση με {backup_file} δεν έγινε ποτέ Line 2452 {error}")
+                messagebox.showerror("Σφάλμα", f"Η σύνδεση με {backup_file} δεν έγινε ποτέ  {error}")
 
 
 # The following code is added to facilitate the Scrolled widgets you specified.

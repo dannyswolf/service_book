@@ -9,7 +9,7 @@ import add_copier_support
 import sys
 from tkinter import messagebox, StringVar
 import sqlite3
-from settings import dbase, root_logger  # settings
+from settings import dbase, root_logger, spare_parts_db  # settings
 
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
 sys.stderr.write = root_logger.error
@@ -42,17 +42,17 @@ def vp_start_gui():
 
 
 w = None
-service_id = None
-customer_id = None
-copier = None
+table = None
+spare_part_id = None
+spare_part_code = None
 
 def create_insert_spare_parts_window(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
-    global w, w_win, rt, service_id, customer_id, copier
+    global w, w_win, rt, table, spare_part_id, spare_part_code
     rt = root
-    service_id = args[0]  # Το Service_ID απο το add_service.py και edit_service_windows
-    customer_id = args[1]  # Το customer_id απο το add_service.py και edit_service_windows
-    copier = args[2]    # self.copiers_combobox.get() απο το add_service.py και edit_service_windows
+    table = args[0]  # Πίνακας αποθήκης ανταλλακτικών απο το service_book
+    spare_part_id = args[1]   # spare_part_id αποθήκης ανταλλακτικών απο το service_book
+    spare_part_code = args[2]  # spare_part_code αποθήκης ανταλλακτικών απο το service_book
     w = tk.Toplevel(root)
     add_copier_support.set_Tk_var()
     top = add_copier_window(w)
@@ -88,9 +88,9 @@ class add_copier_window:
         self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#69ab3a")])
         self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
 
-        self.service_id = service_id
-        self.customer_id = customer_id
-        self.copier = copier
+        self.table = table
+        self.spare_part_id = spare_part_id
+        self.spare_part_code = spare_part_code
         self.top = top
         top.geometry("505x524+444+228")
         top.minsize(120, 1)
@@ -172,6 +172,7 @@ class add_copier_window:
         self.code_label.configure(relief="groove")
         self.code_label.configure(text='''Κωδικός''')
         self.code = StringVar()
+        self.code.trace('w', self.check_code)
         self.code_entry = tk.Entry(top)
         self.code_entry.place(relx=0.260, rely=0.248, height=31, relwidth=0.593)
         self.code_entry.configure(textvariable=self.code)
@@ -184,6 +185,11 @@ class add_copier_window:
         self.code_entry.configure(insertbackground="black")
         self.code_entry.configure(selectbackground="#c4c4c4")
         self.code_entry.configure(selectforeground="black")
+        self.code_entry_warning = ttk.Label(top)
+        self.code_entry_warning_img = tk.PhotoImage(file="icons/lamp.png")
+        self.code_entry_warning.configure(image=self.code_entry_warning_img)
+        self.code_entry_warning.configure(compound='left')
+        self.code_entry_warning.configure(background="#ffffff")
 
         # self.add_code_btn = tk.Button(top)
         # self.add_code_btn.place(relx=0.885, rely=0.248, height=30, relwidth=0.060)
@@ -221,7 +227,6 @@ class add_copier_window:
         self.TSeparator1 = ttk.Separator(top)
         self.TSeparator1.place(relx=0.025, rely=0.553, relwidth=0.938)
 
-
         self.notes_label = tk.Label(top)
         self.notes_label.place(relx=0.025, rely=0.573, height=31, relwidth=0.940)
         self.notes_label.configure(activebackground="#f9f9f9")
@@ -251,7 +256,7 @@ class add_copier_window:
         self.notes_scrolledtext.configure(wrap="none")
 
         self.save_btn = tk.Button(top)
-        self.save_btn.place(relx=0.296, rely=0.916, height=34, width=147)
+        self.save_btn.place(relx=0.196, rely=0.916, height=34, width=147)
         self.save_btn.configure(activebackground="#ececec")
         self.save_btn.configure(activeforeground="#000000")
         self.save_btn.configure(background="green")
@@ -261,8 +266,25 @@ class add_copier_window:
         self.save_btn.configure(highlightbackground="#d9d9d9")
         self.save_btn.configure(highlightcolor="black")
         self.save_btn.configure(pady="0")
-        self.save_btn.configure(text='''Εισαγωγή''')
+        self.save_btn.configure(text='''Αποθήκευση''')
         self.save_btn.configure(command=self.add_spare_part)
+
+        # Διαγραφή επιλεγμένου ανταλλακτικών
+        self.del_spare_parts_btn = tk.Button(top)
+        self.del_spare_parts_btn.place(relx=0.615, rely=0.903, height=50, relwidth=0.350)
+        self.del_spare_parts_btn.configure(activebackground="#ececec")
+        self.del_spare_parts_btn.configure(activeforeground="#000000")
+        self.del_spare_parts_btn.configure(background="#6b6b6b")
+        self.del_spare_parts_btn.configure(disabledforeground="#a3a3a3")
+        self.del_spare_parts_btn.configure(foreground="#ffffff")
+        self.del_spare_parts_btn.configure(highlightbackground="#d9d9d9")
+        self.del_spare_parts_btn.configure(highlightcolor="black")
+        self.del_spare_parts_btn.configure(pady="0")
+        self.del_spare_parts_btn.configure(text=''' Διαγραφή επιλεγμένου\n   ανταλλακτικού''')
+        self.del_spare_parts_btn.configure(command=self.del_spare_parts)
+        self.del_spare_parts_btn_img = tk.PhotoImage(file="icons/delete_spare_parts.png")
+        self.del_spare_parts_btn.configure(image=self.del_spare_parts_btn_img)
+        self.del_spare_parts_btn.configure(compound="left")
 
         self.Label2 = tk.Label(top)
         self.Label2.place(relx=0.025, rely=0.019, height=31, relwidth=0.938)
@@ -275,44 +297,118 @@ class add_copier_window:
         self.Label2.configure(highlightbackground="#d9d9d9")
         self.Label2.configure(highlightcolor="black")
         self.Label2.configure(relief="groove")
-        self.Label2.configure(text='''Εισαγωγή ανταλλακτικού''')
+        self.Label2.configure(text=f'''Εισαγωγή ανταλλακτικού {self.table}''')
+        self.get_data()
+
+    def get_data(self):
+        con = sqlite3.connect(spare_parts_db)
+        c = con.cursor()
+        c.execute("SELECT * FROM " + self.table + " WHERE ID =?", (self.spare_part_id,))
+        data = c.fetchall()
+        con.close()
+        data = data[0]
+        if len(data) > 7:  # Αν ο πίνακας είναι TONER ΦΩΤΟΤΥΠΙΚΑ κτλπ.
+            self.parts_nr.set(value=data[1] + "  " + data[2] + "  " + data[2])
+            self.description.set(value=data[4])
+            self.code.set(value=data[5])
+            self.pieces.set(value=data[6])
+            var = StringVar(self.top, value=data[-1])  # Σημειώσεις
+            self.notes_scrolledtext.insert("1.0", var.get())
+
+        else:
+            self.parts_nr.set(value=data[1])
+            self.description.set(value=data[2])
+            self.code.set(value=data[3])
+            self.pieces.set(value=data[4])
+            var = StringVar(self.top, value=data[-1])  # Σημειώσεις
+            self.notes_scrolledtext.insert("1.0", var.get())
 
     def quit(self, event):
         self.top.destroy()
 
+    # Ελεγχος αν το serial  υπάρχει
+    def check_code(self, name, index, mode):
+        self.code_entry_warning.place_forget()
+        # current_copier_id = (self.copiers_treeview.set(self.copiers_treeview.selection(), '#1'))
+
+        all_codes = []
+        con = sqlite3.connect(spare_parts_db)
+        c = con.cursor()
+        c.execute("SELECT ΚΩΔΙΚΟΣ FROM " + self.table + ";")
+        codes = c.fetchall()
+        # c.execute("SELECT Serial FROM Φωτοτυπικά WHERE ID = ?", (current_copier_id,))
+        # current_serial = c.fetchall()
+        con.close()
+
+        for code in codes:
+            all_codes.append(code[0])
+
+        if self.code.get() in all_codes and self.code.get() != self.spare_part_code:
+            self.code_entry.configure(foreground="red")
+            # self.code_entry.place(relx=0.260, rely=0.248, height=31, relwidth=0.593)
+            self.code_entry_warning.place(relx=0.860, rely=0.248, relheight=0.060, relwidth=0.060)
+        else:
+            self.code_entry.configure(foreground="green")
+            self.code_entry_warning.place_forget()
+
+    # Ενημέρωση ανταλλακτικού
     def add_spare_part(self):
-
-        conn = sqlite3.connect(dbase)
+        conn = sqlite3.connect(spare_parts_db)
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM Ανταλλακτικά;")
-        headers = list(map(lambda x:x[0], cursor.description))
-        culumns = ", ".join(headers)
-        values = []
+        try:
+            cursor.execute("SELECT PARTS_NR, ΠΕΡΙΓΡΑΦΗ, ΚΩΔΙΚΟΣ, ΤΕΜΑΧΙΑ, ΠΑΡΑΤΗΡΗΣΗΣ FROM " + self.table + ";")
+            data = [self.parts_nr.get(), self.description.get(), self.code.get(), self.pieces.get(),
+                    self.notes_scrolledtext.get('1.0', 'end-1c'), self.spare_part_id]
+
+        except sqlite3.OperationalError:  # no such column: PARTS_NR
+            # Αν ο πίνακας είναι TONER ΦΩΤΟΤΥΠΙΚΑ  πέρνουμε  ΠΕΡΙΓΡΑΦΗ ΚΩΔΙΚΟΣ ΤΕΜΑΧΙΑ ΤΙΜΗ ΣΥΝΟΛΟ ΠΑΡΑΤΗΡΗΣΗΣ
+            cursor.execute("SELECT ΠΕΡΙΓΡΑΦΗ, ΚΩΔΙΚΟΣ, ΤΕΜΑΧΙΑ, ΤΙΜΗ, ΣΥΝΟΛΟ, ΠΑΡΑΤΗΡΗΣΗΣ FROM " + self.table +
+                           " WHERE ID=?", (self.spare_part_id,))
+            price_pieces_total = cursor.fetchall()
+            description = price_pieces_total[0][0]
+            price = price_pieces_total[0][3]
+
+            total = float(self.pieces.get()) * float(price[:-1].replace(",", "."))  # για να μήν πάρει το €
+
+            data = [description, self.code.get(), self.pieces.get(), price,
+                    str("{:0.2f}".format(total)) + " €", self.notes_scrolledtext.get('1.0', 'end-1c'),
+                    self.spare_part_id]
+
+        headers = list(map(lambda x: x[0], cursor.description))
+        all_headers = []
         for head in headers:
-            if head == "ID":
-                values.append("Null")
-            else:
-                values.append("?")
-        values = ", ".join(values)
-        data = [self.parts_nr.get(), self.description.get(), self.code.get(),
-                self.pieces.get(), self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier, self.service_id,
-                self.customer_id]
+            if head != "ID":
+                all_headers.append(head + " = ?")
+        columns = ", ".join(all_headers)
 
-        sql_insert = "INSERT INTO Ανταλλακτικά (" + culumns + ")" + "VALUES(" + values + ");"
 
+
+        sql_insert = "UPDATE " + self.table + " SET " + columns + " WHERE ID = ? "
+        print("columns", columns)
+        print("data", data)
         cursor.execute(sql_insert, tuple(data))
         conn.commit()
         conn.close()
-        messagebox.showinfo("Info", f"Το  {data[0]} προστέθηκε επιτυχώς.\n Μπορείτε να εισάγετε νέο ανταλλακτικό")
-        self.parts_nr.set(value="")
-        self.description.set(value="")
-        self.code.set(value="")
-        self.pieces.set(value="")
-        self.notes_scrolledtext.delete("1.0", "end-1c")
+        messagebox.showinfo("Info", f"Το  {self.code.get()} Αποθηκεύτηκε επιτυχώς στο {self.table}")
 
-        self.top.focus()
+        self.top.destroy()
         return None
 
+    def del_spare_parts(self):
+        answer = messagebox.askquestion("Προσοχή!", f'Είστε σήγουρος για την διαγραφή του προιόντος με κωδικό {self.spare_part_code};')
+        if answer == "yes":
+
+            con = sqlite3.connect(spare_parts_db)
+            c = con.cursor()
+            c.execute("DELETE FROM " + self.table + " WHERE ID =?", (self.spare_part_id,))
+            con.commit()
+            con.close()
+            messagebox.showwarning("Προσοχή!", f'Το προιόν με κωδικό {self.spare_part_code} διαγράφηκε παρακαλώ ανανεώστε')
+            self.top.destroy()
+            return
+        else:
+            self.top.focus()
+            return
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):

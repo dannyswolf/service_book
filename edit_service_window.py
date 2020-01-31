@@ -7,15 +7,18 @@
 import os
 import sys
 import sqlite3
+import time
 from tkinter import StringVar, filedialog, messagebox, PhotoImage
 import edit_service_window_support
 import image_viewer
 import add_spare_parts
 import insert_spare_parts
 from tkcalendar import DateEntry
-from settings import dbase, spare_parts_db, root_logger  # settings
-
-
+from settings import dbase, spare_parts_db, root_logger, today  # settings
+import pyscreenshot as ImageGrab
+from PIL import Image
+import subprocess
+from xhtml2pdf import pisa
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
@@ -24,6 +27,7 @@ print(f"{100 * '*'}\n\t\t\t\t\t\t\t\t\t\tFILE {__name__}")
 selected_service_id = None
 selected_copier = None
 selected_customer = None
+selected_customer_id = None
 try:
     import Tkinter as tk
 except ImportError:
@@ -151,9 +155,10 @@ w = None
 
 def create_edit_service_window(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
-    global w, w_win, rt, selected_service_id, selected_copier, selected_customer
+    global w, w_win, rt, selected_service_id, selected_copier, selected_customer, selected_customer_id
     selected_service_id = args[0]  # Επιλεγμένο Service  περνουμε το selected_service_id απο το service_book.pyw
     try:
+        selected_customer_id = args[3]  # Επιλεγμένο id πελάτη περνουμε το selected_customer_id απο το service_book.pyw
         selected_copier = args[1]      # Επιλεγμένο Φωτοτυπικό περνουμε το selected_copier απο το service_book.pyw
         selected_customer = args[2]    # Επιλεγμένο πελάτης περνουμε το selected_customer απο το service_book.pyw
     except IndexError as error:
@@ -180,11 +185,13 @@ class edit_service_window():
         # Αρχικοποιηση του selected_service_id σαν self.selected_service_id
         self.selected_service_id = selected_service_id
         self.copier_id = ""
-        self.customer_id = ""
+        self.customer_id = selected_customer_id
         self.selected_copier = selected_copier
         self.selected_customer = selected_customer
+
         self.purpose_list, self.actions_list = get_service_data()
         self.files = []
+        self.len_images = 0
         self.culumns = None
 
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -278,6 +285,24 @@ class edit_service_window():
                                     foreground='white', borderwidth=5, locale="el_GR", font=("Calibri", 10, 'bold'),
                                     date_pattern='dd/mm/yyyy')
         self.date_entry.place(relx=0.37, rely=0.030, height=25, relwidth=0.331)
+
+        # Εισαγωγή ανταλλακτικών εκτός αποθήκης
+        self.insert_spare_parts_btn = tk.Button(self.service_frame)
+        self.insert_spare_parts_btn.place(relx=0.720, rely=0.030, height=50, relwidth=0.280)
+        self.insert_spare_parts_btn.configure(activebackground="#ececec")
+        self.insert_spare_parts_btn.configure(activeforeground="#000000")
+        self.insert_spare_parts_btn.configure(background="#3268a8")
+        self.insert_spare_parts_btn.configure(disabledforeground="#a3a3a3")
+        self.insert_spare_parts_btn.configure(foreground="#ffffff")
+        self.insert_spare_parts_btn.configure(highlightbackground="#d9d9d9")
+        self.insert_spare_parts_btn.configure(highlightcolor="black")
+        self.insert_spare_parts_btn.configure(pady="0")
+        self.insert_spare_parts_btn.configure(text='''    Προσθήκη\n    ανταλλακτικών\nεκτός αποθήκης''')
+        self.insert_spare_parts_btn.configure(command=self.insert_spare_part_outside_of_repository)
+        self.insert_spare_parts_btn_img = PhotoImage(file="icons/add_spare_parts.png")
+        self.insert_spare_parts_btn.configure(image=self.insert_spare_parts_btn_img)
+        self.insert_spare_parts_btn.configure(compound="left")
+
         # Counter
         self.counter_label = tk.Label(self.service_frame)
         self.counter_label.place(relx=0.025, rely=0.100, height=25, relwidth=0.331)
@@ -305,7 +330,7 @@ class edit_service_window():
 
         # Αρχεία
         self.show_files_btn = tk.Button(self.spare_parts_frame)
-        self.show_files_btn.place(relx=0.600, rely=0.750, height=50, relwidth=0.250)
+        self.show_files_btn.place(relx=0.600, rely=0.750, height=50, relwidth=0.300)
         self.show_files_btn.configure(activebackground="#ececec")
         self.show_files_btn.configure(activeforeground="#000000")
         self.show_files_btn.configure(background="#6b6b6b")
@@ -526,16 +551,53 @@ class edit_service_window():
         self.spare_parts_treeview.configure(show="headings", style="mystyle.Treeview", selectmode="browse")
         self.get_spare_parts()
 
+        # get screen shot
+        self.print = tk.Button(top)
+        self.print.place(relx=0.580, rely=0.914, height=34, width=147)
+        self.print.configure(activebackground="#ececec")
+        self.print.configure(activeforeground="#000000")
+        self.print.configure(background="green")
+        self.print.configure(disabledforeground="#a3a3a3")
+        self.print.configure(font=("Calibri", 12, "bold"))
+        self.print.configure(foreground="#ffffff")
+        self.print.configure(highlightbackground="#d9d9d9")
+        self.print.configure(highlightcolor="black")
+        self.print.configure(pady="2")
+        self.print.configure(text="Στιγμιότυπο pdf")
+        self.print.configure(command=self.get_screen_shot)
+        self.print_img = PhotoImage(file="icons/grab_screen.png")
+        self.print.configure(image=self.print_img)
+        self.print.configure(compound="left")
+
+        self.delete_task_btn = tk.Button(top)
+        self.delete_task_btn.place(relx=0.706, rely=0.200, relheight=0.060, relwidth=0.250)
+        self.delete_task_btn.configure(text="Διαγραφή")
+        self.delete_task_btn.configure(background="#CFD5CE")
+        self.delete_task_btn.configure(compound="left")
+        self.delete_task_btn_img = PhotoImage(file="icons/delete_task.png")
+        self.delete_task_btn.configure(image=self.delete_task_btn_img)
+        self.delete_task_btn.configure(command=self.delete_task)
+
     # Ελεγχος αν υπάρχουν αρχεία για προβολή
     def check_if_files_exists(self):
         con = sqlite3.connect(dbase)
         cursor = con.cursor()
         cursor.execute("SELECT * FROM Service_images WHERE Service_ID =?", (self.selected_service_id,))
         images = cursor.fetchall()
+        self.len_images = len(images)
+        self.show_files_btn.configure(text=f'Προβολή {self.len_images}\nαρχείων')
         cursor.close()
         con.close()
-        if not images:  # αδεια λιστα δλδ δεν υπάρχουν αρχεια και απενεργοποιουμε το κουμπί προβολή αρχείων
+        if self.files:
+            self.show_files_btn.place(relx=0.600, rely=0.750, height=50, relwidth=0.300)
+            self.show_files_btn.configure(text=f'{len(self.files)}\n Αρχεία για προσθήκη')
+            self.show_files_btn.configure(command=self.show_files_to_add)
+        elif not images:  # αδεια λιστα δλδ δεν υπάρχουν αρχεια και απενεργοποιουμε το κουμπί προβολή αρχείων
             self.show_files_btn.place_forget()
+
+    def show_files_to_add(self):
+        messagebox.showwarning('Προσοχή', 'Δεν μπορείτε να δείτε τα αρχεία αν δεν πατήσετε Αποθήκευση')
+        self.top.focus()
 
     # Προβολή αρχείων
     def show_files(self):
@@ -577,7 +639,7 @@ class edit_service_window():
                 if culumn != "ID":
                     edited_culumns.append(culumn + "=?")
             edited_culumns = ",".join(edited_culumns)
-            data_to_add = [date.get(), self.purpose_combobox.get(), self.actions_combobox.get(),
+            data_to_add = [self.date_entry.get(), self.purpose_combobox.get(), self.actions_combobox.get(),
                            self.notes_scrolledtext.get("1.0", "end-1c"), counter.get(), next_service.get(),
                            self.copier_id, dte.get(), self.selected_service_id]
 
@@ -603,6 +665,132 @@ class edit_service_window():
         self.save_btn.configure(text="Αποθήκευση")
         self.save_btn.configure(command=add_to_db)
 
+    def get_screen_shot(self, index=None):
+        if not index:
+            index = 0
+        width = self.top.winfo_x() + self.top.winfo_width() + 9
+        height = self.top.winfo_y() + self.top.winfo_height() + 15
+        # part of the screen
+        im = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height), childprocess=False)  # X1,Y1,X2,Y2
+        im.save(f"prints/screen_shot/screen_shot{index}.png")
+        self.notebook.select(tab_id=1)
+        if not index:
+            answer = messagebox.askyesno("Προσοχή", 'Θα θέλατε και τα ανταλλακτικά;')
+            if answer:
+                time.sleep(0.5)
+                self.get_screen_shot(1)
+        # scree_shot = Image.open("prints/screen_shot.png")
+        # # screen_rgb = scree_shot.convert('RGB')
+        # scree_shot.save("prints/screen_shot.png")
+
+        # logo = Image.open("icons/logo-small-orange.png")
+        # # logo_rgb = logo.convert('RGB')
+        # logo.save("prints/logo-small-orange.png")
+
+        # Define your data
+        prints_dir = f'prints/{today}'.replace(" ", "_")
+        if not os.path.exists(prints_dir):
+            os.makedirs(prints_dir)
+        outputFilename = f"{prints_dir}/Service Book {self.selected_customer}  {today}.pdf".replace(" ", "_")
+
+        # Utility function
+        def convertHtmlToPdf(sourceHtml, outputFilename):
+            # open output file for writing (truncated binary)
+            resultFile = open(outputFilename, "w+b")
+
+            # convert HTML to PDF
+
+            pisaStatus = pisa.CreatePDF(sourceHtml.encode('utf-8'), dest=resultFile, encoding='utf8')
+
+            # close output file
+            resultFile.close()  # close output file
+
+            # return True on success and False on errors
+            return pisaStatus.err
+            # Αν γράψουμε νέο φωτοτυπικό και όχι απο την λίστα
+        if sys.platform == "linux":
+            src = "icons/"
+            src_images = "prints/"
+            font = """{
+                font-family: DejaVuSans;
+                src: url('fonts/DejaVuSans-Bold.ttf');
+                }
+
+                body {
+                font-family: DejaVuSans;
+                font-weight: bold;
+                }
+                h1 {
+                font-family: DejaVuSans;
+                font-weight: bold;
+                }
+                h2 {
+                font-family: DejaVuSans;
+                font-weight: bold;
+                }
+                h3 {
+                font-family: DejaVuSans;
+                font-weight: bold;
+                }
+                h4 {
+                font-family: DejaVuSans;
+                font-weight: bold;
+
+                }
+                """
+        else:
+            src = "../icons/"
+            src_images = "../prints/"
+            font = """{
+                    font-family: Calibri;
+                    src: url('../fonts/Calibrib.ttf');
+                    }
+
+                    body {
+                    font-family: Calibri;
+                    font-weight: bold;
+                    }
+                    h1 {
+                    font-family: Calibri;
+                    font-weight: bold;
+                    }
+                    h2 {
+                    font-family: Calibri;
+                    font-weight: bold;
+                    }
+                    h3 {
+                    font-family: Calibri;
+                    font-weight: bold;
+                    }
+                    h4 {
+                    font-family: Calibri;
+                    font-weight: bold;
+
+                    }
+                    """
+
+        sourceHtml = f"""<html>
+
+                <meta http-equiv=Content-Type content="text/html;charset=utf-8"></meta>
+                <style>
+                @font-face {font}
+                </style> 
+    <font size = "5">
+                <h1 style="text-align: center;"><img style="float: right;" src="{src}logo-small-orange.png" alt="" width="200" height="143" /></h1>
+                <h1 style="text-align: center;"><img style="float: right;" src="{src_images}screen_shot/screen_shot0.png" alt="" /></h1>
+                <h1 style="text-align: center;"><img style="float: right;" src="{src_images}screen_shot/screen_shot1.png" alt="" /></h1>
+
+    
+    </font>
+                </html>
+                """
+
+        convertHtmlToPdf(sourceHtml, outputFilename)
+        if sys.platform == "linux":
+            os.system("okular " + outputFilename)
+        else:
+            subprocess.Popen(outputFilename, shell=True)
+
     # Προσθήκη αρχείων
     def add_files(self):
 
@@ -612,7 +800,9 @@ class edit_service_window():
         if self.files == "":  # αν ο χρήστης επιλεξει ακυρο
             self.top.focus()
             return
-
+        else:
+            self.show_files_btn.configure(text=f'{len(self.files)} Αρχεία για προσθήκη')
+            self.check_if_files_exists()
         self.top.focus()
 
     def add_files_to_db(self):
@@ -649,6 +839,10 @@ class edit_service_window():
     def quit(self, event):
         self.top.destroy()
 
+    def insert_spare_part_outside_of_repository(self):
+        insert_spare_parts.create_insert_spare_parts_window(self.top, self.selected_service_id, self.customer_id,
+                                                            self.selected_copier)
+
     def get_spare_parts(self, event=None):
         self.spare_parts_treeview.delete(*self.spare_parts_treeview.get_children())
         con = sqlite3.connect(dbase)
@@ -678,7 +872,13 @@ class edit_service_window():
         c.execute("SELECT ID FROM Πελάτες WHERE Επωνυμία_Επιχείρησης =?", (self.selected_customer,))
         data = c.fetchall()
         con.close()
-        self.customer_id = data[0]
+
+        if int(data[0][0]) == int(self.customer_id):
+            pass
+        else:
+            messagebox.showerror("Σφάλμα!", f'O Πελάτης {self.selected_customer} υπάρχει παραπάνω απο μία φορά')
+            return
+
         if spare_parts_db:
             add_spare_parts.create_Toplevel1(self.top, self.selected_service_id, self.customer_id, self.selected_copier)
         else:
@@ -687,7 +887,7 @@ class edit_service_window():
 
     # Διαγραφή ανταλλακτικών
     def del_spare_parts(self):
-        selected_spare_part = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#1'))
+        selected_spare_part_id = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#1'))
         selected_part_code = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#4'))
         selected_part_pieces = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), '#5'))
         answer = messagebox.askokcancel("Προσοχή!", f"Ειστε σήγουρος για την διαγραφή προϊόντος με κωδικό {selected_part_code};")
@@ -696,39 +896,85 @@ class edit_service_window():
             return
         con = sqlite3.connect(dbase)
         c = con.cursor()
-        c.execute("DELETE FROM Ανταλλακτικά WHERE ID=?", (selected_spare_part,))
+        c.execute("DELETE FROM Ανταλλακτικά WHERE ID=?", (selected_spare_part_id,))
         con.commit()
         con.close()
         # Προσθήκη πίσω στην αποθήκη
+        answer = messagebox.askquestion("Προσοχή!", f'Θέλετε το προιόν να προστεθεί πίσω στην αποθήκή;')
+        if answer != "yes":
+            self.top.focus()
+            return
         con = sqlite3.connect(spare_parts_db)
         c = con.cursor()
         # ευρεση προίοντος στην αποθήκη ψάχνοντας όλους τους πίνακες σύμφονα με κωδικό
         for table in c.execute("SELECT name FROM sqlite_sequence").fetchall():
             try:
                 c.execute("SELECT * FROM " + str(table[0]) + " WHERE ΚΩΔΙΚΟΣ =? ", (selected_part_code,))
-            except sqlite3.OperationalError:  # sqlite3.OperationalError: no such table: ΠΡΩΤΟΣ_ΟΡΟΦΟΣ todo
+            except sqlite3.OperationalError:  # sqlite3.OperationalError: no such table: ΠΡΩΤΟΣ_ΟΡΟΦΟΣ
                 continue
             data = c.fetchall()
             if data:  # αφου το βρούμε πέρνουμε μόνο τον πίνακα
                 part_table = table[0]
                 break
-        # Πέρνουμε τα τεμάχια που έχουν απομείνει
-        c.execute("SELECT ΤΕΜΑΧΙΑ FROM " + part_table + " WHERE ΚΩΔΙΚΟΣ =?", (selected_part_code,))
-        old_part_pieces = c.fetchall()
-        # και προσθέτουμε σε αυτά τα τεμάχια που έχουμε εισάγει στο Service
-        new_pieces = str(int(old_part_pieces[0][0]) + int(selected_part_pieces))
+        try:
+            # Πέρνουμε τα τεμάχια που έχουν απομείνει
+            c.execute("SELECT ΤΕΜΑΧΙΑ FROM " + part_table + " WHERE ΚΩΔΙΚΟΣ =?", (selected_part_code,))
+            old_part_pieces = c.fetchall()
+            # και προσθέτουμε σε αυτά τα τεμάχια που έχουμε εισάγει στο Service
+            new_pieces = str(int(old_part_pieces[0][0]) + int(selected_part_pieces))
 
-        # ενημερώνουμε το προιόν στον πίνακα
-        c.execute("UPDATE " + part_table + " SET ΤΕΜΑΧΙΑ =?  WHERE ΚΩΔΙΚΟΣ =?", (new_pieces, selected_part_code))
+            # ενημερώνουμε το προιόν στον πίνακα
+            c.execute("UPDATE " + part_table + " SET ΤΕΜΑΧΙΑ =?  WHERE ΚΩΔΙΚΟΣ =?", (new_pieces, selected_part_code))
+            con.commit()
 
-        messagebox.showinfo("Πληροφορία!", f"Το προιόν με κωδικό {selected_part_code}  της εταιρείας {part_table}"
-                                           f" ενημερώθηκε")
-        con.commit()
+        except (UnboundLocalError, ValueError):  # Όταν το ανταλλακτικό δεν είναι στην αποθήκη
+            pass
+        try:
+            c.execute("SELECT ΤΙΜΗ FROM " + part_table + " WHERE ΚΩΔΙΚΟΣ =?", (selected_part_code,))
+            price = c.fetchall()
+            price = price[0][0]
+            total = float(new_pieces) * float(price[:-1])
+            str_total = str("{:0.2f}".format(total)) + " €"
+            c.execute("UPDATE " + part_table + " SET ΣΥΝΟΛΟ =? WHERE ΚΩΔΙΚΟΣ =?",
+                      (str_total, selected_part_code))
+            con.commit()
+            messagebox.showinfo("Πληροφορία!", f"Το προιόν με κωδικό {selected_part_code}  της εταιρείας {part_table}"
+                                               f" ενημερώθηκε")
+        except (sqlite3.OperationalError, UnboundLocalError):  # όταν δεν έχει τιμή και  Όταν το ανταλλακτικό δεν είναι στην αποθήκη
+            pass
+
         c.close()
         con.close()
 
         self.spare_parts_treeview.delete(self.spare_parts_treeview.selection())
+        self.top.focus()
 
+    def delete_task(self):
+        spare_parts = self.spare_parts_treeview.get_children()
+        if spare_parts:
+            messagebox.showerror("Σφάλμα!", "Διαγράψτε πρώτα τα ανταλλακτικά")
+            self.top.focus()
+            return
+        self.check_if_files_exists()
+        if self.len_images:
+            messagebox.showerror("Σφάλμα!", "Διαγράψτε πρώτα τα αρχεία")
+            self.top.focus()
+            return
+        answer = messagebox.askyesno("Προσοχή", 'Είστε σήγουρος για την διαγραφή;')
+        if not answer:
+            self.top.focus()
+            return
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("DELETE FROM Service WHERE ID=?", (self.selected_service_id,))
+        con.commit()
+        c.execute("DELETE FROM Service_images WHERE Service_ID=?", (self.selected_service_id,))
+        con.commit()
+        c.close()
+        con.close()
+        print(f"Η εργασία {self.selected_service_id} διαγράφηκε με επιτυχία!")
+        messagebox.showwarning("Προσοχή", "Η εργασία διαγράφηκε με επιτυχία!\nΠαρακαλώ ανανεώστε")
+        self.top.destroy()
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):
