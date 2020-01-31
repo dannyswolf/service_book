@@ -15,6 +15,7 @@ todo Αποθήκη για τα ανταλλακτικά που εισάγουμ
 todo να μπει στις σημειώσεις πότε ενεργοποίθηκε/απενεργοποίθηκε φωτοτυπικό και πελάτης
 todo uniq (στα πεδία των πινακων στην βαση) στους κωδικους και part_nr serial ονοματεπωνυμο τηλ
 
+V1.5.5 Backup Αποθήκης ------------- ------------------ -------------- -------------31/01/2020
 
 V1.5.4 Αναζήτηση ΔΤΕ και στο Service ------------------ -------------- -------------31/01/2020
 
@@ -269,7 +270,7 @@ import edit_task
 from tkcalendar import Calendar, DateEntry
 from datetime import date, timedelta
 import sys  # Για τα αρχεία log files
-from settings import dbase, demo, service_book_version, root_logger, today  # settings
+from settings import dbase, demo, service_book_version, root_logger, today, spare_parts_db  # settings
 
 
 sys.stderr.write = root_logger.error
@@ -474,7 +475,10 @@ class Toplevel1:
 
         self.backup_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Backup", menu=self.backup_menu)
-        self.backup_menu.add_command(label="Δημιουργία αντίγραφο ασφαλείας!", command=self.backup)
+        self.backup_menu.add_command(label="Backup Service Book", command=self.backup)
+        self.backup_menu.add_command(label="Backup Αποθήκη", command=self.backup_repository)
+
+
 
         self.licence_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Αδεια", menu=self.licence_menu)
@@ -2737,7 +2741,7 @@ class Toplevel1:
         up_conn.close()
         messagebox.showinfo("Info", f"Τα στοιχεία του Φωτοτυπικού {self.selected_copier} του πελάτη {self.selected_customer} ενημερώθηκαν επιτυχώς")
 
-    # Αντίγραφα ασφαλείας
+    # Αντίγραφα ασφαλείας Service Book
     def backup(self):
 
         def progress(status, remainig, total):
@@ -2746,7 +2750,7 @@ class Toplevel1:
         try:
             now = datetime.now().strftime("%d %m %Y %H %M %S")
 
-            back_dir = "backups" + "\\" + today + "\\"
+            back_dir = "backups" + "/" + today + "/"
 
             backup_file = os.path.join(back_dir, os.path.basename(dbase[:-3]) + " " + now + ".db")
             # print("============BACKUP FILE===========Line 542=\n", backup_file, "\n")
@@ -2768,6 +2772,56 @@ class Toplevel1:
                 # print("=====Αποτέλεσμα ====Line 558\n", result)
                 # Ειναι ενοχλητικο να εμφανιζει καθε φορα μηνυμα οτι εγινε backup
                 messagebox.showinfo('Αποτέλεσμα αντιγράφου ασφαλείας', result)
+
+        except FileNotFoundError as file_error:
+            messagebox.showwarning("Σφάλμα...", "{}".format(file_error))
+            print(f"File {__name__} Error Line 2440", file_error)
+
+        except sqlite3.Error as error:
+            if not os.path.exists(backup_file):
+                result = "Σφάλμα κατα την αντιγραφή : ", error
+                messagebox.showwarning("Σφάλμα...", "{}".format(result))
+        finally:
+            try:
+                if back_conn:
+                    back_conn.close()
+                    print("Δημιουργία αντιγράφου ασφαλείας στο αρχείο  ", backup_file, " ολοκληρώθηκε")
+            except UnboundLocalError as error:
+                print(f"Η σύνδεση με {backup_file} δεν έγινε ποτέ Line 2452 {error}")
+                messagebox.showerror("Σφάλμα", f"Η σύνδεση με {backup_file} δεν έγινε ποτέ  {error}")
+
+    # Αντίγραφα ασφαλείας spare_parts_db
+    def backup_repository(self):
+
+        def progress(status, remainig, total):
+            print(f"{status} Αντιγράφηκαν {total - remainig} απο {total} σελίδες...")
+
+        try:
+            now = datetime.now().strftime("%d %m %Y %H %M %S")
+
+            back_dir = "backups" + "/" + today + "/"
+
+            backup_file = os.path.join(back_dir, os.path.basename(spare_parts_db[:-3]) + " " + now + ".db")
+            # print("============BACKUP FILE===========Line 542=\n", backup_file, "\n")
+            if not os.path.exists(back_dir):
+                os.makedirs(back_dir)
+            else:
+                pass
+            # Υπάρχουσα βάση
+            conn = sqlite3.connect(spare_parts_db)
+            print("===========Υπάρχουσα βάση===========Line 744\n ", spare_parts_db, "\n")
+
+            # Δημιουργία νέας βάσης και αντίγραφο ασφαλείας
+            back_conn = sqlite3.connect(backup_file)
+            with back_conn:
+                conn.backup(back_conn, pages=10, progress=progress)
+                back_conn.close()
+                text = "Η βάση αντιγράφηκε :  "
+                result = text + os.path.realpath(backup_file)
+                # print("=====Αποτέλεσμα ====Line 558\n", result)
+                # Ειναι ενοχλητικο να εμφανιζει καθε φορα μηνυμα οτι εγινε backup
+                messagebox.showinfo('Αποτέλεσμα αντιγράφου ασφαλείας', result)
+
         except FileNotFoundError as file_error:
             messagebox.showwarning("Σφάλμα...", "{}".format(file_error))
             print(f"File {__name__} Error Line 2440", file_error)
