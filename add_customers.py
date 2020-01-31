@@ -489,7 +489,7 @@ class Toplevel1:
             customers = c.fetchall()
             c.close()
             con.close()
-            if len(customers) > 2:
+            if len(customers) > 5:
                 messagebox.showerror("Demo",
                                     "Λυπούμαστε η εκδοση αυτή είναι demo και δεν μπορείτε να προσθέσεται νέους πελάτες")
 

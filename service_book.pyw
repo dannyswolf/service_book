@@ -13,9 +13,12 @@ todo προβολή όλων των εικόνων
 todo start day to binary file
 todo Αποθήκη για τα ανταλλακτικά που εισάγουμε στο local version
 todo να μπει στις σημειώσεις πότε ενεργοποίθηκε/απενεργοποίθηκε φωτοτυπικό και πελάτης
-todo στην αφαίρεση ανταλλακτικών να λεει για τον κωδικο προιοντος οχι για το part_nr
 todo uniq (στα πεδία των πινακων στην βαση) στους κωδικους και part_nr serial ονοματεπωνυμο τηλ
 
+
+V1.5.4 Αναζήτηση ΔΤΕ και στο Service ------------------ -------------- -------------31/01/2020
+
+V1.5.3 Fix bug on add_task ---------------------------- -------------- -------------30/01/2020
 
 V1.5.2 Τροποποιήσης στην διαγραφή ιστορικού και εργασιών -------------- -------------30/01/2020
 Τροποποιήσης στην εισαγωγεί πίνακα
@@ -1737,12 +1740,19 @@ class Toplevel1:
         con = sqlite3.connect(dbase)
         c = con.cursor()
         c.execute("SELECT * FROM Calendar WHERE ΔΤΕ =?", (self.search_dte_entry.get(),))
-        data = c.fetchall()
+        data_from_calendar = c.fetchall()
+        try:
+            if self.search_dte_entry.get() in data_from_calendar[0]:
+                for task in data_from_calendar:
+                    self.calendar_treeview.insert("", "end", values=task)
+        except IndexError:  # Όταν δεν βρήσκει στο calendar ψάχνει  στο service και αν βρει να σε παει στο search_error
+            c.execute("SELECT * FROM Service WHERE ΔΤΕ =?", (self.search_dte_entry.get(),))
+            data_from_service = c.fetchall()
+            if self.search_dte_entry.get() in data_from_service[0]:
+                self.search_error(event, 1)
+                self.notebook.select(tab_id=3)
         c.close()
         con.close()
-
-        for task in data:
-            self.calendar_treeview.insert("", "end", values=task)
 
     def search_tasks_of_selected_copier(self):
 
@@ -2003,8 +2013,9 @@ class Toplevel1:
         copiers_log.create_Toplevel1(root)
 
     # Αναζήτηση σφαλμάτων
-    def search_error(self, event=None):
-
+    def search_error(self, event=None, search_from_dte=None):
+        if search_from_dte:
+            self.search_errors_data.set(value=self.search_dte_entry.get())
         if self.search_errors_data.get() != "":  # Αν έχουμε γράψει κάτι στην αναζήτηση στο search_errors_entry
 
             # Αδειάζουμε το tree  δλδ το self.service_treeview
@@ -2601,6 +2612,7 @@ class Toplevel1:
             cu.close()
             con.close()
             self.customers_treeview.delete(*self.customers_treeview.get_children())
+            self.selected_customer_id = ""
             self.get_customers()
         else:
             messagebox.showinfo("Προσοχή", "Παρακαλώ επιλέξτε πελάτη για διαγραφή")

@@ -460,8 +460,10 @@ class add_task_window:
 
     def get_copier_id(self, event=None):
         self.customers_list, self.serials = self.get_copiers_data()
+
         copier = self.copiers_combobox.get()
         list_data_of_copier = copier.split()
+
         try:
             for serial in self.serials:
                 if serial == list_data_of_copier[-1]:
@@ -472,14 +474,16 @@ class add_task_window:
         c = con.cursor()
         c.execute("SELECT ID, Εταιρεία FROM Φωτοτυπικά WHERE Serial =?", (self.selected_serial,))
         data = c.fetchall()
+
         try:
             self.copier_id = data[0][0]
+
             self.selected_copier = data[0][1] + "  Σειριακός : " + self.selected_serial
         except IndexError:  # Αν εισάγουμε μηχάνημα μόνο όνομα και όχι serial nr
             self.copier_id = 0
             self.selected_copier = self.copiers_combobox.get() + "  Σειριακός : " + self.selected_serial
         con.close()
-        self.get_copier()
+
         return self.copier_id
 
     # Να πάρουμε Φωτοτυπικά και πελάτη
@@ -511,22 +515,27 @@ class add_task_window:
     def get_copier(self, event=None):
         # να πάρουμε το id του πελάτη απο το ονομα του
         customer = self.customer_combobox.get()
-        self.copiers_combobox.configure(values="")
+        # self.copiers_combobox.configure(values="")
 
         con = sqlite3.connect(dbase)
         cursor = con.cursor()
         cursor.execute("SELECT ID, Τηλέφωνο, Κινητό, Διεύθυνση FROM Πελάτες WHERE  Επωνυμία_Επιχείρησης =?",
                        (customer,))
         customer_data = cursor.fetchall()  # ==> [(4,)] αρα θέλουμε το customer_id[0][0]
-        self.customer_id = customer_data[0][0]
 
-        self.phone_var = StringVar(w, value=customer_data[0][1])
-        self.phone_entry.configure(textvariable=self.phone_var)
-
-        self.notes_scrolledtext.delete('1.0', "end")
-        self.mobile = StringVar(w, value="Κινητό : " + customer_data[0][2] + "\n")
-        self.notes_scrolledtext.insert("1.0", self.mobile.get())
-        self.notes = StringVar(w, value="Διεύθυνση : " + customer_data[0][3] + "\n")
+        try:
+            self.customer_id = customer_data[0][0]
+            self.phone_var = StringVar(w, value=customer_data[0][1])
+            self.phone_entry.configure(textvariable=self.phone_var)
+        except IndexError:  # Αν δεν έχει τηλ
+            pass
+        try:
+            self.notes_scrolledtext.delete('1.0', "end")
+            self.mobile = StringVar(w, value="Κινητό : " + customer_data[0][2] + "\n")
+            self.notes_scrolledtext.insert("1.0", self.mobile.get())
+            self.notes = StringVar(w, value="Διεύθυνση : " + customer_data[0][3] + "\n")
+        except IndexError:  # Όταν δεν έχει κινητό και διευθυνση ο πελάτης
+            pass
         self.notes_scrolledtext.insert("2.0", self.notes.get())
         line = 40 * "-"
         self.notes_scrolledtext.insert("3.0", line + user + line + "\n")
@@ -546,16 +555,20 @@ class add_task_window:
             self.copiers.append("   Σειριακός: ".join(copier))
         cursor.close()
         con.close()
+        # todo πρόβλημα αν ορισο self.copiers_combobox.set(value=κατι) γιατί το αυτήν την συνάρτηση την τρέχω πολλές
+        #  φορές  και μπαινει λαθος id στον πίνακα service
         # Αν επιλέξουμε φωτοτυπικό του πελάτη απο τα περασμένα στην βάση φωτοτυπικά
         emtpy_value = f"Ο {customer} δεν έχει μηχάνημα"
-        self.copiers_combobox.configure(foreground="red")
-        self.copiers_combobox.set(value=emtpy_value)
+
+
         if copiers:
             self.copiers_combobox.configure(foreground="")
             self.copiers_combobox.configure(values=self.copiers)
-            self.copiers_combobox.set(value=self.copiers[0])
+            # self.copiers_combobox.set(value=self.copiers[0])
         # Διαφορετικά μπορούμε να εισάγουμε νέο μηχάνημα
         else:
+            self.copiers_combobox.configure(foreground="red")
+            self.copiers_combobox.set(value=emtpy_value)
             self.copiers_combobox.configure(textvariable=self.copier_stringvar)
 
     def quit(self, event):
@@ -582,7 +595,7 @@ class add_task_window:
                 self.top.focus()
                 return
 
-        self.get_copier_id()  # Να πάρουμε το id του μηχανήματος
+        # self.copier_id = self.get_copier_id()  # Να πάρουμε το id του μηχανήματος  # Να πάρουμε το id του μηχανήματος
         conn = sqlite3.connect(dbase)
         cursor = conn.cursor()
         # Δημιουργία columns για της εργασίες
@@ -615,15 +628,21 @@ class add_task_window:
         cursor.execute("SELECT  Εταιρεία, Serial FROM Φωτοτυπικά WHERE Πελάτη_ID = ? AND Κατάσταση = 1 ",
                        (self.customer_id,))
         copiers = cursor.fetchall()
-        self.copier_id = self.get_copier_id()
+
         self.copiers = []
         for copier in copiers:
             self.copiers.append("   Σειριακός: ".join(copier))
 
         if not self.copiers_combobox.get() in self.copiers:
             self.copier_id = "0"
+
         # "", "", ==>> Actions, Ημερομηνία ολοκήροσης, ΔΤΕ, Μετρητής και Επώμενο service
 
+        if self.copier_id == "0":
+            messagebox.showerror("self.copier_id", f'self.copier_id = {self.copier_id}')
+            answer = messagebox.askquestion("Continue?", "Continue?")
+            if not answer:
+                return
         data = [self.start_date.get(), self.customer_combobox.get(), self.copiers_combobox.get(),
                 self.purpose_combobox.get(), "", self.technician_entry.get(), "", self.urgent.get(),
                 self.phone_var.get(), self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, "",
@@ -661,7 +680,7 @@ class add_task_window:
         # 	"ΔΤΕ"	TEXT,               # ""
         # 	FOREIGN KEY("Copier_ID") REFERENCES "Φωτοτυπικά"("ID")
         # )
-
+        # self.copier_id = self.get_copier_id()
         data = [self.start_date.get(), self.purpose_combobox.get(), "", self.notes_scrolledtext.get('1.0', 'end-1c'),
                 "", "", self.copier_id, ""]
         sql_insert = "INSERT INTO Service (" + columns + ")" + "VALUES(" + values + ");"
