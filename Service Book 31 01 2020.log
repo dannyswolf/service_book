@@ -1,0 +1,396 @@
+2020-01-31 19:16:58,247 - root - INFO - ****************************************************************************************************
+										FILE add_spare_parts_to_repository
+2020-01-31 19:16:58,247 - root - INFO - 
+
+2020-01-31 19:16:58,249 - root - INFO - ****************************************************************************************************
+										FILE edit_spare_parts_to_repository
+2020-01-31 19:16:58,249 - root - INFO - 
+
+2020-01-31 19:16:58,289 - root - INFO - ****************************************************************************************************
+										FILE image_viewer
+2020-01-31 19:16:58,289 - root - INFO - 
+
+2020-01-31 19:16:58,289 - root - INFO - ****************************************************************************************************
+										FILE add_spare_parts
+2020-01-31 19:16:58,289 - root - INFO - 
+
+2020-01-31 19:16:58,289 - root - INFO - ****************************************************************************************************
+										FILE insert_spare_parts
+2020-01-31 19:16:58,289 - root - INFO - 
+
+2020-01-31 19:17:01,886 - easyprocess - DEBUG - version=0.2.9
+2020-01-31 19:17:01,902 - pyscreenshot - DEBUG - version=1.0
+2020-01-31 19:17:02,468 - root - INFO - ****************************************************************************************************
+										FILE edit_service_window
+2020-01-31 19:17:02,468 - root - INFO - 
+
+2020-01-31 19:17:02,468 - root - INFO - ****************************************************************************************************
+										FILE add_customers
+2020-01-31 19:17:02,468 - root - INFO - 
+
+2020-01-31 19:17:02,484 - root - INFO - ****************************************************************************************************
+										FILE add_copier
+2020-01-31 19:17:02,484 - root - INFO - 
+
+2020-01-31 19:17:02,484 - root - INFO - ****************************************************************************************************
+										FILE change_customer
+2020-01-31 19:17:02,484 - root - INFO - 
+
+2020-01-31 19:17:02,484 - root - INFO - ****************************************************************************************************
+										FILE add_service
+2020-01-31 19:17:02,484 - root - INFO - 
+
+2020-01-31 19:17:02,484 - root - INFO - ****************************************************************************************************
+										FILE copiers_log
+2020-01-31 19:17:02,484 - root - INFO - 
+
+2020-01-31 19:17:02,484 - root - INFO - ****************************************************************************************************
+										FILE enable_customers
+2020-01-31 19:17:02,484 - root - INFO - 
+
+2020-01-31 19:17:02,484 - root - INFO - ****************************************************************************************************
+										FILE enable_copiers
+2020-01-31 19:17:02,484 - root - INFO - 
+
+2020-01-31 19:17:02,515 - root - INFO - ****************************************************************************************************
+										FILE mail
+2020-01-31 19:17:02,515 - root - INFO - 
+
+2020-01-31 19:17:02,515 - root - INFO - ****************************************************************************************************
+										FILE add_task
+2020-01-31 19:17:02,515 - root - INFO - 
+
+2020-01-31 19:17:02,515 - root - INFO - ****************************************************************************************************
+										FILE edit_task
+2020-01-31 19:17:02,515 - root - INFO - 
+
+2020-01-31 19:17:04,273 - root - INFO - ****************************************************************************************************
+										FILE add_spare_parts_to_repository
+2020-01-31 19:17:04,273 - root - INFO - 
+
+2020-01-31 19:17:04,289 - root - INFO - ****************************************************************************************************
+										FILE edit_spare_parts_to_repository
+2020-01-31 19:17:04,289 - root - INFO - 
+
+2020-01-31 19:17:04,313 - root - INFO - ****************************************************************************************************
+										FILE image_viewer
+2020-01-31 19:17:04,313 - root - INFO - 
+
+2020-01-31 19:17:04,315 - root - INFO - ****************************************************************************************************
+										FILE add_spare_parts
+2020-01-31 19:17:04,315 - root - INFO - 
+
+2020-01-31 19:17:04,317 - root - INFO - ****************************************************************************************************
+										FILE insert_spare_parts
+2020-01-31 19:17:04,317 - root - INFO - 
+
+2020-01-31 19:17:04,559 - easyprocess - DEBUG - version=0.2.9
+2020-01-31 19:17:04,559 - pyscreenshot - DEBUG - version=1.0
+2020-01-31 19:17:05,075 - root - INFO - ****************************************************************************************************
+										FILE edit_service_window
+2020-01-31 19:17:05,075 - root - INFO - 
+
+2020-01-31 19:17:05,075 - root - INFO - ****************************************************************************************************
+										FILE add_customers
+2020-01-31 19:17:05,075 - root - INFO - 
+
+2020-01-31 19:17:05,091 - root - INFO - ****************************************************************************************************
+										FILE add_copier
+2020-01-31 19:17:05,091 - root - INFO - 
+
+2020-01-31 19:17:05,091 - root - INFO - ****************************************************************************************************
+										FILE change_customer
+2020-01-31 19:17:05,091 - root - INFO - 
+
+2020-01-31 19:17:05,091 - root - INFO - ****************************************************************************************************
+										FILE add_service
+2020-01-31 19:17:05,091 - root - INFO - 
+
+2020-01-31 19:17:05,091 - root - INFO - ****************************************************************************************************
+										FILE copiers_log
+2020-01-31 19:17:05,091 - root - INFO - 
+
+2020-01-31 19:17:05,091 - root - INFO - ****************************************************************************************************
+										FILE enable_customers
+2020-01-31 19:17:05,091 - root - INFO - 
+
+2020-01-31 19:17:05,107 - root - INFO - ****************************************************************************************************
+										FILE enable_copiers
+2020-01-31 19:17:05,107 - root - INFO - 
+
+2020-01-31 19:17:05,129 - root - INFO - ****************************************************************************************************
+										FILE mail
+2020-01-31 19:17:05,130 - root - INFO - 
+
+2020-01-31 19:17:05,130 - root - INFO - ****************************************************************************************************
+										FILE add_task
+2020-01-31 19:17:05,130 - root - INFO - 
+
+2020-01-31 19:17:05,133 - root - INFO - ****************************************************************************************************
+										FILE edit_task
+2020-01-31 19:17:05,133 - root - INFO - 
+
+2020-01-31 19:31:25,035 - root - INFO - ****************************************************************************************************
+										FILE add_spare_parts_to_repository
+2020-01-31 19:31:25,035 - root - INFO - 
+
+2020-01-31 19:31:25,035 - root - INFO - ****************************************************************************************************
+										FILE edit_spare_parts_to_repository
+2020-01-31 19:31:25,035 - root - INFO - 
+
+2020-01-31 19:31:25,066 - root - INFO - ****************************************************************************************************
+										FILE image_viewer
+2020-01-31 19:31:25,066 - root - INFO - 
+
+2020-01-31 19:31:25,066 - root - INFO - ****************************************************************************************************
+										FILE add_spare_parts
+2020-01-31 19:31:25,066 - root - INFO - 
+
+2020-01-31 19:31:25,066 - root - INFO - ****************************************************************************************************
+										FILE insert_spare_parts
+2020-01-31 19:31:25,066 - root - INFO - 
+
+2020-01-31 19:31:25,309 - easyprocess - DEBUG - version=0.2.9
+2020-01-31 19:31:25,309 - pyscreenshot - DEBUG - version=1.0
+2020-01-31 19:31:25,793 - root - INFO - ****************************************************************************************************
+										FILE edit_service_window
+2020-01-31 19:31:25,793 - root - INFO - 
+
+2020-01-31 19:31:25,793 - root - INFO - ****************************************************************************************************
+										FILE add_customers
+2020-01-31 19:31:25,793 - root - INFO - 
+
+2020-01-31 19:31:25,793 - root - INFO - ****************************************************************************************************
+										FILE add_copier
+2020-01-31 19:31:25,793 - root - INFO - 
+
+2020-01-31 19:31:25,793 - root - INFO - ****************************************************************************************************
+										FILE change_customer
+2020-01-31 19:31:25,793 - root - INFO - 
+
+2020-01-31 19:31:25,793 - root - INFO - ****************************************************************************************************
+										FILE add_service
+2020-01-31 19:31:25,793 - root - INFO - 
+
+2020-01-31 19:31:25,793 - root - INFO - ****************************************************************************************************
+										FILE copiers_log
+2020-01-31 19:31:25,793 - root - INFO - 
+
+2020-01-31 19:31:25,793 - root - INFO - ****************************************************************************************************
+										FILE enable_customers
+2020-01-31 19:31:25,793 - root - INFO - 
+
+2020-01-31 19:31:25,809 - root - INFO - ****************************************************************************************************
+										FILE enable_copiers
+2020-01-31 19:31:25,809 - root - INFO - 
+
+2020-01-31 19:31:25,824 - root - INFO - ****************************************************************************************************
+										FILE mail
+2020-01-31 19:31:25,824 - root - INFO - 
+
+2020-01-31 19:31:25,824 - root - INFO - ****************************************************************************************************
+										FILE add_task
+2020-01-31 19:31:25,824 - root - INFO - 
+
+2020-01-31 19:31:25,824 - root - INFO - ****************************************************************************************************
+										FILE edit_task
+2020-01-31 19:31:25,824 - root - INFO - 
+
+2020-01-31 19:31:45,913 - root - INFO - mail
+2020-01-31 19:31:45,914 - root - INFO -  
+2020-01-31 19:31:45,914 - root - INFO - 'utf-8' codec can't decode byte 0xca in position 0: invalid continuation byte
+2020-01-31 19:31:45,914 - root - INFO - 
+
+2020-01-31 19:31:45,915 - root - ERROR - Exception in Tkinter callback
+2020-01-31 19:31:45,915 - root - ERROR - 
+
+2020-01-31 19:31:45,916 - root - ERROR - Traceback (most recent call last):
+
+2020-01-31 19:31:45,916 - root - ERROR - 
+2020-01-31 19:31:45,916 - root - ERROR -   File "tkinter\__init__.py", line 1883, in __call__
+
+2020-01-31 19:31:45,916 - root - ERROR - 
+2020-01-31 19:31:45,916 - root - ERROR -   File "mail.py", line 203, in <lambda>
+
+2020-01-31 19:31:45,917 - root - ERROR - 
+2020-01-31 19:31:45,917 - root - ERROR -   File "mail.py", line 185, in set_receiver
+
+2020-01-31 19:31:45,917 - root - ERROR - 
+2020-01-31 19:31:45,917 - root - ERROR - UnboundLocalError: local variable 'server' referenced before assignment
+
+2020-01-31 19:31:45,917 - root - ERROR - 
+2020-01-31 19:31:52,629 - xhtml2pdf - DEBUG - pisaDocument options:
+  src = b'<html>\n\n            <meta http-equiv=Content-Type content="text/html;charset=utf-8"></meta>\n            <style>\n            @font-face {\n                font-family: Calibri;\n                src: url(\'../fonts/Calibrib.ttf\');\n                }\n\n                body {\n                font-family: Calibri;\n                font-weight: bold;\n                }\n                h1 {\n                font-family: Calibri;\n                font-weight: bold;\n                }\n                h2 {\n                font-family: Calibri;\n                font-weight: bold;\n                }\n                h3 {\n                font-family: Calibri;\n                font-weight: bold;\n                }\n                h4 {\n                font-family: Calibri;\n                font-weight: bold;\n\n                }\n                \n            </style> \n<font size = "5">\n            <h1 style="text-align: center;"><img style="float: right;" src="../icons/logo-small-orange.png" alt="" width="200" height="143" /></h1>\n            <h1 style="text-align: center;"><span style="text-decoration: underline;">&Delta;&epsilon;&lambda;&tau;\xce\xaf&omicron; &tau;&epsilon;&chi;&nu;&iota;&kappa;\xce\xae&sigmaf;&nbsp;&epsilon;&xi;&upsilon;&pi;&eta;&rho;\xce\xad&tau;&eta;&sigma;&eta;&sigmaf;&nbsp;</h1>\n            \n<table style="height: 35px; width: 663px;" border="1">\n<tbody>\n<tr>\n<td style="width: 244px; text-align: center;"><strong>&Eta;&mu;&epsilon;&rho;&omicron;&mu;. &Omicron;&lambda;&omicron;&kappa;&lambda;\xce\xae&rho;&omega;&sigma;&eta;&sigmaf;&nbsp;</strong></td>\n<td style="width: 100px;">&nbsp; &nbsp; 31/01/2020</td>\n<td style="width: 214px; text-align: center;"><strong>&Alpha;&rho;&iota;&theta;&mu;\xcf\x8c&sigmaf; &Delta;&epsilon;&lambda;&tau;\xce\xaf&omicron;&upsilon; &Tau;&epsilon;&chi;&nu;&iota;&kappa;\xce\xae&sigmaf; &Epsilon;&xi;&upsilon;&pi;&eta;&rho;\xce\xad&tau;&eta;&sigma;&eta;&sigmaf;</strong></td>\n<td style="width: 125px;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</td>\n</tr>\n</tbody>\n</table>\n<table style="width: 663px;" border="1">\n<tbody>\n<tr style="height: 46px;">\n<td style="width: 244px; text-align: center; height: 46px;">\n<p><strong>&Pi;&rho;&omicron;&gamma;&rho;&alpha;&mu;&mu;. &Eta;&mu;&epsilon;&rho;&omicron;&mu;.</strong></p>\n</td>\n<td style="width: 439px; height: 46px;">&nbsp; &nbsp; 03/02/2020</td>\n</tr>\n<tr style="height: 46px;">\n<td style="width: 244px; text-align: center; height: 46px;">\n<p><strong>&Pi;&epsilon;&lambda;\xce\xac&tau;&eta;&sigmaf;</strong></p>\n</td>\n<td style="width: 439px; height: 46px;">&nbsp; &nbsp; \xce\x94\xce\x99\xce\x9a\xce\x91\xce\xa3\xce\xa4\xce\x97\xce\xa1\xce\x99\xce\x91 \xce\xa0\xce\xa1\xce\xa9\xce\xa4\xce\x9f\xce\x94\xce\x99\xce\x9a\xce\x95\xce\x99\xce\x9f</td>\n</tr>\n<tr style="height: 46px;">\n<td style="width: 244px; text-align: center; height: 46px;">\n<p><strong>&Tau;&eta;&lambda;\xce\xad&phi;&omega;&nu;&omicron;</strong></p>\n</td>\n<td style="width: 439px; height: 46px;">&nbsp; &nbsp; 693 866 9828</td>\n</tr>\n<tr style="height: 46px;">\n<td style="width: 244px; text-align: center; height: 46px;">\n<p><strong>&Mu;&eta;&chi;\xce\xac&nu;&eta;&mu;&alpha;</strong></p>\n</td>\n<td style="width: 439px; height: 46px;">&nbsp; &nbsp; BROTHER MFC L2710DW   \xce\xa3\xce\xb5\xce\xb9\xcf\x81\xce\xb9\xce\xb1\xce\xba\xcf\x8c\xcf\x82: 00000</td>\n</tr>\n<tr style="height: 46px;">\n<td style="width: 244px; text-align: center; height: 46px;">\n<p><strong>&Sigma;&kappa;&omicron;&pi;\xcf\x8c&sigmaf; &epsilon;&pi;\xce\xaf&sigma;&kappa;&epsilon;&psi;&eta;&sigmaf;</strong></p>\n</td>\n<td style="width: 439px; height: 46px;">&nbsp; &nbsp; \xce\x94\xce\x95\xce\x9d \xce\x95\xce\x9a\xce\xa4\xce\xa5\xce\xa0\xce\xa9\xce\x9d\xce\x95\xce\x99</td>\n</tr>\n<tr style="height: 46px;">\n<td style="width: 244px; text-align: center; height: 46px;">\n<p><strong>&Epsilon;&nu;\xce\xad&rho;&gamma;&epsilon;&iota;&epsilon;&sigmaf;</strong></p>\n</td>\n<td style="width: 439px; height: 46px;">&nbsp; &nbsp; </td>\n</tr>\n<tr style="height: 46px;">\n<td style="width: 244px; text-align: center; height: 46px;">\n<p><strong>&Tau;&epsilon;&chi;&nu;&iota;&kappa;\xcf\x8c&sigmaf;</strong></p>\n</td>\n<td style="width: 439px; height: 46px;">&nbsp; &nbsp; \xce\x99\xce\xbf\xcf\x81\xce\xb4\xce\xac\xce\xbd\xce\xb7\xcf\x82 </td>\n</tr>\n<tr style="height: 46px;">\n<td style="width: 244px; text-align: center; height: 46px;">\n<p><strong>&Mu;&epsilon;&tau;&rho;&eta;&tau;\xce\xae&sigmaf;</strong></p>\n</td>\n<td style="width: 439px; height: 46px;">&nbsp; &nbsp; </td>\n</tr>\n<tr style="height: 46px;">\n<td style="width: 244px; text-align: center; height: 46px;">\n<p><strong>&Epsilon;&pi;\xcf\x8c&mu;&epsilon;&nu;&omicron; Service</strong></p>\n</td>\n<td style="width: 439px; height: 46px;">&nbsp; &nbsp; </td>\n</tr>\n<tr style="height: 182.5px;">\n<td style="width: 244px; text-align: center; height: 182.5px;">\n<p><strong>&Sigma;&eta;&mu;&epsilon;&iota;\xcf\x8e&sigma;&epsilon;&iota;&sigmaf;</strong></p>\n</td>\n<td style="width: 439px; height: 182.5px;">&nbsp; &nbsp;\xce\x9a\xce\xb9\xce\xbd\xce\xb7\xcf\x84\xcf\x8c : 2385 0 22287\n\xce\x94\xce\xb9\xce\xb5\xcf\x8d\xce\xb8\xcf\x85\xce\xbd\xcf\x83\xce\xb7 : \xce\x9c\xce\x95\xce\x93\xce\x91\xce\x9b\xce\x9f\xce\xa5 \xce\x91\xce\x9b\xce\x95\xce\x9e\xce\x91\xce\x9d\xce\x94\xce\xa1\xce\x9f\xce\xa5\n----------------------------------------\xce\x9a\xce\x95\xce\x9d\xce\xa4\xce\xa1\xce\x99\xce\x9a\xce\x9f\xce\xa3----------------------------------------\n \xce\x94\xce\x95\xce\x9d \xce\x95\xce\xa7\xce\x95\xce\x99 \xce\xa4\xce\x9f\xce\x9d\xce\x95\xce\xa1 \xce\x9d\xce\x91 \xce\x93\xce\x99\xce\x9d\xce\x95\xce\x99 \xce\x91\xce\x9d\xce\xa4\xce\x99\xce\x9a\xce\x91\xce\xa4\xce\x91\xce\xa3\xce\xa4\xce\x91\xce\xa3\xce\x97 \xce\xa4\xce\x9d 2420 (14119)</td>\n</tr>\n</tbody>\n</table>\n</td>\n</tr>\n</tbody>\n</table>\n\n<table style="height: 28px; width: 663px;" border="1">\n<tbody>\n<tr style="height: 118.5px;">\n<td style="width: 244px; height: 26px;">\n<h3 style="text-align: center;">&Alpha;&nu;&tau;&alpha;&lambda;&lambda;&alpha;&kappa;&tau;&iota;&kappa;\xce\xac&nbsp;</h3>\n</td>\n</tbody>\n</table>\n<table style="height: 167px; width: 663;" border="1">\n<tbody>\n<tr style="height: 26px;">\n<td style="width: 682px; height: 26px;">&nbsp; &nbsp; </td>\n</tr>\n<tr style="height: 26px;">\n<td style="width: 682px; height: 26px;">&nbsp; &nbsp; </td>\n</tr>\n<tr style="height: 26px;">\n<td style="width: 682px; height: 27px;">&nbsp; &nbsp; </td>\n</tr>\n<tr style="height: 26px;">\n<td style="width: 682px; height: 39px;">&nbsp; &nbsp; </td>\n</tr>\n<tr style="height: 26px;">\n<td style="width: 682px; height: 27.5px;">&nbsp; &nbsp; </td>\n</tr>\n</tbody>\n</table>\n</td>\n</tr>\n</tbody>\n</table>\n</font>\n            </html>\n            '
+  dest = <_io.BufferedRandom name='prints/31 01 2020/Service Book ΔΙΚΑΣΤΗΡΙΑ ΠΡΩΤΟΔΙΚΕΙΟ  31 01 2020  .pdf'>
+  path = None
+  link_callback = None
+  xhtml = False
+  context_meta = None
+2020-01-31 19:31:52,676 - xhtml2pdf - DEBUG - FileObject '../fonts/Calibrib.ttf', Basepath: 'C:\\Service Book  V 1.5.4 ML Shop\\__dummy__'
+2020-01-31 19:31:52,676 - xhtml2pdf - DEBUG - URLParts: (ParseResult(scheme='c', netloc='', path='\\Service Book  V 1.5.4 ML Shop\\__dummy__', params='', query='', fragment=''), 'c')
+2020-01-31 19:31:52,676 - xhtml2pdf - DEBUG - Unrecognized scheme, assuming local file path
+2020-01-31 19:31:53,305 - xhtml2pdf - DEBUG - Load font 'C:\\Service Book  V 1.5.4 ML Shop\\fonts\\Calibrib.ttf'
+2020-01-31 19:31:53,406 - xhtml2pdf - DEBUG - FileObject '../icons/logo-small-orange.png', Basepath: 'C:\\Service Book  V 1.5.4 ML Shop\\__dummy__'
+2020-01-31 19:31:53,406 - xhtml2pdf - DEBUG - URLParts: (ParseResult(scheme='c', netloc='', path='\\Service Book  V 1.5.4 ML Shop\\__dummy__', params='', query='', fragment=''), 'c')
+2020-01-31 19:31:53,406 - xhtml2pdf - DEBUG - Unrecognized scheme, assuming local file path
+2020-01-31 19:31:53,421 - xhtml2pdf - DEBUG - Parsing img tag, src: <xhtml2pdf.util.pisaFileObject object at 0x08964268>
+2020-01-31 19:31:53,421 - xhtml2pdf - DEBUG - Attrs: {'src': <xhtml2pdf.util.pisaFileObject object at 0x08964268>, 'width': 200.0, 'height': 143.0, 'align': None, 'id': None}
+2020-01-31 19:31:53,437 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2020-01-31 19:31:53,437 - PIL.PngImagePlugin - DEBUG - STREAM b'pHYs' 41 9
+2020-01-31 19:31:53,437 - PIL.PngImagePlugin - DEBUG - STREAM b'iTXt' 62 14374
+2020-01-31 19:31:53,437 - PIL.PngImagePlugin - DEBUG - STREAM b'cHRM' 14448 32
+2020-01-31 19:31:53,437 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 14492 11544
+2020-01-31 19:31:53,453 - xhtml2pdf - DEBUG - Col 0 has width 244px
+2020-01-31 19:31:53,468 - xhtml2pdf - DEBUG - Col 1 has width 100px
+2020-01-31 19:31:53,468 - xhtml2pdf - DEBUG - Col 2 has width 214px
+2020-01-31 19:31:53,468 - xhtml2pdf - DEBUG - Col 3 has width 125px
+2020-01-31 19:31:53,468 - xhtml2pdf - DEBUG - Col widths: [183.0, 75.0, 160.5, 93.75]
+2020-01-31 19:31:53,484 - xhtml2pdf - DEBUG - Col 0 has width 244px
+2020-01-31 19:31:53,500 - xhtml2pdf - DEBUG - Col 1 has width 439px
+2020-01-31 19:31:53,500 - xhtml2pdf - DEBUG - Col 0 has width 244px
+2020-01-31 19:31:53,515 - xhtml2pdf - DEBUG - Col 1 has width 439px
+2020-01-31 19:31:53,515 - xhtml2pdf - DEBUG - Col 0 has width 244px
+2020-01-31 19:31:53,531 - xhtml2pdf - DEBUG - Col 1 has width 439px
+2020-01-31 19:31:53,531 - xhtml2pdf - DEBUG - Col 0 has width 244px
+2020-01-31 19:31:53,531 - xhtml2pdf - DEBUG - Col 1 has width 439px
+2020-01-31 19:31:53,546 - xhtml2pdf - DEBUG - Col 0 has width 244px
+2020-01-31 19:31:53,546 - xhtml2pdf - DEBUG - Col 1 has width 439px
+2020-01-31 19:31:53,562 - xhtml2pdf - DEBUG - Col 0 has width 244px
+2020-01-31 19:31:53,562 - xhtml2pdf - DEBUG - Col 1 has width 439px
+2020-01-31 19:31:53,562 - xhtml2pdf - DEBUG - Col 0 has width 244px
+2020-01-31 19:31:53,578 - xhtml2pdf - DEBUG - Col 1 has width 439px
+2020-01-31 19:31:53,578 - xhtml2pdf - DEBUG - Col 0 has width 244px
+2020-01-31 19:31:53,593 - xhtml2pdf - DEBUG - Col 1 has width 439px
+2020-01-31 19:31:53,593 - xhtml2pdf - DEBUG - Col 0 has width 244px
+2020-01-31 19:31:53,612 - xhtml2pdf - DEBUG - Col 1 has width 439px
+2020-01-31 19:31:53,617 - xhtml2pdf - DEBUG - Col 0 has width 244px
+2020-01-31 19:31:53,617 - xhtml2pdf - DEBUG - Col 1 has width 439px
+2020-01-31 19:31:53,617 - xhtml2pdf - DEBUG - Col widths: [183.0, 329.25]
+2020-01-31 19:31:53,632 - xhtml2pdf - DEBUG - Col 0 has width 244px
+2020-01-31 19:31:53,632 - xhtml2pdf - DEBUG - Col widths: [183.0]
+2020-01-31 19:31:53,653 - xhtml2pdf - DEBUG - Col 0 has width 682px
+2020-01-31 19:31:53,653 - xhtml2pdf - DEBUG - Col 0 has width 682px
+2020-01-31 19:31:53,653 - xhtml2pdf - DEBUG - Col 0 has width 682px
+2020-01-31 19:31:53,653 - xhtml2pdf - DEBUG - Col 0 has width 682px
+2020-01-31 19:31:53,669 - xhtml2pdf - DEBUG - Col 0 has width 682px
+2020-01-31 19:31:53,669 - xhtml2pdf - DEBUG - Col widths: [511.5]
+2020-01-31 19:31:53,669 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2020-01-31 19:31:53,669 - PIL.PngImagePlugin - DEBUG - STREAM b'pHYs' 41 9
+2020-01-31 19:31:53,669 - PIL.PngImagePlugin - DEBUG - STREAM b'iTXt' 62 14374
+2020-01-31 19:31:53,669 - PIL.PngImagePlugin - DEBUG - STREAM b'cHRM' 14448 32
+2020-01-31 19:31:53,669 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 14492 11544
+2020-01-31 19:31:59,457 - pyscreenshot.loader - DEBUG - forcing:None
+2020-01-31 19:31:59,457 - pyscreenshot.loader - DEBUG - selecting plugin:pil
+2020-01-31 19:32:03,604 - pyscreenshot.loader - DEBUG - forcing:None
+2020-01-31 19:32:03,604 - pyscreenshot.loader - DEBUG - selecting plugin:pil
+2020-01-31 19:32:03,736 - xhtml2pdf - DEBUG - pisaDocument options:
+  src = b'<html>\n\n                <meta http-equiv=Content-Type content="text/html;charset=utf-8"></meta>\n                <style>\n                @font-face {\n                    font-family: Calibri;\n                    src: url(\'../fonts/Calibrib.ttf\');\n                    }\n\n                    body {\n                    font-family: Calibri;\n                    font-weight: bold;\n                    }\n                    h1 {\n                    font-family: Calibri;\n                    font-weight: bold;\n                    }\n                    h2 {\n                    font-family: Calibri;\n                    font-weight: bold;\n                    }\n                    h3 {\n                    font-family: Calibri;\n                    font-weight: bold;\n                    }\n                    h4 {\n                    font-family: Calibri;\n                    font-weight: bold;\n\n                    }\n                    \n                </style> \n    <font size = "5">\n                <h1 style="text-align: center;"><img style="float: right;" src="../icons/logo-small-orange.png" alt="" width="200" height="143" /></h1>\n                <h1 style="text-align: center;"><img style="float: right;" src="../prints/screen_shot/screen_shot0.png" alt="" /></h1>\n                <h1 style="text-align: center;"><img style="float: right;" src="../prints/screen_shot/screen_shot1.png" alt="" /></h1>\n\n    </font>\n                </html>\n                '
+  dest = <_io.BufferedRandom name='prints/31 01 2020/Service Book ΔΙΚΑΣΤΗΡΙΑ ΠΡΩΤΟΔΙΚΕΙΟ  31 01 2020  .pdf'>
+  path = None
+  link_callback = None
+  xhtml = False
+  context_meta = None
+2020-01-31 19:32:03,736 - xhtml2pdf - DEBUG - FileObject '../fonts/Calibrib.ttf', Basepath: 'C:\\Service Book  V 1.5.4 ML Shop\\__dummy__'
+2020-01-31 19:32:03,736 - xhtml2pdf - DEBUG - URLParts: (ParseResult(scheme='c', netloc='', path='\\Service Book  V 1.5.4 ML Shop\\__dummy__', params='', query='', fragment=''), 'c')
+2020-01-31 19:32:03,752 - xhtml2pdf - DEBUG - Unrecognized scheme, assuming local file path
+2020-01-31 19:32:03,752 - xhtml2pdf - DEBUG - Load font 'C:\\Service Book  V 1.5.4 ML Shop\\fonts\\Calibrib.ttf'
+2020-01-31 19:32:03,855 - xhtml2pdf - DEBUG - FileObject '../icons/logo-small-orange.png', Basepath: 'C:\\Service Book  V 1.5.4 ML Shop\\__dummy__'
+2020-01-31 19:32:03,855 - xhtml2pdf - DEBUG - URLParts: (ParseResult(scheme='c', netloc='', path='\\Service Book  V 1.5.4 ML Shop\\__dummy__', params='', query='', fragment=''), 'c')
+2020-01-31 19:32:03,856 - xhtml2pdf - DEBUG - Unrecognized scheme, assuming local file path
+2020-01-31 19:32:03,859 - xhtml2pdf - DEBUG - Parsing img tag, src: <xhtml2pdf.util.pisaFileObject object at 0x08D24D18>
+2020-01-31 19:32:03,860 - xhtml2pdf - DEBUG - Attrs: {'src': <xhtml2pdf.util.pisaFileObject object at 0x08D24D18>, 'width': 200.0, 'height': 143.0, 'align': None, 'id': None}
+2020-01-31 19:32:03,860 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2020-01-31 19:32:03,860 - PIL.PngImagePlugin - DEBUG - STREAM b'pHYs' 41 9
+2020-01-31 19:32:03,860 - PIL.PngImagePlugin - DEBUG - STREAM b'iTXt' 62 14374
+2020-01-31 19:32:03,861 - PIL.PngImagePlugin - DEBUG - STREAM b'cHRM' 14448 32
+2020-01-31 19:32:03,861 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 14492 11544
+2020-01-31 19:32:03,862 - xhtml2pdf - DEBUG - FileObject '../prints/screen_shot/screen_shot0.png', Basepath: 'C:\\Service Book  V 1.5.4 ML Shop\\__dummy__'
+2020-01-31 19:32:03,862 - xhtml2pdf - DEBUG - URLParts: (ParseResult(scheme='c', netloc='', path='\\Service Book  V 1.5.4 ML Shop\\__dummy__', params='', query='', fragment=''), 'c')
+2020-01-31 19:32:03,862 - xhtml2pdf - DEBUG - Unrecognized scheme, assuming local file path
+2020-01-31 19:32:03,866 - xhtml2pdf - DEBUG - Parsing img tag, src: <xhtml2pdf.util.pisaFileObject object at 0x08D24D18>
+2020-01-31 19:32:03,867 - xhtml2pdf - DEBUG - Attrs: {'src': <xhtml2pdf.util.pisaFileObject object at 0x08D24D18>, 'width': None, 'height': None, 'align': None, 'id': None}
+2020-01-31 19:32:03,867 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2020-01-31 19:32:03,867 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 41 37152
+2020-01-31 19:32:03,868 - xhtml2pdf - DEBUG - FileObject '../prints/screen_shot/screen_shot1.png', Basepath: 'C:\\Service Book  V 1.5.4 ML Shop\\__dummy__'
+2020-01-31 19:32:03,869 - xhtml2pdf - DEBUG - URLParts: (ParseResult(scheme='c', netloc='', path='\\Service Book  V 1.5.4 ML Shop\\__dummy__', params='', query='', fragment=''), 'c')
+2020-01-31 19:32:03,869 - xhtml2pdf - DEBUG - Unrecognized scheme, assuming local file path
+2020-01-31 19:32:03,873 - xhtml2pdf - DEBUG - Parsing img tag, src: <xhtml2pdf.util.pisaFileObject object at 0x08D24E38>
+2020-01-31 19:32:03,874 - xhtml2pdf - DEBUG - Attrs: {'src': <xhtml2pdf.util.pisaFileObject object at 0x08D24E38>, 'width': None, 'height': None, 'align': None, 'id': None}
+2020-01-31 19:32:03,874 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2020-01-31 19:32:03,875 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 41 33457
+2020-01-31 19:32:03,877 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2020-01-31 19:32:03,877 - PIL.PngImagePlugin - DEBUG - STREAM b'pHYs' 41 9
+2020-01-31 19:32:03,877 - PIL.PngImagePlugin - DEBUG - STREAM b'iTXt' 62 14374
+2020-01-31 19:32:03,878 - PIL.PngImagePlugin - DEBUG - STREAM b'cHRM' 14448 32
+2020-01-31 19:32:03,878 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 14492 11544
+2020-01-31 19:32:03,915 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2020-01-31 19:32:03,915 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 41 37152
+2020-01-31 19:32:04,005 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2020-01-31 19:32:04,006 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 41 33457
+2020-01-31 19:32:04,120 - xhtml2pdf - DEBUG - pisaDocument options:
+  src = b'<html>\n\n                <meta http-equiv=Content-Type content="text/html;charset=utf-8"></meta>\n                <style>\n                @font-face {\n                    font-family: Calibri;\n                    src: url(\'../fonts/Calibrib.ttf\');\n                    }\n\n                    body {\n                    font-family: Calibri;\n                    font-weight: bold;\n                    }\n                    h1 {\n                    font-family: Calibri;\n                    font-weight: bold;\n                    }\n                    h2 {\n                    font-family: Calibri;\n                    font-weight: bold;\n                    }\n                    h3 {\n                    font-family: Calibri;\n                    font-weight: bold;\n                    }\n                    h4 {\n                    font-family: Calibri;\n                    font-weight: bold;\n\n                    }\n                    \n                </style> \n    <font size = "5">\n                <h1 style="text-align: center;"><img style="float: right;" src="../icons/logo-small-orange.png" alt="" width="200" height="143" /></h1>\n                <h1 style="text-align: center;"><img style="float: right;" src="../prints/screen_shot/screen_shot0.png" alt="" /></h1>\n                <h1 style="text-align: center;"><img style="float: right;" src="../prints/screen_shot/screen_shot1.png" alt="" /></h1>\n\n    </font>\n                </html>\n                '
+  dest = <_io.BufferedRandom name='prints/31 01 2020/Service Book ΔΙΚΑΣΤΗΡΙΑ ΠΡΩΤΟΔΙΚΕΙΟ  31 01 2020  .pdf'>
+  path = None
+  link_callback = None
+  xhtml = False
+  context_meta = None
+2020-01-31 19:32:04,120 - xhtml2pdf - DEBUG - FileObject '../fonts/Calibrib.ttf', Basepath: 'C:\\Service Book  V 1.5.4 ML Shop\\__dummy__'
+2020-01-31 19:32:04,120 - xhtml2pdf - DEBUG - URLParts: (ParseResult(scheme='c', netloc='', path='\\Service Book  V 1.5.4 ML Shop\\__dummy__', params='', query='', fragment=''), 'c')
+2020-01-31 19:32:04,120 - xhtml2pdf - DEBUG - Unrecognized scheme, assuming local file path
+2020-01-31 19:32:04,120 - xhtml2pdf - DEBUG - Load font 'C:\\Service Book  V 1.5.4 ML Shop\\fonts\\Calibrib.ttf'
+2020-01-31 19:32:04,231 - xhtml2pdf - DEBUG - FileObject '../icons/logo-small-orange.png', Basepath: 'C:\\Service Book  V 1.5.4 ML Shop\\__dummy__'
+2020-01-31 19:32:04,231 - xhtml2pdf - DEBUG - URLParts: (ParseResult(scheme='c', netloc='', path='\\Service Book  V 1.5.4 ML Shop\\__dummy__', params='', query='', fragment=''), 'c')
+2020-01-31 19:32:04,231 - xhtml2pdf - DEBUG - Unrecognized scheme, assuming local file path
+2020-01-31 19:32:04,235 - xhtml2pdf - DEBUG - Parsing img tag, src: <xhtml2pdf.util.pisaFileObject object at 0x08D374C0>
+2020-01-31 19:32:04,235 - xhtml2pdf - DEBUG - Attrs: {'src': <xhtml2pdf.util.pisaFileObject object at 0x08D374C0>, 'width': 200.0, 'height': 143.0, 'align': None, 'id': None}
+2020-01-31 19:32:04,235 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2020-01-31 19:32:04,236 - PIL.PngImagePlugin - DEBUG - STREAM b'pHYs' 41 9
+2020-01-31 19:32:04,236 - PIL.PngImagePlugin - DEBUG - STREAM b'iTXt' 62 14374
+2020-01-31 19:32:04,236 - PIL.PngImagePlugin - DEBUG - STREAM b'cHRM' 14448 32
+2020-01-31 19:32:04,236 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 14492 11544
+2020-01-31 19:32:04,237 - xhtml2pdf - DEBUG - FileObject '../prints/screen_shot/screen_shot0.png', Basepath: 'C:\\Service Book  V 1.5.4 ML Shop\\__dummy__'
+2020-01-31 19:32:04,238 - xhtml2pdf - DEBUG - URLParts: (ParseResult(scheme='c', netloc='', path='\\Service Book  V 1.5.4 ML Shop\\__dummy__', params='', query='', fragment=''), 'c')
+2020-01-31 19:32:04,238 - xhtml2pdf - DEBUG - Unrecognized scheme, assuming local file path
+2020-01-31 19:32:04,238 - xhtml2pdf - DEBUG - Parsing img tag, src: <xhtml2pdf.util.pisaFileObject object at 0x08D374C0>
+2020-01-31 19:32:04,238 - xhtml2pdf - DEBUG - Attrs: {'src': <xhtml2pdf.util.pisaFileObject object at 0x08D374C0>, 'width': None, 'height': None, 'align': None, 'id': None}
+2020-01-31 19:32:04,238 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2020-01-31 19:32:04,238 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 41 37152
+2020-01-31 19:32:04,238 - xhtml2pdf - DEBUG - FileObject '../prints/screen_shot/screen_shot1.png', Basepath: 'C:\\Service Book  V 1.5.4 ML Shop\\__dummy__'
+2020-01-31 19:32:04,238 - xhtml2pdf - DEBUG - URLParts: (ParseResult(scheme='c', netloc='', path='\\Service Book  V 1.5.4 ML Shop\\__dummy__', params='', query='', fragment=''), 'c')
+2020-01-31 19:32:04,238 - xhtml2pdf - DEBUG - Unrecognized scheme, assuming local file path
+2020-01-31 19:32:04,238 - xhtml2pdf - DEBUG - Parsing img tag, src: <xhtml2pdf.util.pisaFileObject object at 0x08D37538>
+2020-01-31 19:32:04,238 - xhtml2pdf - DEBUG - Attrs: {'src': <xhtml2pdf.util.pisaFileObject object at 0x08D37538>, 'width': None, 'height': None, 'align': None, 'id': None}
+2020-01-31 19:32:04,238 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2020-01-31 19:32:04,238 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 41 33457
+2020-01-31 19:32:04,238 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2020-01-31 19:32:04,238 - PIL.PngImagePlugin - DEBUG - STREAM b'pHYs' 41 9
+2020-01-31 19:32:04,238 - PIL.PngImagePlugin - DEBUG - STREAM b'iTXt' 62 14374
+2020-01-31 19:32:04,238 - PIL.PngImagePlugin - DEBUG - STREAM b'cHRM' 14448 32
+2020-01-31 19:32:04,238 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 14492 11544
+2020-01-31 19:32:04,285 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2020-01-31 19:32:04,285 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 41 37152
+2020-01-31 19:32:04,363 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2020-01-31 19:32:04,363 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 41 33457
+2020-01-31 19:32:35,661 - root - INFO - mail
+2020-01-31 19:32:35,661 - root - INFO -  
+2020-01-31 19:32:35,661 - root - INFO - 'utf-8' codec can't decode byte 0xca in position 0: invalid continuation byte
+2020-01-31 19:32:35,661 - root - INFO - 
+
+2020-01-31 19:32:35,661 - root - ERROR - Exception in Tkinter callback
+2020-01-31 19:32:35,661 - root - ERROR - 
+
+2020-01-31 19:32:35,676 - root - ERROR - Traceback (most recent call last):
+
+2020-01-31 19:32:35,676 - root - ERROR - 
+2020-01-31 19:32:35,676 - root - ERROR -   File "tkinter\__init__.py", line 1883, in __call__
+
+2020-01-31 19:32:35,676 - root - ERROR - 
+2020-01-31 19:32:35,676 - root - ERROR -   File "mail.py", line 203, in <lambda>
+
+2020-01-31 19:32:35,676 - root - ERROR - 
+2020-01-31 19:32:35,676 - root - ERROR -   File "mail.py", line 185, in set_receiver
+
+2020-01-31 19:32:35,676 - root - ERROR - 
+2020-01-31 19:32:35,676 - root - ERROR - UnboundLocalError: local variable 'server' referenced before assignment
+
+2020-01-31 19:32:35,676 - root - ERROR - 
