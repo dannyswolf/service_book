@@ -688,10 +688,10 @@ class edit_service_window():
         # logo.save("prints/logo-small-orange.png")
 
         # Define your data
-        prints_dir = f'prints/{today}'
+        prints_dir = f'prints/{today}'.replace(" ", "_")
         if not os.path.exists(prints_dir):
             os.makedirs(prints_dir)
-        outputFilename = f"{prints_dir}/Service Book {self.selected_customer}  {today}  .pdf"
+        outputFilename = f"{prints_dir}/Service Book {self.selected_customer}  {today}.pdf".replace(" ", "_")
 
         # Utility function
         def convertHtmlToPdf(sourceHtml, outputFilename):
@@ -708,8 +708,40 @@ class edit_service_window():
             # return True on success and False on errors
             return pisaStatus.err
             # Αν γράψουμε νέο φωτοτυπικό και όχι απο την λίστα
+        if sys.platform == "linux":
+            src = "icons/"
+            src_images = "prints/"
+            font = """{
+                font-family: DejaVuSans;
+                src: url('fonts/DejaVuSans-Bold.ttf');
+                }
 
-        font = """{
+                body {
+                font-family: DejaVuSans;
+                font-weight: bold;
+                }
+                h1 {
+                font-family: DejaVuSans;
+                font-weight: bold;
+                }
+                h2 {
+                font-family: DejaVuSans;
+                font-weight: bold;
+                }
+                h3 {
+                font-family: DejaVuSans;
+                font-weight: bold;
+                }
+                h4 {
+                font-family: DejaVuSans;
+                font-weight: bold;
+
+                }
+                """
+        else:
+            src = "../icons/"
+            src_images = "../prints/"
+            font = """{
                     font-family: Calibri;
                     src: url('../fonts/Calibrib.ttf');
                     }
@@ -744,9 +776,9 @@ class edit_service_window():
                 @font-face {font}
                 </style> 
     <font size = "5">
-                <h1 style="text-align: center;"><img style="float: right;" src="../icons/logo-small-orange.png" alt="" width="200" height="143" /></h1>
-                <h1 style="text-align: center;"><img style="float: right;" src="../prints/screen_shot/screen_shot0.png" alt="" /></h1>
-                <h1 style="text-align: center;"><img style="float: right;" src="../prints/screen_shot/screen_shot1.png" alt="" /></h1>
+                <h1 style="text-align: center;"><img style="float: right;" src="{src}logo-small-orange.png" alt="" width="200" height="143" /></h1>
+                <h1 style="text-align: center;"><img style="float: right;" src="{src_images}screen_shot/screen_shot0.png" alt="" /></h1>
+                <h1 style="text-align: center;"><img style="float: right;" src="{src_images}screen_shot/screen_shot1.png" alt="" /></h1>
 
     
     </font>
@@ -754,7 +786,10 @@ class edit_service_window():
                 """
 
         convertHtmlToPdf(sourceHtml, outputFilename)
-        subprocess.Popen(outputFilename, shell=True)
+        if sys.platform == "linux":
+            os.system("okular " + outputFilename)
+        else:
+            subprocess.Popen(outputFilename, shell=True)
 
     # Προσθήκη αρχείων
     def add_files(self):

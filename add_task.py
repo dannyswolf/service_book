@@ -695,11 +695,11 @@ class add_task_window:
     # Print to pdf
     def print_to_pdf(self):
         # Define your data
-        prints_dir = f'prints/{today}'
+        prints_dir = f'prints/{today}'.replace(" ", "_")
 
         if not os.path.exists(prints_dir):
             os.makedirs(prints_dir)
-        outputFilename = f"{prints_dir}/Service Book {self.customer_combobox.get()} {today}.pdf"
+        outputFilename = f"{prints_dir}/Service Book{self.customer_combobox.get()}{today}.pdf".replace(" ", "_")
 
         # Utility function
         def convertHtmlToPdf(sourceHtml, outputFilename):
@@ -725,33 +725,66 @@ class add_task_window:
         images = ['icons/date.png', 'icons/customer.png', 'icons/phone.png', 'icons/copier.png', 'icons/purpose.png',
                   'icons/technician.png', 'icons/urgent.png', 'icons/notes.png']
 
-        font = """{
-        font-family: Calibri;
-        src: url('../fonts/Calibrib.ttf');
-        }
+        if sys.platform == "linux":
+            font = """{
+                font-family: DejaVuSans;
+                src: url('fonts/DejaVuSans-Bold.ttf');
+                }
 
-        body {
-        font-family: Calibri;
-        font-weight: bold;
-        }
-        h1 {
-        font-family: Calibri;
-        font-weight: bold;
-        }
-        h2 {
-        font-family: Calibri;
-        font-weight: bold;
-        }
-        h3 {
-        font-family: Calibri;
-        font-weight: bold;
-        }
-        h4 {
-        font-family: Calibri;
-        font-weight: bold;
-        
-        }
-        """
+                body {
+                font-family: DejaVuSans;
+                font-weight: bold;
+                }
+                h1 {
+                font-family: DejaVuSans;
+                font-weight: bold;
+                }
+                h2 {
+                font-family: DejaVuSans;
+                font-weight: bold;
+                }
+                h3 {
+                font-family: DejaVuSans;
+                font-weight: bold;
+                }
+                h4 {
+                font-family: DejaVuSans;
+                font-weight: bold;
+
+                }
+                """
+        else:
+            font = """{
+                font-family: Calibri;
+                src: url('../fonts/Calibrib.ttf');
+                }
+
+                body {
+                font-family: Calibri;
+                font-weight: bold;
+                }
+                h1 {
+                font-family: Calibri;
+                font-weight: bold;
+                }
+                h2 {
+                font-family: Calibri;
+                font-weight: bold;
+                }
+                h3 {
+                font-family: Calibri;
+                font-weight: bold;
+                }
+                h4 {
+                font-family: Calibri;
+                font-weight: bold;
+
+                }
+                """
+        if sys.platform == "linux":
+            src = "icons/"
+        else:
+            src = "../icons/"
 
         sourceHtml = f"""<html>
         
@@ -761,7 +794,7 @@ class add_task_window:
         </style>
         <body>
         <font size = "5"> 
-        <img style="float: right;" src="../icons/logo-small-orange.png" alt="" width="200" height="143" />
+        <img style="float: right;" src="{src}logo-small-orange.png" alt="" width="200" height="143" />
 <h2 style="text-align: center;"><span style="text-decoration: underline;">&Delta;&epsilon;&lambda;&tau;ί&omicron;&nbsp;&tau;&epsilon;&chi;&nu;&iota;&kappa;ή&sigmaf;&nbsp;&epsilon;&xi;&upsilon;&pi;&eta;&rho;έ&tau;&eta;&sigma;&eta;&sigmaf;</span></h2>
 <table style="width: 765px; height: 120px; border-color: black; margin-left: auto; margin-right: auto;" border="1">
 <tbody>
@@ -856,8 +889,13 @@ class add_task_window:
         """
 
         convertHtmlToPdf(sourceHtml, outputFilename)
+        if sys.platform == "linux":
+            # outputFilename.replace(" ", "")
 
-        subprocess.Popen(outputFilename, shell=True)
+            os.system("okular " + outputFilename)
+
+        else:
+            subprocess.Popen(outputFilename, shell=True)
         self.printed = 1
 
     def get_screen_shot(self):
@@ -875,10 +913,10 @@ class add_task_window:
         # logo.save("prints/logo-small-orange.png")
 
         # Define your data
-        prints_dir = f'prints/{today}'
+        prints_dir = f'prints/{today}'.replace(" ", "_")
         if not os.path.exists(prints_dir):
             os.makedirs(prints_dir)
-        outputFilename = f"{prints_dir}/Service Book {self.selected_customer}  {today}  .pdf"
+        outputFilename = f"{prints_dir}/Service Book {self.selected_customer} {today}.pdf".replace(" ", "_")
 
         # Utility function
         def convertHtmlToPdf(sourceHtml, outputFilename):
@@ -894,9 +932,41 @@ class add_task_window:
 
             # return True on success and False on errors
             return pisaStatus.err
-            # Αν γράψουμε νέο φωτοτυπικό και όχι απο την λίστα
 
-        font = """{
+        if sys.platform == "linux":
+            src = "icons/"
+            src_images = "prints/"
+            font = """{
+                font-family: DejaVuSans;
+                src: url('fonts/DejaVuSans-Bold.ttf');
+                }
+
+                body {
+                font-family: DejaVuSans;
+                font-weight: bold;
+                }
+                h1 {
+                font-family: DejaVuSans;
+                font-weight: bold;
+                }
+                h2 {
+                font-family: DejaVuSans;
+                font-weight: bold;
+                }
+                h3 {
+                font-family: DejaVuSans;
+                font-weight: bold;
+                }
+                h4 {
+                font-family: DejaVuSans;
+                font-weight: bold;
+
+                }
+                """
+        else:
+            src = "../icons/"
+            src_images = "../prints/"
+            font = """{
                     font-family: Calibri;
                     src: url('../fonts/Calibrib.ttf');
                     }
@@ -931,8 +1001,8 @@ class add_task_window:
                 @font-face {font}
                 </style> 
     <font size = "5">
-                <h1 style="text-align: center;"><img style="float: right;" src="../icons/logo-small-orange.png" alt="" width="200" height="143" /></h1>
-                <h1 style="text-align: center;"><img style="float: right;" src="../prints/screen_shot.png" alt="" /></h1>
+                <h1 style="text-align: center;"><img style="float: right;" src="{src}logo-small-orange.png" alt="" width="200" height="143" /></h1>
+                <h1 style="text-align: center;"><img style="float: right;" src="{src_images}screen_shot.png" alt="" /></h1>
 
 
     </font>
@@ -940,7 +1010,10 @@ class add_task_window:
                 """
 
         convertHtmlToPdf(sourceHtml, outputFilename)
-        subprocess.Popen(outputFilename, shell=True)
+        if sys.platform == "linux":
+            os.system("okular " + outputFilename)
+        else:
+            subprocess.Popen(outputFilename, shell=True)
 
     # Αποστολή email
     def send_mail(self):

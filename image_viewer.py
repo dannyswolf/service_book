@@ -34,7 +34,8 @@ def vp_start_gui():
 
 
 w = None
-
+selected_service_ID = None
+images_path = None
 
 def create_Toplevel1(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
@@ -158,7 +159,10 @@ class Toplevel1:
             self.image_label.image = photo
 
         else:
-            subprocess.Popen(self.images_path + self.filenames[self.index], shell=True)
+            if sys.platform == "linux":
+                os.system("okular " + str(self.images_path + self.filenames[self.index]))
+            else:
+                subprocess.Popen(self.images_path + self.filenames[self.index], shell=True)
 
         # Αποθύκευση
         self.save_btn = tk.Button(top)
@@ -283,8 +287,10 @@ class Toplevel1:
 
                 self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index] +
                                                      "  Μέγεθος: " + self.image_size)
-
-                subprocess.Popen([self.images_path + self.filenames[self.index]], shell=True)
+                if sys.platform == "linux":
+                    os.system("okular " + str([self.images_path + self.filenames[self.index]]))
+                else:
+                    subprocess.Popen([self.images_path + self.filenames[self.index]], shell=True)
 
         except FileNotFoundError:
             messagebox.showinfo("Προσοχή", "Το αρχείο δεν βρέθηκε")
@@ -339,8 +345,11 @@ class Toplevel1:
 
                 self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index] +
                                                      "  Μέγεθος: " + self.image_size)
+                if sys.platform == "linux":
+                    os.system("okular " + str([self.images_path + self.filenames[self.index]]))
+                else:
+                    subprocess.Popen([self.images_path + self.filenames[self.index]], shell=True)
 
-                subprocess.Popen([self.images_path + self.filenames[self.index]], shell=True)
 
         except FileNotFoundError:
             messagebox.showinfo("Προσοχή", "Το αρχείο δεν βρέθηκε")

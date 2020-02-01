@@ -9,19 +9,27 @@ user = getpass.getuser()
 
 mlshop = 0
 
+
 if mlshop:
-    # ML Shop dbases
-    dbase = "\\\\192.168.1.200\\Public\\DROPBOX\\ΕΓΓΡΑΦΑ\\6.  ΒΙΒΛΙΟ SERVICE\\Service_book.db"
-    spare_parts_db = "\\\\192.168.1.200\\Public\\DROPBOX\\ΕΓΓΡΑΦΑ\\2.  ΑΠΟΘΗΚΗ\\3. ΚΑΙΝΟΥΡΙΑ_ΑΠΟΘΗΚΗ.db"
+    if sys.platform == "linux":
+        # ML Shop dbases Linux
+        dbase = "/home/dannys/qnap/DROPBOX/ΕΓΓΡΑΦΑ/6.  ΒΙΒΛΙΟ SERVICE/Service_book.db"
+        spare_parts_db = "/home/dannys/qnap/DROPBOX/ΕΓΓΡΑΦΑ/2.  ΑΠΟΘΗΚΗ/3. ΚΑΙΝΟΥΡΙΑ_ΑΠΟΘΗΚΗ.db"
+    else:
+        # ML Shop dbases
+        dbase = "\\\\192.168.1.200\\Public\\DROPBOX\\ΕΓΓΡΑΦΑ\\6.  ΒΙΒΛΙΟ SERVICE\\Service_book.db"
+        spare_parts_db = "\\\\192.168.1.200\\Public\\DROPBOX\\ΕΓΓΡΑΦΑ\\2.  ΑΠΟΘΗΚΗ\\3. ΚΑΙΝΟΥΡΙΑ_ΑΠΟΘΗΚΗ.db"
 
 else:
-    spare_parts_db = "3. ΚΑΙΝΟΥΡΙΑ_ΑΠΟΘΗΚΗ.db"
+    spare_parts_db = "ΑΠΟΘΗΚΗ.db"
     dbase = "Service_book.db"  # Local Dbase
 
-service_book_version = "V 1.5.2 ML Shop"
 
 demo = 0  # 0 Demo Disabled 1 Demo enabled
-
+if demo:
+    service_book_version = "V 1.5.6 Demo"
+else:
+    service_book_version = "V 1.5.6 ML Shop"
 # -------------------------------- Email -------------------------------------------
 smtp_server = "smtp.gmail.com"
 ssl_port = 465  # For SSL
@@ -45,7 +53,7 @@ except:
 
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE και Ημερομηνία ------------------
 
-log_dir = "logs" + "\\" + today + "\\"
+log_dir = "logs" + "/" + today + "/"
 if not os.path.exists(log_dir):
     os.makedirs(log_dir)
 else:
