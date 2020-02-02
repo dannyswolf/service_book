@@ -7,10 +7,11 @@
 
 import add_copier_support
 import sys
-from tkinter import messagebox, StringVar
+from tkinter import messagebox, StringVar, filedialog
 import sqlite3
 from settings import dbase, root_logger, spare_parts_db  # settings
-
+import os
+import view_images_from_repository
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
@@ -87,6 +88,9 @@ class add_copier_window:
         self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
 
         self.table = table
+        self.files = ""
+        self.len_images = ""
+        self.id = ""
         self.top = top
         top.geometry("505x524+444+228")
         top.minsize(120, 1)
@@ -220,6 +224,41 @@ class add_copier_window:
         self.pieces_entry.configure(selectbackground="#c4c4c4")
         self.pieces_entry.configure(selectforeground="black")
 
+        # Προσθήκη αρχείων
+        self.add_files_btn = tk.Button(top)
+        self.add_files_btn.place(relx=0.025, rely=0.410, height=50, relwidth=0.350)
+        self.add_files_btn.configure(activebackground="#ececec")
+        self.add_files_btn.configure(activeforeground="#000000")
+        self.add_files_btn.configure(background="green")
+        self.add_files_btn.configure(disabledforeground="#a3a3a3")
+        self.add_files_btn.configure(foreground="#ffffff")
+        self.add_files_btn.configure(highlightbackground="#d9d9d9")
+        self.add_files_btn.configure(highlightcolor="black")
+        self.add_files_btn.configure(pady="0")
+        self.add_files_btn.configure(text='''Προσθήκη αρχείων''')
+        self.add_files_btn.configure(command=self.add_files)
+        self.add_files_btn_img = tk.PhotoImage(file="icons/add_files.png")
+        self.add_files_btn.configure(image=self.add_files_btn_img)
+        self.add_files_btn.configure(compound="left")
+
+        # Αρχεία
+        self.show_files_btn = tk.Button(top)
+        # self.show_files_btn.place(relx=0.420, rely=0.410, height=50, relwidth=0.350)
+        self.show_files_btn.configure(activebackground="#ececec")
+        self.show_files_btn.configure(activeforeground="#000000")
+        self.show_files_btn.configure(background="#6b6b6b")
+        self.show_files_btn.configure(disabledforeground="red")
+        self.show_files_btn.configure(foreground="#ffffff")
+        self.show_files_btn.configure(highlightbackground="#d9d9d9")
+        self.show_files_btn.configure(highlightcolor="black")
+        self.show_files_btn.configure(pady="0")
+        self.show_files_btn.configure(text=f'Προβολή {self.len_images} αρχείων')
+
+        self.show_files_btn.configure(command=self.show_files)
+        self.show_files_btn_img = tk.PhotoImage(file="icons/view_files.png")
+        self.show_files_btn.configure(image=self.show_files_btn_img)
+        self.show_files_btn.configure(compound="left")
+
         self.TSeparator1 = ttk.Separator(top)
         self.TSeparator1.place(relx=0.025, rely=0.553, relwidth=0.938)
 
@@ -277,9 +316,97 @@ class add_copier_window:
         self.Label2.configure(highlightcolor="black")
         self.Label2.configure(relief="groove")
         self.Label2.configure(text=f'''Εισαγωγή ανταλλακτικού {self.table}''')
+        self.get_next_id()
 
     def quit(self, event):
         self.top.destroy()
+
+    def get_next_id(self):
+        con = sqlite3.connect(spare_parts_db)
+        c = con.cursor()
+        c.execute("SELECT seq FROM sqlite_sequence WHERE NAME =?", (self.table,))
+        data = c.fetchall()
+
+        next_id = data[0][0]
+        self.id = str(self.table) + "_" + str(int(next_id) + 1)
+
+
+    # Ελεγχος αν υπάρχουν αρχεία για προβολή
+    def check_if_files_exists(self):
+
+        con = sqlite3.connect(spare_parts_db)
+        cursor = con.cursor()
+        cursor.execute("SELECT * FROM Images WHERE ID =?", (self.id,))
+        images = cursor.fetchall()
+
+        self.len_images = len(images)
+        self.show_files_btn.configure(text=f'Προβολή {self.len_images}\nαρχείων')
+        cursor.close()
+        con.close()
+        if self.files:
+            self.show_files_btn.place(relx=0.420, rely=0.410, height=50, relwidth=0.350)
+            self.show_files_btn.configure(command=self.show_files)
+        elif not images:  # αδεια λιστα δλδ δεν υπάρχουν αρχεια και απενεργοποιουμε το κουμπί προβολή αρχείων
+            self.show_files_btn.place_forget()
+
+    # Προβολή αρχείων
+    def show_files(self):
+        view_images_from_repository.create_Toplevel1(w, self.id, spare_parts_db)
+
+    # Προσθήκη αρχείων
+    def add_files(self):
+
+        self.files = filedialog.askopenfilenames(initialdir=os.getcwd(), title="Επιλογή αρχείων για προσθήκη",
+                                                     filetypes=[("Υπ. αρχεία", "*.jpg *.png *.pdf")])
+
+        if self.files == "":  # αν ο χρήστης επιλεξει ακυρο
+
+            return
+        else:
+            self.add_files_to_db()
+            self.show_files_btn.configure(text=f'{len(self.files)} Αρχεία για προσθήκη')
+            self.check_if_files_exists()
+
+    # Προσθήκη αρχείων στην βάση
+    def add_files_to_db(self):
+        if self.files == "":
+            return
+        con = sqlite3.connect(spare_parts_db)
+        cursor = con.cursor()
+        cursor.execute("SELECT Filename FROM Images WHERE ID =?", (self.id,))
+        # υπάρχοντα αρχεία
+        images = cursor.fetchall()
+
+        cursor.close()
+        con.close()
+
+        con = sqlite3.connect(spare_parts_db)
+        cu = con.cursor()
+
+        # Εισαγωγη αρχείων
+        for img in self.files:
+
+            base = os.path.basename(img)
+            filename, ext = os.path.splitext(base)
+            # Ελεγχος αν το αρχείο υπάρχει σε αυτο το προιόν
+            try:
+                if filename in images[0]:
+                    messagebox.showerror("img!",
+                                             f'Το αρχείο {filename} υπάρχει.\nΠαρακαλώ αλλάξτε όνομα ή επιλεξτε διαφορετικό αρχείο')
+                    return
+            except IndexError:  # Όταν δεν υπάρχουν αρχεία
+                pass
+            with open(img, 'rb') as f:
+                file = f.read()  # Εισαγωγη αρχείων
+                file_size = len(file)  # μεγεθος σε bytes
+
+                cu.execute("INSERT INTO Images(ID, Filename, Type, File_size, File, ΚΩΔΙΚΟΣ)"
+                               "VALUES(?,?,?,?,?,?)", (self.id, filename, ext, file_size, sqlite3.Binary(file),
+                                                       self.code.get()))
+
+        con.commit()
+        con.close()
+        self.check_if_files_exists()
 
     # Ελεγχος αν το serial  υπάρχει
     def check_code(self, name, index, mode):
@@ -306,9 +433,7 @@ class add_copier_window:
             self.code_entry.configure(foreground="green")
             self.code_entry_warning.place_forget()
 
-
     def add_spare_part(self):
-
         conn = sqlite3.connect(spare_parts_db)
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM " + self.table + ";")

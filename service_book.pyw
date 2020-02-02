@@ -15,6 +15,10 @@ todo Αποθήκη για τα ανταλλακτικά που εισάγουμ
 todo να μπει στις σημειώσεις πότε ενεργοποίθηκε/απενεργοποίθηκε φωτοτυπικό και πελάτης
 todo uniq (στα πεδία των πινακων στην βαση) στους κωδικους και part_nr serial ονοματεπωνυμο τηλ
 
+V1.5.7 Προσθήκη αρχείων στα ανταλλακτικά -------------- -------------- -------------02/02/2020
+
+V1.5.6 Fix prints on linux need okular ---------------- -------------- -------------31/01/2020
+
 V1.5.5 Backup Αποθήκης ------------- ------------------ -------------- -------------31/01/2020
 
 V1.5.4 Αναζήτηση ΔΤΕ και στο Service ------------------ -------------- -------------31/01/2020
@@ -332,7 +336,7 @@ def get_tables():
     """
         Αποκόμιση  πινάκων απο την βάση δεδομένων
     """
-    no_needed_tables = ['ΠΡΩΤΟΣ_ΟΡΟΦΟΣ', "ΧΧΧ", "sqlite_sequence"]
+    no_needed_tables = ['ΠΡΩΤΟΣ_ΟΡΟΦΟΣ', "ΧΧΧ", "sqlite_sequence", "Images"]
     con = sqlite3.connect(spare_parts_db)
     c = con.cursor()
     c.execute("select name from sqlite_master where type = 'table' ORDER BY name;")
@@ -1503,11 +1507,25 @@ class Toplevel1:
         con = sqlite3.connect(spare_parts_db)
         c = con.cursor()
         try:
-            c.execute(" CREATE TABLE IF NOT EXISTS " + table_to_add +
-                   " (ID INTEGER PRIMARY KEY, PARTS_NR TEXT, ΠΕΡΙΓΡΑΦΗ TEXT, ΚΩΔΙΚΟΣ TEXT, ΤΕΜΑΧΙΑ TEXT, "
+            # Ελεγχος αν το όνομα εταιρείας που εισάγει ο χρήστης είναι κεφαλαία
+            for letter in table_to_add:
+                if str(letter).islower():
+                    messagebox.showerror("Σφάλμα!", "Παρακαλώ μόνο κεφαλαία γράμματα")
+                    return
+            c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table_to_add,))
+            table_exist = c.fetchall()
+
+            if table_exist:
+                messagebox.showerror("Σφάλμα", f'Η εταιρεία {table_exist[0][0]} υπάρχει')
+                return
+            else:
+                c.execute(" CREATE TABLE IF NOT EXISTS " + table_to_add +
+                   " (ID INTEGER PRIMARY KEY AUTOINCREMENT, PARTS_NR TEXT, ΠΕΡΙΓΡΑΦΗ TEXT, ΚΩΔΙΚΟΣ TEXT, ΤΕΜΑΧΙΑ TEXT, "
                    "ΠΑΡΑΤΗΡΗΣΗΣ text); ")
-        except sqlite3.OperationalError:
-            messagebox.showerror("Σφάλμα!", "Το όνομα της εταιρείας πρέπει να είναι χωρίς κενά")
+
+                c.execute("INSERT INTO sqlite_sequence(name, seq)VALUES(?,?)", (table_to_add, 0))
+        except sqlite3.OperationalError as error:
+            messagebox.showerror("Σφάλμα!", f"{error}")
             return
         con.commit()
         con.close()
