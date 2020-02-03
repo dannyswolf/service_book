@@ -500,11 +500,8 @@ class add_copier_window:
                 all_headers.append(head + " = ?")
         columns = ", ".join(all_headers)
 
-
-
         sql_insert = "UPDATE " + self.table + " SET " + columns + " WHERE ID = ? "
-        print("columns", columns)
-        print("data", data)
+
         cursor.execute(sql_insert, tuple(data))
         conn.commit()
         conn.close()
@@ -520,6 +517,9 @@ class add_copier_window:
             con = sqlite3.connect(spare_parts_db)
             c = con.cursor()
             c.execute("DELETE FROM " + self.table + " WHERE ID =?", (self.spare_part_id,))
+            # Διαγαφή εικόνων του προιόντος
+            image_id_to_delete = self.table + "_" + self.spare_part_id
+            c.execute("DELETE FROM Images WHERE ID =?", (image_id_to_delete,))
             con.commit()
             con.close()
             messagebox.showwarning("Προσοχή!", f'Το προιόν με κωδικό {self.spare_part_code} διαγράφηκε παρακαλώ ανανεώστε')

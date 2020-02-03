@@ -47,7 +47,9 @@ def vp_start_gui():
 
 
 w = None
-
+selected_service_ID = None
+images_path = None
+dbase = None
 
 def create_Toplevel1(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
@@ -381,7 +383,7 @@ class Toplevel1:
     def del_from_db(self):
         con = sqlite3.connect(dbase)
         cur = con.cursor()
-        cur.execute("DELETE FROM Images WHERE Filename =?", (self.image,))
+        cur.execute("DELETE FROM Images WHERE ID =?", (self.selected_service_ID,))
         con.commit()
         cur.close()
         con.close()

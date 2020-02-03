@@ -125,6 +125,7 @@ class add_copier_window:
         self.old_customer_label.configure(relief="groove")
         self.old_customer_label.configure(text='''Από πελάτη''')
 
+
         # self.get_copiers_btn = tk.Button(top)
         # self.get_copiers_btn.place(relx=0.885, rely=0.095, height=30, relwidth=0.060)
         # self.get_copiers_btn.configure(background="#006291")
@@ -233,9 +234,7 @@ class add_copier_window:
         self.copiers_combobox.place(relx=0.27, rely=0.172, relheight=0.057, relwidth=0.593)
         self.copiers_combobox.configure(values="")
         self.copiers_combobox.configure(takefocus="")
-        # self.copiers_combobox.configure(state="readonly")
-
-
+        self.copiers_combobox.configure(state="readonly")
 
         self.Label2 = tk.Label(top)
         self.Label2.place(relx=0.025, rely=0.019, height=31, relwidth=0.840)
@@ -284,11 +283,13 @@ class add_copier_window:
         self.customer_combobox.configure(values=self.customers_list)
         self.customer_combobox.configure(takefocus="")
         self.customer_combobox.bind("<<ComboboxSelected>>", self.get_copier)
+        self.customer_combobox.configure(state="readonly")
 
         self.new_customer_combobox = ttk.Combobox(top)
         self.new_customer_combobox.place(relx=0.27, rely=0.324, relheight=0.059, relwidth=0.593)
         self.new_customer_combobox.configure(values=self.customers_list)
         self.new_customer_combobox.configure(takefocus="")
+        self.new_customer_combobox.configure(state='readonly')
 
         self.notes_label = tk.Label(top)
         self.notes_label.place(relx=0.025, rely=0.430, height=31, relwidth=0.840)
@@ -381,7 +382,22 @@ class add_copier_window:
 
         # ενημέρωση το πεδίο Πελάτη_ID του φωτοτυπικού με το ID του νέου πελάτη
         # ("UPDATE Service  SET " + edited_culumns + " WHERE ID=? ", (tuple(data_to_add)))
+
         cursor.execute("UPDATE Φωτοτυπικά SET Πελάτη_ID =? WHERE ID=? ", (new_customer_id, copier_id,))
+        # ενημέρωση παλιου πελάτη
+        cursor.execute("SELECT Σημειώσεις FROM Πελάτες  WHERE Επωνυμία_Επιχείρησης=?", (self.customer_combobox.get(),))
+        old_notes = cursor.fetchall()
+        new_data_to_log = str(old_notes[0][0]) + "\n" + today + "--- Μεταφορά μηχανήματος --- " + \
+                          f'{self.copiers_combobox.get()} στον πελάτη {self.new_customer_combobox.get()}'
+        cursor.execute("UPDATE Πελάτες  SET Σημειώσεις = ? WHERE Επωνυμία_Επιχείρησης=?", (new_data_to_log,
+                                                                                           self.customer_combobox.get()))
+        # ενημέρωση νεου πελάτη
+        cursor.execute("SELECT Σημειώσεις FROM Πελάτες  WHERE Επωνυμία_Επιχείρησης=?", (self.new_customer_combobox.get(),))
+        old_notes = cursor.fetchall()
+        new_data_to_log = str(old_notes[0][0]) + "\n" + today + "--- Μεταφορά μηχανήματος --- " + \
+                          f'{self.copiers_combobox.get()} απο τον πελάτη {self.customer_combobox.get()}'
+        cursor.execute("UPDATE Πελάτες  SET Σημειώσεις = ? WHERE Επωνυμία_Επιχείρησης=?", (new_data_to_log,
+                                                                                           self.new_customer_combobox.get()))
         con.commit()
         con.close()
 

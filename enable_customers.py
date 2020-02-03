@@ -8,7 +8,9 @@
 import sys
 import sqlite3
 from tkinter import StringVar, messagebox
-from settings import dbase, root_logger  # settings
+from tkinter.scrolledtext import ScrolledText
+
+from settings import dbase, root_logger, today  # settings
 
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
 sys.stderr.write = root_logger.error
@@ -102,7 +104,7 @@ class Toplevel1:
         self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#69ab3a")])
         self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
         self.top = top
-        top.geometry("900x400+480+276")
+        top.geometry("900x550+480+276")
         top.minsize(120, 1)
         top.maxsize(1604, 881)
         top.resizable(1, 1)
@@ -115,7 +117,7 @@ class Toplevel1:
 
         # Επιλογή απενεργοποιημένου πελάτη
         self.select_customer_label = tk.Label(top)
-        self.select_customer_label.place(relx=0.017, rely=0.146, height=30, relwidth=0.244)
+        self.select_customer_label.place(relx=0.017, rely=0.146, height=25, relwidth=0.244)
         self.select_customer_label.configure(activebackground="#f9f9f9")
         self.select_customer_label.configure(activeforeground="black")
         self.select_customer_label.configure(background="#994d33")
@@ -128,11 +130,12 @@ class Toplevel1:
 
         # Εμφάνηση απενεργοποιημένων πελατών
         self.customer_combobox = ttk.Combobox(top)
-        self.customer_combobox.place(relx=0.275, rely=0.146, relheight=0.063, relwidth=0.500)
+        self.customer_combobox.place(relx=0.275, rely=0.146, height=25, relwidth=0.500)
         self.customer_combobox.configure(values=self.customers)
         # self.actions_combobox.configure(textvariable=edit_service_window_support.combobox)
         self.customer_combobox.bind("<<ComboboxSelected>>", self.get_customers_data)
         self.customer_combobox.configure(takefocus="")
+        self.customer_combobox.configure(state='readonly')
 
         self.Label1 = tk.Label(top)
         self.Label1.place(relx=0.017, rely=0.246, height=20, relwidth=0.244)
@@ -397,7 +400,7 @@ class Toplevel1:
         self.place_entry.configure(selectforeground="black")
 
         self.Label13 = tk.Label(top)
-        self.Label13.place(relx=0.017, rely=0.714, height=21, relwidth=0.244)
+        self.Label13.place(relx=0.017, rely=0.680, height=21, relwidth=0.244)
         self.Label13.configure(activebackground="#f9f9f9")
         self.Label13.configure(activeforeground="black")
         self.Label13.configure(background="#2f42f0")
@@ -409,7 +412,7 @@ class Toplevel1:
         self.Label13.configure(text='''Σελίδες Πακέτου''')
 
         self.Label14 = tk.Label(top)
-        self.Label14.place(relx=0.568, rely=0.714, height=21, relwidth=0.170)
+        self.Label14.place(relx=0.568, rely=0.680, height=21, relwidth=0.170)
         self.Label14.configure(activebackground="#f9f9f9")
         self.Label14.configure(activeforeground="black")
         self.Label14.configure(background="#2f42f0")
@@ -421,7 +424,7 @@ class Toplevel1:
         self.Label14.configure(text='''Κόστος Πακέτου''')
 
         self.page_package_entry = tk.Entry(top)
-        self.page_package_entry.place(relx=0.275, rely=0.714, height=20
+        self.page_package_entry.place(relx=0.275, rely=0.680, height=20
                                       , relwidth=0.280)
         self.package = StringVar()
         self.page_package_entry.configure(textvariable=self.package)
@@ -436,8 +439,7 @@ class Toplevel1:
         self.page_package_entry.configure(selectforeground="black")
 
         self.package_cost_entry = tk.Entry(top)
-        self.package_cost_entry.place(relx=0.757, rely=0.714, height=20
-                                      , relwidth=0.217)
+        self.package_cost_entry.place(relx=0.757, rely=0.680, height=20, relwidth=0.217)
         self.cost = StringVar()
         self.package_cost_entry.configure(textvariable=self.cost)
         self.package_cost_entry.configure(background="white")
@@ -450,8 +452,33 @@ class Toplevel1:
         self.package_cost_entry.configure(selectbackground="#c4c4c4")
         self.package_cost_entry.configure(selectforeground="black")
 
+        self.notes_label = tk.Label(top)
+        self.notes_label.place(relx=0.017, rely=0.740, height=25, relwidth=0.980)
+        self.notes_label.configure(activebackground="#f9f9f9")
+        self.notes_label.configure(activeforeground="black")
+        self.notes_label.configure(background="#6b6b6b")
+        self.notes_label.configure(disabledforeground="#a3a3a3")
+        self.notes_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.notes_label.configure(foreground="#ffffff")
+        self.notes_label.configure(highlightbackground="#d9d9d9")
+        self.notes_label.configure(highlightcolor="black")
+        self.notes_label.configure(relief="groove")
+        self.notes_label.configure(text='''Σημειώσεις''')
+        self.customer_notes_scrolledtext = ScrolledText(top)
+        self.customer_notes_scrolledtext.place(relx=0.017, rely=0.790, relheight=0.130, relwidth=0.980)
+        self.customer_notes_scrolledtext.configure(background="white")
+        self.customer_notes_scrolledtext.configure(font="TkTextFont")
+        self.customer_notes_scrolledtext.configure(foreground="black")
+        self.customer_notes_scrolledtext.configure(highlightbackground="#d9d9d9")
+        self.customer_notes_scrolledtext.configure(highlightcolor="black")
+        self.customer_notes_scrolledtext.configure(insertbackground="black")
+        self.customer_notes_scrolledtext.configure(insertborderwidth="3")
+        self.customer_notes_scrolledtext.configure(selectbackground="#c4c4c4")
+        self.customer_notes_scrolledtext.configure(selectforeground="black")
+        self.customer_notes_scrolledtext.configure(wrap="none")
+
         self.add_btn = tk.Button(top)
-        self.add_btn.place(relx=0.344, rely=0.850, height=34, relwidth=0.250)
+        self.add_btn.place(relx=0.344, rely=0.930, height=34, relwidth=0.250)
         self.add_btn.configure(activebackground="#ececec")
         self.add_btn.configure(activeforeground="#000000")
         self.add_btn.configure(background="#339933")
@@ -465,10 +492,10 @@ class Toplevel1:
         self.add_btn.configure(command=self.add_to_db)
 
         self.TSeparator1 = ttk.Separator(top)
-        self.TSeparator1.place(relx=0.017, rely=0.685, relwidth=0.955)
+        self.TSeparator1.place(relx=0.017, rely=0.665, relwidth=0.955)
 
         self.Label11 = tk.Label(top)
-        self.Label11.place(relx=0.017, rely=0.058, height=21, relwidth=0.955)
+        self.Label11.place(relx=0.017, rely=0.058, height=35, relwidth=0.955)
         self.Label11.configure(background="#994d33")
         self.Label11.configure(disabledforeground="#a3a3a3")
         self.Label11.configure(foreground="#ffffff")
@@ -529,15 +556,25 @@ class Toplevel1:
         self.cost = StringVar(value=data[12])
         self.package_cost_entry.configure(textvariable=self.cost, state="readonly")
 
+        var = StringVar(value=data[13])
+        self.customer_notes_scrolledtext.insert("1.0", var.get())
+        self.customer_notes_scrolledtext.configure(state='disabled')
+
     def add_to_db(self):
 
         conn = sqlite3.connect(dbase)
         cursor = conn.cursor()
         cursor.execute("UPDATE Πελάτες SET Κατάσταση =1 WHERE Επωνυμία_Επιχείρησης=?", (self.customer_combobox.get(),))
+        cursor.execute("SELECT Σημειώσεις FROM Πελάτες  WHERE Επωνυμία_Επιχείρησης=?", (self.customer_combobox.get(),))
+        old_notes = cursor.fetchall()
+        new_data_to_log = str(old_notes[0][0]) + "\n" + today + "*********** Ενεργοποιήση πελάτη *********** "
+        cursor.execute("UPDATE Πελάτες  SET Σημειώσεις = ? WHERE Επωνυμία_Επιχείρησης=?", (new_data_to_log,
+                                                                                           self.customer_combobox.get()))
 
         conn.commit()
         conn.close()
-        messagebox.showinfo("Info", f"Ο πελάτης {self.company_name.get()} ενεργοποιήθηκε επιτυχώς")
+        messagebox.showinfo("Info", f"Ο πελάτης {self.company_name.get()} "
+                                    f"ενεργοποιήθηκε επιτυχώς\nΠαρακαλώ ανανεώστε την λίστα πελατών")
         self.top.destroy()
         return None
 

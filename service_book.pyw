@@ -11,9 +11,14 @@
 todo αν ο χρήστης πατήση ακυρο κατα την προσθήκη επισκευής τι θα γίνει με τα ανταλλακτικα που έχουν οριστεί με νεο service_id
 todo προβολή όλων των εικόνων
 todo start day to binary file
-todo Αποθήκη για τα ανταλλακτικά που εισάγουμε στο local version
-todo να μπει στις σημειώσεις πότε ενεργοποίθηκε/απενεργοποίθηκε φωτοτυπικό και πελάτης
 todo uniq (στα πεδία των πινακων στην βαση) στους κωδικους και part_nr serial ονοματεπωνυμο τηλ
+
+V1.6.0 Log on customer when machine transported ------ ---------------------------03/02/2020
+todo να μπει στις σημειώσεις πότε ενεργοποίθηκε/απενεργοποίθηκε φωτοτυπικό και πελάτης -- Done
+
+V1.5.9 Διαγραφή εταιρείας απο αποθήκη ---------------- ---------------------------03/02/2020
+
+V1.5.8 Διαγραφή εικόνων μετά την διαγραφή ανταλλακτικού ------------- -------------03/02/2020
 
 V1.5.7 Προσθήκη αρχείων στα ανταλλακτικά -------------- -------------- -------------02/02/2020
 
@@ -45,6 +50,7 @@ V1.4.7 Προσθήκη ανταλλακτικών εκτός αποθήκης  
 fix bug οταν προσθέταμε νέο φωτοτυπικό απο add_task
 
 V1.4.6 Προσθήκη αποθήκης στο κεντρικό παράθυρο  ----------------------------------------25/01/2020
+todo Αποθήκη για τα ανταλλακτικά που εισάγουμε στο local version  -- Done
 
 V1.4.5 Προσθήκη πελάτη στο παράθυρο add_task  ------------------------------------------25/01/2020
 Fix εμφάνηση φωτοτυπικών όταν αλλάζουμε πελάτη στο edit_task
@@ -608,6 +614,16 @@ class Toplevel1:
         self.add_table_entry_warning.configure(image=self.add_table_entry_warning_img)
         self.add_table_entry_warning.configure(text=f"{self.add_table_entry.get()} υπάρχει")
         self.add_table_entry_warning.configure(compound='left')
+
+        self.del_table_from_repository_btn = tk.Button(self.repository_frame)
+        # self.del_table_from_repository_btn.place(relx=0.815, rely=0.170, relheight=0.080, relwidth=0.200)
+        self.del_table_from_repository_btn.configure(background="#6b6b6b")
+        self.del_table_from_repository_btn.configure(foreground="white")
+        self.del_table_from_repository_btn_img = PhotoImage(file="icons/delete_table_from_repository.png")
+        self.del_table_from_repository_btn.configure(image=self.del_table_from_repository_btn_img)
+        self.del_table_from_repository_btn.configure(text="Διαγραφή εταιρείας")
+        self.del_table_from_repository_btn.configure(compound="left")
+        self.del_table_from_repository_btn.configure(command=self.del_table_from_repository)
 
         self.search_on_repository_stringvar = StringVar()
         self.search_on_repository_entry = tk.Entry(self.repository_frame, textvariable=self.search_on_repository_stringvar)
@@ -1502,6 +1518,7 @@ class Toplevel1:
 
         self.get_calendar()
 
+    # Προσθήκη εταιρείας στην αποθήκη ανταλλακτικών repository
     def add_table(self):
         table_to_add = self.add_table_entry.get()
         con = sqlite3.connect(spare_parts_db)
@@ -1517,6 +1534,7 @@ class Toplevel1:
 
             if table_exist:
                 messagebox.showerror("Σφάλμα", f'Η εταιρεία {table_exist[0][0]} υπάρχει')
+                con.close()
                 return
             else:
                 c.execute(" CREATE TABLE IF NOT EXISTS " + table_to_add +
@@ -1526,6 +1544,7 @@ class Toplevel1:
                 c.execute("INSERT INTO sqlite_sequence(name, seq)VALUES(?,?)", (table_to_add, 0))
         except sqlite3.OperationalError as error:
             messagebox.showerror("Σφάλμα!", f"{error}")
+            con.close()
             return
         con.commit()
         con.close()
@@ -1534,10 +1553,28 @@ class Toplevel1:
         self.repository_company_combobox.configure(values=self.companies)
         return
 
+    def del_table_from_repository(self):
+        answer = messagebox.askquestion("Προσοχή!", f'Ειστε σίγουρος για την διαγραφή της εταιρείας {self.repository_company_combobox.get()};')
+        if answer != "yes":
+            return
+        table_to_del = self.repository_company_combobox.get()
+        con = sqlite3.connect(spare_parts_db)
+        c = con.cursor()
+        c.execute(f"DROP TABLE {table_to_del}")
+        c.execute("DELETE FROM sqlite_sequence WHERE name =?", (table_to_del,))
+        con.commit()
+        c.close()
+        con.close()
+        messagebox.showinfo("Προσοχή!", f"Η εταιρεία {table_to_del} διαγράφηκε")
+        self.companies = get_tables()
+        self.repository_company_combobox.configure(values=self.companies)
+
+
     def add_spare_part_on_repository(self):
         selected_table = self.repository_company_combobox.get()
         if selected_table != "":
             add_spare_parts_to_repository.create_insert_spare_parts_window(self.top, selected_table)
+            self.top.wm_state('iconic')
         else:
             messagebox.showinfo("Προσοχή!", "Παρακαλώ επιλέξτε πρώτα εταιρεία")
             pass
@@ -1555,12 +1592,14 @@ class Toplevel1:
             if heading == "ΚΩΔΙΚΟΣ":
                 spare_part_code = (self.repository_treeview.set(self.repository_treeview.selection(), "#4"))
 
+
             else:  # αν δεν είναι ΚΩΔΙΚΟΣ το #4 πεδίο τότε είναι το #6
                 heading = self.repository_treeview.heading("#6", "text")
                 spare_part_code = (self.repository_treeview.set(self.repository_treeview.selection(), "#6"))
 
             edit_spare_parts_to_repository.create_insert_spare_parts_window(self.top, selected_table, spare_part_id,
                                                                             spare_part_code)
+            self.top.wm_state('iconic')
 
         else:
             messagebox.showinfo("Προσοχή!", "Παρακαλώ επιλέξτε πρώτα εταιρεία")
@@ -1571,6 +1610,9 @@ class Toplevel1:
         self.add_spare_part_on_repository_btn.configure(
             text=f'''Προσθήκη ανταλλακτικού {self.repository_company_combobox.get()}''')
         self.add_spare_part_on_repository_btn.place(relx=0.025, rely=0.150, height=35, relwidth=0.260)
+
+        self.del_table_from_repository_btn.configure(text=f'Διαγραφή {self.repository_company_combobox.get()}')
+        self.del_table_from_repository_btn.place(relx=0.815, rely=0.220, relheight=0.080, relwidth=0.200)
         self.selected_repository_company = self.repository_company_combobox.get()
         self.company_image.place(relx=0.690, rely=0.050, height=78, width=120)
         try:
@@ -2630,6 +2672,10 @@ class Toplevel1:
             con = sqlite3.connect(dbase)
             cu = con.cursor()
             cu.execute("UPDATE " + self.customer_table + " SET Κατάσταση = 0 WHERE  ID=?", (self.selected_customer_id,))
+            cu.execute("SELECT Σημειώσεις FROM " + self.customer_table + " WHERE ID =?", (self.selected_customer_id,))
+            old_notes = cu.fetchall()
+            new_data_to_log = str(old_notes[0][0]) + "\n" + today + "*********** Απενεργοποιήση πελάτη *********** "
+            cu.execute("UPDATE " + self.customer_table + " SET Σημειώσεις = ? WHERE  ID=?", (new_data_to_log, self.selected_customer_id))
             con.commit()
             cu.close()
             con.close()

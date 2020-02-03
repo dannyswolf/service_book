@@ -391,9 +391,9 @@ class add_copier_window:
             # Ελεγχος αν το αρχείο υπάρχει σε αυτο το προιόν
             try:
                 if filename in images[0]:
-                    messagebox.showerror("img!",
-                                             f'Το αρχείο {filename} υπάρχει.\nΠαρακαλώ αλλάξτε όνομα ή επιλεξτε διαφορετικό αρχείο')
-                    return
+                    messagebox.showerror("img!", f'Το αρχείο {filename} υπάρχει.'
+                                                 f'\nΠαρακαλώ αλλάξτε όνομα ή επιλεξτε διαφορετικό αρχείο')
+                    break
             except IndexError:  # Όταν δεν υπάρχουν αρχεία
                 pass
             with open(img, 'rb') as f:
@@ -406,7 +406,9 @@ class add_copier_window:
 
         con.commit()
         con.close()
+        self.top.focus()
         self.check_if_files_exists()
+
 
     # Ελεγχος αν το serial  υπάρχει
     def check_code(self, name, index, mode):
@@ -450,8 +452,6 @@ class add_copier_window:
                 self.pieces.get(), self.notes_scrolledtext.get('1.0', 'end-1c')]
 
         sql_insert = "INSERT INTO " + self.table + "(" + columns + ")" + "VALUES(" + values + ");"
-        print("columns", columns)
-        print("data", data)
         cursor.execute(sql_insert, tuple(data))
         conn.commit()
         conn.close()
