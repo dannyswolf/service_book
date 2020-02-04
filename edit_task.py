@@ -540,14 +540,14 @@ class edit_task_window:
 
         self.send_mail_btn = tk.Button(top)
         # self.save_btn.place(relx=0.296, rely=0.932, height=34, width=147)
-        self.send_mail_btn.place(relx=0.550, rely=0.932, relheight=0.055, relwidth=0.080)
-        self.send_mail_btn.configure(background="#006291")
+        self.send_mail_btn.place(relx=0.600, rely=0.932, relheight=0.055, relwidth=0.080)
+        # self.send_mail_btn.configure(background="#006291")
         self.send_mail_btn_img1 = PhotoImage(file="icons/send_mail.png")
         self.send_mail_btn.configure(image=self.send_mail_btn_img1)
         self.send_mail_btn.configure(command=self.send_mail)
 
         self.print_btn = tk.Button(top)
-        self.print_btn.place(relx=0.635, rely=0.932, relheight=0.055, relwidth=0.070)
+        self.print_btn.place(relx=0.845, rely=0.932, relheight=0.055, relwidth=0.070)
         # self.print_btn.configure(background="#6b6b6b")
         self.print_btn_img = PhotoImage(file="icons/print.png")
         self.print_btn.configure(image=self.print_btn_img)
@@ -747,17 +747,17 @@ class edit_task_window:
 
         # get screen shot
         self.print = tk.Button(top)
-        self.print.place(relx=0.001, rely=0.932, height=34, width=147)
+        self.print.place(relx=0.055, rely=0.934, relheight=0.050, relwidth=0.060)
         self.print.configure(activebackground="#ececec")
         self.print.configure(activeforeground="#000000")
-        self.print.configure(background="green")
+        # self.print.configure(background="green")
         self.print.configure(disabledforeground="#a3a3a3")
         self.print.configure(font=("Calibri", 12, "bold"))
         self.print.configure(foreground="#ffffff")
         self.print.configure(highlightbackground="#d9d9d9")
         self.print.configure(highlightcolor="black")
         self.print.configure(pady="2")
-        self.print.configure(text="Στιγμιότυπο pdf")
+        self.print.configure(text="")
         self.print.configure(command=self.get_screen_shot)
         self.print_img = PhotoImage(file="icons/grab_screen.png")
         self.print.configure(image=self.print_img)
@@ -962,7 +962,7 @@ class edit_task_window:
         prints_dir = f'prints/{today}'.replace(" ", "_")
         if not os.path.exists(prints_dir):
             os.makedirs(prints_dir)
-        outputFilename = f"{prints_dir}/Service Book {self.customer_combobox.get()}  {today}  .pdf".replace(" ", "_")
+        outputFilename = f"{prints_dir}/Service_Book{self.customer_combobox.get()}{today}.pdf"
 
         # Utility function
         def convertHtmlToPdf(sourceHtml, outputFilename):
@@ -1235,7 +1235,7 @@ class edit_task_window:
         prints_dir = f'prints/{today}'.replace(" ", "_")
         if not os.path.exists(prints_dir):
             os.makedirs(prints_dir)
-        outputFilename = f"{prints_dir}/Service Book {self.customer_combobox.get()} {today}.pdf".replace(" ", "_")
+        outputFilename = f"{prints_dir}/Service_Book{self.customer_combobox.get()}{today}.pdf"
 
         # Utility function
         def convertHtmlToPdf(sourceHtml, outputFilename):

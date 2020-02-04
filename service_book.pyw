@@ -13,6 +13,8 @@ todo προβολή όλων των εικόνων
 todo start day to binary file
 todo uniq (στα πεδία των πινακων στην βαση) στους κωδικους και part_nr serial ονοματεπωνυμο τηλ
 
+V1.6.1 Fix prints on windows Αλλαγή εικονιδίων  ------ ---------------------------04/02/2020
+
 V1.6.0 Log on customer when machine transported ------ ---------------------------03/02/2020
 todo να μπει στις σημειώσεις πότε ενεργοποίθηκε/απενεργοποίθηκε φωτοτυπικό και πελάτης -- Done
 
@@ -456,7 +458,8 @@ class Toplevel1:
         top.bind('<F1>', self.add_customer_event)
         top.bind('<Escape>', self.quit)
         top.bind('<F2>', self.add_copier)
-        top.iconbitmap("icons/icon.ico")
+        if sys.platform == "win32":
+            top.iconbitmap("icons/icon.ico")
 
         # ---------------------------------------Menu-----------------------------------------
         self.menubar = tk.Menu(top, font=("Calibri", 10, "bold"), bg=_bgcolor, fg=_fgcolor)

@@ -4,6 +4,7 @@ import os
 import logging
 import sys
 from urllib.request import urlopen
+import urllib.error
 from tkinter import messagebox
 user = getpass.getuser()
 
@@ -16,9 +17,11 @@ if mlshop:
         dbase = "/home/dannys/qnap/DROPBOX/ΕΓΓΡΑΦΑ/6.  ΒΙΒΛΙΟ SERVICE/Service_book.db"
         spare_parts_db = "/home/dannys/qnap/DROPBOX/ΕΓΓΡΑΦΑ/2.  ΑΠΟΘΗΚΗ/3. ΚΑΙΝΟΥΡΙΑ_ΑΠΟΘΗΚΗ.db"
     else:
+
         # ML Shop dbases
         dbase = "\\\\192.168.1.200\\Public\\DROPBOX\\ΕΓΓΡΑΦΑ\\6.  ΒΙΒΛΙΟ SERVICE\\Service_book.db"
         spare_parts_db = "\\\\192.168.1.200\\Public\\DROPBOX\\ΕΓΓΡΑΦΑ\\2.  ΑΠΟΘΗΚΗ\\3. ΚΑΙΝΟΥΡΙΑ_ΑΠΟΘΗΚΗ.db"
+
 
 else:
     spare_parts_db = "ΑΠΟΘΗΚΗ.db"
@@ -27,9 +30,9 @@ else:
 
 demo = 0  # 0 Demo Disabled 1 Demo enabled
 if demo:
-    service_book_version = "V 1.6.0 Demo"
+    service_book_version = "V 1.6.1 Demo"
 else:
-    service_book_version = "V 1.6.0 ML Shop"
+    service_book_version = "V 1.6.1 ML Shop"
 # -------------------------------- Email -------------------------------------------
 smtp_server = "smtp.gmail.com"
 ssl_port = 465  # For SSL
@@ -48,8 +51,10 @@ try:
     year = only_date[:4]
     today = day + " " + month + " " + year  # 08 01 2020
 
-except:
-    messagebox.showerror("Σφάλμα στην σύνδεση σας", "Παρακαλω ελέγξτε την σύνδεση σας στο διαδίκτυο")
+except urllib.error.URLError as error:
+
+    messagebox.showerror("Σφάλμα στην σύνδεση σας", "Παρακαλω ελέγξτε την σύνδεση σας στο διαδίκτυο ")
+    raise urllib.error.URLError(f"{error}")
 
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE και Ημερομηνία ------------------
 

@@ -553,17 +553,17 @@ class edit_service_window():
 
         # get screen shot
         self.print = tk.Button(top)
-        self.print.place(relx=0.580, rely=0.914, height=34, width=147)
+        self.print.place(relx=0.870, rely=0.910, height=34, width=40)
         self.print.configure(activebackground="#ececec")
         self.print.configure(activeforeground="#000000")
-        self.print.configure(background="green")
+        # self.print.configure(background="green")
         self.print.configure(disabledforeground="#a3a3a3")
         self.print.configure(font=("Calibri", 12, "bold"))
         self.print.configure(foreground="#ffffff")
         self.print.configure(highlightbackground="#d9d9d9")
         self.print.configure(highlightcolor="black")
         self.print.configure(pady="2")
-        self.print.configure(text="Στιγμιότυπο pdf")
+        self.print.configure(text="")
         self.print.configure(command=self.get_screen_shot)
         self.print_img = PhotoImage(file="icons/grab_screen.png")
         self.print.configure(image=self.print_img)
@@ -666,6 +666,8 @@ class edit_service_window():
         self.save_btn.configure(command=add_to_db)
 
     def get_screen_shot(self, index=None):
+        if not os.path.exists("prints/screen_shot"):
+            os.makedirs("prints/screen_shot")
         if not index:
             index = 0
         width = self.top.winfo_x() + self.top.winfo_width() + 9
@@ -691,7 +693,7 @@ class edit_service_window():
         prints_dir = f'prints/{today}'.replace(" ", "_")
         if not os.path.exists(prints_dir):
             os.makedirs(prints_dir)
-        outputFilename = f"{prints_dir}/Service Book {self.selected_customer}  {today}.pdf".replace(" ", "_")
+        outputFilename = f"{prints_dir}/Service_Book{self.selected_customer}{today}.pdf"
 
         # Utility function
         def convertHtmlToPdf(sourceHtml, outputFilename):

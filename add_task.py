@@ -359,7 +359,7 @@ class add_task_window:
         self.technician_entry.configure(insertbackground="black")
 
         self.print_btn = tk.Button(top)
-        self.print_btn.place(relx=0.700, rely=0.936, relheight=0.060, relwidth=0.070)
+        self.print_btn.place(relx=0.890, rely=0.930, relheight=0.060, relwidth=0.070)
         # self.print_btn.configure(background="#6b6b6b")
         self.print_btn_img = PhotoImage(file="icons/print.png")
         self.print_btn.configure(image=self.print_btn_img)
@@ -388,8 +388,8 @@ class add_task_window:
         self.urgent_entry.configure(insertbackground="black")
 
         self.send_mail_btn = tk.Button(top)
-        self.send_mail_btn.place(relx=0.620, rely=0.936, relheight=0.060, relwidth=0.070)
-        self.send_mail_btn.configure(background="#6b6b6b")
+        self.send_mail_btn.place(relx=0.620, rely=0.930, relheight=0.060, relwidth=0.070)
+        # self.send_mail_btn.configure(background="#6b6b6b")
         self.send_mail_btn_img1 = PhotoImage(file="icons/send_mail.png")
         self.send_mail_btn.configure(image=self.send_mail_btn_img1)
         self.send_mail_btn.configure(command=self.send_mail)
@@ -424,17 +424,17 @@ class add_task_window:
 
         # get screen shot
         self.print = tk.Button(top)
-        self.print.place(relx=0.001, rely=0.936, height=34, width=147)
+        self.print.place(relx=0.025, rely=0.930, relheight=0.050, relwidth=0.065)
         self.print.configure(activebackground="#ececec")
         self.print.configure(activeforeground="#000000")
-        self.print.configure(background="green")
+        # self.print.configure(background="green")
         self.print.configure(disabledforeground="#a3a3a3")
         self.print.configure(font=("Calibri", 12, "bold"))
         self.print.configure(foreground="#ffffff")
         self.print.configure(highlightbackground="#d9d9d9")
         self.print.configure(highlightcolor="black")
         self.print.configure(pady="2")
-        self.print.configure(text="Screen Shot")
+        self.print.configure(text="")
         self.print.configure(command=self.get_screen_shot)
         self.print_img = PhotoImage(file="icons/grab_screen.png")
         self.print.configure(image=self.print_img)
@@ -560,7 +560,6 @@ class add_task_window:
         # Αν επιλέξουμε φωτοτυπικό του πελάτη απο τα περασμένα στην βάση φωτοτυπικά
         emtpy_value = f"Ο {customer} δεν έχει μηχάνημα"
 
-
         if copiers:
             self.copiers_combobox.configure(foreground="")
             self.copiers_combobox.configure(values=self.copiers)
@@ -639,9 +638,9 @@ class add_task_window:
         # "", "", ==>> Actions, Ημερομηνία ολοκήροσης, ΔΤΕ, Μετρητής και Επώμενο service
 
         if self.copier_id == "0":
-            messagebox.showerror("self.copier_id", f'self.copier_id = {self.copier_id}')
-            answer = messagebox.askquestion("Continue?", "Continue?")
-            if not answer:
+            answer = messagebox.askquestion("Προσοχή?", f'Το {self.copiers_combobox.get()} δεν είναι στην βάση θέλεται να συνεχίσεται;')
+            if answer != "yes":
+                self.top.focus()
                 return
         data = [self.start_date.get(), self.customer_combobox.get(), self.copiers_combobox.get(),
                 self.purpose_combobox.get(), "", self.technician_entry.get(), "", self.urgent.get(),
@@ -699,7 +698,7 @@ class add_task_window:
 
         if not os.path.exists(prints_dir):
             os.makedirs(prints_dir)
-        outputFilename = f"{prints_dir}/Service Book{self.customer_combobox.get()}{today}.pdf".replace(" ", "_")
+        outputFilename = f"{prints_dir}/Service_Book{self.customer_combobox.get()}{today}.pdf"
 
         # Utility function
         def convertHtmlToPdf(sourceHtml, outputFilename):
@@ -713,7 +712,7 @@ class add_task_window:
             # close output file
             resultFile.close()  # close output file
 
-            # return True on success and False on errors
+            # return True (0) on success and False (1) on errors
             return pisaStatus.err
 
         data = [self.start_date.get(), self.customer_combobox.get(), self.phone_var.get(), self.copiers_combobox.get(),
@@ -914,9 +913,10 @@ class add_task_window:
 
         # Define your data
         prints_dir = f'prints/{today}'.replace(" ", "_")
+
         if not os.path.exists(prints_dir):
             os.makedirs(prints_dir)
-        outputFilename = f"{prints_dir}/Service Book {self.selected_customer} {today}.pdf".replace(" ", "_")
+        outputFilename = f"{prints_dir}/Service_Book{self.selected_customer}{today}.pdf"
 
         # Utility function
         def convertHtmlToPdf(sourceHtml, outputFilename):
@@ -1010,9 +1010,11 @@ class add_task_window:
                 """
 
         convertHtmlToPdf(sourceHtml, outputFilename)
+
         if sys.platform == "linux":
             os.system("okular " + outputFilename)
         else:
+
             subprocess.Popen(outputFilename, shell=True)
 
     # Αποστολή email
