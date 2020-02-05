@@ -335,6 +335,7 @@ class add_copier_window:
         self.add_model_btn.configure(command=lambda: (self.add_company("Μοντέλο")))
 
     def company_callback(self, event=None):
+        pass
         print("File add_copier.py Line 323 Επιλεγμένη εταιρεία", self.company_combobox.get())
 
     def get_customer(self):

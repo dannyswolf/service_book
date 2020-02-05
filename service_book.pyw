@@ -13,6 +13,8 @@ todo προβολή όλων των εικόνων
 todo start day to binary file
 todo uniq (στα πεδία των πινακων στην βαση) στους κωδικους και part_nr serial ονοματεπωνυμο τηλ
 
+V1.6.2 Δυνατότητα αλλαγής εταιρείας - μοντέλου φωτοτυπικού  ----------------------05/02/2020
+
 V1.6.1 Fix prints on windows Αλλαγή εικονιδίων  ------ ---------------------------04/02/2020
 
 V1.6.0 Log on customer when machine transported ------ ---------------------------03/02/2020
@@ -359,6 +361,25 @@ def get_tables():
     return companies
 
 
+# Να πάρουμε Εταιρεία και μοντέλο φωτοτυπικού
+def get_copiers_data():
+    company_list = []
+    model_list = []
+    conn = sqlite3.connect(dbase)
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM Companies")
+    copiers_data = cursor.fetchall()
+    for n in range(len(copiers_data)):
+        if copiers_data[n][1] != "" and copiers_data[n][1] is not None:
+            company_list.append(copiers_data[n][1])
+        if copiers_data[n][2] != "" and copiers_data[n][2] is not None:
+            model_list.append(copiers_data[n][2])
+
+    cursor.close()
+    conn.close()
+
+    return sorted(company_list), sorted(model_list)
+
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
     global val, w, root
@@ -419,6 +440,8 @@ class Toplevel1:
         self.selected_repository_company = ""
         self.repository_headers = ""
         # self.service_calendar = DateEntry
+
+        self.machine_company_list, self.machine_model_list = get_copiers_data()
 
         self.customers_headers = []
         self.copiers_headers = []
@@ -679,13 +702,10 @@ class Toplevel1:
         self.add_spare_part_on_repository_btn.configure(command=self.add_spare_part_on_repository)
         # self.add_spare_part_on_repository_btn.place_forget()
 
-
-
         self.repository_treeview = ScrolledTreeView(self.repository_frame)
         self.repository_treeview.place(relx=0.017, rely=0.300, relheight=0.59, relwidth=0.967)
         self.repository_treeview.configure(show="headings", style="mystyle.Treeview", selectmode="browse")
         self.repository_treeview.bind("<Double-1>", self.edit_spare_part_on_repository)
-
 
         self.customer_title_label = tk.Label(self.customer_frame)
         self.customer_title_label.place(relx=0.021, rely=0.005, height=30, relwidth=0.847)
@@ -724,7 +744,6 @@ class Toplevel1:
         self.company_label.configure(highlightcolor="black")
         self.company_label.configure(relief="groove")
         self.company_label.configure(text="Εμφανιζόμενο όνομα")
-
 
         self.customer_name = StringVar()
         self.customer_name.trace('w', self.check_customer_name)
@@ -912,7 +931,6 @@ class Toplevel1:
         self.phone_warning.configure(image=self.phone_warning_img)
         self.phone_warning.configure(compound='left')
 
-
         self.Label8 = tk.Label(self.customer_frame)
         self.Label8.place(relx=0.021, rely=0.420, height=20, relwidth=0.200)
         self.Label8.configure(activebackground="#f9f9f9")
@@ -1087,6 +1105,25 @@ class Toplevel1:
         self.serial_entry_warning.configure(image=self.serial_entry_warning_img)
         self.serial_entry_warning.configure(compound='left')
 
+        # Serial Number
+        self.machine_company_label = tk.Label(self.copier_frame)
+        self.machine_company_label.place(relx=0.450, rely=0.100, height=20, relwidth=0.200)
+        self.machine_company_label.configure(activebackground="#f9f9f9")
+        self.machine_company_label.configure(activeforeground="black")
+        self.machine_company_label.configure(background="#6b6b6b")
+        self.machine_company_label.configure(disabledforeground="#a3a3a3")
+        self.machine_company_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.machine_company_label.configure(foreground="#ffffff")
+        self.machine_company_label.configure(highlightbackground="#d9d9d9")
+        self.machine_company_label.configure(highlightcolor="black")
+        self.machine_company_label.configure(relief="groove")
+        self.machine_company_label.configure(text='''Εταιρεία - Μοντέλο''')
+        self.machine_company = StringVar()
+        self.machine_company_entry = tk.Entry(self.copier_frame)
+        self.machine_company_entry.place(relx=0.450, rely=0.150, relheight=0.059, relwidth=0.200)
+        self.machine_company_entry.configure(textvariable="")
+        self.machine_company_entry.configure(takefocus="")
+
 
         # Μετρητής Εναρξης
         self.Label12 = tk.Label(self.copier_frame)
@@ -1194,7 +1231,7 @@ class Toplevel1:
 
         # Ενημέρωση φωτοτυπικού
         self.update_copier_btn = tk.Button(self.copier_frame)
-        self.update_copier_btn.place(relx=0.570, rely=0.130, height=35, relwidth=0.130)
+        self.update_copier_btn.place(relx=0.670, rely=0.130, height=35, relwidth=0.130)
         self.update_copier_btn.configure(activebackground="#ececec")
         self.update_copier_btn.configure(activeforeground="#000000")
         self.update_copier_btn.configure(background="#6b6b6b")
@@ -2317,7 +2354,6 @@ class Toplevel1:
         self.company_name_entry.configure(textvariable=self.customer_name)
         self.current_customer_name = customers_data[0][1]
 
-
         var = StringVar(root, value=customers_data[0][2])
         self.name_entry.configure(textvariable=var)
         var = StringVar(root, value=customers_data[0][3])
@@ -2404,7 +2440,6 @@ class Toplevel1:
         self.company_name_entry.configure(textvariable=self.customer_name)
         self.current_customer_name = customers_data[0][1]
 
-
         var = StringVar(root, value=customers_data[0][2])
         self.name_entry.configure(textvariable=var)
         var = StringVar(root, value=customers_data[0][3])
@@ -2446,6 +2481,8 @@ class Toplevel1:
             # Το selected_item == string
             if int(selected_item) == int(copiers[n][0]):
                 self.selected_copier_id = int(selected_item)
+                self.machine_company.set(value=copiers[n][1])
+                self.machine_company_entry.configure(textvariable=self.machine_company)
                 self.serial.set(value=copiers[n][2])  # Σειριακός αριθμός
                 self.serial_entry.configure(textvariable=self.serial)
 
@@ -2788,12 +2825,12 @@ class Toplevel1:
             messagebox.showwarning("Σφάλμα", "Παρακαλώ πρώτα επιλέξτε Φωτοτυπικό")
             return None
         headers = []
-        not_needed_header = ["Εταιρεία", "ID"]
+        not_needed_header = ["ID"]
         for head in self.copiers_headers:
             if head not in not_needed_header:
                 headers.append(head + " = ?")
         culumns = ", ".join(headers)
-        new_data = [self.serial_entry.get(), self.start_entry.get(), self.start_counter_entry.get(),
+        new_data = [self.machine_company_entry.get(), self.serial_entry.get(), self.start_entry.get(), self.start_counter_entry.get(),
                     self.selected_customer_id, self.copier_notes_scrolledtext.get("1.0", "end-1c"), 1,
                     # 1 => ενεργό φωτοτυπικό
                     self.selected_copier_id]
