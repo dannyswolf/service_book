@@ -39,7 +39,11 @@ def vp_start_gui():
     copiers_log_support.init(root, top)
     root.mainloop()
 
+
 w = None
+rt = None
+
+
 def create_Toplevel1(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
     global w, w_win, rt
@@ -152,6 +156,7 @@ class Toplevel1:
             self.Scrolledtreeview1.insert("", "end", values=data[n])
 
     def quit(self, event):
+        rt.focus()
         self.top.destroy()
 
     def fixed_map(self, option):

@@ -36,6 +36,8 @@ def vp_start_gui():
 w = None
 selected_service_ID = None
 images_path = None
+rt = None
+
 
 def create_Toplevel1(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
@@ -202,6 +204,7 @@ class Toplevel1:
 
     def quit(self, event=None):
         self.del_files()
+        rt.focus()
         self.top.destroy()
 
     def get_size_of_files(self):
@@ -367,6 +370,7 @@ class Toplevel1:
     # Διαγραφή αρχείων μετά το κλείσημο του παραθύρου
     def del_files(self):
         shutil.rmtree(self.images_path, ignore_errors=True)
+        rt.focus()
         self.top.destroy()
 
     # Διαγραφή αρχείου απο την βαση

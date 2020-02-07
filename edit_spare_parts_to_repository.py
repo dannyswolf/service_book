@@ -48,6 +48,8 @@ w = None
 table = None
 spare_part_id = None
 spare_part_code = None
+rt = None
+
 
 def create_insert_spare_parts_window(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
@@ -443,6 +445,7 @@ class add_copier_window:
             self.notes_scrolledtext.insert("1.0", var.get())
 
     def quit(self, event):
+        rt.focus()
         self.top.destroy()
 
     # Ελεγχος αν το serial  υπάρχει
@@ -506,7 +509,7 @@ class add_copier_window:
         conn.commit()
         conn.close()
         messagebox.showinfo("Info", f"Το  {self.code.get()} Αποθηκεύτηκε επιτυχώς στο {self.table}")
-
+        rt.focus()
         self.top.destroy()
         return None
 
@@ -523,6 +526,7 @@ class add_copier_window:
             con.commit()
             con.close()
             messagebox.showwarning("Προσοχή!", f'Το προιόν με κωδικό {self.spare_part_code} διαγράφηκε παρακαλώ ανανεώστε')
+            rt.focus()
             self.top.destroy()
             return
         else:

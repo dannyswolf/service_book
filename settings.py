@@ -2,11 +2,13 @@
 import getpass
 import os
 import logging
+import sqlite3
 import sys
 from urllib.request import urlopen
 import urllib.error
 from tkinter import messagebox
 user = getpass.getuser()
+
 
 mlshop = 0
 
@@ -30,10 +32,13 @@ else:
 
 demo = 0  # 0 Demo Disabled 1 Demo enabled
 if demo:
-    service_book_version = "V 1.6.1 Demo"
+    service_book_version = "V 1.7.1 Demo"
 else:
-    service_book_version = "V 1.6.1 ML Shop"
-# -------------------------------- Email -------------------------------------------
+    service_book_version = "V 1.7.1 ML Shop"
+
+
+
+
 smtp_server = "smtp.gmail.com"
 ssl_port = 465  # For SSL
 port = 587  # For starttls

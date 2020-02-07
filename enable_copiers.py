@@ -58,6 +58,7 @@ def vp_start_gui():
 
 
 w = None
+rt = None
 
 
 def create_enable_copiers_window(root, *args, **kwargs):
@@ -278,9 +279,11 @@ class enable_copiers_window:
 
         if not self.copiers_list:
             messagebox.showerror("Προσοχή", "Δεν υπάρχουν απενεργοποιημένα φωτοτυπικά")
+            rt.focus()
             self.top.destroy()
 
     def quit(self, event):
+        rt.focus()
         self.top.destroy()
 
     def show_data(self, event):
@@ -328,6 +331,7 @@ class enable_copiers_window:
         cursor.close()
         conn.close()
         messagebox.showinfo("Προσοχή", f"Το {self.select_copier_combobox.get()} \n εργοποιήθηκε επιτυχώς")
+        rt.focus()
         self.top.destroy()
 
         return None

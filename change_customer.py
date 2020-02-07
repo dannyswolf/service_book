@@ -59,6 +59,8 @@ def vp_start_gui():
 
 w = None
 
+rt = None
+
 
 def create_add_copier_window(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
@@ -334,6 +336,7 @@ class add_copier_window:
         self.save_btn.configure(command=self.add_copier)
 
     def quit(self, event):
+        rt.focus()
         self.top.destroy()
 
     def get_copier(self, event=None):
@@ -441,6 +444,7 @@ class add_copier_window:
         messagebox.showwarning("Επιτυχής μεταφορά", f"To {self.copiers_combobox.get()} μεταφέρθηκε επιτυχώς στον πελάτη"
                                                     f" {self.new_customer_combobox.get()}")
 
+        rt.focus()
         self.top.destroy()
         return None
 

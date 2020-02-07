@@ -45,6 +45,8 @@ w = None
 service_id = None
 customer_id = None
 copier = None
+rt = None
+
 
 def create_insert_spare_parts_window(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
@@ -102,6 +104,7 @@ class add_copier_window:
         top.configure(highlightcolor="black")
         top.bind('<Escape>', self.quit)
         top.focus()
+        top.protocol("WM_DELETE_WINDOW", self.quit)
 
         self.parts_nr_label = tk.Label(top)
         self.parts_nr_label.place(relx=0.025, rely=0.095, height=31, relwidth=0.230)
@@ -277,7 +280,8 @@ class add_copier_window:
         self.Label2.configure(relief="groove")
         self.Label2.configure(text='''Εισαγωγή ανταλλακτικού''')
 
-    def quit(self, event):
+    def quit(self, event=None):
+        rt.focus()
         self.top.destroy()
 
     def add_spare_part(self):

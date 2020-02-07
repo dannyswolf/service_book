@@ -7,9 +7,10 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from os.path import basename
-from settings import smtp_server, port, sender_email, password, ssl_port, user, root_logger, dbase  # settings
+from settings import user, root_logger, dbase  # settings
 from tkinter import Tk, ttk, messagebox
 from tkinter.ttk import Progressbar
+import tkinter as tk
 import time
 import sqlite3
 import shutil  # για διαγραφη των φακέλων με τις εικόνες
@@ -19,19 +20,111 @@ sys.stdout.write = root_logger.info
 print(f"{100 * '*'}\n\t\t\t\t\t\t\t\t\t\tFILE {__name__}")
 
 
+# -------------------------------- Email -------------------------------------------
+def get_senders_emails():
+    con = sqlite3.connect(dbase)
+    c = con.cursor()
+    c.execute("SELECT * FROM Sender_emails;")
+    sender_email_data = c.fetchall()
+    c.execute("SELECT * FROM Receiver_emails;")
+    receiver_email_data = c.fetchall()
+    con.close()
+
+    return sender_email_data, receiver_email_data
+
+
+senders_data, receiver_data = get_senders_emails()
 # ssl_port = 465  # For SSL
 # port = 587  # For starttls
+
+senders = []
+receivers = []
+receivers_names = []
+for n in range(len(senders_data)):
+    senders.append(senders_data[n][1])
+
+for n in range(len(receiver_data)):
+    receivers_names.append(receiver_data[n][1])
+    receivers.append(receiver_data[n][2])
+
+
+def get_receiver_mail(name):
+    con = sqlite3.connect(dbase)
+    c = con.cursor()
+    c.execute("SELECT Receiver_email FROM Receiver_emails WHERE Ονομα=?", (name,))
+    receiver_mail = c.fetchall()
 
 
 def send_mail(data):
 
     root = Tk()
-    root.geometry("350x150+50+50")
+    root.geometry("400x350+300+300")
     root.title("Αποστολή e-mail")
-    email_label = ttk.Label(root, text="Εισάγεται e-mail")
-    email_label.pack()
-    email_entry = ttk.Entry(root, width=30)
-    email_entry.pack()
+
+    # Όνομα Αποστολέα
+    semder_email_label = tk.Label(root)
+    semder_email_label.place(relx=0.005, rely=0.050, height=31, relwidth=0.280)
+    semder_email_label.configure(activebackground="#f9f9f9")
+    semder_email_label.configure(activeforeground="black")
+    semder_email_label.configure(background="#6b6b6b")
+    semder_email_label.configure(disabledforeground="#a3a3a3")
+    semder_email_label.configure(font="-family {Calibri} -size 10 -weight bold")
+    semder_email_label.configure(foreground="#ffffff")
+    semder_email_label.configure(highlightbackground="#d9d9d9")
+    semder_email_label.configure(highlightcolor="black")
+    semder_email_label.configure(relief="groove")
+    semder_email_label.configure(text='''Αποστολέας''')
+
+    senders_combobox = ttk.Combobox(root)
+    senders_combobox.place(relx=0.29, rely=0.050, height=31, relwidth=0.600)
+    senders_combobox.configure(values=senders)
+    senders_combobox.configure(takefocus="")
+    # senders_combobox.bind("<<ComboboxSelected>>", self.get_repository)
+    senders_combobox.configure(state="readonly")
+    senders_combobox.set(value=senders[0])
+    # Παραλήπτης
+    receiver_name_label = tk.Label(root)
+    receiver_name_label.place(relx=0.005, rely=0.150, height=31, relwidth=0.280)
+    receiver_name_label.configure(activebackground="#f9f9f9")
+    receiver_name_label.configure(activeforeground="black")
+    receiver_name_label.configure(background="#6b6b6b")
+    receiver_name_label.configure(disabledforeground="#a3a3a3")
+    receiver_name_label.configure(font="-family {Calibri} -size 10 -weight bold")
+    receiver_name_label.configure(foreground="#ffffff")
+    receiver_name_label.configure(highlightbackground="#d9d9d9")
+    receiver_name_label.configure(highlightcolor="black")
+    receiver_name_label.configure(relief="groove")
+    receiver_name_label.configure(text='''Παραλήπτης''')
+
+    receiver_name_combobox = ttk.Combobox(root)
+    receiver_name_combobox.place(relx=0.29, rely=0.150, height=31, relwidth=0.600)
+    receiver_name_combobox.configure(values=receivers_names)
+    receiver_name_combobox.configure(takefocus="")
+    receiver_name_combobox.set(value=receivers_names[0])
+    # senders_combobox.bind("<<ComboboxSelected>>", self.get_repository)
+    receiver_name_combobox.configure(state="readonly")
+    # receiver_name_combobox.bind('<<ComboboxSelected>>', lambda x=receiver_name_combobox.get(): get_receiver_mail(x))
+
+    # Email Παραλήπτη
+    receiver_email_label = tk.Label(root)
+    receiver_email_label.place(relx=0.005, rely=0.250, height=31, relwidth=0.280)
+    receiver_email_label.configure(activebackground="#f9f9f9")
+    receiver_email_label.configure(activeforeground="black")
+    receiver_email_label.configure(background="#6b6b6b")
+    receiver_email_label.configure(disabledforeground="#a3a3a3")
+    receiver_email_label.configure(font="-family {Calibri} -size 10 -weight bold")
+    receiver_email_label.configure(foreground="#ffffff")
+    receiver_email_label.configure(highlightbackground="#d9d9d9")
+    receiver_email_label.configure(highlightcolor="black")
+    receiver_email_label.configure(relief="groove")
+    receiver_email_label.configure(text='''Ε-mail παραλήπτη''')
+    receiver_combobox = ttk.Combobox(root)
+    receiver_combobox.place(relx=0.29, rely=0.250, height=31, relwidth=0.600)
+    receiver_combobox.configure(values=receivers)
+    receiver_combobox.configure(takefocus="")
+    receiver_combobox.set(value=receivers[0])
+    # senders_combobox.bind("<<ComboboxSelected>>", self.get_repository)
+    # receiver_combobox.configure(state="readonly")
 
     # Progress bar widget
 
@@ -40,10 +133,26 @@ def send_mail(data):
     # Function responsible for the updation
     # of the progress bar value
 
+    def get_server_settings(sender):
+
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT smtp_server, port, password FROM Sender_emails WHERE sender_email =?", (sender,))
+        data_from_Sender_emails = c.fetchall()
+        con.close()
+        smtp_server = data_from_Sender_emails[0][0]
+        port = data_from_Sender_emails[0][1]
+        password = data_from_Sender_emails[0][2]
+
+        return smtp_server, port, password
+
     def set_receiver(receiver_email=None):
 
         if not receiver_email:
-            receiver_email = str(email_entry.get())
+            receiver_email = str(receiver_combobox.get())
+            if receiver_email == "":
+                messagebox.showwarning("Προσοχή!", "Παρακαλώ συμπληρώστε ενα email")
+                return
 
         message = MIMEMultipart()
 
@@ -55,7 +164,7 @@ def send_mail(data):
             customer = data[1]
             copier = data[2]
             message["Subject"] = "Service Book " + " " + customer + " " + copier
-            message["From"] = sender_email
+            message["From"] = senders_combobox.get()
             message["To"] = receiver_email
             purpose = data[3]
             technician = data[4]
@@ -96,7 +205,7 @@ def send_mail(data):
             con.close()
             if images:
                 files = []
-                images_path = "Service images/Service_ID_" + str(service_id) + "/"
+                images_path = "Service_images/Service_ID_" + str(service_id) + "/"
                 if not os.path.exists(images_path):
                     os.makedirs(images_path)
                 # Δημιουργεία εικόνων
@@ -134,7 +243,7 @@ def send_mail(data):
             customer = data[1]
             copier = data[2]
             message["Subject"] = "Service Book " + " " + customer + " " + copier
-            message["From"] = sender_email
+            message["From"] = senders_combobox.get()
             message["To"] = receiver_email
             purpose = data[3]
             technician = data[4]
@@ -166,16 +275,17 @@ def send_mail(data):
         # Create a secure SSL context
         context = ssl.create_default_context()
 
+        smtp_server, port, password, = get_server_settings(senders_combobox.get())
         # Try to log in to server and send email
         try:
             server = smtplib.SMTP(smtp_server, port)
             server.ehlo()  # Can be omitted
             server.starttls(context=context)  # Secure the connection
             server.ehlo()  # Can be omitted
-            server.login(sender_email, password)
+            server.login(senders_combobox.get(), password)
             progress['value'] = 80
             progress.update()
-            server.sendmail(sender_email, receiver_email, message.as_bytes())  # Send email here
+            server.sendmail(senders_combobox.get(), receiver_email, message.as_bytes())  # Send email here
 
         except Exception as e:
             # Print any error messages to stdout
@@ -195,14 +305,12 @@ def send_mail(data):
             progress.stop()
             root.destroy()
 
-    email_entry.focus()
-
     send_btn = ttk.Button(root, text="Αποστολή", command=set_receiver)
-    send_btn.pack()
+    send_btn.place(relx=0.29, rely=0.450, relheight=0.060, relwidth=0.200)
 
-    send_to_mlcopier_btn = ttk.Button(root, text="Αποστολή στο mlcopier", command=lambda: set_receiver("mlcopier@mail.com"))
-    send_to_mlcopier_btn.pack()
-    progress.pack(pady=10)
+    # send_to_mlcopier_btn = ttk.Button(root, text="Αποστολή στο mlcopier", command=lambda: set_receiver("mlcopier@mail.com"))
+    # send_to_mlcopier_btn.place(relx=0.29, rely=0.550, relheight=0.060, relwidth=0.200)
+    progress.place(relx=0.29, rely=0.350, relheight=0.060, relwidth=0.600)
 
 
 

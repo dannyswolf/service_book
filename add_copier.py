@@ -68,7 +68,7 @@ def vp_start_gui():
 
 w = None
 customer_id = None
-
+rt = None
 
 def create_add_copier_window(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
@@ -336,7 +336,7 @@ class add_copier_window:
 
     def company_callback(self, event=None):
         pass
-        print("File add_copier.py Line 323 Επιλεγμένη εταιρεία", self.company_combobox.get())
+        # print("File add_copier.py Line 323 Επιλεγμένη εταιρεία", self.company_combobox.get())
 
     def get_customer(self):
         if self.customer_id:
@@ -351,6 +351,7 @@ class add_copier_window:
             self.customer_combobox.configure(values=self.customers_list)
 
     def quit(self, event):
+        rt.focus()
         self.top.destroy()
 
     def add_company(self, company):
@@ -451,6 +452,7 @@ class add_copier_window:
         conn.commit()
         conn.close()
         messagebox.showinfo("Info", f"Το  {data[0]} προστέθηκε επιτυχώς στον πελάτη {self.customer_combobox.get()}")
+        rt.focus()
         self.top.destroy()
 
     # Ελεγχος αν το τηλ υπάρχει

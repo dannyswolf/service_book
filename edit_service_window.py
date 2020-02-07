@@ -151,6 +151,7 @@ def vp_start_gui():
 
 
 w = None
+rt = None
 
 
 def create_edit_service_window(root, *args, **kwargs):
@@ -649,6 +650,7 @@ class edit_service_window():
             add_conn.commit()
             add_conn.close()
             self.add_files_to_db()
+            rt.focus()
             w.destroy()
 
         self.save_btn = tk.Button(w)
@@ -839,6 +841,7 @@ class edit_service_window():
         self.top.focus()
 
     def quit(self, event):
+        rt.focus()
         self.top.destroy()
 
     def insert_spare_part_outside_of_repository(self):
@@ -976,6 +979,7 @@ class edit_service_window():
         con.close()
         print(f"Η εργασία {self.selected_service_id} διαγράφηκε με επιτυχία!")
         messagebox.showwarning("Προσοχή", "Η εργασία διαγράφηκε με επιτυχία!\nΠαρακαλώ ανανεώστε")
+        rt.focus()
         self.top.destroy()
 
 # The following code is added to facilitate the Scrolled widgets you specified.

@@ -42,7 +42,7 @@ def vp_start_gui():
 
 
 w = None
-
+rt = None
 def create_Toplevel1(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
     global w, w_win, rt
@@ -472,6 +472,7 @@ class Toplevel1:
         self.Label11.configure(text='''Προσθήκη πελάτη''')
 
     def quit(self, event):
+        rt.focus()
         self.top.destroy()
 
     def add_to_db(self):
@@ -530,6 +531,7 @@ class Toplevel1:
         conn.commit()
         conn.close()
         messagebox.showinfo("Info", f"Ο πελάτης {self.company_name.get()} προστέθηκε επιτυχώς")
+        rt.focus()
         self.top.destroy()
 
     # Ελεγχος αν το όνομα του πελάτη υπάρχει

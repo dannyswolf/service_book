@@ -57,6 +57,8 @@ w = None
 service_id = ""
 customer_id = ""
 copier_name = ""
+rt = None
+
 
 def create_Toplevel1(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
@@ -196,6 +198,7 @@ class Toplevel1:
 
         if not self.service_ID:
             messagebox.showerror("Σφάλμα!", "Παρακαλώ επιλεξτε πρώτα ιστορικό συντήρησής.")
+            rt.focus()
             self.top.destroy()
 
     def get_spare_parts(self, event=None):
@@ -223,6 +226,7 @@ class Toplevel1:
             self.spare_parts_treeview.insert("", "end", values=d)
 
     def quit(self, event):
+        rt.focus()
         self.top.destroy()
 
     def fixed_map(self, option):
@@ -342,9 +346,11 @@ class Toplevel1:
                         c.close()
                         con.close()
                         # messagebox.showinfo("Πληροφορία", f"O κωδικός {value} προστέθηκε ")
+                        rt.focus()
                         self.top.destroy()
                         return
                     else:
+                        rt.focus()
                         self.top.focus()
                         return
 
@@ -419,13 +425,17 @@ class Toplevel1:
                 c.execute("UPDATE " + self.selected_company + " SET ΣΥΝΟΛΟ =? WHERE ΚΩΔΙΚΟΣ =?",
                           (str_total, code))
                 con.commit()
-            except sqlite3.OperationalError:
+            except sqlite3.OperationalError as error:
+                messagebox.showerror("Error!", f'{error}')
                 pass
         print(f" Line 362 Οι κωδικοί {added_codes} αφερέθηκαν απο την αποθήκη {self.selected_company} με επιτυχία ")
         c.close()
         con.close()
         self.get_spare_parts()
+        rt.focus()
         self.top.destroy()
+
+
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):
     '''Configure the scrollbars for a widget.'''

@@ -12,6 +12,15 @@ todo αν ο χρήστης πατήση ακυρο κατα την προσθή
 todo προβολή όλων των εικόνων
 todo start day to binary file
 todo uniq (στα πεδία των πινακων στην βαση) στους κωδικους και part_nr serial ονοματεπωνυμο τηλ
+2) todo να γινεται εισοδος με email την πρώτη φορα για επιβεβαίωση ότι ειναι αυτός ο αγοραστης
+1) todo το settings να περνει τα στοιχεία email απο την βάση πίνα Email
+------------------todo ενημέρωση βάσεις με πίνακα Email sto ML Shop---------------
+
+
+V1.7.1 Fix focus on previous windows  -------------------------------------------06/02/2020
+
+V1.7.0 added email_settings   ---------------------------------------------------05/02/2020
+Αρχείο email_settings
 
 V1.6.2 Δυνατότητα αλλαγής εταιρείας - μοντέλου φωτοτυπικού  ----------------------05/02/2020
 
@@ -281,6 +290,7 @@ import enable_customers
 import enable_copiers
 import add_task
 import edit_task
+import email_settings
 from tkcalendar import Calendar, DateEntry
 from datetime import date, timedelta
 import sys  # Για τα αρχεία log files
@@ -361,42 +371,31 @@ def get_tables():
     return companies
 
 
-# Να πάρουμε Εταιρεία και μοντέλο φωτοτυπικού
-def get_copiers_data():
-    company_list = []
-    model_list = []
-    conn = sqlite3.connect(dbase)
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM Companies")
-    copiers_data = cursor.fetchall()
-    for n in range(len(copiers_data)):
-        if copiers_data[n][1] != "" and copiers_data[n][1] is not None:
-            company_list.append(copiers_data[n][1])
-        if copiers_data[n][2] != "" and copiers_data[n][2] is not None:
-            model_list.append(copiers_data[n][2])
+w = None
+root = None
+rt = None
 
-    cursor.close()
-    conn.close()
-
-    return sorted(company_list), sorted(model_list)
 
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
+
     global val, w, root
     root = tk.Tk()
-    top = Toplevel1 (root)
+    top = Toplevel1(root)
     service_book_colors_support.init(root, top)
     root.mainloop()
 
-w = None
+
+
 def create_Toplevel1(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
     global w, w_win, rt
     rt = root
-    w = tk.Toplevel (root)
-    top = Toplevel1 (w)
+    w = tk.Toplevel(root)
+    top = Toplevel1(w)
     service_book_colors_support.init(w, top, *args, **kwargs)
     return (w, top)
+
 
 def destroy_Toplevel1():
     global w
@@ -440,8 +439,6 @@ class Toplevel1:
         self.selected_repository_company = ""
         self.repository_headers = ""
         # self.service_calendar = DateEntry
-
-        self.machine_company_list, self.machine_model_list = get_copiers_data()
 
         self.customers_headers = []
         self.copiers_headers = []
@@ -514,8 +511,6 @@ class Toplevel1:
         self.backup_menu.add_command(label="Backup Service Book", command=self.backup)
         self.backup_menu.add_command(label="Backup Αποθήκη", command=self.backup_repository)
 
-
-
         self.licence_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Αδεια", menu=self.licence_menu)
         self.licence_menu.add_command(label="Πληροφορίες χρήσης", command=self.show_licence)
@@ -524,9 +519,10 @@ class Toplevel1:
         self.menubar.add_cascade(label="Info", menu=self.info_menu)
         self.info_menu.add_command(label="Πληροφορίες", command=show_info)
 
-        # self.info_menu = tk.Menu(self.menubar, tearoff=0)
-        # self.menubar.add_cascade(label="Info", menu=self.info_menu)
-        # self.info_menu.add_command(label="Πληροφορίες", command=get_info)
+        self.settings_menu = tk.Menu(self.menubar, tearoff=0)
+        self.menubar.add_cascade(label="Ρυθμίσεις", menu=self.settings_menu)
+        self.settings_menu.add_command(label="Ρυθμίσεις Email", command=self.set_email_settings)
+        # self.settings_menu.add_command(label="Ρυθμίσεις Αποθήκη", command=self.backup_repository)
 
         top.configure(menu=self.menubar)
 
@@ -1614,7 +1610,7 @@ class Toplevel1:
         selected_table = self.repository_company_combobox.get()
         if selected_table != "":
             add_spare_parts_to_repository.create_insert_spare_parts_window(self.top, selected_table)
-            self.top.wm_state('iconic')
+            # self.top.wm_state('iconic')
         else:
             messagebox.showinfo("Προσοχή!", "Παρακαλώ επιλέξτε πρώτα εταιρεία")
             pass
@@ -1639,7 +1635,7 @@ class Toplevel1:
 
             edit_spare_parts_to_repository.create_insert_spare_parts_window(self.top, selected_table, spare_part_id,
                                                                             spare_part_code)
-            self.top.wm_state('iconic')
+            # self.top.wm_state('iconic')
 
         else:
             messagebox.showinfo("Προσοχή!", "Παρακαλώ επιλέξτε πρώτα εταιρεία")
@@ -2008,7 +2004,7 @@ class Toplevel1:
 
         selected_calendar_id = (self.calendar_treeview.set(self.calendar_treeview.selection(), '#1'))
         edit_task.create_edit_task_window(root, selected_calendar_id)
-        self.top.wm_state('iconic')
+        # self.top.wm_state('iconic')
 
     def search_tasks(self, event=None, data=None):
 
@@ -2582,7 +2578,7 @@ class Toplevel1:
                 selected_copier = copier[0][0]
                 cursor.close()
                 con.close()
-                self.top.wm_state('iconic')
+                # self.top.wm_state('iconic')
                 create_edit_service_window(root, selected_service_id, selected_copier, self.selected_customer, self.selected_customer_id)
                 # ==============================  Notebook style  =============
                 self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#69ab3a")])
@@ -2590,7 +2586,7 @@ class Toplevel1:
 
     def add_service(self):
         selecteted_copier_id = (self.copiers_treeview.set(self.copiers_treeview.selection(), "#1"))
-        self.top.wm_state('iconic')
+        # self.top.wm_state('iconic')
         create_add_service_window(root, selecteted_copier_id)
         # ==============================  Notebook style  =============
         self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#69ab3a")])
@@ -2942,6 +2938,9 @@ class Toplevel1:
             except UnboundLocalError as error:
                 print(f"Η σύνδεση με {backup_file} δεν έγινε ποτέ Line 2452 {error}")
                 messagebox.showerror("Σφάλμα", f"Η σύνδεση με {backup_file} δεν έγινε ποτέ  {error}")
+
+    def set_email_settings(self):
+        email = email_settings.run_email_settings()
 
 
 # The following code is added to facilitate the Scrolled widgets you specified.

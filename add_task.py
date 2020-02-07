@@ -111,6 +111,8 @@ w = None
 selected_customer_id = ""
 selected_customer = ""
 
+rt = None
+
 
 def create_add_task_window(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
@@ -571,6 +573,7 @@ class add_task_window:
             self.copiers_combobox.configure(textvariable=self.copier_stringvar)
 
     def quit(self, event):
+        rt.focus()
         self.top.destroy()
 
     def add_task(self):
@@ -688,6 +691,7 @@ class add_task_window:
         conn.commit()
         conn.close()
         # messagebox.showinfo("Info", f"H εργασία προστέθηκε επιτυχώς στον πελάτη {self.customer_combobox.get()}")
+        rt.focus()
         self.top.destroy()
         return None
 
@@ -1022,7 +1026,7 @@ class add_task_window:
         # Αν γράψουμε νέο φωτοτυπικό και όχι απο την λίστα
         if not self.selected_copier:
             self.selected_copier = self.copiers_combobox.get()
-        self.get_copier_id()
+
         data = [self.start_date.get(), self.customer_combobox.get(), self.copiers_combobox.get(),
                 self.purpose_combobox.get(),
                 self.technician.get(), self.urgent.get(), self.phone_var.get(),

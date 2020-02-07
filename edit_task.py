@@ -114,9 +114,12 @@ def get_copiers_data():
     conn.close()
     return sorted(customers_list), serials
 
+
 w = None
 selected_calendar_id = None
 selected_customer_id = None
+rt = None
+
 
 def create_edit_task_window(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
@@ -1581,6 +1584,7 @@ class edit_task_window:
         conn.close()
         self.add_files_to_db()
         messagebox.showinfo("Info", f"H εργασία αποθηκεύτηκε επιτυχώς στον πελάτη {self.customer_combobox.get()}")
+        rt.focus()
         self.top.destroy()
         return None
 
@@ -1620,9 +1624,11 @@ class edit_task_window:
         con.close()
         print(f"Η εργασία {selected_calendar_id} διαγράφηκε με επιτυχία!")
         messagebox.showwarning("Προσοχή", "Η εργασία διαγράφηκε με επιτυχία!\nΠαρακαλώ ανανεώστε το ημερολόγιο")
+        rt.focus()
         self.top.destroy()
 
     def quit(self, event):
+        rt.focus()
         self.top.destroy()
 
 # The following code is added to facilitate the Scrolled widgets you specified.

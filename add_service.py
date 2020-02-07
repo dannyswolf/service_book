@@ -59,6 +59,9 @@ def get_service_data():
     return sorted(purpose_list), sorted(actions_list)
 
 
+root = None
+
+
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
     global val, w, root
@@ -403,6 +406,7 @@ class add_service_window():
 
 
     def quit(self, event):
+        root.focus()
         w.destroy()
 
     def add_to_service_data(self, column):
@@ -460,6 +464,7 @@ class add_service_window():
         try:
             self.customer_id = selected_copier_data[0][5]
         except IndexError as error:
+            root.focus()
             self.top.destroy()
             messagebox.showwarning("Σφάλμα", f"{error},\nΠαρακαλώ επιλέξτε φωτοτυπικό")
             return
@@ -531,6 +536,7 @@ class add_service_window():
             add_cursor.execute(sql_insert, tuple(data_to_add))
             add_conn.commit()
             add_conn.close()
+            root.focus()
             w.destroy()
             messagebox.showinfo('Επιτυχής ενημέρωση', "Το ιστορικό συντήρησης του φωτοτυπικού "
                                                       "{} στον πελάτη {} ενημερώθηκε ".format(

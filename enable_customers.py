@@ -61,6 +61,7 @@ def get_customers():
 
 
 w = None
+rt = None
 
 
 def create_Toplevel1(root, *args, **kwargs):
@@ -505,9 +506,11 @@ class Toplevel1:
         # Αν δεν υπάρχουν απενεργοποιημένοι πελάτες
         if not self.customers:
             messagebox.showinfo("Προσοχή ", "Δεν υπάρχουν απενεργοποιημένοι πελάτες")
+            rt.focus()
             self.top.destroy()
 
     def quit(self, event):
+        rt.focus()
         self.top.destroy()
 
     def get_customers_data(self, event=None):
@@ -575,6 +578,7 @@ class Toplevel1:
         conn.close()
         messagebox.showinfo("Info", f"Ο πελάτης {self.company_name.get()} "
                                     f"ενεργοποιήθηκε επιτυχώς\nΠαρακαλώ ανανεώστε την λίστα πελατών")
+        rt.focus()
         self.top.destroy()
         return None
 
