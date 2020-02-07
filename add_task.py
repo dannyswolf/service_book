@@ -1033,7 +1033,7 @@ class add_task_window:
                 self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id]
         names = ["Ημερομηνία", "Πελάτης", "Μηχάνημα", "Σκοπός", "Τεχνικός", "Επίγων", "Τηλέφωνο", "Σημειώσεις"]
 
-        mail.send_mail(data)
+        mail.send_mail(self.top, data)
 
     def add_to_service_data(self, column):
         # self.purpose_list, self.actions_list

@@ -1353,7 +1353,7 @@ class edit_task_window:
                 self.notes_scrolledtext.get('1.0', 'end-1c'), self.dte_entry.get(),
                 self.copier_id, self.compl_date_entry.get(), self.completed_var.get(), self.customer_id, self.service_id]
 
-        mail.send_mail(data)
+        mail.send_mail(self.top, data)
 
     # Να πάρουμε Δεδομένα
     def get_data(self):

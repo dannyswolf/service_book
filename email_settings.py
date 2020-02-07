@@ -156,33 +156,33 @@ class SetEmailSettings:
         self.port_entry.configure(selectbackground="#c4c4c4")
         self.port_entry.configure(selectforeground="black")
 
-        # ssl_port
-        self.ssl_port_label = tk.Label(self.root)
-        self.ssl_port_label.place(relx=0.025, rely=0.450, height=31, relwidth=0.230)
-        self.ssl_port_label.configure(activebackground="#f9f9f9")
-        self.ssl_port_label.configure(activeforeground="black")
-        self.ssl_port_label.configure(background="#6b6b6b")
-        self.ssl_port_label.configure(disabledforeground="#a3a3a3")
-        self.ssl_port_label.configure(font="-family {Calibri} -size 10 -weight bold")
-        self.ssl_port_label.configure(foreground="#ffffff")
-        self.ssl_port_label.configure(highlightbackground="#d9d9d9")
-        self.ssl_port_label.configure(highlightcolor="black")
-        self.ssl_port_label.configure(relief="groove")
-        self.ssl_port_label.configure(text='''SSL Port''')
-
-        self.ssl_port = StringVar()
-        self.ssl_port_entry = tk.Entry(self.root)
-        self.ssl_port_entry.place(relx=0.27, rely=0.450, height=30, relwidth=0.150)
-        self.ssl_port_entry.configure(textvariable=self.ssl_port)
-        self.ssl_port_entry.configure(background="white")
-        self.ssl_port_entry.configure(disabledforeground="#a3a3a3")
-        self.ssl_port_entry.configure(font="TkFixedFont")
-        self.ssl_port_entry.configure(foreground="#000000")
-        self.ssl_port_entry.configure(highlightbackground="#d9d9d9")
-        self.ssl_port_entry.configure(highlightcolor="black")
-        self.ssl_port_entry.configure(insertbackground="black")
-        self.ssl_port_entry.configure(selectbackground="#c4c4c4")
-        self.ssl_port_entry.configure(selectforeground="black")
+        # # ssl_port
+        # self.ssl_port_label = tk.Label(self.root)
+        # self.ssl_port_label.place(relx=0.025, rely=0.450, height=31, relwidth=0.230)
+        # self.ssl_port_label.configure(activebackground="#f9f9f9")
+        # self.ssl_port_label.configure(activeforeground="black")
+        # self.ssl_port_label.configure(background="#6b6b6b")
+        # self.ssl_port_label.configure(disabledforeground="#a3a3a3")
+        # self.ssl_port_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        # self.ssl_port_label.configure(foreground="#ffffff")
+        # self.ssl_port_label.configure(highlightbackground="#d9d9d9")
+        # self.ssl_port_label.configure(highlightcolor="black")
+        # self.ssl_port_label.configure(relief="groove")
+        # self.ssl_port_label.configure(text='''SSL Port''')
+        #
+        # self.ssl_port = StringVar()
+        # self.ssl_port_entry = tk.Entry(self.root)
+        # self.ssl_port_entry.place(relx=0.27, rely=0.450, height=30, relwidth=0.150)
+        # self.ssl_port_entry.configure(textvariable=self.ssl_port)
+        # self.ssl_port_entry.configure(background="white")
+        # self.ssl_port_entry.configure(disabledforeground="#a3a3a3")
+        # self.ssl_port_entry.configure(font="TkFixedFont")
+        # self.ssl_port_entry.configure(foreground="#000000")
+        # self.ssl_port_entry.configure(highlightbackground="#d9d9d9")
+        # self.ssl_port_entry.configure(highlightcolor="black")
+        # self.ssl_port_entry.configure(insertbackground="black")
+        # self.ssl_port_entry.configure(selectbackground="#c4c4c4")
+        # self.ssl_port_entry.configure(selectforeground="black")
 
         # Παραλήπτης
         self.receiver_label = tk.Label(self.root)
@@ -198,33 +198,33 @@ class SetEmailSettings:
         self.receiver_label.configure(relief="groove")
         self.receiver_label.configure(text='''Παραλήπτης''')
 
-        # Όνομα Παραλήπτη
-        self.receiver_name_label = tk.Label(self.root)
-        self.receiver_name_label.place(relx=0.025, rely=0.670, height=31, relwidth=0.280)
-        self.receiver_name_label.configure(activebackground="#f9f9f9")
-        self.receiver_name_label.configure(activeforeground="black")
-        self.receiver_name_label.configure(background="#6b6b6b")
-        self.receiver_name_label.configure(disabledforeground="#a3a3a3")
-        self.receiver_name_label.configure(font="-family {Calibri} -size 10 -weight bold")
-        self.receiver_name_label.configure(foreground="#ffffff")
-        self.receiver_name_label.configure(highlightbackground="#d9d9d9")
-        self.receiver_name_label.configure(highlightcolor="black")
-        self.receiver_name_label.configure(relief="groove")
-        self.receiver_name_label.configure(text='''Όνομα παραλήπτη''')
-
-        self.receiver_name = StringVar()
-        self.receiver_name_entry = tk.Entry(self.root)
-        self.receiver_name_entry.place(relx=0.320, rely=0.670, height=30, relwidth=0.600)
-        self.receiver_name_entry.configure(textvariable=self.receiver_name)
-        self.receiver_name_entry.configure(background="white")
-        self.receiver_name_entry.configure(disabledforeground="#a3a3a3")
-        self.receiver_name_entry.configure(font="TkFixedFont")
-        self.receiver_name_entry.configure(foreground="#000000")
-        self.receiver_name_entry.configure(highlightbackground="#d9d9d9")
-        self.receiver_name_entry.configure(highlightcolor="black")
-        self.receiver_name_entry.configure(insertbackground="black")
-        self.receiver_name_entry.configure(selectbackground="#c4c4c4")
-        self.receiver_name_entry.configure(selectforeground="black")
+        # # Όνομα Παραλήπτη
+        # self.receiver_name_label = tk.Label(self.root)
+        # self.receiver_name_label.place(relx=0.025, rely=0.670, height=31, relwidth=0.280)
+        # self.receiver_name_label.configure(activebackground="#f9f9f9")
+        # self.receiver_name_label.configure(activeforeground="black")
+        # self.receiver_name_label.configure(background="#6b6b6b")
+        # self.receiver_name_label.configure(disabledforeground="#a3a3a3")
+        # self.receiver_name_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        # self.receiver_name_label.configure(foreground="#ffffff")
+        # self.receiver_name_label.configure(highlightbackground="#d9d9d9")
+        # self.receiver_name_label.configure(highlightcolor="black")
+        # self.receiver_name_label.configure(relief="groove")
+        # self.receiver_name_label.configure(text='''Όνομα παραλήπτη''')
+        #
+        # self.receiver_name = StringVar()
+        # self.receiver_name_entry = tk.Entry(self.root)
+        # self.receiver_name_entry.place(relx=0.320, rely=0.670, height=30, relwidth=0.600)
+        # self.receiver_name_entry.configure(textvariable=self.receiver_name)
+        # self.receiver_name_entry.configure(background="white")
+        # self.receiver_name_entry.configure(disabledforeground="#a3a3a3")
+        # self.receiver_name_entry.configure(font="TkFixedFont")
+        # self.receiver_name_entry.configure(foreground="#000000")
+        # self.receiver_name_entry.configure(highlightbackground="#d9d9d9")
+        # self.receiver_name_entry.configure(highlightcolor="black")
+        # self.receiver_name_entry.configure(insertbackground="black")
+        # self.receiver_name_entry.configure(selectbackground="#c4c4c4")
+        # self.receiver_name_entry.configure(selectforeground="black")
 
         # Email Παραλήπτη
         self.receiver_email_label = tk.Label(self.root)
@@ -263,17 +263,17 @@ class SetEmailSettings:
         self.save_btn.configure(command=self.save_settings)
 
     def save_settings(self):
-        email_data = [self.sender_email.get(), self.password.get(), self.smtp_server.get(), self.port.get(),
-                      self.ssl_port.get()]
+        email_data = [self.sender_email_entry.get(), self.password_entry.get(), self.smtp_server_entry.get(),
+                      self.port_entry.get()]
 
         con = sqlite3.connect(dbase)
         c = con.cursor()
-        sql = "INSERT INTO Sender_emails(sender_email, password, smtp_server, port, ssl_port)" \
-              "VALUES(?,?,?,?,?)"
+        sql = "INSERT INTO Sender_emails(sender_email, password, smtp_server, port)VALUES(?,?,?,?)"
         try:
-            c.execute(sql, tuple(email_data,))
-            c.execute("INSERT INTO Receiver_emails(Ονομα, Receiver_email)VALUES(?,?)", (self.receiver_name_entry.get(),
-                                                                                        self.receiver_email.get()))
+            if "@" in self.sender_email_entry.get():
+                c.execute(sql, tuple(email_data,))
+            if "@" in self.receiver_email_entry.get():
+                c.execute("INSERT INTO Receiver_emails(Receiver_email)VALUES(?)", (self.receiver_email_entry.get(),))
 
         except sqlite3.IntegrityError as error:
             messagebox.showerror("Σφάλμα", f"{error}")
@@ -291,8 +291,6 @@ class SetEmailSettings:
 if __name__ == "__main__":
     set_mail = SetEmailSettings()
     set_mail.root.mainloop()
-
-
 
 
 def run_email_settings():

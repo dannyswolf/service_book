@@ -2,11 +2,10 @@
 import getpass
 import os
 import logging
-import sqlite3
+import datetime
+
 import sys
-from urllib.request import urlopen
-import urllib.error
-from tkinter import messagebox
+
 user = getpass.getuser()
 
 
@@ -32,35 +31,12 @@ else:
 
 demo = 0  # 0 Demo Disabled 1 Demo enabled
 if demo:
-    service_book_version = "V 1.7.1 Demo"
+    service_book_version = "V 1.7.2 Demo"
 else:
-    service_book_version = "V 1.7.1 ML Shop"
+    service_book_version = "V 1.7.2 ML Shop"
 
 
-
-
-smtp_server = "smtp.gmail.com"
-ssl_port = 465  # For SSL
-port = 587  # For starttls
-sender_email = "mlcopier10@gmail.com"
-password = '3714000000'
-
-# Ημερομηνία
-try:
-    res = urlopen('http://just-the-time.appspot.com/')
-    result = res.read().strip()
-    result_str = result.decode('utf-8')  # 2020-01-08 22:30:56
-    only_date = result_str[:11]
-    day = only_date[8:10]
-    month = only_date[5:7]
-    year = only_date[:4]
-    today = day + " " + month + " " + year  # 08 01 2020
-
-except urllib.error.URLError as error:
-
-    messagebox.showerror("Σφάλμα στην σύνδεση σας", "Παρακαλω ελέγξτε την σύνδεση σας στο διαδίκτυο ")
-    raise urllib.error.URLError(f"{error}")
-
+today = datetime.datetime.today().strftime("%d %m %Y")
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE και Ημερομηνία ------------------
 
 log_dir = "logs" + "/" + today + "/"
