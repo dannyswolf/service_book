@@ -1213,6 +1213,8 @@ class edit_task_window:
         screen_dir = f"prints/screen_shot"
         if not os.path.exists(screen_dir):
             os.makedirs(screen_dir)
+
+
         if sys.platform == "win32":
             width = self.top.winfo_x() + self.top.winfo_width() + 9
             height = self.top.winfo_y() + self.top.winfo_height() + 20
@@ -1226,9 +1228,9 @@ class edit_task_window:
         im.save(f"{screen_dir}/screen_shot0.png")
         self.notebook.select(tab_id=1)
 
-        answer = messagebox.askyesno("Προσοχή", 'Θα θέλατε και τα ανταλλακτικά;')
+        answer = messagebox.askquestion("Προσοχή", 'Θα θέλατε και τα ανταλλακτικά;')
 
-        if answer:
+        if answer == "yes":
             self.top.focus()
             time.sleep(0.5)
             im2 = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height))  # X1,Y1,X2,Y2
@@ -1342,6 +1344,8 @@ class edit_task_window:
             os.system("okular " + outputFilename)
         else:
             subprocess.Popen(outputFilename, shell=True)
+
+        shutil.rmtree(screen_dir)
 
     # Αποστολή email
     def send_mail(self):

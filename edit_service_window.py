@@ -5,6 +5,7 @@
 #  in conjunction with Tcl version 8.6
 #    Dec 16, 2019 11:26:05 PM EET  platform: Windows NT
 import os
+import shutil
 import sys
 import sqlite3
 import time
@@ -682,8 +683,8 @@ class edit_service_window():
         im.save(f"prints/screen_shot/screen_shot0.png")
         self.notebook.select(tab_id=1)
 
-        answer = messagebox.askyesno("Προσοχή", 'Θα θέλατε και τα ανταλλακτικά;')
-        if answer:
+        answer = messagebox.askquestion("Προσοχή", 'Θα θέλατε και τα ανταλλακτικά;')
+        if answer == "yes":
             self.top.focus()
             time.sleep(0.5)
             im1 = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height), childprocess=False)  # X1,Y1,X2,Y2
@@ -797,6 +798,8 @@ class edit_service_window():
             os.system("okular " + outputFilename)
         else:
             subprocess.Popen(outputFilename, shell=True)
+        # Διαγραφή αρχείων
+        shutil.rmtree("prints/screen_shot")
 
     # Προσθήκη αρχείων
     def add_files(self):

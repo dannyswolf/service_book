@@ -387,7 +387,6 @@ class add_service_window():
         self.add_to_service_data_btn1.configure(image=self.add_to_service_data_img1)
         self.add_to_service_data_btn1.configure(command=lambda: (self.add_to_service_data("Σκοπός")))
 
-
         self.add_to_service_data_btn2 = tk.Button(top)
         self.add_to_service_data_btn2.place(relx=0.800, rely=0.390, height=29, relwidth=0.060)
         self.add_to_service_data_btn2.configure(background="#006291")
@@ -404,7 +403,6 @@ class add_service_window():
         self.Label2.configure(relief="groove")
         self.Label2.configure(text='''Προσθήκη ιστορικού''')
         self.edit()
-
 
     def quit(self, event):
         root.focus()
@@ -539,9 +537,9 @@ class add_service_window():
             add_conn.close()
             rt.focus()
             w.destroy()
-            messagebox.showinfo('Επιτυχής ενημέρωση', "Το ιστορικό συντήρησης του φωτοτυπικού "
-                                                      "{} στον πελάτη {} ενημερώθηκε ".format(
-                selected_copier_data[0][1], curtomer_data[0][1]))
+            messagebox.showinfo('Επιτυχής ενημέρωση',
+                                "Το ιστορικό συντήρησης του φωτοτυπικού {} στον πελάτη {} ενημερώθηκε "
+                                .format(selected_copier_data[0][1], curtomer_data[0][1]))
 
         self.save_btn = tk.Button(w)
         self.save_btn.place(relx=0.396, rely=0.934, height=34, width=147)
@@ -634,9 +632,17 @@ class add_service_window():
                                                             self.copier)
 
     def check_before_close_windows(self):
-        messagebox.showinfo("Προσοχή!", "Παρακαλώ πρώτα αποθηκεύστε και επιτα διαγράψτε την επισκευή αν θέλετε")
-        return
-
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT * FROM Ανταλλακτικά WHERE Service_ID = ?", (self.service_id,))
+        spare_parts = c.fetchall()
+        con.close()
+        if spare_parts:
+            messagebox.showinfo("Προσοχή!", "Έχεται προσθέση ανταλλακτικά!\nΠαρακαλώ πρώτα αποθηκεύστε και επειτα "
+                                            "διαγράψτε την επισκευή αν θέλετε")
+            return
+        else:
+            self.top.destroy()
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):
     '''Configure the scrollbars for a widget.'''
