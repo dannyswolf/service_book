@@ -330,7 +330,6 @@ class add_copier_window:
         next_id = data[0][0]
         self.id = str(self.table) + "_" + str(int(next_id) + 1)
 
-
     # Ελεγχος αν υπάρχουν αρχεία για προβολή
     def check_if_files_exists(self):
 

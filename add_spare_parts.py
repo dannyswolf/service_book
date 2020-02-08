@@ -412,7 +412,7 @@ class Toplevel1:
             old_pieces = c.fetchall()
             try:
                 new_pieces = int(old_pieces[0][0]) - 1
-            except ValueError: # όταν τα τεμάχια δεν έιναι αριθμός αλλα έχουμε γραμματα
+            except ValueError:  # όταν τα τεμάχια δεν έιναι αριθμός αλλα έχουμε γραμματα
                 new_pieces = old_pieces[0][0]
             c.execute("UPDATE " + self.selected_company + " SET ΤΕΜΑΧΙΑ =? WHERE ΚΩΔΙΚΟΣ =?", (new_pieces, code))
             con.commit()
@@ -425,8 +425,8 @@ class Toplevel1:
                 c.execute("UPDATE " + self.selected_company + " SET ΣΥΝΟΛΟ =? WHERE ΚΩΔΙΚΟΣ =?",
                           (str_total, code))
                 con.commit()
-            except sqlite3.OperationalError as error:
-                messagebox.showerror("Error!", f'{error}')
+            except sqlite3.OperationalError as error:  # Οταν δεν έχουμε τιμή
+                # messagebox.showerror("Error!", f'{error}')
                 pass
         print(f" Line 362 Οι κωδικοί {added_codes} αφερέθηκαν απο την αποθήκη {self.selected_company} με επιτυχία ")
         c.close()
