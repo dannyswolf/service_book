@@ -138,6 +138,7 @@ class add_service_window():
         self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#69ab3a")])
         self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
         self.top = top
+        top.protocol("WM_DELETE_WINDOW", self.check_before_close_windows)
         top.geometry("655x650+0+0")
         top.minsize(120, 1)
         top.maxsize(1604, 881)
@@ -631,6 +632,10 @@ class add_service_window():
     def insert_spare_part_outside_of_repository(self):
         insert_spare_parts.create_insert_spare_parts_window(self.top, self.service_id, self.customer_id,
                                                             self.copier)
+
+    def check_before_close_windows(self):
+        messagebox.showinfo("Προσοχή!", "Παρακαλώ πρώτα αποθηκεύστε και επιτα διαγράψτε την επισκευή αν θέλετε")
+        return
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):
