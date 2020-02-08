@@ -965,7 +965,7 @@ class edit_task_window:
         prints_dir = f'prints/{today}'.replace(" ", "_")
         if not os.path.exists(prints_dir):
             os.makedirs(prints_dir)
-        outputFilename = f"{prints_dir}/Service_Book{self.customer_combobox.get()}{today}.pdf"
+        outputFilename = f"{prints_dir}/Service_Book{self.customer_combobox.get()}.pdf"
 
         # Utility function
         def convertHtmlToPdf(sourceHtml, outputFilename):
@@ -1203,42 +1203,38 @@ class edit_task_window:
         else:
             subprocess.Popen(outputFilename, shell=True)
 
-    def get_screen_shot(self, index=None):
+    def get_screen_shot(self):
+
         screen_dir = f"prints/screen_shot"
         if not os.path.exists(screen_dir):
             os.makedirs(screen_dir)
-        if not index:
-            index = 0
-        width = self.top.winfo_x() + self.top.winfo_width() + 9
-        height = self.top.winfo_y() + self.top.winfo_height() + 25
-        # part of the screen
+        if sys.platform == "win32":
+            width = self.top.winfo_x() + self.top.winfo_width() + 9
+            height = self.top.winfo_y() + self.top.winfo_height() + 20
+        else:
+            width = self.top.winfo_x() + self.top.winfo_width()
+            height = self.top.winfo_y() + self.top.winfo_height()
+            # part of the screen
 
         im = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height), childprocess=False)  # X1,Y1,X2,Y2
 
-        im.save(f"{screen_dir}/screen_shot{index}.png")
+        im.save(f"{screen_dir}/screen_shot0.png")
         self.notebook.select(tab_id=1)
-        if not index:
-            answer = messagebox.askyesno("Προσοχή", 'Θα θέλατε και τα ανταλλακτικά;')
-            if answer:
-                time.sleep(0.5)
-                self.get_screen_shot(1)
 
-        # time.sleep(0.5)
-        # im2 = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height))  # X1,Y1,X2,Y2
-        # im2.save("prints/screen_shot2.png")
-        # scree_shot = Image.open("prints/screen_shot.png")
-        # # screen_rgb = scree_shot.convert('RGB')
-        # scree_shot.save("prints/screen_shot.png")
+        answer = messagebox.askyesno("Προσοχή", 'Θα θέλατε και τα ανταλλακτικά;')
 
-        # logo = Image.open("icons/logo-small-orange.png")
-        # # logo_rgb = logo.convert('RGB')
-        # logo.save("prints/logo-small-orange.png")
+        if answer:
+            self.top.focus()
+            time.sleep(0.5)
+            im2 = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height))  # X1,Y1,X2,Y2
+            im2.save(f"{screen_dir}/screen_shot1.png")
 
+        self.top.focus()
         # Define your data
         prints_dir = f'prints/{today}'.replace(" ", "_")
         if not os.path.exists(prints_dir):
             os.makedirs(prints_dir)
-        outputFilename = f"{prints_dir}/Service_Book{self.customer_combobox.get()}{today}.pdf"
+        outputFilename = f"{prints_dir}/Service_Book{self.customer_combobox.get()}.pdf"
 
         # Utility function
         def convertHtmlToPdf(sourceHtml, outputFilename):

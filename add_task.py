@@ -702,7 +702,7 @@ class add_task_window:
 
         if not os.path.exists(prints_dir):
             os.makedirs(prints_dir)
-        outputFilename = f"{prints_dir}/Service_Book{self.customer_combobox.get()}{today}.pdf"
+        outputFilename = f"{prints_dir}/Service_Book{self.customer_combobox.get()}.pdf"
 
         # Utility function
         def convertHtmlToPdf(sourceHtml, outputFilename):
@@ -902,8 +902,13 @@ class add_task_window:
         self.printed = 1
 
     def get_screen_shot(self):
-        width = self.top.winfo_x() + self.top.winfo_width() + 9
-        height = self.top.winfo_y() + self.top.winfo_height() + 20
+
+        if sys.platform == "win32":
+            width = self.top.winfo_x() + self.top.winfo_width() + 9
+            height = self.top.winfo_y() + self.top.winfo_height() + 20
+        else:
+            width = self.top.winfo_x() + self.top.winfo_width()
+            height = self.top.winfo_y() + self.top.winfo_height()
         # part of the screen
         im = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height), childprocess=False)  # X1,Y1,X2,Y2
         im.save("prints/screen_shot.png")
@@ -920,7 +925,7 @@ class add_task_window:
 
         if not os.path.exists(prints_dir):
             os.makedirs(prints_dir)
-        outputFilename = f"{prints_dir}/Service_Book{self.selected_customer}{today}.pdf"
+        outputFilename = f"{prints_dir}/Service_Book{self.selected_customer}.pdf"
 
         # Utility function
         def convertHtmlToPdf(sourceHtml, outputFilename):

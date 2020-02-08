@@ -73,7 +73,7 @@ def vp_start_gui():
 
 
 w = None
-
+rt = None
 
 def create_add_service_window(root, *args, **kwargs):
     """
@@ -536,7 +536,7 @@ class add_service_window():
             add_cursor.execute(sql_insert, tuple(data_to_add))
             add_conn.commit()
             add_conn.close()
-            root.focus()
+            rt.focus()
             w.destroy()
             messagebox.showinfo('Επιτυχής ενημέρωση', "Το ιστορικό συντήρησης του φωτοτυπικού "
                                                       "{} στον πελάτη {} ενημερώθηκε ".format(

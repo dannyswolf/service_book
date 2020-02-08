@@ -57,4 +57,3 @@ handler.setFormatter(formatter)  # Pass handler as a parameter, not assign
 root_logger.addHandler(handler)
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
-

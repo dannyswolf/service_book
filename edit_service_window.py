@@ -667,35 +667,32 @@ class edit_service_window():
         self.save_btn.configure(text="Αποθήκευση")
         self.save_btn.configure(command=add_to_db)
 
-    def get_screen_shot(self, index=None):
+    def get_screen_shot(self):
         if not os.path.exists("prints/screen_shot"):
             os.makedirs("prints/screen_shot")
-        if not index:
-            index = 0
-        width = self.top.winfo_x() + self.top.winfo_width() + 9
-        height = self.top.winfo_y() + self.top.winfo_height() + 15
-        # part of the screen
+        if sys.platform == "win32":
+            width = self.top.winfo_x() + self.top.winfo_width() + 9
+            height = self.top.winfo_y() + self.top.winfo_height() + 20
+        else:
+            width = self.top.winfo_x() + self.top.winfo_width()
+            height = self.top.winfo_y() + self.top.winfo_height()
+            # part of the screen
         im = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height), childprocess=False)  # X1,Y1,X2,Y2
-        im.save(f"prints/screen_shot/screen_shot{index}.png")
+        im.save(f"prints/screen_shot/screen_shot0.png")
         self.notebook.select(tab_id=1)
-        if not index:
-            answer = messagebox.askyesno("Προσοχή", 'Θα θέλατε και τα ανταλλακτικά;')
-            if answer:
-                time.sleep(0.5)
-                self.get_screen_shot(1)
-        # scree_shot = Image.open("prints/screen_shot.png")
-        # # screen_rgb = scree_shot.convert('RGB')
-        # scree_shot.save("prints/screen_shot.png")
 
-        # logo = Image.open("icons/logo-small-orange.png")
-        # # logo_rgb = logo.convert('RGB')
-        # logo.save("prints/logo-small-orange.png")
+        answer = messagebox.askyesno("Προσοχή", 'Θα θέλατε και τα ανταλλακτικά;')
+        if answer:
+            self.top.focus()
+            time.sleep(0.5)
+            im1 = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height), childprocess=False)  # X1,Y1,X2,Y2
+            im1.save(f"prints/screen_shot/screen_shot1.png")
 
         # Define your data
         prints_dir = f'prints/{today}'.replace(" ", "_")
         if not os.path.exists(prints_dir):
             os.makedirs(prints_dir)
-        outputFilename = f"{prints_dir}/Service_Book{self.selected_customer}{today}.pdf"
+        outputFilename = f"{prints_dir}/Service_Book{self.selected_customer}.pdf"
 
         # Utility function
         def convertHtmlToPdf(sourceHtml, outputFilename):
