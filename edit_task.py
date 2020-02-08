@@ -1219,8 +1219,8 @@ class edit_task_window:
             width = self.top.winfo_x() + self.top.winfo_width() + 9
             height = self.top.winfo_y() + self.top.winfo_height() + 20
         else:
-            width = self.top.winfo_x() + self.top.winfo_width()
-            height = self.top.winfo_y() + self.top.winfo_height()
+            width = self.top.winfo_x() + self.top.winfo_width() + 5
+            height = self.top.winfo_y() + self.top.winfo_height() + 10
             # part of the screen
 
         im = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height), childprocess=False)  # X1,Y1,X2,Y2
@@ -1233,7 +1233,10 @@ class edit_task_window:
         if answer == "yes":
             self.top.focus()
             time.sleep(0.5)
-            im2 = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height))  # X1,Y1,X2,Y2
+            if sys.platform == "linux":
+                im2 = ImageGrab.grab(bbox=(self.top.winfo_x(), self.top.winfo_y(), width, height))
+            else:
+                im2 = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height))  # X1,Y1,X2,Y2
             im2.save(f"{screen_dir}/screen_shot1.png")
 
         self.top.focus()

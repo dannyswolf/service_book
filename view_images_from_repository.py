@@ -15,21 +15,11 @@ import tkinter as tk
 from tkinter import messagebox, filedialog
 import image_viewer_support
 import shutil  # για διαγραφη των φακέλων με τις εικόνες
-import logging
 import sys
-from datetime import datetime
 from settings import dbase, root_logger, spare_parts_db
 
 
-dbase = ""
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE------------------
-today = datetime.today().strftime("%d %m %Y")
-log_dir = "logs" + "\\" + today + "\\"
-
-if not os.path.exists(log_dir):
-    os.makedirs(log_dir)
-else:
-    pass
 
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
 sys.stderr.write = root_logger.error

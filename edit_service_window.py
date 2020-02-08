@@ -799,7 +799,7 @@ class edit_service_window():
         else:
             subprocess.Popen(outputFilename, shell=True)
         # Διαγραφή αρχείων
-        shutil.rmtree("prints/screen_shot")
+        shutil.rmtree("prints/")
 
     # Προσθήκη αρχείων
     def add_files(self):

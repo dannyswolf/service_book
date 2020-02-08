@@ -14,6 +14,8 @@ todo uniq (στα πεδία των πινακων στην βαση) στους
 3) todo open pdf files on webdriver
 
 
+V1.7.3 Change layout  ----------------------------------------------------------------08/02/2020
+
 V1.7.3 Fix ScreenShot ----------------------------------------------------------------08/02/2020
 todo δεν παιζει καλα το screen shot  Done
 
@@ -161,7 +163,7 @@ V1.1.1 Προσθήκη τηλ στο tasks ====================================
 V1.0.1 Προσθήκη Διαγραφή ανταλλακτικών ========================================================07/01/2020
 added new icons
 todo fix search on tasks   --- Done
-todo change colors
+todo change colors  Done
 
 
 V1.0.0 Demo ready == ==========================================================================06/01/2020
@@ -522,18 +524,21 @@ class Toplevel1:
         self.backup_menu.add_command(label="Backup Service Book", command=self.backup)
         self.backup_menu.add_command(label="Backup Αποθήκη", command=self.backup_repository)
 
-        self.licence_menu = tk.Menu(self.menubar, tearoff=0)
-        self.menubar.add_cascade(label="Αδεια", menu=self.licence_menu)
-        self.licence_menu.add_command(label="Πληροφορίες χρήσης", command=self.show_licence)
+        # self.licence_menu = tk.Menu(self.menubar, tearoff=0)
+        # self.menubar.add_cascade(label="Αδεια", menu=self.licence_menu)
+        # self.licence_menu.add_command(label="Πληροφορίες χρήσης", command=self.show_licence)
 
-        self.info_menu = tk.Menu(self.menubar, tearoff=0)
-        self.menubar.add_cascade(label="Info", menu=self.info_menu)
-        self.info_menu.add_command(label="Πληροφορίες", command=show_info)
+
 
         self.settings_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Ρυθμίσεις", menu=self.settings_menu)
         self.settings_menu.add_command(label="Ρυθμίσεις Email", command=self.set_email_settings)
         # self.settings_menu.add_command(label="Ρυθμίσεις Αποθήκη", command=self.backup_repository)
+
+        self.info_menu = tk.Menu(self.menubar, tearoff=0)
+        self.menubar.add_cascade(label="Info", menu=self.info_menu)
+        self.info_menu.add_command(label="Πληροφορίες", command=show_info)
+        self.info_menu.add_command(label="Υποστήρηξη", command=self.show_licence)
 
         top.configure(menu=self.menubar)
 
@@ -623,19 +628,19 @@ class Toplevel1:
         self.company_image = tk.Label(self.repository_frame)
 
         self.add_table_to_repository_btn = tk.Button(self.repository_frame)
-        self.add_table_to_repository_btn.place(relx=0.815, rely=0.005, relheight=0.070, relwidth=0.200)
+        self.add_table_to_repository_btn.place(relx=0.630, rely=0.015, relheight=0.130, relwidth=0.150)
         self.add_table_to_repository_btn.configure(background="#5fa15f")
         self.add_table_to_repository_btn.configure(foreground="white")
         self.add_table_to_repository_btn_img = PhotoImage(file="icons/add_table_to_repository.png")
         self.add_table_to_repository_btn.configure(image=self.add_table_to_repository_btn_img)
         self.add_table_to_repository_btn.configure(text="Προσθήκη εταιρείας")
-        self.add_table_to_repository_btn.configure(compound="left")
+        self.add_table_to_repository_btn.configure(compound="top")
         self.add_table_to_repository_btn.configure(command=self.add_table)
 
         self.repository_table = StringVar()
         self.repository_table.trace("w", self.check_table)
         self.add_table_entry = tk.Entry(self.repository_frame)
-        self.add_table_entry.place(relx=0.815, rely=0.080, relheight=0.065, relwidth=0.200)
+        self.add_table_entry.place(relx=0.630, rely=0.150, relheight=0.065, relwidth=0.150)
         self.add_table_entry.configure(background="white")
         self.add_table_entry.configure(disabledforeground="#a3a3a3")
         self.add_table_entry.configure(font=("Calibri", 12))
@@ -655,12 +660,12 @@ class Toplevel1:
         self.del_table_from_repository_btn_img = PhotoImage(file="icons/delete_table_from_repository.png")
         self.del_table_from_repository_btn.configure(image=self.del_table_from_repository_btn_img)
         self.del_table_from_repository_btn.configure(text="Διαγραφή εταιρείας")
-        self.del_table_from_repository_btn.configure(compound="left")
+        self.del_table_from_repository_btn.configure(compound="top")
         self.del_table_from_repository_btn.configure(command=self.del_table_from_repository)
 
         self.search_on_repository_stringvar = StringVar()
         self.search_on_repository_entry = tk.Entry(self.repository_frame, textvariable=self.search_on_repository_stringvar)
-        self.search_on_repository_entry.place(relx=0.29, rely=0.150, height=25, relwidth=0.200)
+        self.search_on_repository_entry.place(relx=0.29, rely=0.220, height=25, relwidth=0.200)
         self.search_on_repository_entry.configure(background="white")
         self.search_on_repository_entry.configure(disabledforeground="#a3a3a3")
         self.search_on_repository_entry.configure(font=("Calibri", 10, "bold"))
@@ -669,7 +674,7 @@ class Toplevel1:
         self.search_on_repository_entry.bind('<Return>', self.search_on_repository)
 
         self.search_on_repository_btn = tk.Button(self.repository_frame)
-        self.search_on_repository_btn.place(relx=0.500, rely=0.150, height=25, relwidth=0.145)
+        self.search_on_repository_btn.place(relx=0.290, rely=0.140, height=30, relwidth=0.145)
         self.search_on_repository_btn.configure(activebackground="#ececec")
         self.search_on_repository_btn.configure(activeforeground="#000000")
         self.search_on_repository_btn.configure(background="#006291")
@@ -685,7 +690,7 @@ class Toplevel1:
         self.search_on_repository_btn.configure(text='''Αναζήτηση''')
         self.search_on_repository_btn.configure(command=self.search_on_repository)
         self.refresh_repository_btn = tk.Button(self.repository_frame)
-        self.refresh_repository_btn.place(relx=0.650, rely=0.150, height=25, relwidth=0.030)
+        self.refresh_repository_btn.place(relx=0.450, rely=0.140, height=30, relwidth=0.030)
         self.refresh_repository_btn.configure(background="#0685c4")
         self.refresh_repository_btn_img = PhotoImage(file="icons/refresh.png")
         self.refresh_repository_btn.configure(image=self.refresh_repository_btn_img)
@@ -1604,7 +1609,10 @@ class Toplevel1:
         answer = messagebox.askquestion("Προσοχή!", f'Ειστε σίγουρος για την διαγραφή της εταιρείας {self.repository_company_combobox.get()};')
         if answer != "yes":
             return
+
         table_to_del = self.repository_company_combobox.get()
+        print(f"=============Backup =========\nΔιαγραφή πίνακα {table_to_del}")
+        self.backup_repository()
         con = sqlite3.connect(spare_parts_db)
         c = con.cursor()
         c.execute(f"DROP TABLE {table_to_del}")
@@ -1659,9 +1667,9 @@ class Toplevel1:
         self.add_spare_part_on_repository_btn.place(relx=0.025, rely=0.150, height=35, relwidth=0.260)
 
         self.del_table_from_repository_btn.configure(text=f'Διαγραφή {self.repository_company_combobox.get()}')
-        self.del_table_from_repository_btn.place(relx=0.815, rely=0.220, relheight=0.080, relwidth=0.200)
+        self.del_table_from_repository_btn.place(relx=0.850, rely=0.015, relheight=0.150, relwidth=0.150)
         self.selected_repository_company = self.repository_company_combobox.get()
-        self.company_image.place(relx=0.690, rely=0.050, height=78, width=120)
+        self.company_image.place(relx=0.500, rely=0.050, height=88, width=120)
         try:
             self.company_image_img = PhotoImage(file="icons/" + self.repository_company_combobox.get() + ".png")
             self.company_image.configure(image=self.company_image_img)
@@ -2052,12 +2060,12 @@ class Toplevel1:
 
     def show_licence(self):
 
-        messagebox.showinfo("Υπολειπόμενες μέρες", f"Υπολειπόμενες μέρες χρήσης της εφαρμογής {self.remaining_days}")
+        messagebox.showinfo("Υπολειπόμενες μέρες", f"Υπολειπόμενες μέρες υποστήριξης της εφαρμογής {self.remaining_days}")
 
     def search_selected_copier_service(self, event=None):
 
         if not self.selected_copier_id:
-            messagebox.showwarning("Προσοχή", "Παρακαλώ επιλεξτε πρώτα φωτοτυπικό")
+            messagebox.showwarning("Προσοχή", "Παρακαλώ επιλέξτε πρώτα μηχάνημα")
             return
         # Αδειάζουμε πρώτα το tree
         self.service_treeview.delete(*self.service_treeview.get_children())
@@ -2854,6 +2862,8 @@ class Toplevel1:
 
     # Αντίγραφα ασφαλείας Service Book
     def backup(self):
+        messagebox.showinfo("Προσοχή!", 'Μήν κλείσετε το παράθυρο μέχρει να εμφανιστεί μήνυμα ολοκλήρωσεις διαδικασίας'
+                                        ' αντιγράφου ασφαλείας')
 
         def progress(status, remainig, total):
             print(f"{status} Αντιγράφηκαν {total - remainig} απο {total} σελίδες...")
@@ -2903,7 +2913,8 @@ class Toplevel1:
 
     # Αντίγραφα ασφαλείας spare_parts_db
     def backup_repository(self):
-
+        messagebox.showinfo("Προσοχή!", 'Μήν κλείσετε το παράθυρο μέχρει να εμφανιστεί μήνυμα ολοκλήρωσεις διαδικασίας'
+                                        ' αντιγράφου ασφαλείας')
         def progress(status, remainig, total):
             print(f"{status} Αντιγράφηκαν {total - remainig} απο {total} σελίδες...")
 
