@@ -698,7 +698,11 @@ class add_task_window:
     # Print to pdf
     def print_to_pdf(self):
         # Define your data
-        prints_dir = f'prints/{today}'.replace(" ", "_")
+        if sys.platform == "win32":
+            prints_dir = f'/prints/{today}'.replace(" ", "_")
+
+        elif sys.platform == "linux":
+            prints_dir = f'prints/{today}'.replace(" ", "_")
 
         if not os.path.exists(prints_dir):
             os.makedirs(prints_dir)
@@ -921,7 +925,11 @@ class add_task_window:
         # logo.save("prints/logo-small-orange.png")
 
         # Define your data
-        prints_dir = f'prints/{today}'.replace(" ", "_")
+        if sys.platform == "win32":
+            prints_dir = f'/prints/{today}'.replace(" ", "_")
+
+        elif sys.platform == "linux":
+            prints_dir = f'prints/{today}'.replace(" ", "_")
 
         if not os.path.exists(prints_dir):
             os.makedirs(prints_dir)

@@ -668,6 +668,7 @@ class edit_service_window():
         self.save_btn.configure(command=add_to_db)
 
     def get_screen_shot(self):
+
         if not os.path.exists("prints/screen_shot"):
             os.makedirs("prints/screen_shot")
         if sys.platform == "win32":
@@ -689,7 +690,12 @@ class edit_service_window():
             im1.save(f"prints/screen_shot/screen_shot1.png")
 
         # Define your data
-        prints_dir = f'prints/{today}'.replace(" ", "_")
+        if sys.platform == "win32":
+            prints_dir = f'/prints/{today}'.replace(" ", "_")
+
+        elif sys.platform == "linux":
+            prints_dir = f'prints/{today}'.replace(" ", "_")
+
         if not os.path.exists(prints_dir):
             os.makedirs(prints_dir)
         outputFilename = f"{prints_dir}/Service_Book{self.selected_customer}.pdf"
