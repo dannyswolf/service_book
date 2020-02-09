@@ -390,6 +390,13 @@ class add_task_window:
         self.urgent_entry.configure(foreground="#000000")
         self.urgent_entry.configure(insertbackground="black")
 
+        self.send_mail_screen_shot_btn = tk.Button(top)
+        self.send_mail_screen_shot_btn.place(relx=0.720, rely=0.930, relheight=0.060, relwidth=0.140)
+        # self.send_mail_btn.configure(background="#6b6b6b")
+        self.send_mail_screen_shot_btn_img1 = PhotoImage(file="icons/send_screen_shot.png")
+        self.send_mail_screen_shot_btn.configure(image=self.send_mail_screen_shot_btn_img1)
+        self.send_mail_screen_shot_btn.configure(command=self.send_mail_screen_shot)
+
         self.send_mail_btn = tk.Button(top)
         self.send_mail_btn.place(relx=0.620, rely=0.930, relheight=0.060, relwidth=0.070)
         # self.send_mail_btn.configure(background="#6b6b6b")
@@ -676,6 +683,7 @@ class add_task_window:
         # 	"Ημερομηνία"	TEXT,      # ---------------  self.start_date.get()
         # 	"Σκοπός_Επίσκεψης"	TEXT,  # ---------------  self.purpose_combobox.get()
         # 	"Ενέργειες"	TEXT,          #  ""
+        #   "Τεχνικός"  TEXT,         #
         # 	"Σημειώσεις"	TEXT,       # --------------  self.notes_scrolledtext.get('1.0', 'end-1c')
         # 	"Μετρητής"	TEXT,           #  ""
         # 	"Επ_Service"	TEXT,       #  ""
@@ -684,8 +692,8 @@ class add_task_window:
         # 	FOREIGN KEY("Copier_ID") REFERENCES "Φωτοτυπικά"("ID")
         # )
         # self.copier_id = self.get_copier_id()
-        data = [self.start_date.get(), self.purpose_combobox.get(), "", self.notes_scrolledtext.get('1.0', 'end-1c'),
-                "", "", self.copier_id, ""]
+        data = [self.start_date.get(), self.purpose_combobox.get(), "", self.technician_entry.get(),
+                self.notes_scrolledtext.get('1.0', 'end-1c'), "", "", self.copier_id, ""]
         sql_insert = "INSERT INTO Service (" + columns + ")" + "VALUES(" + values + ");"
 
         cursor.execute(sql_insert, tuple(data))
@@ -907,7 +915,8 @@ class add_task_window:
         self.printed = 1
 
     def get_screen_shot(self):
-
+        if not os.path.exists("prints"):
+            os.makedirs("prints")
         if sys.platform == "win32":
             width = self.top.winfo_x() + self.top.winfo_width() + 9
             height = self.top.winfo_y() + self.top.winfo_height() + 20
@@ -1050,6 +1059,25 @@ class add_task_window:
         names = ["Ημερομηνία", "Πελάτης", "Μηχάνημα", "Σκοπός", "Τεχνικός", "Επίγων", "Τηλέφωνο", "Σημειώσεις"]
 
         mail.send_mail(self.top, data)
+
+    def send_mail_screen_shot(self):
+        screen_dir = f"prints/screen_shot"
+        if not os.path.exists(screen_dir):
+            os.makedirs(screen_dir)
+
+        if sys.platform == "win32":
+            width = self.top.winfo_x() + self.top.winfo_width() + 9
+            height = self.top.winfo_y() + self.top.winfo_height() + 20
+        else:
+            width = self.top.winfo_x() + self.top.winfo_width() + 5
+            height = self.top.winfo_y() + self.top.winfo_height() + 10
+
+        # part of the screen
+        im = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height), childprocess=False)  # X1,Y1,X2,Y2
+        im.save(f"{screen_dir}/screen_shot.png")
+        data = [self.customer_combobox.get(), self.copiers_combobox.get(), f"{screen_dir}/screen_shot.png"]
+        mail.send_mail(self.top, data)
+
 
     def add_to_service_data(self, column):
         # self.purpose_list, self.actions_list

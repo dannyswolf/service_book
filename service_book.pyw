@@ -7,12 +7,20 @@
 
 """
 
-
+todo =============== Insert Τεχνικός μετα τις ενεργιες Στον πίνακα Service Ml Shop Dbase  ===============
 todo προβολή όλων των εικόνων
 todo uniq (στα πεδία των πινακων στην βαση) στους κωδικους και part_nr serial ονοματεπωνυμο τηλ
 1) todo να γινεται εισοδος με email την πρώτη φορα για επιβεβαίωση ότι ειναι αυτός ο αγοραστης
+2) todo προσθήκη τεχνικού στην συντήρηση
 3) todo open pdf files on webdriver
 
+
+V1.7.6 Τεχνικός στην συντήρηση -------------------------------------------------------9/2/2020
+
+V1.7.5 Send Screen Shot emails -------------------------------------------------------9/2/2020
+todo να στέλνει σε email τα screen shot ----Done
+
+V1.7.4 Send email Ιστορικό φωτοτυπικού -----------------------------------------------08/02/2020
 
 V1.7.3 Change layout  ----------------------------------------------------------------08/02/2020
 
@@ -465,16 +473,16 @@ class Toplevel1:
 
         self.remaining_days = days_left()
         if self.remaining_days < 10:
-            messagebox.showwarning("Προσοχή", f"Η εφαρμογή θα στματατήσει σε {self.remaining_days} μέρες")
+            messagebox.showwarning("Προσοχή", f"Η Υποστήρηξη θα στματατήσει σε {self.remaining_days} μέρες")
         elif self.remaining_days < 0:
-            messagebox.showwarning("Προσοχή", f"Η εφαρμογή έληξε παρακαλώ ανανεώστε την υποστήριξη συντήρησης")
-            return
+            messagebox.showwarning("Προσοχή", f"Η Υποστήρηξη έληξε παρακαλώ ανανεώστε την υποστήριξη συντήρησης")
+            pass
         self.style = ttk.Style()
         if sys.platform == "win32":
             self.style.theme_use('clam')
-        self.style.configure('.',background=_bgcolor)
-        self.style.configure('.',foreground=_fgcolor)
-        self.style.configure('.',font=("Calibri", 10))
+        self.style.configure('.', background=_bgcolor)
+        self.style.configure('.', foreground=_fgcolor)
+        self.style.configure('.', font=("Calibri", 10))
         # self.style.map('.',background=[('selected', _compcolor), ('active',_ana2color)])
         self.top = top
         top.geometry("1324x800+150+50")
@@ -2014,10 +2022,10 @@ class Toplevel1:
         copier_id = copier_data[0][0]
         c.execute("SELECT Εταιρεία FROM Φωτοτυπικά WHERE ID =?", (copier_id,))
         copier_name = c.fetchall()
-        selected_copier = copier_name[0][0]
+        selected_copier_name = copier_name[0][0]
         con.close()
         # Αυτή είναι συνάρτηση του αρχείου edi_service_windows
-        create_edit_service_window(root, service_id, selected_copier, self.selected_customer, self.selected_customer_id)
+        create_edit_service_window(root, service_id, selected_copier_name, self.selected_customer, self.selected_customer_id)
 
     def edit_scheduled_tasks(self, event=None):
 

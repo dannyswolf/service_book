@@ -15,6 +15,8 @@ import image_viewer
 import add_spare_parts
 import insert_spare_parts
 from tkcalendar import DateEntry
+
+import mail
 from settings import dbase, spare_parts_db, root_logger, today  # settings
 import pyscreenshot as ImageGrab
 from PIL import Image
@@ -493,11 +495,36 @@ class edit_service_window():
         self.dte_entry.configure(selectbackground="#c4c4c4")
         self.dte_entry.configure(selectforeground="black")
 
+        # Τεχνικός
+        self.technician_label = tk.Label(self.service_frame)
+        self.technician_label.place(relx=0.025, rely=0.460, height=31, relwidth=0.331)
+        self.technician_label.configure(activebackground="#f9f9f9")
+        self.technician_label.configure(activeforeground="black")
+        self.technician_label.configure(background="#6b6b6b")
+        self.technician_label.configure(disabledforeground="#a3a3a3")
+        self.technician_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.technician_label.configure(foreground="#ffffff")
+        self.technician_label.configure(highlightbackground="#d9d9d9")
+        self.technician_label.configure(highlightcolor="black")
+        self.technician_label.configure(relief="groove")
+        self.technician_label.configure(text='''Τεχνικός''')
+        self.technician_entry = tk.Entry(self.service_frame)
+        self.technician_entry.place(relx=0.37, rely=0.460, height=30, relwidth=0.331)
+        self.technician_entry.configure(background="white")
+        self.technician_entry.configure(disabledforeground="#a3a3a3")
+        self.technician_entry.configure(font="TkFixedFont")
+        self.technician_entry.configure(foreground="#000000")
+        self.technician_entry.configure(highlightbackground="#d9d9d9")
+        self.technician_entry.configure(highlightcolor="black")
+        self.technician_entry.configure(insertbackground="black")
+        self.technician_entry.configure(selectbackground="#c4c4c4")
+        self.technician_entry.configure(selectforeground="black")
+
         self.TSeparator1 = ttk.Separator(self.service_frame)
-        self.TSeparator1.place(relx=0.025, rely=0.450, relwidth=0.938)
+        self.TSeparator1.place(relx=0.025, rely=0.550, relwidth=0.938)
         # Σημειώσεις
         self.notes_label = tk.Label(self.service_frame)
-        self.notes_label.place(relx=0.025, rely=0.470, height=30, relwidth=0.331)
+        self.notes_label.place(relx=0.025, rely=0.570, height=30, relwidth=0.941)
         self.notes_label.configure(activebackground="#f9f9f9")
         self.notes_label.configure(activeforeground="black")
         self.notes_label.configure(background="#6b6b6b")
@@ -509,7 +536,7 @@ class edit_service_window():
         self.notes_label.configure(relief="groove")
         self.notes_label.configure(text='''Σημειώσεις''')
         self.notes_scrolledtext = ScrolledText(self.service_frame)
-        self.notes_scrolledtext.place(relx=0.025, rely=0.550, relheight=0.300, relwidth=0.941)
+        self.notes_scrolledtext.place(relx=0.025, rely=0.650, relheight=0.200, relwidth=0.941)
         self.notes_scrolledtext.configure(background="white")
         self.notes_scrolledtext.configure(font="TkTextFont")
         self.notes_scrolledtext.configure(foreground="black")
@@ -553,6 +580,15 @@ class edit_service_window():
         self.spare_parts_treeview.configure(show="headings", style="mystyle.Treeview", selectmode="browse")
         self.get_spare_parts()
 
+        # Send mail
+        self.send_mail_btn = tk.Button(top)
+        # self.save_btn.place(relx=0.296, rely=0.932, height=34, width=147)
+        self.send_mail_btn.place(relx=0.600, rely=0.910, relheight=0.055, relwidth=0.080)
+        # self.send_mail_btn.configure(background="#006291")
+        self.send_mail_btn_img1 = PhotoImage(file="icons/send_mail.png")
+        self.send_mail_btn.configure(image=self.send_mail_btn_img1)
+        self.send_mail_btn.configure(command=self.send_mail)
+
         # get screen shot
         self.print = tk.Button(top)
         self.print.place(relx=0.870, rely=0.910, height=34, width=40)
@@ -570,6 +606,13 @@ class edit_service_window():
         self.print_img = PhotoImage(file="icons/grab_screen.png")
         self.print.configure(image=self.print_img)
         self.print.configure(compound="left")
+
+        self.send_mail_screen_shot_btn = tk.Button(top)
+        self.send_mail_screen_shot_btn.place(relx=0.120, rely=0.910, relheight=0.060, relwidth=0.140)
+        # self.send_mail_btn.configure(background="#6b6b6b")
+        self.send_mail_screen_shot_btn_img1 = PhotoImage(file="icons/send_screen_shot.png")
+        self.send_mail_screen_shot_btn.configure(image=self.send_mail_screen_shot_btn_img1)
+        self.send_mail_screen_shot_btn.configure(command=self.send_mail_screen_shot)
 
         self.delete_task_btn = tk.Button(top)
         self.delete_task_btn.place(relx=0.706, rely=0.200, relheight=0.060, relwidth=0.250)
@@ -605,6 +648,46 @@ class edit_service_window():
     def show_files(self):
         image_viewer.create_Toplevel1(w, self.selected_service_id)
 
+    def send_mail_screen_shot(self):
+        screen_dir = f"prints/screen_shot"
+        if not os.path.exists(screen_dir):
+            os.makedirs(screen_dir)
+
+        if sys.platform == "win32":
+            width = self.top.winfo_x() + self.top.winfo_width() + 9
+            height = self.top.winfo_y() + self.top.winfo_height() + 20
+        else:
+            width = self.top.winfo_x() + self.top.winfo_width() + 5
+            height = self.top.winfo_y() + self.top.winfo_height() + 10
+            # part of the screen
+
+        im = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height), childprocess=False)  # X1,Y1,X2,Y2
+
+        im.save(f"{screen_dir}/screen_shot0.png")
+        self.notebook.select(tab_id=1)
+        answer = messagebox.askquestion("Προσοχή", 'Θα θέλατε και τα ανταλλακτικά;')
+
+        if answer == "yes":
+            self.top.focus()
+            time.sleep(0.5)
+            if sys.platform == "linux":
+                im2 = ImageGrab.grab(bbox=(self.top.winfo_x(), self.top.winfo_y(), width, height))
+            else:
+                im2 = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height))  # X1,Y1,X2,Y2
+            im2.save(f"{screen_dir}/screen_shot1.png")
+
+        data = [self.selected_customer, self.selected_copier, f"{screen_dir}/screen_shot0.png",
+                f"{screen_dir}/screen_shot1.png", self.selected_service_id]
+        # data = [self.start_date.get(), self.customer_combobox.get(), self.selected_copier, self.purpose_combobox.get(),
+        #         self.technician_entry.get(), self.actions_combobox.get(), self.counter_entry.get(),
+        #         self.next_service_entry.get(),
+        #         self.files, added_spare_parts, self.urgent, self.phone_entry.get(),
+        #         self.notes_scrolledtext.get('1.0', 'end-1c'), self.dte_entry.get(),
+        #         self.copier_id, self.compl_date_entry.get(), self.completed_var.get(), self.customer_id,
+        #         self.service_id]
+
+        mail.send_mail(self.top, data)
+
     # επεξεργασία δεδομένων
     def edit(self):
         edit_conn = sqlite3.connect(dbase)
@@ -613,7 +696,7 @@ class edit_service_window():
         self.culumns = list(map(lambda x: x[0], edit_corsor.description))
 
         data = edit_corsor.fetchall()
-        self.copier_id = data[0][7]
+        self.copier_id = data[0][8]
         edit_corsor.close()
         edit_conn.close()
         # w ==>> το global root
@@ -623,14 +706,16 @@ class edit_service_window():
         purpose_combobox = StringVar(w, value=data[0][2])
         self.purpose_combobox.set(purpose_combobox.get())
         action = StringVar(w, value=data[0][3])
+        technician = StringVar(w, value=data[0][4])
+        self.technician_entry.configure(textvariable=technician)
         self.actions_combobox.set(action.get())
-        notes = StringVar(w, value=data[0][4])
+        notes = StringVar(w, value=data[0][5])
         self.notes_scrolledtext.insert('1.0', notes.get())
-        counter = StringVar(w, value=data[0][5])
+        counter = StringVar(w, value=data[0][6])
         self.counter_entry.configure(textvariable=counter)
-        next_service = StringVar(w, value=data[0][6])
+        next_service = StringVar(w, value=data[0][7])
         self.next_service_entry.configure(textvariable=next_service)
-        dte = StringVar(w, value=data[0][8])
+        dte = StringVar(w, value=data[0][9])
         self.dte_entry.configure(textvariable=dte)
 
         # Προσθήκη αλλαγών στην βαση δεδομένων
@@ -642,8 +727,8 @@ class edit_service_window():
                     edited_culumns.append(culumn + "=?")
             edited_culumns = ",".join(edited_culumns)
             data_to_add = [self.date_entry.get(), self.purpose_combobox.get(), self.actions_combobox.get(),
-                           self.notes_scrolledtext.get("1.0", "end-1c"), counter.get(), next_service.get(),
-                           self.copier_id, dte.get(), self.selected_service_id]
+                           self.technician_entry.get(), self.notes_scrolledtext.get("1.0", "end-1c"), counter.get(),
+                           next_service.get(), self.copier_id, dte.get(), self.selected_service_id]
 
             add_conn = sqlite3.connect(dbase)
             add_cursor = add_conn.cursor()
@@ -800,6 +885,19 @@ class edit_service_window():
             subprocess.Popen(outputFilename, shell=True)
         # Διαγραφή αρχείων
         shutil.rmtree("prints/")
+
+    def send_mail(self):
+        added_spare_parts = []
+
+        for child in self.spare_parts_treeview.get_children():
+            added_spare_parts.append(self.spare_parts_treeview.item(child)["values"][2:4])
+
+        data = [self.date_entry.get(), self.selected_customer, self.selected_copier, self.purpose_combobox.get(),
+                "technician", self.actions_combobox.get(), self.counter_entry.get(), self.next_service_entry.get(),
+                self.files, added_spare_parts, "urgent", "phone", self.notes_scrolledtext.get("1.0", "end-1c"),
+                self.dte_entry.get(), self.copier_id, self.date_entry.get(), 1, self.customer_id, self.selected_service_id]
+
+        mail.send_mail(self.top, data)
 
     # Προσθήκη αρχείων
     def add_files(self):

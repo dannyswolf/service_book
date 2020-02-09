@@ -540,7 +540,6 @@ class edit_task_window:
         self.dte_entry.configure(foreground="#000000")
         self.dte_entry.configure(insertbackground="black")
 
-
         self.send_mail_btn = tk.Button(top)
         # self.save_btn.place(relx=0.296, rely=0.932, height=34, width=147)
         self.send_mail_btn.place(relx=0.600, rely=0.932, relheight=0.055, relwidth=0.080)
@@ -548,6 +547,8 @@ class edit_task_window:
         self.send_mail_btn_img1 = PhotoImage(file="icons/send_mail.png")
         self.send_mail_btn.configure(image=self.send_mail_btn_img1)
         self.send_mail_btn.configure(command=self.send_mail)
+
+
 
         self.print_btn = tk.Button(top)
         self.print_btn.place(relx=0.845, rely=0.932, relheight=0.055, relwidth=0.070)
@@ -765,6 +766,13 @@ class edit_task_window:
         self.print_img = PhotoImage(file="icons/grab_screen.png")
         self.print.configure(image=self.print_img)
         self.print.configure(compound="left")
+
+        self.send_mail_screen_shot_btn = tk.Button(top)
+        self.send_mail_screen_shot_btn.place(relx=0.120, rely=0.930, relheight=0.060, relwidth=0.140)
+        # self.send_mail_btn.configure(background="#6b6b6b")
+        self.send_mail_screen_shot_btn_img1 = PhotoImage(file="icons/send_screen_shot.png")
+        self.send_mail_screen_shot_btn.configure(image=self.send_mail_screen_shot_btn_img1)
+        self.send_mail_screen_shot_btn.configure(command=self.send_mail_screen_shot)
 
         self.save_btn = tk.Button(w)
         self.save_btn.place(relx=0.296, rely=0.932, height=34, width=147)
@@ -1208,12 +1216,51 @@ class edit_task_window:
         else:
             subprocess.Popen(outputFilename, shell=True)
 
+    def send_mail_screen_shot(self):
+        screen_dir = f"prints/screen_shot"
+        if not os.path.exists(screen_dir):
+            os.makedirs(screen_dir)
+
+        if sys.platform == "win32":
+            width = self.top.winfo_x() + self.top.winfo_width() + 9
+            height = self.top.winfo_y() + self.top.winfo_height() + 20
+        else:
+            width = self.top.winfo_x() + self.top.winfo_width() + 5
+            height = self.top.winfo_y() + self.top.winfo_height() + 10
+            # part of the screen
+
+        im = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height), childprocess=False)  # X1,Y1,X2,Y2
+
+        im.save(f"{screen_dir}/screen_shot0.png")
+        self.notebook.select(tab_id=1)
+        answer = messagebox.askquestion("Προσοχή", 'Θα θέλατε και τα ανταλλακτικά;')
+
+        if answer == "yes":
+            self.top.focus()
+            time.sleep(0.5)
+            if sys.platform == "linux":
+                im2 = ImageGrab.grab(bbox=(self.top.winfo_x(), self.top.winfo_y(), width, height))
+            else:
+                im2 = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height))  # X1,Y1,X2,Y2
+            im2.save(f"{screen_dir}/screen_shot1.png")
+
+        data = [self.customer_combobox.get(), self.selected_copier, f"{screen_dir}/screen_shot0.png",
+                f"{screen_dir}/screen_shot1.png", self.service_id]
+        # data = [self.start_date.get(), self.customer_combobox.get(), self.selected_copier, self.purpose_combobox.get(),
+        #         self.technician_entry.get(), self.actions_combobox.get(), self.counter_entry.get(),
+        #         self.next_service_entry.get(),
+        #         self.files, added_spare_parts, self.urgent, self.phone_entry.get(),
+        #         self.notes_scrolledtext.get('1.0', 'end-1c'), self.dte_entry.get(),
+        #         self.copier_id, self.compl_date_entry.get(), self.completed_var.get(), self.customer_id,
+        #         self.service_id]
+
+        mail.send_mail(self.top, data)
+
     def get_screen_shot(self):
 
         screen_dir = f"prints/screen_shot"
         if not os.path.exists(screen_dir):
             os.makedirs(screen_dir)
-
 
         if sys.platform == "win32":
             width = self.top.winfo_x() + self.top.winfo_width() + 9
@@ -1581,6 +1628,7 @@ class edit_task_window:
         # 	"Ημερομηνία"	TEXT,      # ---------------  [self.date.get()
         # 	"Σκοπός_Επίσκεψης"	TEXT,  # ---------------  self.purpose_combobox.get()
         # 	"Ενέργειες"	TEXT,          #  --------------  self.actions_combobox.get()
+        #   "Τεχνικός"  TEXT,          #  --------------- self.technician_entry.get()
         # 	"Σημειώσεις"	TEXT,       # --------------  self.notes_scrolledtext.get('1.0', 'end-1c')
         # 	"Μετρητής"	TEXT,           # --------------  self.counter_entry.get()
         # 	"Επ_Service"	TEXT,       # --------------  self.next_service_entry.get()
@@ -1589,8 +1637,8 @@ class edit_task_window:
         # 	FOREIGN KEY("Copier_ID") REFERENCES "Φωτοτυπικά"("ID")
         # )
         data = [self.compl_date_entry.get(), self.purpose_combobox.get(), self.actions_combobox.get(),
-                self.notes_scrolledtext.get('1.0', 'end-1c'), self.counter_entry.get(), self.next_service_entry.get(),
-                self.copier_id, self.dte_entry.get(), self.service_id]
+                self.technician_entry.get(), self.notes_scrolledtext.get('1.0', 'end-1c'), self.counter_entry.get(),
+                self.next_service_entry.get(), self.copier_id, self.dte_entry.get(), self.service_id]
 
         cursor.execute("UPDATE Service  SET " + edited_columns + " WHERE ID=? ", (tuple(data)))
         conn.commit()

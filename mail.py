@@ -1,4 +1,5 @@
 #  -*- coding: utf-8 -*-
+import datetime
 import sys
 import os
 import smtplib
@@ -217,19 +218,20 @@ class Mail:
                 status = "Ολοκληρώθηκε"
 
                 # Προσθήκη αρχείων
-            if files:
-                for file in files:
-                    with open(file, "rb") as fil:
-                        ext = file.split('.')[-1:]
-                        attached_file = MIMEApplication(fil.read(), _subtype=ext)
-                        attached_file.add_header('content-disposition', 'attachment', filename=basename(file))
-                        message.attach(attached_file)
+            # if files:
+            #     for file in files:
+            #         with open(file, "rb") as fil:
+            #             ext = file.split('.')[-1:]
+            #             attached_file = MIMEApplication(fil.read(), _subtype=ext)
+            #             attached_file.add_header('content-disposition', 'attachment', filename=basename(file))
+            #             message.attach(attached_file)
 
-            # get_images_from_db():
+            # get_images_from_db:
             con = sqlite3.connect(dbase)
             cursor = con.cursor()
             cursor.execute("SELECT * FROM Service_images WHERE Service_ID =?", (service_id,))
             images = cursor.fetchall()
+
             cursor.close()
             con.close()
             if images:
@@ -267,6 +269,91 @@ class Mail:
                                 </body>
                             </html>
                             """
+        elif len(self.data) == 3:  # Οταν δημηουργούμε κλήση
+
+            customer = self.data[0]
+            copier = self.data[1]
+            file = self.data[2]
+
+            message["Subject"] = "Service Book " + " " + customer + " " + copier
+            message["From"] = self.senders_combobox.get()
+            message["To"] = self.receiver_email
+            with open(file, "rb") as img:
+                attached_file = MIMEApplication(img.read(), _subtype="png")
+                attached_file.add_header('content-disposition', 'attachment', filename=basename(file))
+                message.attach(attached_file)
+            date = datetime.datetime.today()
+            html = f"""\
+                            <html>
+                                <body>
+                        <p><b>Ημερομηνία:  </b>  {date} <br> <b>Πελάτης: </b>  {customer}  <br> <b>Φωτοτυπικό: </b>  {copier}  
+                       <br> <b>Χρήστης:  </b>{user}
+                                </body>
+                            </html>
+                            """
+        elif len(self.data) == 5:  # επεξεργασία κλήσης και συντήρησης
+
+            customer = self.data[0]
+            copier = self.data[1]
+            file1 = self.data[2]
+            file2 = self.data[3]
+            service_id = self.data[4]
+
+            message["Subject"] = "Service Book " + " " + customer + " " + copier
+            message["From"] = self.senders_combobox.get()
+            message["To"] = self.receiver_email
+            with open(file1, "rb") as img:
+                attached_file = MIMEApplication(img.read(), _subtype="png")
+                attached_file.add_header('content-disposition', 'attachment', filename=basename(file1))
+                message.attach(attached_file)
+            try:
+                with open(file2, "rb") as img:
+                    attached_file = MIMEApplication(img.read(), _subtype="png")
+                    attached_file.add_header('content-disposition', 'attachment', filename=basename(file2))
+                    message.attach(attached_file)
+            except FileNotFoundError:  # όταν δεν στελνουμε σαν screen shot την καρτέλα ανταλλακτικά
+                pass
+
+            # get_images_from_db:
+            con = sqlite3.connect(dbase)
+            cursor = con.cursor()
+            cursor.execute("SELECT * FROM Service_images WHERE Service_ID =?", (service_id,))
+            images = cursor.fetchall()
+
+            cursor.close()
+            con.close()
+            if images:
+                files = []
+                images_path = "Service_images/Service_ID_" + str(service_id) + "/"
+                if not os.path.exists(images_path):
+                    os.makedirs(images_path)
+                # Δημιουργεία εικόνων
+                # images[num][4] ==> Η εικόνα σε sqlite3.Binary
+                # images[num][2 ] =>> Ονομα αρχείου
+                for num, i in enumerate(images):
+                    with open(images_path + images[num][1] + images[num][2], 'wb') as image_file:
+                        image_file.write(images[num][4])
+                images = os.listdir(images_path)
+
+                for img in images:
+                    files.append(img)
+                    ext = img.split('.')[-1:]
+                    img = images_path + img
+                    with open(img, "rb") as file:
+                        attached_file = MIMEApplication(file.read(), _subtype=ext)
+                        attached_file.add_header('content-disposition', 'attachment', filename=basename(img))
+                        message.attach(attached_file)
+
+            date = datetime.datetime.today()
+            html = f"""\
+                            <html>
+                                <body>
+                        <p><b>Ημερομηνία:  </b>  {date} <br> <b>Πελάτης: </b>  {customer}  <br> <b>Φωτοτυπικό: </b>  {copier}  
+                       <br> <b>Χρήστης:  </b>{user}
+                                </body>
+                            </html>
+                            """
+
         else:
             date = self.data[0]
             customer = self.data[1]
@@ -314,7 +401,6 @@ class Mail:
             server.login(self.senders_combobox.get(), self.password)
             self.progress['value'] = 80
             self.progress.update()
-            print(self.senders_combobox.get(), self.receiver_email, message)
             server.sendmail(self.senders_combobox.get(), self.receiver_email, message.as_bytes())  # Send email here
 
         except Exception as e:
@@ -325,9 +411,12 @@ class Mail:
             server.quit()
 
             try:
+
                 # Διαγραφή αρχείων μετά το κλείσημο του παραθύρου
+                shutil.rmtree("prints/screen_shot", ignore_errors=True)
                 if os.path.exists(images_path):
                     shutil.rmtree(images_path, ignore_errors=True)
+
             except UnboundLocalError:  # Δεν υπάρχουν αρχεία για διαγραφή
                 pass
             self.progress['value'] = 100

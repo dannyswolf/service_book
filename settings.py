@@ -31,9 +31,9 @@ else:
 
 demo = 0  # 0 Demo Disabled 1 Demo enabled
 if demo:
-    service_book_version = "V 1.7.3 Demo"
+    service_book_version = "V 1.7.6 Demo"
 else:
-    service_book_version = "V 1.7.3 ML Shop"
+    service_book_version = "V 1.7.6 ML Shop"
 
 
 today = datetime.datetime.today().strftime("%d %m %Y")

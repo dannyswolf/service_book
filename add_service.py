@@ -243,7 +243,7 @@ class add_service_window():
 
         # Ανταλλακτικά
         self.add_spare_parts_btn = tk.Button(top)
-        self.add_spare_parts_btn.place(relx=0.525, rely=0.450, height=35, relwidth=0.420)
+        self.add_spare_parts_btn.place(relx=0.650, rely=0.240, height=50, relwidth=0.280)
         self.add_spare_parts_btn.configure(activebackground="#ececec")
         self.add_spare_parts_btn.configure(activeforeground="#000000")
         self.add_spare_parts_btn.configure(background="green")
@@ -252,7 +252,7 @@ class add_service_window():
         self.add_spare_parts_btn.configure(highlightbackground="#d9d9d9")
         self.add_spare_parts_btn.configure(highlightcolor="black")
         self.add_spare_parts_btn.configure(pady="0")
-        self.add_spare_parts_btn.configure(text='''Προσθήκη ανταλλακτικών απο αποθήκη''')
+        self.add_spare_parts_btn.configure(text='''    Προσθήκη\n    ανταλλακτικών\nαπο αποθήκη''')
         self.add_spare_parts_btn.configure(command=self.add_spare_parts)
         self.add_spare_parts_btn_img = PhotoImage(file="icons/add_spare_parts.png")
         self.add_spare_parts_btn.configure(image=self.add_spare_parts_btn_img)
@@ -284,7 +284,7 @@ class add_service_window():
         self.dte_entry.configure(selectforeground="black")
         # Σημειώσεις
         self.notes_label = tk.Label(top)
-        self.notes_label.place(relx=0.025, rely=0.550, height=31, relwidth=0.250)
+        self.notes_label.place(relx=0.025, rely=0.650, height=31, relwidth=0.950)
         self.notes_label.configure(activebackground="#f9f9f9")
         self.notes_label.configure(activeforeground="black")
         self.notes_label.configure(background="#6b6b6b")
@@ -298,7 +298,7 @@ class add_service_window():
 
         # Προσθήκη αρχείων
         self.add_files_btn = tk.Button(top)
-        self.add_files_btn.place(relx=0.525, rely=0.550, height=31, relwidth=0.250)
+        self.add_files_btn.place(relx=0.650, rely=0.550, height=41, relwidth=0.250)
         self.add_files_btn.configure(activebackground="#ececec")
         self.add_files_btn.configure(activeforeground="#000000")
         self.add_files_btn.configure(background="green")
@@ -339,8 +339,33 @@ class add_service_window():
         self.next_service_label.configure(relief="groove")
         self.next_service_label.configure(text='''Επόμενο Service''')
 
+        # Τεχνικός
+        self.technician_label = tk.Label(top)
+        self.technician_label.place(relx=0.025, rely=0.520, height=31, relwidth=0.260)
+        self.technician_label.configure(activebackground="#f9f9f9")
+        self.technician_label.configure(activeforeground="black")
+        self.technician_label.configure(background="#6b6b6b")
+        self.technician_label.configure(disabledforeground="#a3a3a3")
+        self.technician_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.technician_label.configure(foreground="#ffffff")
+        self.technician_label.configure(highlightbackground="#d9d9d9")
+        self.technician_label.configure(highlightcolor="black")
+        self.technician_label.configure(relief="groove")
+        self.technician_label.configure(text='''Τεχνικός''')
+        self.technician_entry = tk.Entry(top)
+        self.technician_entry.place(relx=0.29, rely=0.520, height=30, relwidth=0.331)
+        self.technician_entry.configure(background="white")
+        self.technician_entry.configure(disabledforeground="#a3a3a3")
+        self.technician_entry.configure(font="TkFixedFont")
+        self.technician_entry.configure(foreground="#000000")
+        self.technician_entry.configure(highlightbackground="#d9d9d9")
+        self.technician_entry.configure(highlightcolor="black")
+        self.technician_entry.configure(insertbackground="black")
+        self.technician_entry.configure(selectbackground="#c4c4c4")
+        self.technician_entry.configure(selectforeground="black")
+
         self.TSeparator1 = ttk.Separator(top)
-        self.TSeparator1.place(relx=0.025, rely=0.520, relwidth=0.938)
+        self.TSeparator1.place(relx=0.025, rely=0.620, relwidth=0.938)
 
 
         self.counter_entry = tk.Entry(top)
@@ -368,7 +393,7 @@ class add_service_window():
         self.next_service_entry.configure(selectforeground="black")
 
         self.notes_scrolledtext = ScrolledText(top)
-        self.notes_scrolledtext.place(relx=0.025, rely=0.626, relheight=0.273, relwidth=0.941)
+        self.notes_scrolledtext.place(relx=0.025, rely=0.726, relheight=0.200, relwidth=0.941)
         self.notes_scrolledtext.configure(background="white")
         self.notes_scrolledtext.configure(font="TkTextFont")
         self.notes_scrolledtext.configure(foreground="black")
@@ -521,8 +546,8 @@ class add_service_window():
             values = ",".join(values_var)
 
             data_to_add = [self.date_entry.get(), self.purpose_combobox.get(), self.actions_combobox.get(),
-                           self.notes_scrolledtext.get("1.0", "end-1c"), counter.get(), next_service.get(),
-                           self.selected_copier_id, dte.get()]
+                           self.technician_entry.get(), self.notes_scrolledtext.get("1.0", "end-1c"), counter.get(),
+                           next_service.get(), self.selected_copier_id, dte.get()]
             add_conn = sqlite3.connect(dbase)
             add_cursor = add_conn.cursor()
             # ΒΑΖΟΥΜΕ ΤΟ ΠΡΩΤΟ NULL ΓΙΑ ΝΑ ΠΆΡΕΙ ΜΟΝΟ ΤΟΥ ΤΟ ID = PRIMARY KEY
