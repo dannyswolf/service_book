@@ -1,5 +1,5 @@
 #  -*- coding: utf-8 -*-
-from tkinter import Tk, ttk, messagebox, StringVar
+from tkinter import Tk, ttk, messagebox, StringVar, PhotoImage
 import tkinter as tk
 import sqlite3
 import sys
@@ -16,13 +16,32 @@ password = None
 receiver_email = None
 
 
+def get_senders_emails():
+    con = sqlite3.connect(dbase)
+    c = con.cursor()
+    c.execute("SELECT * FROM Sender_emails;")
+    sender_email_data = c.fetchall()
+    c.execute("SELECT * FROM Receiver_emails;")
+    receiver_email_data = c.fetchall()
+    con.close()
+
+    senders = []
+    receivers = []
+    for n in range(len(sender_email_data)):
+        senders.append(sender_email_data[n][1])
+
+    for n in range(len(receiver_email_data)):
+        receivers.append(receiver_email_data[n][1])
+
+    return senders, receivers
+
 class SetEmailSettings:
-    def __init__(self):
-        self.root = Tk()
+    def __init__(self, top=None):
+        self.root = top
         self.root.geometry("400x400+200+200")
         self.root.title("Ρυθμήσεις email")
         self.root.bind('<Escape>', self.quit)
-
+        self.senders, self.receivers = get_senders_emails()
         # Αποστολέας
         self.sender_label = tk.Label(self.root)
         self.sender_label.place(relx=0.025, rely=0.010, height=25, relwidth=0.950)
@@ -37,8 +56,31 @@ class SetEmailSettings:
         self.sender_label.configure(relief="groove")
         self.sender_label.configure(text='''Αποστολέας''')
 
+        self.sender_label = tk.Label(self.root)
+        self.sender_label.place(relx=0.025, rely=0.090, height=31, relwidth=0.230)
+        self.sender_label.configure(activebackground="#f9f9f9")
+        self.sender_label.configure(activeforeground="black")
+        self.sender_label.configure(background="#6b6b6b")
+        self.sender_label.configure(disabledforeground="#a3a3a3")
+        self.sender_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.sender_label.configure(foreground="#ffffff")
+        self.sender_label.configure(highlightbackground="#d9d9d9")
+        self.sender_label.configure(highlightcolor="black")
+        self.sender_label.configure(relief="groove")
+        self.sender_label.configure(text='''Λογαριασμοί''')
+        self.senders_combobox = ttk.Combobox(self.root)
+        self.senders_combobox.place(relx=0.27, rely=0.090, height=31, relwidth=0.600)
+        self.senders_combobox.configure(values=self.senders)
+        self.senders_combobox.configure(state="readonly")  #
+        self.del_sender_btn = tk.Button(self.root)
+        self.del_sender_btn.place(relx=0.900, rely=0.090, height=30, relwidth=0.080)
+        self.del_sender_btn.configure(background="#0685c4")
+        self.del_sender_btn_img = PhotoImage(file="icons/del_sender.png")
+        self.del_sender_btn.configure(image=self.del_sender_btn_img)
+        # self.del_sender_btn.configure(command=self.del_seder)
+
         self.sender_email_label = tk.Label(self.root)
-        self.sender_email_label.place(relx=0.025, rely=0.090, height=31, relwidth=0.230)
+        self.sender_email_label.place(relx=0.025, rely=0.190, height=31, relwidth=0.230)
         self.sender_email_label.configure(activebackground="#f9f9f9")
         self.sender_email_label.configure(activeforeground="black")
         self.sender_email_label.configure(background="#6b6b6b")
@@ -53,7 +95,7 @@ class SetEmailSettings:
         self.sender_email = StringVar()
         # self.sender_email.trace('w', self.check_sender_email)
         self.sender_email_entry = tk.Entry(self.root)
-        self.sender_email_entry.place(relx=0.27, rely=0.090, height=30, relwidth=0.600)
+        self.sender_email_entry.place(relx=0.27, rely=0.190, height=30, relwidth=0.600)
         self.sender_email_entry.configure(textvariable=self.sender_email)
         self.sender_email_entry.configure(background="white")
         self.sender_email_entry.configure(disabledforeground="#a3a3a3")
@@ -72,7 +114,7 @@ class SetEmailSettings:
 
         # Κωδικός
         self.password_label = tk.Label(self.root)
-        self.password_label.place(relx=0.025, rely=0.180, height=31, relwidth=0.230)
+        self.password_label.place(relx=0.025, rely=0.280, height=31, relwidth=0.230)
         self.password_label.configure(activebackground="#f9f9f9")
         self.password_label.configure(activeforeground="black")
         self.password_label.configure(background="#6b6b6b")
@@ -87,7 +129,7 @@ class SetEmailSettings:
         self.password = StringVar()
         # self.sender_email.trace('w', self.check_sender_email)
         self.password_entry = tk.Entry(self.root, show="*")
-        self.password_entry.place(relx=0.27, rely=0.180, height=30, relwidth=0.600)
+        self.password_entry.place(relx=0.27, rely=0.280, height=30, relwidth=0.600)
         self.password_entry.configure(textvariable=self.password)
         self.password_entry.configure(background="white")
         self.password_entry.configure(disabledforeground="#a3a3a3")
@@ -101,7 +143,7 @@ class SetEmailSettings:
 
         # smtp_server
         self.smtp_server_label = tk.Label(self.root)
-        self.smtp_server_label.place(relx=0.025, rely=0.270, height=31, relwidth=0.230)
+        self.smtp_server_label.place(relx=0.025, rely=0.370, height=31, relwidth=0.230)
         self.smtp_server_label.configure(activebackground="#f9f9f9")
         self.smtp_server_label.configure(activeforeground="black")
         self.smtp_server_label.configure(background="#6b6b6b")
@@ -116,7 +158,7 @@ class SetEmailSettings:
         self.smtp_server = StringVar()
         # self.smtp_server.trace('w', self.check_smtp_server)
         self.smtp_server_entry = tk.Entry(self.root)
-        self.smtp_server_entry.place(relx=0.27, rely=0.270, height=30, relwidth=0.600)
+        self.smtp_server_entry.place(relx=0.27, rely=0.370, height=30, relwidth=0.600)
         self.smtp_server_entry.configure(textvariable=self.smtp_server)
         self.smtp_server_entry.configure(background="white")
         self.smtp_server_entry.configure(disabledforeground="#a3a3a3")
@@ -130,7 +172,7 @@ class SetEmailSettings:
 
         # port
         self.port_label = tk.Label(self.root)
-        self.port_label.place(relx=0.025, rely=0.360, height=31, relwidth=0.230)
+        self.port_label.place(relx=0.025, rely=0.460, height=31, relwidth=0.230)
         self.port_label.configure(activebackground="#f9f9f9")
         self.port_label.configure(activeforeground="black")
         self.port_label.configure(background="#6b6b6b")
@@ -144,7 +186,7 @@ class SetEmailSettings:
 
         self.port = StringVar()
         self.port_entry = tk.Entry(self.root)
-        self.port_entry.place(relx=0.27, rely=0.360, height=30, relwidth=0.150)
+        self.port_entry.place(relx=0.27, rely=0.460, height=30, relwidth=0.150)
         self.port_entry.configure(textvariable=self.port)
         self.port_entry.configure(background="white")
         self.port_entry.configure(disabledforeground="#a3a3a3")
@@ -198,33 +240,28 @@ class SetEmailSettings:
         self.receiver_label.configure(relief="groove")
         self.receiver_label.configure(text='''Παραλήπτης''')
 
-        # # Όνομα Παραλήπτη
-        # self.receiver_name_label = tk.Label(self.root)
-        # self.receiver_name_label.place(relx=0.025, rely=0.670, height=31, relwidth=0.280)
-        # self.receiver_name_label.configure(activebackground="#f9f9f9")
-        # self.receiver_name_label.configure(activeforeground="black")
-        # self.receiver_name_label.configure(background="#6b6b6b")
-        # self.receiver_name_label.configure(disabledforeground="#a3a3a3")
-        # self.receiver_name_label.configure(font="-family {Calibri} -size 10 -weight bold")
-        # self.receiver_name_label.configure(foreground="#ffffff")
-        # self.receiver_name_label.configure(highlightbackground="#d9d9d9")
-        # self.receiver_name_label.configure(highlightcolor="black")
-        # self.receiver_name_label.configure(relief="groove")
-        # self.receiver_name_label.configure(text='''Όνομα παραλήπτη''')
-        #
-        # self.receiver_name = StringVar()
-        # self.receiver_name_entry = tk.Entry(self.root)
-        # self.receiver_name_entry.place(relx=0.320, rely=0.670, height=30, relwidth=0.600)
-        # self.receiver_name_entry.configure(textvariable=self.receiver_name)
-        # self.receiver_name_entry.configure(background="white")
-        # self.receiver_name_entry.configure(disabledforeground="#a3a3a3")
-        # self.receiver_name_entry.configure(font="TkFixedFont")
-        # self.receiver_name_entry.configure(foreground="#000000")
-        # self.receiver_name_entry.configure(highlightbackground="#d9d9d9")
-        # self.receiver_name_entry.configure(highlightcolor="black")
-        # self.receiver_name_entry.configure(insertbackground="black")
-        # self.receiver_name_entry.configure(selectbackground="#c4c4c4")
-        # self.receiver_name_entry.configure(selectforeground="black")
+        self.receivers_label = tk.Label(self.root)
+        self.receivers_label.place(relx=0.025, rely=0.670, height=31, relwidth=0.230)
+        self.receivers_label.configure(activebackground="#f9f9f9")
+        self.receivers_label.configure(activeforeground="black")
+        self.receivers_label.configure(background="#6b6b6b")
+        self.receivers_label.configure(disabledforeground="#a3a3a3")
+        self.receivers_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.receivers_label.configure(foreground="#ffffff")
+        self.receivers_label.configure(highlightbackground="#d9d9d9")
+        self.receivers_label.configure(highlightcolor="black")
+        self.receivers_label.configure(relief="groove")
+        self.receivers_label.configure(text='''Παραλήπτες''')
+        self.receivers_combobox = ttk.Combobox(self.root)
+        self.receivers_combobox.place(relx=0.27, rely=0.670, height=31, relwidth=0.600)
+        self.receivers_combobox.configure(values=self.receivers)
+        self.receivers_combobox.configure(state="readonly")  #
+        self.del_receivers_btn = tk.Button(self.root)
+        self.del_receivers_btn.place(relx=0.900, rely=0.670, height=30, relwidth=0.080)
+        self.del_receivers_btn.configure(background="#0685c4")
+        self.del_receivers_btn_img = PhotoImage(file="icons/del_sender.png")
+        self.del_receivers_btn.configure(image=self.del_sender_btn_img)
+        # self.del_receivers_btn.configure(command=self.del_receivers)
 
         # Email Παραλήπτη
         self.receiver_email_label = tk.Label(self.root)
@@ -292,9 +329,13 @@ if __name__ == "__main__":
     set_mail = SetEmailSettings()
     set_mail.root.mainloop()
 
+rt = None
 
-def run_email_settings():
-    run_mail = SetEmailSettings()
+def run_email_settings(root):
+    global rt
+    rt = root
+    w = tk.Toplevel(root)
+    run_mail = SetEmailSettings(w)
     run_mail.root.mainloop()
 
 

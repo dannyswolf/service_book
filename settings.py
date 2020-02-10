@@ -3,11 +3,11 @@ import getpass
 import os
 import logging
 import datetime
-
+import sqlite3
 import sys
 
-user = getpass.getuser()
 
+user = getpass.getuser()
 
 mlshop = 0
 
@@ -29,11 +29,25 @@ else:
     dbase = "Service_book.db"  # Local Dbase
 
 
-demo = 0  # 0 Demo Disabled 1 Demo enabled
+def check_if_demo():
+    con = sqlite3.connect(dbase)
+    c = con.cursor()
+    c.execute("SELECT seq from sqlite_sequence WHERE name ='demo'")
+    data = c.fetchall()
+    con.close()
+    if data[0][0] == "1":
+        version = 1  # Its Demo
+    else:
+        version = 0  # Its not Demo
+    return version
+
+
+demo = check_if_demo()
+
 if demo:
-    service_book_version = "V 1.7.6 Demo"
+    service_book_version = "V 1.7.7 Demo"
 else:
-    service_book_version = "V 1.7.6 ML Shop"
+    service_book_version = "V 1.7.7"
 
 
 today = datetime.datetime.today().strftime("%d %m %Y")

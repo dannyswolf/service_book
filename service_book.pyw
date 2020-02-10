@@ -7,15 +7,20 @@
 
 """
 
-todo =============== Insert Τεχνικός μετα τις ενεργιες Στον πίνακα Service Ml Shop Dbase  ===============
+Ενεργοποιήση προγράμματος με hash.md5 στον πίνακα sqlite_sequence πεδίο demo και key
 todo προβολή όλων των εικόνων
 todo uniq (στα πεδία των πινακων στην βαση) στους κωδικους και part_nr serial ονοματεπωνυμο τηλ
-1) todo να γινεται εισοδος με email την πρώτη φορα για επιβεβαίωση ότι ειναι αυτός ο αγοραστης
-2) todo προσθήκη τεχνικού στην συντήρηση
-3) todo open pdf files on webdriver
 
+1) todo Στο treeview των φωτοτυπικών δίπλα να βάλω treeview υπολογιστών
+2) todo open pdf files on webdriver
+
+
+V1.7.7 Ταξινόμηση με ημερομηνία στο ιστορικό συντήρησης  -----------------------------10/2/2020
+Αρχειο activate Ενεργοποιήση προγράμματος
+todo να γινεται εισοδος με email την πρώτη φορα για επιβεβαίωση ότι ειναι αυτός ο αγοραστης  -- Done
 
 V1.7.6 Τεχνικός στην συντήρηση -------------------------------------------------------9/2/2020
+todo προσθήκη τεχνικού στην συντήρηση -- Done
 
 V1.7.5 Send Screen Shot emails -------------------------------------------------------9/2/2020
 todo να στέλνει σε email τα screen shot ----Done
@@ -297,6 +302,7 @@ V 0.1.1 Προσθήκη επεξεργασία ιστορικού φωτοτυ�
 v 0.0.1 Ενας πελάτης με πολλά φωτοτυπικά το κάθε φωτοτυπικό με πολλά Service ------------------------14/12/2019
         Η ημερομηνία εναρξης και Μετρητής εναρξης είναι πεδία του φωτοτυπικού γιατί πάνε με το φωτοτυπικό
 """
+import activate
 import add_spare_parts_to_repository
 import edit_spare_parts_to_repository
 import service_book_colors_support
@@ -490,7 +496,7 @@ class Toplevel1:
         top.maxsize(1980, 1980)
         top.resizable(1, 1)
         if demo:
-            top.title("Βιβλίο Επισκευών " + service_book_version + "Demo")
+            top.title("Βιβλίο Επισκευών " + service_book_version)
         else:
             top.title("Βιβλίο Επισκευών " + service_book_version)
         top.configure(background="#bfc2b6")
@@ -547,6 +553,7 @@ class Toplevel1:
         self.menubar.add_cascade(label="Info", menu=self.info_menu)
         self.info_menu.add_command(label="Πληροφορίες", command=show_info)
         self.info_menu.add_command(label="Υποστήρηξη", command=self.show_licence)
+        self.info_menu.add_command(label="Ενεργοποίηση", command=self.activate)
 
         top.configure(menu=self.menubar)
 
@@ -1578,6 +1585,9 @@ class Toplevel1:
 
         self.get_calendar()
 
+    def activate(self):
+        activate.run_activate()
+
     # Προσθήκη εταιρείας στην αποθήκη ανταλλακτικών repository
     def add_table(self):
         table_to_add = self.add_table_entry.get()
@@ -2112,6 +2122,8 @@ class Toplevel1:
                 platos = 1
             elif head == "Ημερομηνία":
                 platos = 100
+            elif head == "Τεχνικός":
+                platos = 100
             elif head == "Σκοπός_Επίσκεψης":
                 platos = 220
             elif head == "Ενέργειες":
@@ -2128,8 +2140,9 @@ class Toplevel1:
                 platos = 50
             self.service_treeview.heading(head, text=head, anchor="center")
             self.service_treeview.column(head, width=platos, anchor="center")
+        sorted_fetch = sorted(fetch, key=lambda x: datetime.strptime(x[1], "%d/%m/%Y"))
         # item[-2] ==> Copier_ID στον πίνακα Service
-        for item in fetch:
+        for item in sorted_fetch:
 
             if item[-2] == self.selected_copier_id:
                 self.service_treeview.insert("", "end", values=item)
@@ -2201,6 +2214,8 @@ class Toplevel1:
                     platos = 100
                 elif head == "Σκοπός_Επίσκεψης":
                     platos = 220
+                elif head == "Τεχνικός":
+                    platos = 100
                 elif head == "Ενέργειες":
                     platos = 180
                 elif head == "Σημειώσεις":
@@ -2217,16 +2232,17 @@ class Toplevel1:
                     platos = 50
                 self.service_treeview.heading(head, text=head, anchor="center")
                 self.service_treeview.column(head, width=platos, anchor="center")
+            sorted_fetch = sorted(fetch, key=lambda x: datetime.strptime(x[1], "%d/%m/%Y"))
             data = []
-            for n in range(len(fetch)):
-                data.append(fetch[n][0])  # ID
-                data.append(fetch[n][1])  # Ημερομηνία
+            for n in range(len(sorted_fetch)):
+                data.append(sorted_fetch[n][0])  # ID
+                data.append(sorted_fetch[n][1])  # Ημερομηνία
                 data.append(str(copiers[n][0][0]))   # Φωτοτυπικό
                 data.append(str(customers[n][0][0]))                   # Πελάτης
-                data.append(fetch[n][2])  # Σκοπός
-                data.append(fetch[n][3])  # Ενέργειες
-                data.append(fetch[n][4])  # Σημειώσεις
-                data.append(fetch[n][8])  # Δελτίο τεχνικής εξυπηρέτησεις
+                data.append(sorted_fetch[n][2])  # Σκοπός
+                data.append(sorted_fetch[n][3])  # Ενέργειες
+                data.append(sorted_fetch[n][5])  # Σημειώσεις
+                data.append(sorted_fetch[n][9])  # Δελτίο τεχνικής εξυπηρέτησεις
                 self.service_treeview.insert("", "end", values=tuple(data))
                 data = []  # Αδιασμα του data για να εισάγουμε τα νέα δεδομένα
 
@@ -2539,6 +2555,8 @@ class Toplevel1:
                 platos = 100
             elif head == "Σκοπός_Επίσκεψης":
                 platos = 220
+            elif head == "Τεχνικός":
+                platos = 100
             elif head == "Ενέργειες":
                 platos = 180
             elif head == "Σημειώσεις":
@@ -2553,8 +2571,9 @@ class Toplevel1:
                 platos = 50
             self.service_treeview.heading(head, text=head, anchor="center")
             self.service_treeview.column(head, width=platos, anchor="center")
-        for n in range(len(service_data)):
-            self.service_treeview.insert("", "end", values=service_data[n])
+        sorted_by_date = sorted(service_data, key=lambda x: datetime.strptime(x[1], "%d/%m/%Y"))
+        for n in range(len(sorted_by_date)):
+            self.service_treeview.insert("", "end", values=sorted_by_date[n])
 
         # Εμφάνηση κουμπιού αναζήτησης ανταλλακτικών
         self.get_spare_parts()  # Πρώτα να πάρουμε τα ανταλλακτικά
@@ -2582,7 +2601,7 @@ class Toplevel1:
             return
 
         selected_service_id = (self.service_treeview.set(self.service_treeview.selection(), "#1"))
-        if heading == "Φωτοτυπικό":
+        if heading == "Φωτοτυπικό":  # Όταν είναι απο την αναζήτηση σφαλμάτων
             selected_copier = (self.service_treeview.set(self.service_treeview.selection(), "#3"))
             selected_customer = (self.service_treeview.set(self.service_treeview.selection(), "#4"))
             con = sqlite3.connect(dbase)
@@ -2970,7 +2989,7 @@ class Toplevel1:
                 messagebox.showerror("Σφάλμα", f"Η σύνδεση με {backup_file} δεν έγινε ποτέ  {error}")
 
     def set_email_settings(self):
-        email = email_settings.run_email_settings()
+        email = email_settings.run_email_settings(self.top)
 
 
 # The following code is added to facilitate the Scrolled widgets you specified.
