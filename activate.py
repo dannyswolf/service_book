@@ -4,7 +4,7 @@ from tkinter import Tk, ttk, messagebox, StringVar
 import tkinter as tk
 import sqlite3
 import sys
-from settings import dbase, root_logger
+from settings import dbase, root_logger, demo
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
@@ -13,6 +13,14 @@ sys.stdout.write = root_logger.info
 
 class activate:
     def __init__(self):
+
+        if not demo:
+            con = sqlite3.connect(dbase)
+            c = con.cursor()
+            c.execute("SELECT seq from sqlite_sequence WHERE name ='customer_email'")
+            name = c.fetchall()
+            messagebox.showinfo("Προσοχή", f'Η εφαρμογή ειναι ενεργοποιημένη στο email {name[0][0]}')
+            return
         self.root = Tk()
         self.root.geometry("350x150+200+200")
         self.root.title("Ενεργοποίηση")
@@ -99,11 +107,12 @@ class activate:
         my_key = self.email_entry.get()
         # Assumes the default UTF-8
         hash_object = hashlib.md5(my_key.encode())
-        print(self.key_entry.get(), "-------", "my_key", my_key, hash_object.hexdigest())
+
         if self.key_entry.get() == hash_object.hexdigest():
             con = sqlite3.connect(dbase)
             c = con.cursor()
             c.execute("UPDATE  sqlite_sequence SET seq = 0 WHERE name ='demo'")
+            c.execute("UPDATE sqlite_sequence SET seq = ? WHERE name ='customer_email'", (self.email_entry.get(),))
             con.commit()
             con.close()
             messagebox.showinfo("Ενεργοποίηση", "Η ενεργοποίηση ήταν επιτυχής\nΠαρακαλώ κλείστε και ανοίξτε ξανά το πρόγραμμα")
