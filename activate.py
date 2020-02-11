@@ -30,7 +30,7 @@ class activate:
         self.email_label.configure(highlightbackground="#d9d9d9")
         self.email_label.configure(highlightcolor="black")
         self.email_label.configure(relief="groove")
-        self.email_label.configure(text='''E-mail''')
+        self.email_label.configure(text='''Κλειδί''')
 
         self.email = StringVar()
         # self.sender_email.trace('w', self.check_sender_email)
@@ -46,6 +46,7 @@ class activate:
         self.email_entry.configure(insertbackground="black")
         self.email_entry.configure(selectbackground="#c4c4c4")
         self.email_entry.configure(selectforeground="black")
+        self.email_entry.configure(show="*")
         # self.sender_email_warning = ttk.Label(top)
         # self.sender_email_warning_img = PhotoImage(file="icons/lamp.png")
         # self.sender_email_warning.configure(background="#f6f6ee")

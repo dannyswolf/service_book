@@ -71,13 +71,14 @@ class SetEmailSettings:
         self.senders_combobox = ttk.Combobox(self.root)
         self.senders_combobox.place(relx=0.27, rely=0.090, height=31, relwidth=0.600)
         self.senders_combobox.configure(values=self.senders)
-        self.senders_combobox.configure(state="readonly")  #
+        self.senders_combobox.configure(state="readonly")
+        self.senders_combobox.bind("<<ComboboxSelected>>", self.show_sender_details)
         self.del_sender_btn = tk.Button(self.root)
         self.del_sender_btn.place(relx=0.900, rely=0.090, height=30, relwidth=0.080)
         self.del_sender_btn.configure(background="#0685c4")
         self.del_sender_btn_img = PhotoImage(file="icons/del_sender.png")
         self.del_sender_btn.configure(image=self.del_sender_btn_img)
-        # self.del_sender_btn.configure(command=self.del_seder)
+        self.del_sender_btn.configure(command=self.del_sender)
 
         self.sender_email_label = tk.Label(self.root)
         self.sender_email_label.place(relx=0.025, rely=0.190, height=31, relwidth=0.230)
@@ -256,12 +257,13 @@ class SetEmailSettings:
         self.receivers_combobox.place(relx=0.27, rely=0.670, height=31, relwidth=0.600)
         self.receivers_combobox.configure(values=self.receivers)
         self.receivers_combobox.configure(state="readonly")  #
+
         self.del_receivers_btn = tk.Button(self.root)
         self.del_receivers_btn.place(relx=0.900, rely=0.670, height=30, relwidth=0.080)
         self.del_receivers_btn.configure(background="#0685c4")
         self.del_receivers_btn_img = PhotoImage(file="icons/del_sender.png")
         self.del_receivers_btn.configure(image=self.del_sender_btn_img)
-        # self.del_receivers_btn.configure(command=self.del_receivers)
+        self.del_receivers_btn.configure(command=self.delete_receiver)
 
         # Email Παραλήπτη
         self.receiver_email_label = tk.Label(self.root)
@@ -299,6 +301,79 @@ class SetEmailSettings:
         self.save_btn.configure(background="#5fa15f")
         self.save_btn.configure(command=self.save_settings)
 
+    def show_sender_details(self, event=None):
+        sender = self.senders_combobox.get()
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT * FROM Sender_emails WHERE sender_email=?", (sender,))
+        data = c.fetchall()
+        con.close()
+        try:
+            email_var = StringVar(value=data[0][1])
+            self.sender_email_entry.configure(textvariable=email_var)
+            pass_var = StringVar(value=data[0][2])
+            self.password_entry.configure(textvariable=pass_var, show="*")
+            smtp_var = StringVar(value=data[0][3])
+            self.smtp_server_entry.configure(textvariable=smtp_var)
+            port_var = StringVar(value=data[0][4])
+            self.port_entry.configure(textvariable=port_var)
+        except IndexError:  # Οταν δεν έχουμε αποστολέα
+            pass
+
+    def del_sender(self):
+        sender = self.senders_combobox.get()
+        if sender == "" or sender == " ":
+            return
+        answer = messagebox.askyesno("Προσοχή!", f"Ειστε σήγουρος για την διαγραφή του {self.senders_combobox.get()}")
+        if answer:
+
+            con = sqlite3.connect(dbase)
+            c = con.cursor()
+            c.execute("DELETE FROM Sender_emails WHERE sender_email=?", (sender,))
+            con.commit()
+            con.close()
+            self.senders, self.receivers = get_senders_emails()
+
+            self.senders_combobox.configure(values=self.senders)
+            try:
+                self.senders_combobox.set(value=self.senders[0])
+            except IndexError:  # Οταν δεν έχουμε αποστολέα
+                self.senders_combobox.set(value=" ")
+
+            empty_var = StringVar(value="")
+            self.sender_email_entry.configure(textvariable=empty_var)
+            self.password_entry.configure(textvariable=empty_var)
+            self.smtp_server_entry.configure(textvariable=empty_var)
+            self.port_entry.configure(textvariable=empty_var)
+            messagebox.showwarning("Προσοχή", f"O {sender}, διαγάφηκε")
+            self.root.focus()
+        else:
+            self.root.focus()
+            return
+
+    def delete_receiver(self):
+        receiver = self.receivers_combobox.get()
+        if receiver == "" or receiver == " ":
+            return
+        answer = messagebox.askyesno("Προσοχή!", f"Ειστε σήγουρος για την διαγραφή του {self.receivers_combobox.get()}")
+        if answer:
+            con = sqlite3.connect(dbase)
+            c = con.cursor()
+            c.execute("DELETE FROM Receiver_emails WHERE Receiver_email=?", (receiver,))
+            con.commit()
+            con.close()
+            self.senders, self.receivers = get_senders_emails()
+            self.receivers_combobox.configure(values=self.receivers)
+            try:
+                self.receivers_combobox.set(value=self.receivers[0])
+            except IndexError:  # Οταν δεν έχουμε αποστολέα
+                self.receivers_combobox.set(value=" ")
+            messagebox.showwarning("Προσοχή", f"O {receiver}, διαγάφηκε")
+            self.root.focus()
+        else:
+            self.root.focus()
+            return
+
     def save_settings(self):
         email_data = [self.sender_email_entry.get(), self.password_entry.get(), self.smtp_server_entry.get(),
                       self.port_entry.get()]
@@ -306,15 +381,27 @@ class SetEmailSettings:
         con = sqlite3.connect(dbase)
         c = con.cursor()
         sql = "INSERT INTO Sender_emails(sender_email, password, smtp_server, port)VALUES(?,?,?,?)"
+        error = -1
         try:
             if "@" in self.sender_email_entry.get():
                 c.execute(sql, tuple(email_data,))
+            else:
+                error += 1
+                messagebox.showerror("Σφάλμα!", f"Μη έγκυρο email αποστολέα\nΟ αποστολέας δεν θα αποθυκευτή")
             if "@" in self.receiver_email_entry.get():
                 c.execute("INSERT INTO Receiver_emails(Receiver_email)VALUES(?)", (self.receiver_email_entry.get(),))
+            else:
+                error += 1
+                messagebox.showerror("Σφάλμα!", f"Μη έγκυρο email παραλήπτη\nΟ παραλήπτης δεν θα αποθυκευτή")
 
         except sqlite3.IntegrityError as error:
             messagebox.showerror("Σφάλμα", f"{error}")
             con.close()
+            return
+        if error:
+            con.close()
+            messagebox.showerror("Προσοχή!", "Τίποτα δεν αποθηκέυτηκε")
+            self.root.focus()
             return
         con.commit()
         con.close()
