@@ -14,6 +14,8 @@ todo uniq (στα πεδία των πινακων στην βαση) στους
 1) todo Στο treeview των φωτοτυπικών δίπλα να βάλω treeview υπολογιστών
 2) todo open pdf files on webdriver
 
+V1.8.0 ability to change service data  ---------------  -----------------------------12/2/2020
+Αρχείο data_settings
 
 V1.7.8 changes on activation    ----------------------  -----------------------------11/2/2020
 
@@ -308,6 +310,7 @@ v 0.0.1 Ενας πελάτης με πολλά φωτοτυπικά το κάθ
 """
 import activate
 import add_spare_parts_to_repository
+import data_settings
 import edit_spare_parts_to_repository
 import service_book_colors_support
 from edit_service_window import *  # Δημιουργία παραθύρου επεξεργασίας ιστορικού επισκευής
@@ -551,6 +554,7 @@ class Toplevel1:
         self.settings_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Ρυθμίσεις", menu=self.settings_menu)
         self.settings_menu.add_command(label="Ρυθμίσεις Email", command=self.set_email_settings)
+        self.settings_menu.add_command(label="Δεδομένα Service", command=self.set_data_settings)
         # self.settings_menu.add_command(label="Ρυθμίσεις Αποθήκη", command=self.backup_repository)
 
         self.info_menu = tk.Menu(self.menubar, tearoff=0)
@@ -1889,11 +1893,16 @@ class Toplevel1:
         except IndexError:  # Όταν δεν βρήσκει στο calendar ψάχνει  στο service και αν βρει να σε παει στο search_error
             c.execute("SELECT * FROM Service WHERE ΔΤΕ =?", (self.search_dte_entry.get(),))
             data_from_service = c.fetchall()
-            if self.search_dte_entry.get() in data_from_service[0]:
-                self.search_error(event, 1)
-                self.notebook.select(tab_id=3)
+            try:
+                if self.search_dte_entry.get() in data_from_service[0]:
+                    self.search_error(event, 1)
+                    self.notebook.select(tab_id=3)
+            except IndexError:  # Δεν βρισκει και εδώ
+                pass
         c.close()
         con.close()
+        empty_var = StringVar(value="")
+        self.search_dte_entry.configure(textvariable=empty_var)
 
     def search_tasks_of_selected_copier(self):
 
@@ -2680,6 +2689,7 @@ class Toplevel1:
             if fetch[n][-1]:  # Αν η κατάσταση του πελάτη είναι 1 επιστρεφει true και τον εμφανίζει ποιο κάτω
                 self.customers_treeview.insert("", "end", values=fetch[n])
         self.search_data.set(value="")
+
     # Αναζήτηση φωτοτυπικού
     def search_copier(self, event=None):
         """
@@ -2995,6 +3005,8 @@ class Toplevel1:
     def set_email_settings(self):
         email = email_settings.run_email_settings(self.top)
 
+    def set_data_settings(self):
+        data_settings.run_data_settings(self.top)
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):

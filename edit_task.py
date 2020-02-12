@@ -1239,9 +1239,9 @@ class edit_task_window:
             self.top.focus()
             time.sleep(0.5)
             if sys.platform == "linux":
-                im2 = ImageGrab.grab(bbox=(self.top.winfo_x(), self.top.winfo_y(), width, height))
+                im2 = ImageGrab.grab(bbox=(self.top.winfo_x(), self.top.winfo_y(), width, height), childprocess=False)
             else:
-                im2 = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height))  # X1,Y1,X2,Y2
+                im2 = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height), childprocess=False)  # X1,Y1,X2,Y2
             im2.save(f"{screen_dir}/screen_shot1.png")
 
         data = [self.customer_combobox.get(), self.selected_copier, f"{screen_dir}/screen_shot0.png",
@@ -1281,9 +1281,9 @@ class edit_task_window:
             self.top.focus()
             time.sleep(0.5)
             if sys.platform == "linux":
-                im2 = ImageGrab.grab(bbox=(self.top.winfo_x(), self.top.winfo_y(), width, height))
+                im2 = ImageGrab.grab(bbox=(self.top.winfo_x(), self.top.winfo_y(), width, height), childprocess=False)
             else:
-                im2 = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height))  # X1,Y1,X2,Y2
+                im2 = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height), childprocess=False)  # X1,Y1,X2,Y2
             im2.save(f"{screen_dir}/screen_shot1.png")
 
         self.top.focus()

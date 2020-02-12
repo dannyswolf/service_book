@@ -649,7 +649,9 @@ class add_task_window:
         # "", "", ==>> Actions, Ημερομηνία ολοκήροσης, ΔΤΕ, Μετρητής και Επώμενο service
 
         if self.copier_id == "0":
-            answer = messagebox.askquestion("Προσοχή?", f'Το {self.copiers_combobox.get()} δεν είναι στην βάση θέλεται να συνεχίσεται;')
+            answer = messagebox.askquestion("Προσοχή!", f'Το {self.copiers_combobox.get()} δεν είναι στην βάση!\nΔεν θα'
+                                                        f' δημιουργηθεί ιστορικό συντήρησης.\n'
+                                                        f'Θέλεται να συνεχίσεται;')
             if answer != "yes":
                 self.top.focus()
                 return
@@ -664,6 +666,9 @@ class add_task_window:
         conn.commit()
         conn.close()
 
+        if self.copier_id == "0":
+            self.top.destroy()
+            return
         # Δημιουργία columns για το Service
         conn = sqlite3.connect(dbase)
         cursor = conn.cursor()
@@ -1077,7 +1082,6 @@ class add_task_window:
         im.save(f"{screen_dir}/screen_shot.png")
         data = [self.customer_combobox.get(), self.copiers_combobox.get(), f"{screen_dir}/screen_shot.png"]
         mail.send_mail(self.top, data)
-
 
     def add_to_service_data(self, column):
         # self.purpose_list, self.actions_list
