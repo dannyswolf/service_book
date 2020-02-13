@@ -118,7 +118,7 @@ class add_copier_window:
         self.old_customer_label.place(relx=0.025, rely=0.095, height=31, relwidth=0.230)
         self.old_customer_label.configure(activebackground="#f9f9f9")
         self.old_customer_label.configure(activeforeground="black")
-        self.old_customer_label.configure(background="#808000")
+        self.old_customer_label.configure(background="#6b6b6b")
         self.old_customer_label.configure(disabledforeground="#a3a3a3")
         self.old_customer_label.configure(font="-family {Calibri} -size 10 -weight bold")
         self.old_customer_label.configure(foreground="#ffffff")
@@ -139,7 +139,7 @@ class add_copier_window:
         self.new_customer_label.place(relx=0.025, rely=0.324, height=31, relwidth=0.230)
         self.new_customer_label.configure(activebackground="#f9f9f9")
         self.new_customer_label.configure(activeforeground="black")
-        self.new_customer_label.configure(background="#808000")
+        self.new_customer_label.configure(background="#6b6b6b")
         self.new_customer_label.configure(disabledforeground="#a3a3a3")
         self.new_customer_label.configure(font="-family {Calibri} -size 10 -weight bold")
         self.new_customer_label.configure(foreground="#ffffff")
@@ -191,14 +191,14 @@ class add_copier_window:
         self.customer_copiers_label.place(relx=0.025, rely=0.172, height=31, relwidth=0.230)
         self.customer_copiers_label.configure(activebackground="#f9f9f9")
         self.customer_copiers_label.configure(activeforeground="black")
-        self.customer_copiers_label.configure(background="#808000")
+        self.customer_copiers_label.configure(background="#6b6b6b")
         self.customer_copiers_label.configure(disabledforeground="#a3a3a3")
         self.customer_copiers_label.configure(font="-family {Calibri} -size 10 -weight bold")
         self.customer_copiers_label.configure(foreground="#ffffff")
         self.customer_copiers_label.configure(highlightbackground="#d9d9d9")
         self.customer_copiers_label.configure(highlightcolor="black")
         self.customer_copiers_label.configure(relief="groove")
-        self.customer_copiers_label.configure(text='''Φωτοτυπικό''')
+        self.customer_copiers_label.configure(text='''Μηχάνημα''')
 
         self.TSeparator1 = ttk.Separator(top)
         self.TSeparator1.place(relx=0.025, rely=0.400, relwidth=0.840)
@@ -249,7 +249,7 @@ class add_copier_window:
         self.Label2.configure(highlightbackground="#d9d9d9")
         self.Label2.configure(highlightcolor="black")
         self.Label2.configure(relief="groove")
-        self.Label2.configure(text='''Μεταφορά φωτοτυπικού''')
+        self.Label2.configure(text='''Μεταφορά μηχανήματος''')
 
         # self.start = StringVar()
         # self.start_entry = tk.Entry(top)
@@ -325,7 +325,7 @@ class add_copier_window:
         self.save_btn.place(relx=0.300, rely=0.800, height=34, width=147)
         self.save_btn.configure(activebackground="#ececec")
         self.save_btn.configure(activeforeground="#000000")
-        self.save_btn.configure(background="#808000")
+        self.save_btn.configure(background="#5fa15f")
         self.save_btn.configure(disabledforeground="#a3a3a3")
         self.save_btn.configure(font="-family {Calibri} -size 11 -weight bold")
         self.save_btn.configure(foreground="#ffffff")
@@ -367,7 +367,7 @@ class add_copier_window:
             copier_id = self.copiers[selected_copier_index][0]
 
         except IndexError as error:  # αν δεν επιλεξουμε Φωτοτυπικό
-            messagebox.showwarning("Προσοχή ", "Παρακαλώ \n Επιλεξτε  Φωτοτυπικό")
+            messagebox.showwarning("Προσοχή ", "Παρακαλώ \n Επιλεξτε  μηχάνημα")
             self.top.focus()
             return
 

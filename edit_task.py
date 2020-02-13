@@ -348,10 +348,12 @@ class edit_task_window:
         self.customer_label.configure(highlightcolor="black")
         self.customer_label.configure(relief="groove")
         self.customer_label.configure(text='''Πελάτης''')
-        self.customer_combobox = ttk.Combobox(self.service_frame)
-        self.customer_combobox.bind("<<ComboboxSelected>>", self.get_copier)
-        self.customer_combobox.place(relx=0.27, rely=0.152, relheight=0.048, relwidth=0.593)
-        self.customer_combobox.configure(takefocus="")
+        self.customer = StringVar(w, value="")
+        self.customer_entry = tk.Entry(self.service_frame)
+        # self.customer_entry.bind("<<ComboboxSelected>>", self.get_copier)
+        self.customer_entry.place(relx=0.27, rely=0.152, relheight=0.048, relwidth=0.593)
+        self.customer_entry.configure(state='readonly')
+        self.customer_entry.configure(textvariable=self.customer)
         # self.customer_combobox.configure(state="readonly")
 
         self.phone_label = tk.Label(self.service_frame)
@@ -387,20 +389,20 @@ class edit_task_window:
         self.customer_copiers_label.configure(highlightbackground="#d9d9d9")
         self.customer_copiers_label.configure(highlightcolor="black")
         self.customer_copiers_label.configure(relief="groove")
-        self.customer_copiers_label.configure(text='''Φωτοτυπικό''')
+        self.customer_copiers_label.configure(text='''Μηχάνημα''')
         self.copier_stringvar = StringVar()
-        self.copiers_combobox = ttk.Combobox(self.service_frame)
-        self.copiers_combobox.place(relx=0.27, rely=0.284, relheight=0.048, relwidth=0.593)
-        self.copiers_combobox.configure(values="")
-        self.copiers_combobox.configure(takefocus="")
-        # self.copiers_combobox.configure(state="readonly")
+        self.copiers_entry = tk.Entry(self.service_frame)
+        self.copiers_entry.place(relx=0.27, rely=0.284, relheight=0.048, relwidth=0.593)
+        self.copiers_entry.configure(textvariable=self.copier_stringvar)
+        self.copiers_entry.configure(state="readonly")
+        # self.copiers_comboboxcopiers_combobox.configure(state="readonly")
         # Ανανέωση μετα
-        self.refresh_task_btn = tk.Button(self.service_frame)
-        self.refresh_task_btn.place(relx=0.880, rely=0.284, height=30, relwidth=0.060)
-        self.refresh_task_btn.configure(background="#0685c4")
-        self.refresh_task_img = PhotoImage(file="icons/refresh.png")
-        self.refresh_task_btn.configure(image=self.refresh_task_img)
-        self.refresh_task_btn.configure(command=self.get_copier)
+        # self.refresh_task_btn = tk.Button(self.service_frame)
+        # self.refresh_task_btn.place(relx=0.880, rely=0.284, height=30, relwidth=0.060)
+        # self.refresh_task_btn.configure(background="#0685c4")
+        # self.refresh_task_img = PhotoImage(file="icons/refresh.png")
+        # self.refresh_task_btn.configure(image=self.refresh_task_img)
+        # self.refresh_task_btn.configure(command=self.get_copier)
 
         self.purpose_label = tk.Label(self.service_frame)
         self.purpose_label.place(relx=0.025, rely=0.351, height=31, relwidth=0.230)
@@ -791,7 +793,7 @@ class edit_task_window:
         self.get_data()
         self.get_spare_parts()
         self.check_if_files_exists()
-
+        self.get_first_copier_id()
     # Ελεγχος αν υπάρχουν αρχεία για προβολή
     def check_if_files_exists(self):
         con = sqlite3.connect(dbase)
@@ -891,18 +893,18 @@ class edit_task_window:
     def add_spare_parts(self):
 
         if not self.customer_id:
-            messagebox.showerror("Σφάλμα", f"Ο πελάτης {self.customer_combobox.get()} δεν υπάρχει \n Πιθανών έγινε μετονομασία")
+            messagebox.showerror("Σφάλμα", f"Ο πελάτης {self.customer_entry.get()} δεν υπάρχει \n Πιθανών έγινε μετονομασία")
             return
         if spare_parts_db:
 
-            add_spare_parts.create_Toplevel1(self.top, self.service_id, self.customer_id, self.copiers_combobox.get())
+            add_spare_parts.create_Toplevel1(self.top, self.service_id, self.customer_id, self.copiers_entry.get())
         else:
             insert_spare_parts.create_insert_spare_parts_window(self.top, self.service_id, self.customer_id,
-                                                                self.copiers_combobox.get())
+                                                                self.copiers_entry.get())
 
     def insert_spare_part_outside_of_repository(self):
         insert_spare_parts.create_insert_spare_parts_window(self.top, self.service_id, self.customer_id,
-                                                            self.copiers_combobox.get())
+                                                            self.copiers_entry.get())
 
     # Διαγραφή ανταλλακτικών
     def del_spare_parts(self):
@@ -978,7 +980,7 @@ class edit_task_window:
 
         if not os.path.exists(prints_dir):
             os.makedirs(prints_dir)
-        outputFilename = f"{prints_dir}/Service_Book{self.customer_combobox.get()}.pdf"
+        outputFilename = f"{prints_dir}/Service_Book{self.customer_entry.get()}.pdf"
 
         # Utility function
         def convertHtmlToPdf(sourceHtml, outputFilename):
@@ -996,7 +998,7 @@ class edit_task_window:
             return pisaStatus.err
             # Αν γράψουμε νέο φωτοτυπικό και όχι απο την λίστα
         if not self.selected_copier:
-            self.selected_copier = self.copiers_combobox.get()
+            self.selected_copier = self.copiers_entry.get()
         added_spare_parts = []
 
         for child in self.spare_parts_treeview.get_children():
@@ -1010,7 +1012,7 @@ class edit_task_window:
             except IndexError:  # όταν δεν υπάρχουν ανταλλακτικά
                 spare_parts_for_html.append("")
 
-        data = [self.start_date.get(), self.customer_combobox.get(), self.selected_copier, self.purpose_combobox.get(),
+        data = [self.start_date.get(), self.customer_entry.get(), self.selected_copier, self.purpose_combobox.get(),
                 self.technician_entry.get(), self.actions_combobox.get(), self.counter_entry.get(),
                 self.next_service_entry.get(),
                 self.files, added_spare_parts, self.urgent, self.phone_entry.get(),
@@ -1117,7 +1119,7 @@ class edit_task_window:
 <td style="width: 244px; text-align: center; height: 46px;">
 <p><strong>&Pi;&epsilon;&lambda;ά&tau;&eta;&sigmaf;</strong></p>
 </td>
-<td style="width: 439px; height: 46px;">&nbsp; &nbsp; {self.customer_combobox.get()}</td>
+<td style="width: 439px; height: 46px;">&nbsp; &nbsp; {self.customer_entry.get()}</td>
 </tr>
 <tr style="height: 46px;">
 <td style="width: 244px; text-align: center; height: 46px;">
@@ -1244,9 +1246,9 @@ class edit_task_window:
                 im2 = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height), childprocess=False)  # X1,Y1,X2,Y2
             im2.save(f"{screen_dir}/screen_shot1.png")
 
-        data = [self.customer_combobox.get(), self.selected_copier, f"{screen_dir}/screen_shot0.png",
+        data = [self.customer_entry.get(), self.selected_copier, f"{screen_dir}/screen_shot0.png",
                 f"{screen_dir}/screen_shot1.png", self.service_id]
-        # data = [self.start_date.get(), self.customer_combobox.get(), self.selected_copier, self.purpose_combobox.get(),
+        # data = [self.start_date.get(), self.customer_entry.get(), self.selected_copier, self.purpose_combobox.get(),
         #         self.technician_entry.get(), self.actions_combobox.get(), self.counter_entry.get(),
         #         self.next_service_entry.get(),
         #         self.files, added_spare_parts, self.urgent, self.phone_entry.get(),
@@ -1296,7 +1298,7 @@ class edit_task_window:
 
         if not os.path.exists(prints_dir):
             os.makedirs(prints_dir)
-        outputFilename = f"{prints_dir}/Service_Book{self.customer_combobox.get()}.pdf"
+        outputFilename = f"{prints_dir}/Service_Book{self.customer_entry.get()}.pdf"
 
         # Utility function
         def convertHtmlToPdf(sourceHtml, outputFilename):
@@ -1401,13 +1403,13 @@ class edit_task_window:
     def send_mail(self):
         # Αν γράψουμε νέο φωτοτυπικό και όχι απο την λίστα
         if not self.selected_copier:
-            self.selected_copier = self.copiers_combobox.get()
+            self.selected_copier = self.copiers_entry.get()
         added_spare_parts = []
 
         for child in self.spare_parts_treeview.get_children():
             added_spare_parts.append(self.spare_parts_treeview.item(child)["values"][2:4])
         # spare_parts = self.spare_parts_treeview.get_children("")
-        data = [self.start_date.get(), self.customer_combobox.get(), self.selected_copier, self.purpose_combobox.get(),
+        data = [self.start_date.get(), self.customer_entry.get(), self.selected_copier, self.purpose_combobox.get(),
                 self.technician_entry.get(), self.actions_combobox.get(), self.counter_entry.get(), self.next_service_entry.get(),
                 self.files, added_spare_parts, self.urgent, self.phone_entry.get(),
                 self.notes_scrolledtext.get('1.0', 'end-1c'), self.dte_entry.get(),
@@ -1437,12 +1439,12 @@ class edit_task_window:
         date = StringVar(self.service_frame, value=data[0][1])
         self.start_date.set_date(date=date.get())
         # self.start_date_entry.configure(textvariable=date)
-        customer_combobox = StringVar(w, value=data[0][2])
-        self.customer_combobox.set(customer_combobox.get())
-        self.customer_combobox.configure(values=self.customers_list)
-        self.customer_combobox.bind("<<ComboboxSelected>>", self.get_copier)
+        self.customer = StringVar(w, value=data[0][2])
+        self.customer_entry.configure(textvariable=self.customer)
+        # self.customer_combobox.configure(values=self.customers_list)
+        # self.customer_combobox.bind("<<ComboboxSelected>>", self.get_copier)
         copier = StringVar(w, value=data[0][3])
-        self.copiers_combobox.set(copier.get())
+        self.copiers_entry.configure(textvariable=copier)
 
         purpose = StringVar(w, value=data[0][4])
         self.purpose_combobox.set(value=purpose.get())
@@ -1487,48 +1489,48 @@ class edit_task_window:
             self.completed_Checkbutton1.configure(bg="red")
             self.completed_Checkbutton1.configure(text='')
 
-    def get_copier(self, event=None):
-        # να πάρουμε το id του πελάτη απο το ονομα του
-        customer = self.customer_combobox.get()
-        self.copiers_combobox.set(value="")
-
-        con = sqlite3.connect(dbase)
-        cursor = con.cursor()
-        cursor.execute("SELECT ID, Τηλέφωνο, Κινητό, Διεύθυνση FROM Πελάτες WHERE  Επωνυμία_Επιχείρησης =?", (customer,))
-        customer_data = cursor.fetchall()  # ==> [(4,)] αρα θέλουμε το customer_id[0][0]
-        self.customer_id = customer_data[0][0]
-
-        self.phone_var = StringVar(w, value=customer_data[0][1])
-        self.phone_entry.configure(textvariable=self.phone_var)
-
-        self.notes_scrolledtext.delete('1.0', "end")
-        self.mobile = StringVar(w, value="Κινητό : " + customer_data[0][2] + "\n")
-        self.notes_scrolledtext.insert("1.0", self.mobile.get())
-        self.notes = StringVar(w, value="Διεύθυνση : " + customer_data[0][3] + "\n")
-        self.notes_scrolledtext.insert("2.0", self.notes.get())
-        line = 40 * "-"
-        self.notes_scrolledtext.insert("3.0", line + user + line + "\n")
-        self.notes_scrolledtext.insert("4.0", " ")
-
-        # Εμφάνιση φωτοτυπικών σύμφονα με το customer_id
-        cursor.execute("SELECT Εταιρεία, Serial FROM Φωτοτυπικά WHERE Πελάτη_ID = ? AND Κατάσταση = 1 ", (self.customer_id,))
-        copiers = cursor.fetchall()
-        self.copiers = []
-        for copier in copiers:
-            self.copiers.append("   Σειριακός: ".join(copier))
-        cursor.close()
-        con.close()
-        # Αν επιλέξουμε φωτοτυπικό του πελάτη απο τα περασμένα στην βάση φωτοτυπικά
-        emtpy_value = f"Ο {customer} δεν έχει μηχάνημα"
-        self.copiers_combobox.configure(foreground="red")
-        self.copiers_combobox.set(value=emtpy_value)
-        if copiers:
-            self.copiers_combobox.configure(foreground="")
-            self.copiers_combobox.configure(values=self.copiers)
-            self.copiers_combobox.set(value=self.copiers[0])
-        # Διαφορετικά μπορούμε να εισάγουμε νέο μηχάνημα
-        else:
-            self.copiers_combobox.configure(textvariable=self.copier_stringvar)
+    # def get_copier(self, event=None):
+    #     # να πάρουμε το id του πελάτη απο το ονομα του
+    #     customer = self.customer_entry.get()
+    #     self.copiers_entry.configure(textvariable="")
+    #
+    #     con = sqlite3.connect(dbase)
+    #     cursor = con.cursor()
+    #     cursor.execute("SELECT ID, Τηλέφωνο, Κινητό, Διεύθυνση FROM Πελάτες WHERE  Επωνυμία_Επιχείρησης =?", (customer,))
+    #     customer_data = cursor.fetchall()  # ==> [(4,)] αρα θέλουμε το customer_id[0][0]
+    #     self.customer_id = customer_data[0][0]
+    #
+    #     self.phone_var = StringVar(w, value=customer_data[0][1])
+    #     self.phone_entry.configure(textvariable=self.phone_var)
+    #
+    #     self.notes_scrolledtext.delete('1.0', "end")
+    #     self.mobile = StringVar(w, value="Κινητό : " + customer_data[0][2] + "\n")
+    #     self.notes_scrolledtext.insert("1.0", self.mobile.get())
+    #     self.notes = StringVar(w, value="Διεύθυνση : " + customer_data[0][3] + "\n")
+    #     self.notes_scrolledtext.insert("2.0", self.notes.get())
+    #     line = 40 * "-"
+    #     self.notes_scrolledtext.insert("3.0", line + user + line + "\n")
+    #     self.notes_scrolledtext.insert("4.0", " ")
+    #
+    #     # Εμφάνιση φωτοτυπικών σύμφονα με το customer_id
+    #     cursor.execute("SELECT Εταιρεία, Serial FROM Φωτοτυπικά WHERE Πελάτη_ID = ? AND Κατάσταση = 1 ", (self.customer_id,))
+    #     copiers = cursor.fetchall()
+    #     self.copiers = []
+    #     for copier in copiers:
+    #         self.copiers.append("   Σειριακός: ".join(copier))
+    #     cursor.close()
+    #     con.close()
+    #     # Αν επιλέξουμε φωτοτυπικό του πελάτη απο τα περασμένα στην βάση φωτοτυπικά
+    #     emtpy_value = f"Ο {customer} δεν έχει μηχάνημα"
+    #     self.copiers_entry.configure(foreground="red")
+    #     self.copiers_entry.configure(textvariable=emtpy_value)
+    #     if copiers:
+    #         self.copiers_entry.configure(foreground="")
+    #         self.copiers_entry.configure(textvariable=self.copiers)
+    #         # self.copiers_entry.set(value=self.copiers[0])
+    #     # Διαφορετικά μπορούμε να εισάγουμε νέο μηχάνημα
+    #     else:
+    #         self.copiers_entry.configure(textvariable=self.copier_stringvar)
 
     # Προσθήκη αρχείων στην βάση
     def add_files_to_db(self):
@@ -1600,7 +1602,7 @@ class edit_task_window:
         values = ", ".join(values)
 
         # Το  0 => ανενεργό δλδ ολοκληρόθηκε ( 0 if self.completed_var.get() else 1 )
-        data = [self.start_date.get(), self.customer_combobox.get(), self.copiers_combobox.get(),
+        data = [self.start_date.get(), self.customer_entry.get(), self.copiers_entry.get(),
                 self.purpose_combobox.get(), self.actions_combobox.get(), self.technician_entry.get(),
                 self.compl_date_entry.get(), self.urgent, self.phone_entry.get(),
                 self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, self.dte_entry.get(),
@@ -1644,7 +1646,7 @@ class edit_task_window:
         conn.commit()
         conn.close()
         self.add_files_to_db()
-        messagebox.showinfo("Info", f"H εργασία αποθηκεύτηκε επιτυχώς στον πελάτη {self.customer_combobox.get()}")
+        messagebox.showinfo("Info", f"H εργασία αποθηκεύτηκε επιτυχώς στον πελάτη {self.customer_entry.get()}")
         rt.focus()
         self.top.destroy()
         return None

@@ -490,7 +490,7 @@ class add_service_window():
         except IndexError as error:
             root.focus()
             self.top.destroy()
-            messagebox.showwarning("Σφάλμα", f"{error},\nΠαρακαλώ επιλέξτε φωτοτυπικό")
+            messagebox.showwarning("Σφάλμα", f"{error},\nΠαρακαλώ επιλέξτε μηχάνημα")
             return
         conn = sqlite3.connect(dbase)
         cursor = conn.cursor()
@@ -563,7 +563,7 @@ class add_service_window():
             rt.focus()
             w.destroy()
             messagebox.showinfo('Επιτυχής ενημέρωση',
-                                "Το ιστορικό συντήρησης του φωτοτυπικού {} στον πελάτη {} ενημερώθηκε "
+                                "Το ιστορικό συντήρησης του μηχανήματος {} στον πελάτη {} ενημερώθηκε "
                                 .format(selected_copier_data[0][1], curtomer_data[0][1]))
 
         self.save_btn = tk.Button(w)

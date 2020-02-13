@@ -120,7 +120,7 @@ class add_copier_window:
         top.minsize(120, 1)
         top.maxsize(1604, 881)
         top.resizable(1, 1)
-        top.title("Προσθήκη Φωτοτυπικού")
+        top.title("Προσθήκη μηχανήματος")
         top.configure(background="#f6f6ee")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
@@ -285,7 +285,7 @@ class add_copier_window:
         self.Label2.configure(highlightbackground="#d9d9d9")
         self.Label2.configure(highlightcolor="black")
         self.Label2.configure(relief="groove")
-        self.Label2.configure(text='''Προσθήκη Φωτοτυπικού''')
+        self.Label2.configure(text='''Προσθήκη μηχανήματος''')
 
         self.start = StringVar()
         self.start_entry = tk.Entry(top)
@@ -404,7 +404,7 @@ class add_copier_window:
             con.close()
             if len(copiers) > 5:
                 messagebox.showerror("Demo",
-                                    "Λυπούμαστε η εκδοση αυτή είναι demo και δεν μπορείτε να προσθέσεται νέα φωτοτυπικά")
+                                    "Λυπούμαστε η εκδοση αυτή είναι demo και δεν μπορείτε να προσθέσεται νέα μηχανήματα")
 
                 self.top.focus()
                 return

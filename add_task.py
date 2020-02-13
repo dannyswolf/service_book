@@ -246,7 +246,7 @@ class add_task_window:
         self.customer_combobox.set(value=self.selected_customer)
         self.customer_combobox.configure(takefocus="")
         self.customer_combobox.bind("<<ComboboxSelected>>", self.get_copier)
-        self.customer_combobox.configure(state="readonly")
+        # self.customer_combobox.configure(state="readonly")
         self.add_customer_btn1 = tk.Button(top)
         self.add_customer_btn1.place(relx=0.875, rely=0.172, height=29, relwidth=0.060)
         self.add_customer_btn1.configure(background="#006291")
@@ -294,7 +294,7 @@ class add_task_window:
         self.customer_copiers_label.configure(highlightbackground="#d9d9d9")
         self.customer_copiers_label.configure(highlightcolor="black")
         self.customer_copiers_label.configure(relief="groove")
-        self.customer_copiers_label.configure(text='''Φωτοτυπικό''')
+        self.customer_copiers_label.configure(text='''Μηχάνημα''')
         self.copier_stringvar = StringVar()
         self.copiers_combobox = ttk.Combobox(top)
         self.copiers_combobox.place(relx=0.27, rely=0.324, relheight=0.057, relwidth=0.593)
@@ -624,7 +624,7 @@ class add_task_window:
 
         if self.start_date.get() == "" or self.customer_combobox.get() == "" or self.copiers_combobox.get() == "":
             messagebox.showwarning("Προσοχή", "Παρακαλώ επιλέξτε \n1.Ημερομηνία, \n2.Πελάτη "
-                                              "\n3.Φωτοτυπικό")
+                                              "\n3.Μηχάνημα")
             self.top.focus()
             return
 

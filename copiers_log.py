@@ -87,7 +87,7 @@ class Toplevel1:
         top.minsize(120, 1)
         top.maxsize(1604, 881)
         top.resizable(1, 1)
-        top.title("Ιστορικό μεταφοράς φωτοτυπικού")
+        top.title("Ιστορικό μεταφοράς μηχανήματος")
         top.configure(background="#f6f6ee")
         top.focus()
         top.bind('<Escape>', self.quit)
@@ -130,7 +130,7 @@ class Toplevel1:
         self.Label1.configure(font=font11)
         self.Label1.configure(foreground="#ffffff")
         self.Label1.configure(relief="groove")
-        self.Label1.configure(text='''Ιστορικό μεταφοράς φωτοτυπικού''')
+        self.Label1.configure(text='''Ιστορικό μεταφοράς μηχανήματος''')
         self.get_data()
 
     def get_data(self):

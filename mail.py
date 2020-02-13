@@ -260,7 +260,7 @@ class Mail:
                             <html>
                                 <body>
 <p><b>Ημερομηνία:  </b>  {date} <br> <b>Πελάτης: </b>  {customer}  <br><b>Customer_id</b> {customer_id} 
-<br> <b>Φωτοτυπικό: </b>  {copier} <br><b>Copier_ID: </b>   {copier_id} <br><b>Σκοπός: </b> {purpose} 
+<br> <b>Μηχάνημα: </b>  {copier} <br><b>Copier_ID: </b>   {copier_id} <br><b>Σκοπός: </b> {purpose} 
 <br><b>Τεχνικός : </b>  {technician} <br><b>Ενέργιες:  </b>{actions} <br><b>Επείγων: </b>  {urgent} 
 <br><b>Τηλέφωνο:  </b> {phone} <br><b>ΔΤΕ:  </b>{dte} <br><b>Κατάσταση:  </b>{status}<br> 
 <br><b>Ημ_Ολοκλ: </b>   {finish_date}  <br><b>Μετρητής:  </b>{counter} <br><b>Επόμενο Service:  </b>{next_service}
@@ -286,7 +286,7 @@ class Mail:
             html = f"""\
                             <html>
                                 <body>
-                        <p><b>Ημερομηνία:  </b>  {date} <br> <b>Πελάτης: </b>  {customer}  <br> <b>Φωτοτυπικό: </b>  {copier}  
+                        <p><b>Ημερομηνία:  </b>  {date} <br> <b>Πελάτης: </b>  {customer}  <br> <b>Μηχάνημα: </b>  {copier}  
                        <br> <b>Χρήστης:  </b>{user}
                                 </body>
                             </html>
@@ -348,7 +348,7 @@ class Mail:
             html = f"""\
                             <html>
                                 <body>
-                        <p><b>Ημερομηνία:  </b>  {date} <br> <b>Πελάτης: </b>  {customer}  <br> <b>Φωτοτυπικό: </b>  {copier}  
+                        <p><b>Ημερομηνία:  </b>  {date} <br> <b>Πελάτης: </b>  {customer}  <br> <b>Μηχάνημα: </b>  {copier}  
                        <br> <b>Χρήστης:  </b>{user}
                                 </body>
                             </html>
@@ -371,7 +371,7 @@ class Mail:
             html = f"""\
                 <html>
                     <body>
-            <p><b>Ημερομηνία:  </b>  {date} <br> <b>Πελάτης: </b>  {customer}  <br> <b>Φωτοτυπικό: </b>  {copier}  
+            <p><b>Ημερομηνία:  </b>  {date} <br> <b>Πελάτης: </b>  {customer}  <br> <b>Μηχάνημα: </b>  {copier}  
             <br><b>Σκοπός: </b> {purpose} <br><b>Τεχνικός : </b>  {technician}<br><b>Επείγων: </b>  {urgent} 
             <br><b>Τηλέφωνο:  </b> {phone} <br><b>Σημειώσεις: </b>  {notes}  <br><b>Copier_ID: </b>   {copier_id} 
             <b>Χρήστης:  </b>{user}

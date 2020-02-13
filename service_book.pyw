@@ -14,6 +14,8 @@ todo uniq (στα πεδία των πινακων στην βαση) στους
 1) todo Στο treeview των φωτοτυπικών δίπλα να βάλω treeview υπολογιστών
 2) todo open pdf files on webdriver
 
+V1.8.1 Changes on edit_task unable to change customer and Machine -------------------13/2/2020
+
 V1.8.0 ability to change service data  ---------------  -----------------------------12/2/2020
 Αρχείο data_settings
 
@@ -534,10 +536,10 @@ class Toplevel1:
         # self.backup_menu.add_command(label="Δημιουργία αντίγραφο ασφαλείας!", command=self.backup)
         #
         self.copier_menu = tk.Menu(self.menubar, tearoff=0)
-        self.menubar.add_cascade(label="Φωτοτυπικά", menu=self.copier_menu)
-        self.copier_menu.add_command(label="Προσθήκη φωτοτυπικού -> F2", command=self.add_copier)
-        self.copier_menu.add_command(label="Μεταφορά φωτοτυπικού", command=self.change_copier)
-        self.copier_menu.add_command(label="Ενεργοποίηση φωτοτυπικού", command=self.enable_copiers)
+        self.menubar.add_cascade(label="Μηχανήματα", menu=self.copier_menu)
+        self.copier_menu.add_command(label="Προσθήκη Μηχανήματος -> F2", command=self.add_copier)
+        self.copier_menu.add_command(label="Μεταφορά Μηχανήματος", command=self.change_copier)
+        self.copier_menu.add_command(label="Ενεργοποίηση Μηχανήματος", command=self.enable_copiers)
         self.copier_menu.add_command(label="Ιστορικό Μεταφορών", command=self.get_copiers_log)
 
         self.backup_menu = tk.Menu(self.menubar, tearoff=0)
@@ -590,7 +592,7 @@ class Toplevel1:
 
         self.copiers_frame = tk.Frame(self.notebook)
         self.notebook.add(self.copiers_frame, padding=3)
-        self.notebook.tab(0, text="Φωτοτυπικά", compound="left", underline="-1", )
+        self.notebook.tab(0, text="Μηχανήματα", compound="left", underline="-1", )
         self.copiers_frame.configure(background="#CFD5CE")
         self.copiers_frame.configure(highlightbackground="#d9d9d9")
         self.copiers_frame.configure(highlightcolor="black")
@@ -604,7 +606,7 @@ class Toplevel1:
 
         self.copier_frame = tk.Frame(self.notebook)
         self.notebook.add(self.copier_frame, padding=3)
-        self.notebook.tab(2, text="Φωτοτυπικό", compound="left", underline="-1", )
+        self.notebook.tab(2, text="Μηχάνημα", compound="left", underline="-1", )
         self.copier_frame.configure(background="#CFD5CE")
         self.copier_frame.configure(highlightbackground="#d9d9d9")
         self.copier_frame.configure(highlightcolor="black")
@@ -1106,7 +1108,7 @@ class Toplevel1:
         self.copiers_title_label.configure(foreground="#ffffff")
         self.copiers_title_label.configure(font=("Calibri", 10, "bold"))
         self.copiers_title_label.configure(relief="groove")
-        self.copiers_title_label.configure(text="Στοιχεία φωτοτυπικού")
+        self.copiers_title_label.configure(text="Στοιχεία μηχανήματος")
 
         # Serial Number
         self.serial_label = tk.Label(self.copier_frame)
@@ -1341,7 +1343,7 @@ class Toplevel1:
         self.copier_search_btn.configure(pady="0")
         self.copier_search_btn.configure(font=("Calibri", 10, "bold"))
         self.copier_search_btn.configure(command=lambda: self.search_copier(self.search_copier_data))
-        self.copier_search_btn.configure(text="   Αναζήτηση Φωτοτυπικού")
+        self.copier_search_btn.configure(text="   Αναζήτηση Μηχανήματος")
         self.copier_search_btn_img = PhotoImage(file="icons/search_copiers.png")
         self.copier_search_btn.configure(image=self.copier_search_btn_img)
         self.copier_search_btn.configure(compound="left")
@@ -1354,9 +1356,9 @@ class Toplevel1:
         # Πίνακας φωτοτυπικών
         self.copiers_treeview = ScrolledTreeView(self.copiers_frame)
         self.copiers_treeview.place(relx=0.022, rely=0.175, relheight=0.810, relwidth=0.450)
-        self.copiers_treeview["columns"] = ["ID", "Φωτοτυπικά", "Σειριακός αριθμός"]
-        self.copiers_treeview.heading("Φωτοτυπικά", text="Φωτοτυπικά", anchor="center")
-        self.copiers_treeview.column("Φωτοτυπικά", anchor="w")
+        self.copiers_treeview["columns"] = ["ID", "Μηχανήματα", "Σειριακός αριθμός"]
+        self.copiers_treeview.heading("Μηχανήματα", text="Μηχάνημα", anchor="center")
+        self.copiers_treeview.column("Μηχανήματα", anchor="w")
         self.copiers_treeview.heading("ID", text="ID", anchor="w", )
         self.copiers_treeview.column("ID", anchor="w", width="1")
         self.copiers_treeview.heading("Σειριακός αριθμός", text="Σειριακός αριθμός", anchor="center")
@@ -1777,7 +1779,7 @@ class Toplevel1:
         if self.add_table_entry.get() in companies and self.add_table_entry.get() != current_table:
             self.add_table_entry.configure(foreground="red")
             # self.add_table_entry.place(relx=0.815, rely=0.080, relheight=0.065, relwidth=0.200)
-            self.add_table_entry_warning.place(relx=0.850, rely=0.150, relheight=0.060, relwidth=0.150)
+            self.add_table_entry_warning.place(relx=0.620, rely=0.230, relheight=0.060, relwidth=0.150)
         else:
             self.add_table_entry.configure(foreground="green")
             self.add_table_entry_warning.place_forget()
@@ -2001,7 +2003,7 @@ class Toplevel1:
                 platos = 1
             elif head == "Πελάτης":
                 platos = 250
-            elif head == "Φωτοτυπικό":
+            elif head == "Μηχάνημα":
                 platos = 260
             elif head == "Σκοπός":
                 platos = 200
@@ -2217,9 +2219,9 @@ class Toplevel1:
 
             search_cursor.close()
             search_conn.close()
-            self.service_treeview["columns"] = ["ID", "Ημερομηνία", "Φωτοτυπικό", "Πελάτης", "Σκοπός_Επίσκεψης",
+            self.service_treeview["columns"] = ["ID", "Ημερομηνία", "Μηχάνημα", "Πελάτης", "Σκοπός_Επίσκεψης",
                                                 "Ενέργειες", "Σημειώσεις", "ΔΤΕ"]
-            headers = ["ID", "Ημερομηνία", "Φωτοτυπικό", "Πελάτης", "Σκοπός_Επίσκεψης", "Ενέργειες", "Σημειώσεις", "ΔΤΕ"]
+            headers = ["ID", "Ημερομηνία", "Μηχάνημα", "Πελάτης", "Σκοπός_Επίσκεψης", "Ενέργειες", "Σημειώσεις", "ΔΤΕ"]
             for head in headers:
                 if head == "ID":
                     platos = 1
@@ -2233,7 +2235,7 @@ class Toplevel1:
                     platos = 180
                 elif head == "Σημειώσεις":
                     platos = 275
-                elif head == "Φωτοτυπικό":
+                elif head == "Μηχάνημα":
                     platos = 200
                 elif head == "Επ_Service":
                     platos = 110
@@ -2366,7 +2368,7 @@ class Toplevel1:
         self.start_entry.configure(textvariable=var)
         self.serial.set(value="")
         self.serial_entry.configure(textvariable=self.serial)
-        self.copiers_title_label.configure(text="Στοιχεία φωτοτυπικού")
+        self.copiers_title_label.configure(text="Στοιχεία μηχανήματος")
         self.copier_notes_scrolledtext.delete('1.0', 'end-1c')
         self.Label16.configure(text='''Ιστορικό''')
 
@@ -2454,7 +2456,7 @@ class Toplevel1:
             self.add_service_btn.configure(activeforeground="white")
             self.add_service_btn.configure(state="active")
             self.add_service_btn.configure(background="#6b6b6b")
-            self.add_service_btn.place(relx=0.021, rely=0.100, height=25, relwidth=0.200)
+            self.add_service_btn.place(relx=0.021, rely=0.100, height=30, relwidth=0.200)
 
         # αδιάζουμε πρώτα το tree του ιστορικού
         for i in self.service_treeview.get_children():
@@ -2480,7 +2482,7 @@ class Toplevel1:
                                    self.copier_table + " COPIER ON CUSTOMERS.ID = COPIER.Πελάτη_ID WHERE COPIER.ID = "
                                    + selected_item)
         except sqlite3.OperationalError as error:
-            messagebox.showwarning("Προσοχή", "Παρακαλω επιλέξτε πρώτα φωτοτυπικό για εμφάνιση ιστορικών")
+            messagebox.showwarning("Προσοχή", "Παρακαλω επιλέξτε πρώτα μηχάνημα για εμφάνιση ιστορικών")
             return None
         customers_data = service_cursor.fetchall()
         # εμφάνιση δεδομένων πελάτη στα entry δεξιά
@@ -2610,11 +2612,11 @@ class Toplevel1:
             heading = self.service_treeview.heading("#3", "text")
         except TclError as error:
 
-            messagebox.showwarning("Προσοχή", "Παρακαλώ επιλεξτε πρώτα φωτοτυπικό")
+            messagebox.showwarning("Προσοχή", "Παρακαλώ επιλεξτε πρώτα μηχάνημα")
             return
 
         selected_service_id = (self.service_treeview.set(self.service_treeview.selection(), "#1"))
-        if heading == "Φωτοτυπικό":  # Όταν είναι απο την αναζήτηση σφαλμάτων
+        if heading == "Μηχάνημα":  # Όταν είναι απο την αναζήτηση σφαλμάτων
             selected_copier = (self.service_treeview.set(self.service_treeview.selection(), "#3"))
             selected_customer = (self.service_treeview.set(self.service_treeview.selection(), "#4"))
             con = sqlite3.connect(dbase)
@@ -2736,7 +2738,7 @@ class Toplevel1:
         self.start_entry.configure(textvariable=var)
         self.serial.set(value="")
         self.serial_entry.configure(textvariable=self.serial)
-        self.copiers_title_label.configure(text="Στοιχεία φωτοτυπικού")
+        self.copiers_title_label.configure(text="Στοιχεία μηχανήματος")
         self.copier_notes_scrolledtext.delete('1.0', 'end-1c')
         try:
             self.service_treeview.delete(*self.service_treeview.get_children())
@@ -2806,7 +2808,7 @@ class Toplevel1:
     def del_copier(self):
         if self.selected_copier_id:
 
-            answer = messagebox.askokcancel("Προσοχή", f"Εχετε επιλέξει για απενεργοποιήση το φωτοτυπικό\n"
+            answer = messagebox.askokcancel("Προσοχή", f"Εχετε επιλέξει για απενεργοποιήση το μηχάνημα\n"
                                                        f"{self.selected_copier} του πελάτη {self.selected_customer}"
                                                        f"\nΘέλετε να συνεχίσεται;")
             if not answer:
@@ -2823,7 +2825,7 @@ class Toplevel1:
             self.copiers_treeview.delete(*self.copiers_treeview.get_children())
             self.search_copier()
         else:
-            messagebox.showinfo("Προσοχή", "Παρακαλώ επιλέξτε φωτοτυπικό για διαγραφή")
+            messagebox.showinfo("Προσοχή", "Παρακαλώ επιλέξτε μηχάνημα για διαγραφή")
             return
 
     # Ενεργοποιήση φωτοτυπικού
@@ -2878,7 +2880,7 @@ class Toplevel1:
         :return:
         """
         if self.selected_copier_id == "":
-            messagebox.showwarning("Σφάλμα", "Παρακαλώ πρώτα επιλέξτε Φωτοτυπικό")
+            messagebox.showwarning("Σφάλμα", "Παρακαλώ πρώτα επιλέξτε μηχάνημα")
             return None
         headers = []
         not_needed_header = ["ID"]
@@ -2899,7 +2901,8 @@ class Toplevel1:
         up_conn.commit()
         up_cursor.close()
         up_conn.close()
-        messagebox.showinfo("Info", f"Τα στοιχεία του Φωτοτυπικού {self.selected_copier} του πελάτη {self.selected_customer} ενημερώθηκαν επιτυχώς")
+        messagebox.showinfo("Info", f"Τα στοιχεία του μηχανήματος {self.selected_copier} του πελάτη "
+                                    f"{self.selected_customer} ενημερώθηκαν επιτυχώς")
 
     # Αντίγραφα ασφαλείας Service Book
     def backup(self):
