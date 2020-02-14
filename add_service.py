@@ -141,7 +141,7 @@ class add_service_window():
         top.protocol("WM_DELETE_WINDOW", self.check_before_close_windows)
         top.geometry("655x650+0+0")
         top.minsize(120, 1)
-        top.maxsize(1604, 881)
+        top.maxsize(2604, 2881)
         top.resizable(1, 1)
         top.title("Προσθήκη ιστορικού συντήρησης")
         top.configure(background="#f6f6ee")

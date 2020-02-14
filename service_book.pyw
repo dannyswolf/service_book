@@ -14,6 +14,8 @@ todo uniq (στα πεδία των πινακων στην βαση) στους
 1) todo Στο treeview των φωτοτυπικών δίπλα να βάλω treeview υπολογιστών
 2) todo open pdf files on webdriver
 
+V1.8.2 Price Label ---------------------------------------------- -------------------14/2/2020
+
 V1.8.1 Changes on edit_task unable to change customer and Machine -------------------13/2/2020
 
 V1.8.0 ability to change service data  ---------------  -----------------------------12/2/2020
@@ -502,7 +504,7 @@ class Toplevel1:
         self.top = top
         top.geometry("1324x800+150+50")
         top.minsize(120, 1)
-        top.maxsize(1980, 1980)
+        top.maxsize(3604, 3881)
         top.resizable(1, 1)
         if demo:
             top.title("Βιβλίο Επισκευών " + service_book_version)
@@ -1960,7 +1962,7 @@ class Toplevel1:
                 platos = 300
             elif head == "PARTS_NR":
                 platos = 120
-            elif head == "Φωτοτυπικό":
+            elif head == "Μηχάνημα":
                 platos = 250
             else:
                 platos = 120

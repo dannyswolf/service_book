@@ -261,7 +261,7 @@ class edit_task_window:
         self.top = top
         top.geometry("600x654+444+228")
         top.minsize(120, 1)
-        top.maxsize(1604, 881)
+        top.maxsize(2604, 2881)
         top.resizable(1, 1)
         top.title("Επεξεργασία εργασίας")
         top.configure(background="#f6f6ee")
@@ -521,7 +521,7 @@ class edit_task_window:
         self.completed_Checkbutton1.configure(command=self.on_check)
 
         self.dte_label = tk.Label(self.service_frame)
-        self.dte_label.place(relx=0.450, rely=0.635, height=31, relwidth=0.230)
+        self.dte_label.place(relx=0.400, rely=0.635, height=31, relwidth=0.230)
         self.dte_label.configure(activebackground="#f9f9f9")
         self.dte_label.configure(activeforeground="black")
         self.dte_label.configure(background="#6b6b6b")
@@ -534,13 +534,35 @@ class edit_task_window:
         self.dte_label.configure(text='''Δελτ.Τεχν.Εξυπ.''')
         self.dte = StringVar()
         self.dte_entry = tk.Entry(self.service_frame)
-        self.dte_entry.place(relx=0.685, rely=0.635, height=30, relwidth=0.150)
+        self.dte_entry.place(relx=0.635, rely=0.635, height=30, relwidth=0.150)
         self.dte_entry.configure(textvariable=self.dte)
         self.dte_entry.configure(background="white")
         self.dte_entry.configure(disabledforeground="#a3a3a3")
         self.dte_entry.configure(font="TkFixedFont")
         self.dte_entry.configure(foreground="#000000")
         self.dte_entry.configure(insertbackground="black")
+        # Price
+        self.price_label = tk.Label(self.service_frame)
+        self.price_label.place(relx=0.800, rely=0.610, height=25, relwidth=0.150)
+        self.price_label.configure(activebackground="#f9f9f9")
+        self.price_label.configure(activeforeground="black")
+        self.price_label.configure(background="#6b6b6b")
+        self.price_label.configure(disabledforeground="#a3a3a3")
+        self.price_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.price_label.configure(foreground="#ffffff")
+        self.price_label.configure(highlightbackground="#d9d9d9")
+        self.price_label.configure(highlightcolor="black")
+        self.price_label.configure(relief="groove")
+        self.price_label.configure(text='''Κόστος''')
+        self.price = StringVar()
+        self.price_entry = tk.Entry(self.service_frame)
+        self.price_entry.place(relx=0.800, rely=0.645, height=25, relwidth=0.150)
+        self.price_entry.configure(textvariable=self.price)
+        self.price_entry.configure(background="white")
+        self.price_entry.configure(disabledforeground="#a3a3a3")
+        self.price_entry.configure(font="TkFixedFont")
+        self.price_entry.configure(foreground="#000000")
+        self.price_entry.configure(insertbackground="black")
 
         self.send_mail_btn = tk.Button(top)
         # self.save_btn.place(relx=0.296, rely=0.932, height=34, width=147)
@@ -793,7 +815,7 @@ class edit_task_window:
         self.get_data()
         self.get_spare_parts()
         self.check_if_files_exists()
-        self.get_first_copier_id()
+
     # Ελεγχος αν υπάρχουν αρχεία για προβολή
     def check_if_files_exists(self):
         con = sqlite3.connect(dbase)
@@ -1480,6 +1502,8 @@ class edit_task_window:
         self.counter_entry.configure(textvariable=counter_entry)
         next_service = StringVar(w, value=data[0][15])
         self.next_service_entry.configure(textvariable=next_service)
+        price = StringVar(w, value=data[0][17])
+        self.price_entry.configure(textvariable=price)
         # data[0][-1] == κατάσταση
         if not data[0][-1]:  # αν η κατάσταση δεν είναι 1 ==>  δλδ δεν ολοκληρόθηκε
             self.completed_Checkbutton1.configure(bg="green")
@@ -1607,7 +1631,7 @@ class edit_task_window:
                 self.compl_date_entry.get(), self.urgent, self.phone_entry.get(),
                 self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, self.dte_entry.get(),
                 self.service_id, self.counter_entry.get(), self.next_service_entry.get(), self.customer_id,
-                0 if self.completed_var.get() else 1, self.selected_calendar_id]
+                self.price_entry.get(), 0 if self.completed_var.get() else 1, self.selected_calendar_id]
 
         cursor.execute("UPDATE Calendar  SET " + edited_columns + " WHERE ID=? ", (tuple(data,)))
         conn.commit()
@@ -1640,7 +1664,7 @@ class edit_task_window:
         # )
         data = [self.compl_date_entry.get(), self.purpose_combobox.get(), self.actions_combobox.get(),
                 self.technician_entry.get(), self.notes_scrolledtext.get('1.0', 'end-1c'), self.counter_entry.get(),
-                self.next_service_entry.get(), self.copier_id, self.dte_entry.get(), self.service_id]
+                self.next_service_entry.get(), self.copier_id, self.dte_entry.get(), self.price_entry.get(), self.service_id]
 
         cursor.execute("UPDATE Service  SET " + edited_columns + " WHERE ID=? ", (tuple(data)))
         conn.commit()

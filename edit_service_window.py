@@ -223,7 +223,7 @@ class edit_service_window():
         self.top = top
         top.geometry("655x650+0+0")
         top.minsize(120, 1)
-        top.maxsize(1604, 881)
+        top.maxsize(2604, 2881)
         top.resizable(1, 1)
         top.title("Επεξεργασία ιστορικού συντήρησης")
         top.configure(background="#f6f6ee")
@@ -520,6 +520,29 @@ class edit_service_window():
         self.technician_entry.configure(selectbackground="#c4c4c4")
         self.technician_entry.configure(selectforeground="black")
 
+        # Price
+        self.price_label = tk.Label(self.service_frame)
+        self.price_label.place(relx=0.800, rely=0.400, height=30, relwidth=0.150)
+        self.price_label.configure(activebackground="#f9f9f9")
+        self.price_label.configure(activeforeground="black")
+        self.price_label.configure(background="#6b6b6b")
+        self.price_label.configure(disabledforeground="#a3a3a3")
+        self.price_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.price_label.configure(foreground="#ffffff")
+        self.price_label.configure(highlightbackground="#d9d9d9")
+        self.price_label.configure(highlightcolor="black")
+        self.price_label.configure(relief="groove")
+        self.price_label.configure(text='''Κόστος''')
+        self.price = StringVar()
+        self.price_entry = tk.Entry(self.service_frame)
+        self.price_entry.place(relx=0.800, rely=0.460, height=30, relwidth=0.150)
+        self.price_entry.configure(textvariable=self.price)
+        self.price_entry.configure(background="white")
+        self.price_entry.configure(disabledforeground="#a3a3a3")
+        self.price_entry.configure(font="TkFixedFont")
+        self.price_entry.configure(foreground="#000000")
+        self.price_entry.configure(insertbackground="black")
+
         self.TSeparator1 = ttk.Separator(self.service_frame)
         self.TSeparator1.place(relx=0.025, rely=0.550, relwidth=0.938)
         # Σημειώσεις
@@ -717,7 +740,8 @@ class edit_service_window():
         self.next_service_entry.configure(textvariable=next_service)
         dte = StringVar(w, value=data[0][9])
         self.dte_entry.configure(textvariable=dte)
-
+        price = StringVar(w, value=data[0][10])
+        self.price_entry.configure(textvariable=price)
         # Προσθήκη αλλαγών στην βαση δεδομένων
         def add_to_db():
 
@@ -728,7 +752,8 @@ class edit_service_window():
             edited_culumns = ",".join(edited_culumns)
             data_to_add = [self.date_entry.get(), self.purpose_combobox.get(), self.actions_combobox.get(),
                            self.technician_entry.get(), self.notes_scrolledtext.get("1.0", "end-1c"), counter.get(),
-                           next_service.get(), self.copier_id, dte.get(), self.selected_service_id]
+                           next_service.get(), self.copier_id, dte.get(), self.price_entry.get(),
+                           self.selected_service_id]
 
             add_conn = sqlite3.connect(dbase)
             add_cursor = add_conn.cursor()

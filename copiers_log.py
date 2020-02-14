@@ -85,7 +85,7 @@ class Toplevel1:
         self.top = top
         top.geometry("600x300+310+227")
         top.minsize(120, 1)
-        top.maxsize(1604, 881)
+        top.maxsize(2604, 2881)
         top.resizable(1, 1)
         top.title("Ιστορικό μεταφοράς μηχανήματος")
         top.configure(background="#f6f6ee")
@@ -145,7 +145,7 @@ class Toplevel1:
         con.close()
         self.Scrolledtreeview1["columns"] = [head for head in self.headers]
         for head in self.headers:
-            if head == "ID_Φωτοτυπικού":
+            if head == "ID_μηχανήματος":
                 platos = 1
             else:
                 platos = 100

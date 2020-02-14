@@ -107,7 +107,7 @@ class Toplevel1:
 
         top.geometry("1024x500+310+227")
         top.minsize(120, 1)
-        top.maxsize(2250, 2040)
+        top.maxsize(2604, 2881)
         top.resizable(1, 1)
         top.title("Προσθήκη ανταλλακτικού")
         top.configure(background="#f6f6ee")
@@ -388,7 +388,7 @@ class Toplevel1:
             values.append('?')  # Για το self.service_ID
             values.append('?')  # Για το self.customer_id
             values = ",".join(values)
-            keys.append('Φωτοτυπικό')
+            keys.append('ΜΗΧΑΝΗΜΑ')
             keys.append('Service_ID')
             keys.append('Customer_ID')
             data.append(self.copier)

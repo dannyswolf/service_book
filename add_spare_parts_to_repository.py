@@ -94,7 +94,7 @@ class add_copier_window:
         self.top = top
         top.geometry("505x524+444+228")
         top.minsize(120, 1)
-        top.maxsize(1604, 881)
+        top.maxsize(2604, 2881)
         top.resizable(1, 1)
         top.title("Προσθήκη Ανταλλακτικού")
         top.configure(background="#f6f6ee")

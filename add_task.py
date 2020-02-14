@@ -181,7 +181,7 @@ class add_task_window:
         self.top = top
         top.geometry("505x624+400+100")
         top.minsize(120, 1)
-        top.maxsize(1604, 881)
+        top.maxsize(2604, 2881)
         top.resizable(1, 1)
         top.title("Προσθήκη εργασίας")
         top.configure(background="#f6f6ee")
@@ -658,7 +658,7 @@ class add_task_window:
         data = [self.start_date.get(), self.customer_combobox.get(), self.copiers_combobox.get(),
                 self.purpose_combobox.get(), "", self.technician_entry.get(), "", self.urgent.get(),
                 self.phone_var.get(), self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, "",
-                self.service_id, "", "", self.customer_id, 1]
+                self.service_id, "", "", self.customer_id, "", 1]
 
         sql_insert = "INSERT INTO Calendar (" + columns + ")" + "VALUES(" + values + ");"
 
@@ -694,11 +694,12 @@ class add_task_window:
         # 	"Επ_Service"	TEXT,       #  ""
         # 	"Copier_ID"	INTEGER,        # -------------   self.copier_id
         # 	"ΔΤΕ"	TEXT,               # ""
+        #   "Price"  TEXT,              # ""
         # 	FOREIGN KEY("Copier_ID") REFERENCES "Φωτοτυπικά"("ID")
         # )
         # self.copier_id = self.get_copier_id()
         data = [self.start_date.get(), self.purpose_combobox.get(), "", self.technician_entry.get(),
-                self.notes_scrolledtext.get('1.0', 'end-1c'), "", "", self.copier_id, ""]
+                self.notes_scrolledtext.get('1.0', 'end-1c'), "", "", self.copier_id, "", ""]
         sql_insert = "INSERT INTO Service (" + columns + ")" + "VALUES(" + values + ");"
 
         cursor.execute(sql_insert, tuple(data))

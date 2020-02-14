@@ -81,7 +81,7 @@ class Toplevel1:
         self.top = top
         top.geometry("681x400+480+276")
         top.minsize(120, 1)
-        top.maxsize(1604, 881)
+        top.maxsize(2604, 2881)
         top.resizable(1, 1)
         top.title("Προσθήκη πελάτη")
         top.configure(background="#f6f6ee")
