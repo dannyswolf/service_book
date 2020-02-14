@@ -1,9 +1,11 @@
 #  -*- coding: utf-8 -*-
-from tkinter import Tk, ttk, messagebox, StringVar, PhotoImage
-import tkinter as tk
 import sqlite3
 import sys
+import tkinter as tk
+from tkinter import ttk, messagebox, StringVar, PhotoImage
+
 from settings import dbase, root_logger
+
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
@@ -199,6 +201,14 @@ class SetEmailSettings:
         self.port_entry.configure(selectbackground="#c4c4c4")
         self.port_entry.configure(selectforeground="black")
 
+        # Αποθήκευση
+        self.save_sender_btn = tk.Button(self.root)
+        self.save_sender_btn.place(relx=0.580, rely=0.460, height=30, relwidth=0.200)
+        self.save_sender_btn.configure(foreground="white")
+        self.save_sender_btn.configure(text="Αποθήκευση")
+        self.save_sender_btn.configure(background="#5fa15f")
+        self.save_sender_btn.configure(command=self.save_sender_settings)
+
         # # ssl_port
         # self.ssl_port_label = tk.Label(self.root)
         # self.ssl_port_label.place(relx=0.025, rely=0.450, height=31, relwidth=0.230)
@@ -374,39 +384,57 @@ class SetEmailSettings:
             self.root.focus()
             return
 
-    def save_settings(self):
+    def save_sender_settings(self):
         email_data = [self.sender_email_entry.get(), self.password_entry.get(), self.smtp_server_entry.get(),
                       self.port_entry.get()]
-
         con = sqlite3.connect(dbase)
         c = con.cursor()
         sql = "INSERT INTO Sender_emails(sender_email, password, smtp_server, port)VALUES(?,?,?,?)"
-        error = -1
         try:
             if "@" in self.sender_email_entry.get():
-                c.execute(sql, tuple(email_data,))
+                c.execute(sql, tuple(email_data, ))
+                con.commit()
+                con.close()
             else:
-                error += 1
                 messagebox.showerror("Σφάλμα!", f"Μη έγκυρο email αποστολέα\nΟ αποστολέας δεν θα αποθυκευτή")
-            if "@" in self.receiver_email_entry.get():
-                c.execute("INSERT INTO Receiver_emails(Receiver_email)VALUES(?)", (self.receiver_email_entry.get(),))
-            else:
-                error += 1
-                messagebox.showerror("Σφάλμα!", f"Μη έγκυρο email παραλήπτη\nΟ παραλήπτης δεν θα αποθυκευτή")
-
+                con.close()
+                self.root.focus()
+                return
         except sqlite3.IntegrityError as error:
-            messagebox.showerror("Σφάλμα", f"{error}")
+            messagebox.showerror("Σφάλμα", f"{error}\n Το email {self.sender_email_entry.get()} υπάρχει")
             con.close()
-            return
-        if error:
-            con.close()
-            messagebox.showerror("Προσοχή!", "Τίποτα δεν αποθηκέυτηκε")
             self.root.focus()
             return
-        con.commit()
-        con.close()
+
         messagebox.showinfo("Προσοχή!", "Τα στοιχεία αποθηκέυτηκαν")
-        self.root.destroy()
+        self.senders, self.receivers = get_senders_emails()
+        self.senders_combobox.configure(values=self.senders)
+        self.root.focus()
+
+    def save_settings(self):
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        try:
+            if "@" in self.receiver_email_entry.get():
+
+                c.execute("INSERT INTO Receiver_emails(Receiver_email)VALUES(?)", (self.receiver_email_entry.get(),))
+                con.commit()
+                con.close()
+            else:
+                messagebox.showerror("Σφάλμα!", f"Μη έγκυρο email παραλήπτη\nΟ παραλήπτης δεν θα αποθυκευτή")
+                con.close()
+                self.root.focus()
+                return
+        except sqlite3.IntegrityError as error:
+            messagebox.showerror("Σφάλμα", f"{error}\n Το email {self.receiver_email_entry.get()} υπάρχει")
+            con.close()
+            self.root.focus()
+            return
+
+        messagebox.showinfo("Προσοχή!", "Τα στοιχεία αποθηκέυτηκαν")
+        self.senders, self.receivers = get_senders_emails()
+        self.receivers_combobox.configure(values=self.receivers)
+        self.root.focus()
 
     def quit(self, event):
         self.root.destroy()

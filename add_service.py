@@ -9,17 +9,18 @@ V0.3.2 Προσθήκη αυτόματης Ημερομηνίας
 
 """
 import os
-import sys
-import sqlite3
-from tkinter import StringVar, messagebox, PhotoImage, filedialog
-import add_service_window_support
 import platform
-from tkcalendar import DateEntry
+import sqlite3
+import sys
 from datetime import datetime
+from tkinter import StringVar, messagebox, PhotoImage, filedialog
+
+from tkcalendar import DateEntry
+
+import add_service_window_support
 import add_spare_parts
 import insert_spare_parts
 from settings import dbase, spare_parts_db, root_logger, today  # settings
-
 
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
 sys.stderr.write = root_logger.error
@@ -139,7 +140,7 @@ class add_service_window():
         self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
         self.top = top
         top.protocol("WM_DELETE_WINDOW", self.check_before_close_windows)
-        top.geometry("655x650+0+0")
+        top.geometry("655x650+300+200")
         top.minsize(120, 1)
         top.maxsize(2604, 2881)
         top.resizable(1, 1)
@@ -282,6 +283,29 @@ class add_service_window():
         self.dte_entry.configure(insertbackground="black")
         self.dte_entry.configure(selectbackground="#c4c4c4")
         self.dte_entry.configure(selectforeground="black")
+        # Price
+        self.price_label = tk.Label(top)
+        self.price_label.place(relx=0.450, rely=0.450, height=31, relwidth=0.150)
+        self.price_label.configure(activebackground="#f9f9f9")
+        self.price_label.configure(activeforeground="black")
+        self.price_label.configure(background="#6b6b6b")
+        self.price_label.configure(disabledforeground="#a3a3a3")
+        self.price_label.configure(font="-family {Calibri} -size 10 -weight bold")
+        self.price_label.configure(foreground="#ffffff")
+        self.price_label.configure(highlightbackground="#d9d9d9")
+        self.price_label.configure(highlightcolor="black")
+        self.price_label.configure(relief="groove")
+        self.price_label.configure(text='''Κόστος''')
+        self.price = StringVar()
+        self.price_entry = tk.Entry(top)
+        self.price_entry.place(relx=0.620, rely=0.450, height=31, relwidth=0.150)
+        self.price_entry.configure(textvariable=self.price)
+        self.price_entry.configure(background="white")
+        self.price_entry.configure(disabledforeground="#a3a3a3")
+        self.price_entry.configure(font="TkFixedFont")
+        self.price_entry.configure(foreground="#000000")
+        self.price_entry.configure(insertbackground="black")
+
         # Σημειώσεις
         self.notes_label = tk.Label(top)
         self.notes_label.place(relx=0.025, rely=0.650, height=31, relwidth=0.950)
@@ -298,7 +322,7 @@ class add_service_window():
 
         # Προσθήκη αρχείων
         self.add_files_btn = tk.Button(top)
-        self.add_files_btn.place(relx=0.650, rely=0.550, height=41, relwidth=0.250)
+        self.add_files_btn.place(relx=0.650, rely=0.520, height=41, relwidth=0.250)
         self.add_files_btn.configure(activebackground="#ececec")
         self.add_files_btn.configure(activeforeground="#000000")
         self.add_files_btn.configure(background="green")
@@ -430,8 +454,8 @@ class add_service_window():
         self.edit()
 
     def quit(self, event):
-        root.focus()
-        w.destroy()
+        self.check_before_close_windows()
+
 
     def add_to_service_data(self, column):
         # self.purpose_list, self.actions_list
@@ -547,7 +571,7 @@ class add_service_window():
 
             data_to_add = [self.date_entry.get(), self.purpose_combobox.get(), self.actions_combobox.get(),
                            self.technician_entry.get(), self.notes_scrolledtext.get("1.0", "end-1c"), counter.get(),
-                           next_service.get(), self.selected_copier_id, dte.get()]
+                           next_service.get(), self.selected_copier_id, dte.get(), self.price_entry.get()]
             add_conn = sqlite3.connect(dbase)
             add_cursor = add_conn.cursor()
             # ΒΑΖΟΥΜΕ ΤΟ ΠΡΩΤΟ NULL ΓΙΑ ΝΑ ΠΆΡΕΙ ΜΟΝΟ ΤΟΥ ΤΟ ID = PRIMARY KEY
@@ -663,8 +687,10 @@ class add_service_window():
         spare_parts = c.fetchall()
         con.close()
         if spare_parts:
-            messagebox.showinfo("Προσοχή!", "Έχεται προσθέση ανταλλακτικά!\nΠαρακαλώ πρώτα αποθηκεύστε και επειτα "
-                                            "διαγράψτε την επισκευή αν θέλετε")
+            messagebox.showinfo("Προσοχή!", f"Έχεται προσθέση ανταλλακτικά!\n{spare_parts[0][1:6]}\n"
+                                            f"Παρακαλώ πρώτα αποθηκεύστε και επειτα "
+                                            "διαγράψτε την επισκευή αν θέλετε,")
+            self.top.focus()
             return
         else:
             self.top.destroy()

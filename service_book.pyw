@@ -14,6 +14,10 @@ todo uniq (στα πεδία των πινακων στην βαση) στους
 1) todo Στο treeview των φωτοτυπικών δίπλα να βάλω treeview υπολογιστών
 2) todo open pdf files on webdriver
 
+
+V1.8.3 Ability to change companies and models of machines  ------ -------------------14/2/2020
+Fix some bugs on add_service and search errors
+
 V1.8.2 Price Label ---------------------------------------------- -------------------14/2/2020
 
 V1.8.1 Changes on edit_task unable to change customer and Machine -------------------13/2/2020
@@ -312,28 +316,29 @@ V 0.1.1 Προσθήκη επεξεργασία ιστορικού φωτοτυ�
 v 0.0.1 Ενας πελάτης με πολλά φωτοτυπικά το κάθε φωτοτυπικό με πολλά Service ------------------------14/12/2019
         Η ημερομηνία εναρξης και Μετρητής εναρξης είναι πεδία του φωτοτυπικού γιατί πάνε με το φωτοτυπικό
 """
+import sys  # Για τα αρχεία log files
+from datetime import timedelta
+from tkinter import TclError
+
+from tkcalendar import Calendar, DateEntry
+
 import activate
+import add_copier  # Προσθήκη Φωτοτυπικού
+import add_customers  # Δημιουργία παραθύρου προσθήκης πελάτη
 import add_spare_parts_to_repository
+import add_task
+import change_customer
+import copiers_log
 import data_settings
 import edit_spare_parts_to_repository
-import service_book_colors_support
-from edit_service_window import *  # Δημιουργία παραθύρου επεξεργασίας ιστορικού επισκευής
-import add_customers  # Δημιουργία παραθύρου προσθήκης πελάτη
-from tkinter import StringVar, TclError, PhotoImage
-import add_copier  # Προσθήκη Φωτοτυπικού
-import change_customer
-from add_service import *
-import copiers_log
-import enable_customers
-import enable_copiers
-import add_task
 import edit_task
 import email_settings
-from tkcalendar import Calendar, DateEntry
-from datetime import date, timedelta
-import sys  # Για τα αρχεία log files
+import enable_copiers
+import enable_customers
+import service_book_colors_support
+from add_service import *
+from edit_service_window import *  # Δημιουργία παραθύρου επεξεργασίας ιστορικού επισκευής
 from settings import dbase, demo, service_book_version, root_logger, today, spare_parts_db  # settings
-
 
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
@@ -2207,9 +2212,9 @@ class Toplevel1:
             customers_id = []
             customers = []
             for n in range(len(fetch)):
-                copiers_id.append(fetch[n][-2])
+                copiers_id.append(fetch[n][-3])
 
-                search_cursor.execute("SELECT Εταιρεία FROM Φωτοτυπικά WHERE ID=?", (fetch[n][-2],))
+                search_cursor.execute("SELECT Εταιρεία FROM Φωτοτυπικά WHERE ID=?", (fetch[n][-3],))
 
                 copiers.append(search_cursor.fetchall())  # Πέρνουμε το Φωτοτυπικό
 
@@ -2254,7 +2259,7 @@ class Toplevel1:
             for n in range(len(sorted_fetch)):
                 data.append(sorted_fetch[n][0])  # ID
                 data.append(sorted_fetch[n][1])  # Ημερομηνία
-                data.append(str(copiers[n][0][0]))   # Φωτοτυπικό
+                data.append(str(copiers[n][0][0]))   # Μηχάνημα
                 data.append(str(customers[n][0][0]))                   # Πελάτης
                 data.append(sorted_fetch[n][2])  # Σκοπός
                 data.append(sorted_fetch[n][3])  # Ενέργειες
