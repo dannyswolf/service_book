@@ -63,10 +63,10 @@ demo = check_if_demo()
 
 if demo:
 
-    service_book_version = "V 1.8.3 Demo"
+    service_book_version = "V 1.8.4 Demo"
 else:
 
-    service_book_version = "V 1.8.3"
+    service_book_version = "V 1.8.4"
 
 
 today = datetime.datetime.today().strftime("%d %m %Y")
