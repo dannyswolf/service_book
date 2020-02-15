@@ -15,6 +15,8 @@ todo uniq (στα πεδία των πινακων στην βαση) στους
 2) todo open pdf files on webdriver
 
 
+V1.8.4 Check if demo with two methods   -----------------  ------ -------------------15/2/2020
+
 V1.8.3 Ability to change companies and models of machines  ------ -------------------14/2/2020
 Fix some bugs on add_service and search errors
 
@@ -316,11 +318,10 @@ V 0.1.1 Προσθήκη επεξεργασία ιστορικού φωτοτυ�
 v 0.0.1 Ενας πελάτης με πολλά φωτοτυπικά το κάθε φωτοτυπικό με πολλά Service ------------------------14/12/2019
         Η ημερομηνία εναρξης και Μετρητής εναρξης είναι πεδία του φωτοτυπικού γιατί πάνε με το φωτοτυπικό
 """
-import sys  # Για τα αρχεία log files
 from datetime import timedelta
 from tkinter import TclError
 
-from tkcalendar import Calendar, DateEntry
+from tkcalendar import Calendar
 
 import activate
 import add_copier  # Προσθήκη Φωτοτυπικού

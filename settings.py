@@ -1,11 +1,11 @@
 #  -*- coding: utf-8 -*-
-import getpass
-import os
-import logging
 import datetime
+import getpass
+import hashlib
+import logging
+import os
 import sqlite3
 import sys
-
 
 user = getpass.getuser()
 
@@ -35,19 +35,38 @@ def check_if_demo():
     c.execute("SELECT seq from sqlite_sequence WHERE name ='demo'")
     data = c.fetchall()
     con.close()
-    if data[0][0] == "1":
-        version = 1  # Its Demo
+    if data[0][0] == 0:
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT seq from sqlite_sequence WHERE name ='key'")
+        key_data = c.fetchall()
+        c.execute("SELECT seq from sqlite_sequence WHERE name ='customer_email'")
+        email_data = c.fetchall()
+        con.close()
+        key = key_data[0][0]
+        email = email_data[0][0]
+        email_key = hashlib.md5(email.encode())
+
+        if key != "" and email != "" and key == email_key.hexdigest():
+
+            version = 0  # Its Not Demo
+
+        else:
+            version = 1
+
     else:
-        version = 0  # Its not Demo
+        version = 1  # Its  Demo
     return version
 
 
 demo = check_if_demo()
 
 if demo:
-    service_book_version = "V 1.8.2 Demo"
+
+    service_book_version = "V 1.8.3 Demo"
 else:
-    service_book_version = "V 1.8.2"
+
+    service_book_version = "V 1.8.3"
 
 
 today = datetime.datetime.today().strftime("%d %m %Y")

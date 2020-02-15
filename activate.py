@@ -1,10 +1,12 @@
 #  -*- coding: utf-8 -*-
 import hashlib
-from tkinter import Tk, ttk, messagebox, StringVar
-import tkinter as tk
 import sqlite3
 import sys
+import tkinter as tk
+from tkinter import Tk, messagebox, StringVar
+
 from settings import dbase, root_logger, demo
+
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
@@ -14,13 +16,7 @@ sys.stdout.write = root_logger.info
 class activate:
     def __init__(self):
 
-        if not demo:
-            con = sqlite3.connect(dbase)
-            c = con.cursor()
-            c.execute("SELECT seq from sqlite_sequence WHERE name ='customer_email'")
-            name = c.fetchall()
-            messagebox.showinfo("Προσοχή", f'Η εφαρμογή ειναι ενεργοποιημένη στο email {name[0][0]}')
-            return
+
         self.root = Tk()
         self.root.geometry("350x150+200+200")
         self.root.title("Ενεργοποίηση")
@@ -119,6 +115,7 @@ class activate:
             self.root.destroy()
         else:
             messagebox.showerror("Ενεργοποίηση", "Η ενεργοποίηση δεν ήταν επιτυχής")
+            self.root.focus()
             return
 
     def quit(self, event):
@@ -131,6 +128,13 @@ if __name__ == "__main__":
 
 
 def run_activate():
+    if not demo:
+        con = sqlite3.connect(dbase)
+        c = con.cursor()
+        c.execute("SELECT seq from sqlite_sequence WHERE name ='customer_email'")
+        name = c.fetchall()
+        messagebox.showinfo("Προσοχή", f'Η εφαρμογή ειναι ενεργοποιημένη στο email {name[0][0]}')
+        return
     run_mail = activate()
     run_mail.root.mainloop()
 
