@@ -57,15 +57,20 @@ w = None
 service_id = ""
 customer_id = ""
 copier_name = ""
+calendar_id = ""
 rt = None
 
 
 def create_Toplevel1(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
-    global w, w_win, rt, service_id, customer_id, copier_name
+    global w, w_win, rt, service_id, customer_id, copier_name, calendar_id
     service_id = args[0]  # Το Service_ID απο το add_service.py, edit_service_windows, edit_task.py
     customer_id = args[1]   # Το customer_id απο το add_service.py, edit_service_windows, edit_task.py
     copier_name = args[2]
+    try:
+        calendar_id = args[3]  # To Calendar_id απο το edit_task.py
+    except IndexError:  # Οταν τρέχουμε το add_spare_parts οχι απο το edit_task
+        pass
     rt = root
     w = tk.Toplevel (root)
     top = Toplevel1 (w)
@@ -120,6 +125,7 @@ class Toplevel1:
         self.selected_company = ""
         self.service_ID = service_id
         self.customer_id = customer_id
+        self.calendar_id = calendar_id
         self.copier = copier_name
         self.select_company_label = tk.Label(top)
         self.select_company_label.place(relx=0.025, rely=0.200, relheight=0.060, relwidth=0.260)
@@ -284,7 +290,10 @@ class Toplevel1:
         # o ελεγχος γίνεται με τους κωδικους προιόντος
         # αν ο κωδικός υπάρχει στο ιστορικό του Service_ID τότε ρωτάει και αναλογα προσθέτη +1 στο τεμάχιο
         # πρώτα πέρνουμε του κωδικούς
-        service_cursor.execute("SELECT ΚΩΔΙΚΟΣ FROM Ανταλλακτικά WHERE Service_ID =?", (self.service_ID,))
+        if self.service_ID == "0":  # Αν δεν υπάρχει service_id (όταν το μηχάνημα δεν ειναι στην βάση δεδομένων μας)
+            service_cursor.execute("SELECT ΚΩΔΙΚΟΣ FROM Ανταλλακτικά WHERE Calendar_ID =?", (self.calendar_id,))
+        else:
+            service_cursor.execute("SELECT ΚΩΔΙΚΟΣ FROM Ανταλλακτικά WHERE Service_ID =?", (self.service_ID,))
         spare_parts = service_cursor.fetchall()
         service_con.close()
         used_parts = []
@@ -300,6 +309,7 @@ class Toplevel1:
                 # όταν το value  πάρει την τιμή του κωδικού πχ 6207 και ο κωδικός αυτός υπάρχει στα Service_ID
                 # τότε προσθέτη +1 στο πεδίο Τεμάχια του πίνακα Ανταλλακτικά στο κωδικό 6207
                 if value in used_parts:  # value είναι ο κωδικός ==> 6207
+                    print("value", value)
 
                     answer = messagebox.askyesno("Προσοχή!", f"Ο κωδικός  {value}, υπάρχει στο ιστορικό αυτό "
                                                               f"θέλετε να το ξανα προσθέσετε;")
@@ -308,12 +318,20 @@ class Toplevel1:
                     if answer:
                         service_con = sqlite3.connect(dbase)
                         service_cursor = service_con.cursor()
-                        service_cursor.execute("SELECT ΤΕΜΑΧΙΑ FROM Ανταλλακτικά WHERE ΚΩΔΙΚΟΣ = ? AND Service_ID =?",
-                                               (value, self.service_ID,))
+                        if self.service_ID != "0":
+                            service_cursor.execute("SELECT ΤΕΜΑΧΙΑ FROM Ανταλλακτικά WHERE ΚΩΔΙΚΟΣ = ? "
+                                                   "AND Service_ID =?", (value, self.service_ID,))
+                        else:
+                            service_cursor.execute("SELECT ΤΕΜΑΧΙΑ FROM Ανταλλακτικά WHERE ΚΩΔΙΚΟΣ = ? "
+                                                   "AND Calendar_ID =?", (value, self.calendar_id,))
                         pieces = service_cursor.fetchall()
                         new_pieces = int(pieces[0][0]) + 1
-                        service_cursor.execute("UPDATE Ανταλλακτικά SET ΤΕΜΑΧΙΑ =? WHERE ΚΩΔΙΚΟΣ =? AND Service_ID =?",
-                                               (new_pieces, value, self.service_ID))
+                        if self.service_ID != "0":
+                            service_cursor.execute("UPDATE Ανταλλακτικά SET ΤΕΜΑΧΙΑ =? WHERE ΚΩΔΙΚΟΣ =? "
+                                                   "AND Service_ID =?", (new_pieces, value, self.service_ID))
+                        else:
+                            service_cursor.execute("UPDATE Ανταλλακτικά SET ΤΕΜΑΧΙΑ =? WHERE ΚΩΔΙΚΟΣ =? "
+                                                   "AND Calendar_ID =?", (new_pieces, value, self.calendar_id))
                         service_con.commit()
                         service_con.close()
                         con = sqlite3.connect(spare_parts_db)
@@ -334,15 +352,15 @@ class Toplevel1:
                             c.execute("SELECT ΤΙΜΗ FROM " + self.selected_company + " WHERE ΚΩΔΙΚΟΣ =?", (value,))
                             price = c.fetchall()
                             price = price[0][0]
-                            total = float(new_pieces) * float(price[:-1])
+                            total = float(new_pieces) * float(price[:-1].replace(",", "."))
                             str_total = str("{:0.2f}".format(total)) + " €"
                             c.execute("UPDATE " + self.selected_company + " SET ΣΥΝΟΛΟ =? WHERE ΚΩΔΙΚΟΣ =?",
                                       (str_total, value))
                             con.commit()
                         except sqlite3.OperationalError:
                             pass
-                        print("line 302"
-                            f"Οι κωδικοί {added_codes} αφερέθηκαν απο την αποθήκη {self.selected_company} με επιτυχία ")
+                        print("line 361"
+                            f" Οι κωδικοί {added_codes} αφερέθηκαν απο την αποθήκη {self.selected_company} με επιτυχία ")
                         c.close()
                         con.close()
                         # messagebox.showinfo("Πληροφορία", f"O κωδικός {value} προστέθηκε ")
@@ -351,7 +369,7 @@ class Toplevel1:
                         return
                     else:
                         rt.focus()
-                        self.top.focus()
+                        self.top.destroy()
                         return
 
         # Μετά το for item in items_to_add:
@@ -387,20 +405,26 @@ class Toplevel1:
             values.append('?')  # Για το self.copier
             values.append('?')  # Για το self.service_ID
             values.append('?')  # Για το self.customer_id
+            values.append('?')  # Για το self.calendar_id
             values = ",".join(values)
             keys.append('ΜΗΧΑΝΗΜΑ')
             keys.append('Service_ID')
             keys.append('Customer_ID')
+            keys.append('Calendar_ID')
             data.append(self.copier)
             data.append(self.service_ID)
             data.append(self.customer_id)
+            data.append(self.calendar_id)
             print("keys", keys)
             sql = ("INSERT INTO Ανταλλακτικά(" + ",".join(keys) + " )VALUES( " + values + " )")
             service_cursor.execute(sql, data)
             service_con.commit()
 
         # messagebox.showinfo("Info", f"Οι κωδικοί {added_codes} προστέθηκαν με επιτυχεία ")
-        print(f"Line 349 Οι κωδικοί {added_codes} προστέθηκαν με επιτυχία στο service_id {self.service_ID} ")
+        if self.service_ID == "0":
+            print(f"Line 349 Οι κωδικοί {added_codes} προστέθηκαν με επιτυχία στο Calendar_Id {self.calendar_id} ")
+        else:
+            print(f"Line 349 Οι κωδικοί {added_codes} προστέθηκαν με επιτυχία στο service_id {self.service_ID} ")
         service_cursor.close()
         service_con.close()
 
@@ -420,7 +444,7 @@ class Toplevel1:
                 c.execute("SELECT ΤΙΜΗ FROM " + self.selected_company + " WHERE ΚΩΔΙΚΟΣ =?", (code,))
                 price = c.fetchall()
                 price = price[0][0]
-                total = float(new_pieces) * float(price[:-1])
+                total = float(new_pieces) * float(price[:-1].replace(",", "."))
                 str_total = str("{:0.2f}".format(total)) + " €"
                 c.execute("UPDATE " + self.selected_company + " SET ΣΥΝΟΛΟ =? WHERE ΚΩΔΙΚΟΣ =?",
                           (str_total, code))

@@ -891,12 +891,17 @@ class edit_task_window:
                 self.top.focus()
 
     def get_spare_parts(self, event=None):
+
         self.spare_parts_treeview.delete(*self.spare_parts_treeview.get_children())
         con = sqlite3.connect(dbase)
         c = con.cursor()
-        c.execute("SELECT * FROM Ανταλλακτικά WHERE Service_ID =?", (self.service_id,))
+        if self.service_id == "0":
+            c.execute("SELECT * FROM Ανταλλακτικά WHERE Calendar_ID =?", (self.selected_calendar_id,))
+            data = c.fetchall()
+        else:
+            c.execute("SELECT * FROM Ανταλλακτικά WHERE Service_ID =?", (self.service_id,))
+            data = c.fetchall()
         headers = list(map(lambda x: x[0], c.description))
-        data = c.fetchall()
         con.close()
         self.spare_parts_treeview["columns"] = [head for head in headers]
         for head in headers:
@@ -915,18 +920,20 @@ class edit_task_window:
     def add_spare_parts(self):
 
         if not self.customer_id:
-            messagebox.showerror("Σφάλμα", f"Ο πελάτης {self.customer_entry.get()} δεν υπάρχει \n Πιθανών έγινε μετονομασία")
+            messagebox.showerror("Σφάλμα", f"Ο πελάτης {self.customer_entry.get()} δεν υπάρχει \n "
+                                           f"Πιθανών έγινε μετανομασία")
             return
         if spare_parts_db:
 
-            add_spare_parts.create_Toplevel1(self.top, self.service_id, self.customer_id, self.copiers_entry.get())
+            add_spare_parts.create_Toplevel1(self.top, self.service_id, self.customer_id, self.copiers_entry.get(),
+                                             self.selected_calendar_id)
         else:
             insert_spare_parts.create_insert_spare_parts_window(self.top, self.service_id, self.customer_id,
-                                                                self.copiers_entry.get())
+                                                                self.copiers_entry.get(), self.selected_calendar_id)
 
     def insert_spare_part_outside_of_repository(self):
         insert_spare_parts.create_insert_spare_parts_window(self.top, self.service_id, self.customer_id,
-                                                            self.copiers_entry.get())
+                                                            self.copiers_entry.get(), self.selected_calendar_id)
 
     # Διαγραφή ανταλλακτικών
     def del_spare_parts(self):
@@ -975,13 +982,18 @@ class edit_task_window:
             c.execute("SELECT ΤΙΜΗ FROM " + part_table + " WHERE ΚΩΔΙΚΟΣ =?", (selected_part_code,))
             price = c.fetchall()
             price = price[0][0]
-            total = float(new_pieces) * float(price[:-1])   # για να μήν πάρει το €
+            total = float(new_pieces) * float(price[:-1].replace(",", "."))   # για να μήν πάρει το €
             str_total = str("{:0.2f}".format(total)) + " €"
             c.execute("UPDATE " + part_table + " SET ΣΥΝΟΛΟ =? WHERE ΚΩΔΙΚΟΣ =?",
                       (str_total, selected_part_code))
             con.commit()
-        except sqlite3.OperationalError:  # όταν δεν έχει τιμή
-            pass
+        except Exception as error:
+            if error == sqlite3.OperationalError: # όταν δεν έχει τιμή
+                pass
+            elif error == UnboundLocalError:
+                pass  # δεν υπάρχει στην αποθήκη
+            else:  # Οταν αλλο σφάλμα
+                pass
         # messagebox.showinfo("Πληροφορία!",
         #                         f"Το προιόν με κωδικό {selected_part_code}  της εταιρείας {part_table} ενημερώθηκε")
         con.commit()
@@ -1451,6 +1463,7 @@ class edit_task_window:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM Calendar WHERE ID =?", (self.selected_calendar_id,))
         data = cursor.fetchall()
+        print("data", data)
         # todo
         # Τα στοιχεία του πελάτη να τα πάρουμε απο τον πίνακα του πελάτη γιατί μπορεί να τα αλλάξουμε
         # cursor.execute("SELECT Επωνυμία_Επιχείρησης, Τηλέφωνο FROM Πελάτες WHERE ID=?", ,))
@@ -1681,7 +1694,11 @@ class edit_task_window:
         c.execute("SELECT Customer_ID FROM Calendar WHERE ID =?", (self.selected_calendar_id,))
         data = c.fetchall()
         con.close()
-        customer_id = data[0][0]
+        try:
+            customer_id = data[0][0]
+        except IndexError:  # Οταν επιλέγουμε ολοκληρωμένες εργασίες κατω απο το ημερολόγιο που ανοιγει το ποντίκι
+            return           # επιλέγει στοιχείο απο την λίστα του calendar treeview που σηνήθως είναι αδεια
+                           # ποιο πολύ συμβαινει στο Linux
 
         return customer_id
 

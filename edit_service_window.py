@@ -1067,7 +1067,7 @@ class edit_service_window():
             c.execute("SELECT ΤΙΜΗ FROM " + part_table + " WHERE ΚΩΔΙΚΟΣ =?", (selected_part_code,))
             price = c.fetchall()
             price = price[0][0]
-            total = float(new_pieces) * float(price[:-1])
+            total = float(new_pieces) * float(price[:-1].replace(",", "."))
             str_total = str("{:0.2f}".format(total)) + " €"
             c.execute("UPDATE " + part_table + " SET ΣΥΝΟΛΟ =? WHERE ΚΩΔΙΚΟΣ =?",
                       (str_total, selected_part_code))

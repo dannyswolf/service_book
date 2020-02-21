@@ -10,6 +10,7 @@ import sys
 from tkinter import messagebox, StringVar
 import sqlite3
 from settings import dbase, root_logger  # settings
+import platform
 
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
 sys.stderr.write = root_logger.error
@@ -45,16 +46,21 @@ w = None
 service_id = None
 customer_id = None
 copier = None
+calendar_id = ""
 rt = None
 
 
 def create_insert_spare_parts_window(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
-    global w, w_win, rt, service_id, customer_id, copier
+    global w, w_win, rt, service_id, customer_id, copier, calendar_id
     rt = root
     service_id = args[0]  # Το Service_ID απο το add_service.py και edit_service_windows
     customer_id = args[1]  # Το customer_id απο το add_service.py και edit_service_windows
     copier = args[2]    # self.copiers_combobox.get() απο το add_service.py και edit_service_windows
+    try:
+        calendar_id = args[3]  # To Calendar_id απο το edit_task.py
+    except IndexError:  # Οταν τρέχουμε το add_spare_parts οχι απο το edit_task
+        pass
     w = tk.Toplevel(root)
     add_copier_support.set_Tk_var()
     top = add_copier_window(w)
@@ -92,6 +98,7 @@ class add_copier_window:
 
         self.service_id = service_id
         self.customer_id = customer_id
+        self.calendar_id = calendar_id
         self.copier = copier
         self.top = top
         top.geometry("505x524+444+228")
@@ -224,7 +231,6 @@ class add_copier_window:
         self.TSeparator1 = ttk.Separator(top)
         self.TSeparator1.place(relx=0.025, rely=0.553, relwidth=0.938)
 
-
         self.notes_label = tk.Label(top)
         self.notes_label.place(relx=0.025, rely=0.573, height=31, relwidth=0.940)
         self.notes_label.configure(activebackground="#f9f9f9")
@@ -289,8 +295,8 @@ class add_copier_window:
         conn = sqlite3.connect(dbase)
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM Ανταλλακτικά;")
-        headers = list(map(lambda x:x[0], cursor.description))
-        culumns = ", ".join(headers)
+        headers = list(map(lambda x: x[0], cursor.description))
+        columns = ", ".join(headers)
         values = []
         for head in headers:
             if head == "ID":
@@ -298,11 +304,12 @@ class add_copier_window:
             else:
                 values.append("?")
         values = ", ".join(values)
+
         data = [self.parts_nr.get(), self.description.get(), self.code.get(),
                 self.pieces.get(), self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier, self.service_id,
-                self.customer_id]
+                self.customer_id, self.calendar_id]
 
-        sql_insert = "INSERT INTO Ανταλλακτικά (" + culumns + ")" + "VALUES(" + values + ");"
+        sql_insert = "INSERT INTO Ανταλλακτικά (" + columns + ")" + "VALUES(" + values + ");"
 
         cursor.execute(sql_insert, tuple(data))
         conn.commit()
@@ -403,7 +410,7 @@ class ScrolledText(AutoScroll, tk.Text):
         AutoScroll.__init__(self, master)
 
 
-import platform
+
 
 
 def _bound_to_mousewheel(event, widget):

@@ -9,11 +9,12 @@ import sys
 
 user = getpass.getuser()
 # if user == "dannys":
-#     mlshop = 0
-# else:
-#     mlshop = 1
+#    mlshop = 0
+#else:
+#    mlshop = 1
 
 mlshop = 1
+
 
 if mlshop:
     if sys.platform == "linux":

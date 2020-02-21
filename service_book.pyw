@@ -14,8 +14,9 @@ todo uniq (στα πεδία των πινακων στην βαση) στους
 1) todo Στο treeview των φωτοτυπικών δίπλα να βάλω treeview υπολογιστών
 2) todo open pdf files on webdriver
 
-V1.8.5 Fix bug with spare_parts when there is no id on machine -- -------------------21/2/2020
+V1.8.5 Fix bugs with spare_parts when there is no id on machine -- -------------------21/2/2020
 Οταν καναμε κληση χωρις να ειναι το μηχάνημα στο συστημα επερνε service_id ενω δεν δημηουργούμε service στην βάση
+Τωρα βάζει service_id = 0 και βαζουμε Calendar_ID και περνουμε ανταλλακτικά απο το Calendar
 
 V1.8.4 Check if demo with two methods   -----------------  ------ -------------------15/2/2020
 
@@ -2048,10 +2049,16 @@ class Toplevel1:
             self.calendar_treeview.insert("", "end", values=item)
 
     def view_service_from_spare_parts(self, event):
-
-        service_id = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), "#8"))
         con = sqlite3.connect(dbase)
         c = con.cursor()
+        service_id = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), "#8"))
+
+        if service_id == "0":
+            calendar_id = (self.spare_parts_treeview.set(self.spare_parts_treeview.selection(), "#10"))
+            # Αυτή είναι συνάρτηση του αρχείου edit_task
+            edit_task.create_edit_task_window(root, calendar_id)
+            return
+
         c.execute("SELECT Copier_ID FROM Service WHERE ID =? ", (service_id,))
         copier_data = c.fetchall()
         copier_id = copier_data[0][0]
