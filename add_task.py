@@ -605,7 +605,7 @@ class add_task_window:
                 self.top.focus()
                 return
 
-        # self.copier_id = self.get_copier_id()  # Να πάρουμε το id του μηχανήματος  # Να πάρουμε το id του μηχανήματος
+        # self.copier_id = self.get_copier_id()  # Να πάρουμε το id του μηχανήματος
         conn = sqlite3.connect(dbase)
         cursor = conn.cursor()
         # Δημιουργία columns για της εργασίες
@@ -649,6 +649,7 @@ class add_task_window:
         # "", "", ==>> Actions, Ημερομηνία ολοκήροσης, ΔΤΕ, Μετρητής και Επώμενο service
 
         if self.copier_id == "0":
+            self.service_id = "0"
             answer = messagebox.askquestion("Προσοχή!", f'Το {self.copiers_combobox.get()} δεν είναι στην βάση!\nΔεν θα'
                                                         f' δημιουργηθεί ιστορικό συντήρησης.\n'
                                                         f'Θέλεται να συνεχίσεται;')

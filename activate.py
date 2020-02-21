@@ -16,7 +16,6 @@ sys.stdout.write = root_logger.info
 class activate:
     def __init__(self):
 
-
         self.root = Tk()
         self.root.geometry("350x150+200+200")
         self.root.title("Ενεργοποίηση")

@@ -8,9 +8,12 @@ import sqlite3
 import sys
 
 user = getpass.getuser()
+# if user == "dannys":
+#     mlshop = 0
+# else:
+#     mlshop = 1
 
-mlshop = 0
-
+mlshop = 1
 
 if mlshop:
     if sys.platform == "linux":
@@ -50,13 +53,15 @@ def check_if_demo():
         if key != "" and email != "" and key == email_key.hexdigest():
 
             version = 0  # Its Not Demo
+            return version
 
         else:
-            version = 1
+            version = 1  # Its  Demo
+            return version
 
     else:
         version = 1  # Its  Demo
-    return version
+        return version
 
 
 demo = check_if_demo()

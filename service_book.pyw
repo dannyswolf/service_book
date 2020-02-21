@@ -14,6 +14,8 @@ todo uniq (στα πεδία των πινακων στην βαση) στους
 1) todo Στο treeview των φωτοτυπικών δίπλα να βάλω treeview υπολογιστών
 2) todo open pdf files on webdriver
 
+V1.8.5 Fix bug with spare_parts when there is no id on machine -- -------------------21/2/2020
+Οταν καναμε κληση χωρις να ειναι το μηχάνημα στο συστημα επερνε service_id ενω δεν δημηουργούμε service στην βάση
 
 V1.8.4 Check if demo with two methods   -----------------  ------ -------------------15/2/2020
 
@@ -2394,7 +2396,12 @@ class Toplevel1:
         customers_data = customers_cursor.fetchall()
         # Οριζμός πελάτη
 
+        if not customers_data:
+            customers_cursor.close()
+            customers_conn.close()
+            return
         self.selected_customer = customers_data[0][1]
+
 
         # Ανάκτηση φωτοτυπικών απο τον επιλεγμένο πελάτη
         # τα φωτοτυπικά είναι το τελευταίο πεδίο του πίνακα πελάτη
@@ -2412,6 +2419,7 @@ class Toplevel1:
         customers_conn.close()
         # Κατασκευή tree το up_index -1 == το τελος ("end")
         # todo πρέπει να γίνει σε for loop και να μπούν σε λίστα
+
         self.customer_name.set(value=customers_data[0][1])
         self.company_name_entry.configure(textvariable=self.customer_name)
         self.current_customer_name = customers_data[0][1]
