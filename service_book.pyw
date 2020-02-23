@@ -350,6 +350,28 @@ import service_book_colors_support
 from add_service import *
 from edit_service_window import *  # Δημιουργία παραθύρου επεξεργασίας ιστορικού επισκευής
 from settings import dbase, demo, service_book_version, root_logger, today, spare_parts_db  # settings
+# ******************************************Pyinstaller Imports******************************************
+from reportlab import Version as __RL_Version__
+from reportlab.graphics.barcode import ecc200datamatrix
+from reportlab.graphics.barcode.common import *
+from reportlab.graphics.barcode.code39 import *
+from reportlab.graphics.barcode.code93 import *
+from reportlab.graphics.barcode.code128 import *
+from reportlab.graphics.barcode.usps import *
+from reportlab.graphics.barcode.usps4s import USPS_4State
+from reportlab.graphics.barcode.qr import QrCodeWidget
+from reportlab.platypus import Spacer, SimpleDocTemplate, Table, TableStyle, Preformatted, PageBreak
+from reportlab.lib.units import inch, cm
+from reportlab.lib import colors
+from reportlab.pdfgen.canvas import Canvas
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus.paragraph import Paragraph
+from reportlab.platypus.frames import Frame
+from reportlab.platypus.flowables import XBox, KeepTogether
+from reportlab.graphics.shapes import Drawing, Rect, Line
+from reportlab.graphics.barcode import getCodes, getCodeNames, createBarcodeDrawing, createBarcodeImageInMemory
+from reportlab.pdfbase import _fontdata_enc_winansi
+from reportlab.pdfbase import _fontdata_enc_macroman
 
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
