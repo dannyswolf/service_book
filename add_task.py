@@ -5,20 +5,23 @@
 #  in conjunction with Tcl version 8.6
 #    Dec 22, 2019 12:31:44 AM EET  platform: Windows NT
 
-import pyscreenshot as ImageGrab
-from xhtml2pdf import pisa
-import add_copier_support
-import sys
 import os
-from tkinter import PhotoImage, messagebox, StringVar
 import sqlite3
-from datetime import datetime
-import mail
-import add_copier
-from tkcalendar import DateEntry
-from settings import dbase, root_logger, demo, today, user  # settings
 import subprocess
+import sys
+from datetime import datetime
+from tkinter import PhotoImage, messagebox, StringVar
+
+import pyscreenshot as ImageGrab
+from tkcalendar import DateEntry
+from xhtml2pdf import pisa
+
+import add_copier
+import add_copier_support
 import add_customers
+import mail
+from settings import dbase, root_logger, demo, today, user  # settings
+
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
@@ -304,7 +307,7 @@ class add_task_window:
         self.add_copier_btn1 = tk.Button(top)
         self.add_copier_btn1.place(relx=0.875, rely=0.324, height=29, relwidth=0.060)
         self.add_copier_btn1.configure(background="#006291")
-        self.add_copier_btn1_img1 = PhotoImage(file="icons/add_to_service_data1.png")
+        self.add_copier_btn1_img1 = PhotoImage(file="icons/insert_machine.png")
         self.add_copier_btn1.configure(image=self.add_copier_btn1_img1)
         self.add_copier_btn1.configure(command=self.add_copier)
         # Ανανέωση μετα απο Προσθήκη Φωτοτυπικού
@@ -354,7 +357,7 @@ class add_task_window:
         self.technician = StringVar(top, value="Ιορδάνης")
         self.technician_entry = tk.Entry(top)
         self.technician_entry.place(relx=0.27, rely=0.480, height=30, relwidth=0.593)
-        self.technician_entry.configure(textvariable=self.technician.get())
+        self.technician_entry.configure(textvariable=self.technician)
         self.technician_entry.configure(background="white")
         self.technician_entry.configure(disabledforeground="#a3a3a3")
         self.technician_entry.configure(font="TkFixedFont")
@@ -551,10 +554,6 @@ class add_task_window:
         self.notes_scrolledtext.insert("3.0", line + user + line + "\n")
         self.notes_scrolledtext.insert("4.0", " ")
 
-        self.technician = StringVar(w, value="Ιορδάνης ")
-        self.technician_entry.delete(0, 'end')
-        self.technician_entry.insert(0, self.technician.get())
-
         # Εμφάνιση φωτοτυπικών σύμφονα με το customer_id
         cursor.execute("SELECT Εταιρεία, Serial FROM Φωτοτυπικά WHERE Πελάτη_ID = ? AND Κατάσταση = 1 ",
                        (self.customer_id,))
@@ -722,7 +721,8 @@ class add_task_window:
 
         if not os.path.exists(prints_dir):
             os.makedirs(prints_dir)
-        outputFilename = f"{prints_dir}/Service_Book{self.customer_combobox.get()}.pdf"
+        # outputFilename = f"{prints_dir}/Service_Book{self.customer_combobox.get()}.pdf"
+        outputFilename = f"{prints_dir}/Service_Book_" + f"{self.customer_combobox.get()}".replace(" ", "_") + ".pdf"
 
         # Utility function
         def convertHtmlToPdf(sourceHtml, outputFilename):
@@ -950,7 +950,8 @@ class add_task_window:
 
         if not os.path.exists(prints_dir):
             os.makedirs(prints_dir)
-        outputFilename = f"{prints_dir}/Service_Book{self.selected_customer}.pdf"
+        # outputFilename = f"{prints_dir}/Service_Book{self.selected_customer}.pdf"
+        outputFilename = f'{prints_dir}/Service_Book_' + f"{self.selected_customer}".replace(" ", "_") + '.pdf'
 
         # Utility function
         def convertHtmlToPdf(sourceHtml, outputFilename):

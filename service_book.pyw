@@ -14,6 +14,12 @@ todo uniq (στα πεδία των πινακων στην βαση) στους
 1) todo Στο treeview των φωτοτυπικών δίπλα να βάλω treeview υπολογιστών
 2) todo open pdf files on webdriver
 
+V1.8.6 Changes thins when no customer on dbase ---------------------- -- -------------------22/2/2020
+can't add spare parts from αποθήκη
+can't add files
+can add spare parts εκτος αποθήκης
+export spare_parts_db to Excel
+
 V1.8.5 Fix bugs with spare_parts when there is no id on machine -- -------------------21/2/2020
 Οταν καναμε κληση χωρις να ειναι το μηχάνημα στο συστημα επερνε service_id ενω δεν δημηουργούμε service στην βάση
 Τωρα βάζει service_id = 0 και βαζουμε Calendar_ID και περνουμε ανταλλακτικά απο το Calendar
@@ -324,6 +330,7 @@ v 0.0.1 Ενας πελάτης με πολλά φωτοτυπικά το κάθ
 from datetime import timedelta
 from tkinter import TclError
 
+import pandas as pd
 from tkcalendar import Calendar
 
 import activate
@@ -354,15 +361,17 @@ except ImportError:
 
 try:
     import ttk
+
     py3 = False
 except ImportError:
     import tkinter.ttk as ttk
+
     py3 = True
 
 
 # Περίδος λειτουργείας
 def days_left():
-
+    start_day = 0
     con = sqlite3.connect(dbase)
     c = con.cursor()
 
@@ -433,7 +442,6 @@ def vp_start_gui():
     root.mainloop()
 
 
-
 def create_Toplevel1(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
     global w, w_win, rt
@@ -471,9 +479,9 @@ class Toplevel1:
 
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
         _fgcolor = '#000000'  # X11 color: 'black'
-        _compcolor = '#d9d9d9' # X11 color: 'gray85'
-        _ana1color = '#d9d9d9' # X11 color: 'gray85'
-        _ana2color = '#ececec' # Closest X11 color: 'gray92'
+        _compcolor = '#d9d9d9'  # X11 color: 'gray85'
+        _ana1color = '#d9d9d9'  # X11 color: 'gray85'
+        _ana2color = '#ececec'  # Closest X11 color: 'gray92'
 
         self.service_table = "Service"
         self.customer_table = "Πελάτες"
@@ -557,12 +565,11 @@ class Toplevel1:
         self.menubar.add_cascade(label="Backup", menu=self.backup_menu)
         self.backup_menu.add_command(label="Backup Service Book", command=self.backup)
         self.backup_menu.add_command(label="Backup Αποθήκη", command=self.backup_repository)
+        self.backup_menu.add_command(label="Αποθήκη σε Excel", command=self.to_excel)
 
         # self.licence_menu = tk.Menu(self.menubar, tearoff=0)
         # self.menubar.add_cascade(label="Αδεια", menu=self.licence_menu)
         # self.licence_menu.add_command(label="Πληροφορίες χρήσης", command=self.show_licence)
-
-
 
         self.settings_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Ρυθμίσεις", menu=self.settings_menu)
@@ -700,7 +707,8 @@ class Toplevel1:
         self.del_table_from_repository_btn.configure(command=self.del_table_from_repository)
 
         self.search_on_repository_stringvar = StringVar()
-        self.search_on_repository_entry = tk.Entry(self.repository_frame, textvariable=self.search_on_repository_stringvar)
+        self.search_on_repository_entry = tk.Entry(self.repository_frame,
+                                                   textvariable=self.search_on_repository_stringvar)
         self.search_on_repository_entry.place(relx=0.29, rely=0.220, height=25, relwidth=0.200)
         self.search_on_repository_entry.configure(background="white")
         self.search_on_repository_entry.configure(disabledforeground="#a3a3a3")
@@ -1172,7 +1180,6 @@ class Toplevel1:
         self.machine_company_entry.configure(textvariable="")
         self.machine_company_entry.configure(takefocus="")
 
-
         # Μετρητής Εναρξης
         self.Label12 = tk.Label(self.copier_frame)
         self.Label12.place(relx=0.021, rely=0.180, height=21, relwidth=0.200)
@@ -1315,7 +1322,6 @@ class Toplevel1:
         self.customer_refresh_btn.configure(image=self.customer_refresh_btn_img)
         self.customer_refresh_btn.configure(command=self.get_customers)
 
-
         # Πίνακας πελατών
         self.customers_treeview = ScrolledTreeView(top)
         # build_treeview_support starting.
@@ -1415,7 +1421,8 @@ class Toplevel1:
 
         # Αναζήτηση στο επιλεγμένο φωτοτυπικό
         self.search_selected_copier_service_data = StringVar()
-        self.search_selected_copier_service_entry = tk.Entry(self.service_frame, textvariable=self.search_selected_copier_service_data)
+        self.search_selected_copier_service_entry = tk.Entry(self.service_frame,
+                                                             textvariable=self.search_selected_copier_service_data)
         self.search_selected_copier_service_entry.place(relx=0.021, rely=0.180, height=20, relwidth=0.200)
         self.search_selected_copier_service_entry.configure(background="white")
         self.search_selected_copier_service_entry.configure(disabledforeground="#a3a3a3")
@@ -1598,9 +1605,10 @@ class Toplevel1:
         self.calendar_var = StringVar()
         # create the entry and configure the calendar colors
         self.service_calendar = Calendar(top, width=12, year=self.year, month=self.month, day=self.day,
-                        background='gray20', selectmode='day', foreground='white', borderwidth=5, locale="el_GR",
+                                         background='gray20', selectmode='day', foreground='white', borderwidth=5,
+                                         locale="el_GR",
                                          font=("Calibri", 10, 'bold'))
-        #self.service_calendar.drop_down()
+        # self.service_calendar.drop_down()
         self.service_calendar.place(relx=0.021, rely=0.680, relheight=0.300, relwidth=0.200)
         self.service_calendar.bind('<<CalendarSelected>> ', self.view_scheduled_tasks)
 
@@ -1629,8 +1637,8 @@ class Toplevel1:
                 return
             else:
                 c.execute(" CREATE TABLE IF NOT EXISTS " + table_to_add +
-                   " (ID INTEGER PRIMARY KEY AUTOINCREMENT, PARTS_NR TEXT, ΠΕΡΙΓΡΑΦΗ TEXT, ΚΩΔΙΚΟΣ TEXT, ΤΕΜΑΧΙΑ TEXT, "
-                   "ΠΑΡΑΤΗΡΗΣΗΣ text); ")
+                          " (ID INTEGER PRIMARY KEY AUTOINCREMENT, PARTS_NR TEXT, ΠΕΡΙΓΡΑΦΗ TEXT, ΚΩΔΙΚΟΣ TEXT, ΤΕΜΑΧΙΑ TEXT, "
+                          "ΠΑΡΑΤΗΡΗΣΗΣ text); ")
 
                 c.execute("INSERT INTO sqlite_sequence(name, seq)VALUES(?,?)", (table_to_add, 0))
         except sqlite3.OperationalError as error:
@@ -1645,7 +1653,8 @@ class Toplevel1:
         return
 
     def del_table_from_repository(self):
-        answer = messagebox.askquestion("Προσοχή!", f'Ειστε σίγουρος για την διαγραφή της εταιρείας {self.repository_company_combobox.get()};')
+        answer = messagebox.askquestion("Προσοχή!",
+                                        f'Ειστε σίγουρος για την διαγραφή της εταιρείας {self.repository_company_combobox.get()};')
         if answer != "yes":
             return
 
@@ -1662,7 +1671,6 @@ class Toplevel1:
         messagebox.showinfo("Προσοχή!", f"Η εταιρεία {table_to_del} διαγράφηκε")
         self.companies = get_tables()
         self.repository_company_combobox.configure(values=self.companies)
-
 
     def add_spare_part_on_repository(self):
         selected_table = self.repository_company_combobox.get()
@@ -1685,7 +1693,6 @@ class Toplevel1:
             # Αν ο κωδικός είναι το τεταρτο πεδίο του πίνακα δεν είναι TONER φωτοτυπικά κτλπ o πήνακας
             if heading == "ΚΩΔΙΚΟΣ":
                 spare_part_code = (self.repository_treeview.set(self.repository_treeview.selection(), "#4"))
-
 
             else:  # αν δεν είναι ΚΩΔΙΚΟΣ το #4 πεδίο τότε είναι το #6
                 heading = self.repository_treeview.heading("#6", "text")
@@ -1810,7 +1817,6 @@ class Toplevel1:
         con.close()
 
         for serial in serials:
-
             all_serials.append(serial[0])
 
         if self.serial_entry.get() in all_serials and self.serial_entry.get() != current_serial[0][0]:
@@ -2067,7 +2073,8 @@ class Toplevel1:
         selected_copier_name = copier_name[0][0]
         con.close()
         # Αυτή είναι συνάρτηση του αρχείου edi_service_windows
-        create_edit_service_window(root, service_id, selected_copier_name, self.selected_customer, self.selected_customer_id)
+        create_edit_service_window(root, service_id, selected_copier_name, self.selected_customer,
+                                   self.selected_customer_id)
 
     def edit_scheduled_tasks(self, event=None):
 
@@ -2110,7 +2117,8 @@ class Toplevel1:
 
     def show_licence(self):
 
-        messagebox.showinfo("Υπολειπόμενες μέρες", f"Υπολειπόμενες μέρες υποστήριξης της εφαρμογής {self.remaining_days}")
+        messagebox.showinfo("Υπολειπόμενες μέρες",
+                            f"Υπολειπόμενες μέρες υποστήριξης της εφαρμογής {self.remaining_days}")
 
     def search_selected_copier_service(self, event=None):
 
@@ -2269,8 +2277,8 @@ class Toplevel1:
             for n in range(len(sorted_fetch)):
                 data.append(sorted_fetch[n][0])  # ID
                 data.append(sorted_fetch[n][1])  # Ημερομηνία
-                data.append(str(copiers[n][0][0]))   # Μηχάνημα
-                data.append(str(customers[n][0][0]))                   # Πελάτης
+                data.append(str(copiers[n][0][0]))  # Μηχάνημα
+                data.append(str(customers[n][0][0]))  # Πελάτης
                 data.append(sorted_fetch[n][2])  # Σκοπός
                 data.append(sorted_fetch[n][3])  # Ενέργειες
                 data.append(sorted_fetch[n][5])  # Σημειώσεις
@@ -2301,7 +2309,6 @@ class Toplevel1:
                 operators.append('%' + str(data_to_search) + '%')
         search_headers = " OR ".join(search_headers)
 
-
         # ΕΤΑΙΡΕΙΑ LIKE ? OR ΜΟΝΤΕΛΟ LIKE ? OR ΚΩΔΙΚΟΣ LIKE ? OR TEMAXIA LIKE ? OR ΤΙΜΗ LIKE ? etc...
 
         # search_cursor.execute("SELECT * FROM " + table + " WHERE \
@@ -2310,7 +2317,7 @@ class Toplevel1:
 
         conn = sqlite3.connect(dbase)
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM Ανταλλακτικά WHERE " + search_headers, operators )
+        cursor.execute("SELECT * FROM Ανταλλακτικά WHERE " + search_headers, operators)
         fetch = cursor.fetchall()  # Δεδομένα απο Service
         conn.close()
         for item in fetch:
@@ -2321,6 +2328,7 @@ class Toplevel1:
         root.destroy()
 
         # ---------------------Fix -Of- Style------------------------------------
+
     def fixed_map(self, option):
 
         # Fix for setting text colour for Tkinter 8.6.9
@@ -2474,7 +2482,6 @@ class Toplevel1:
 
         # Ενεργοποιηση του κουμπιου προσθήκης ιστορικού
         if event:
-
             self.add_service_btn.configure(activebackground="#6b6b6b")
             self.add_service_btn.configure(activeforeground="white")
             self.add_service_btn.configure(state="active")
@@ -2510,8 +2517,8 @@ class Toplevel1:
         customers_data = service_cursor.fetchall()
         # εμφάνιση δεδομένων πελάτη στα entry δεξιά
         # todo πρέπει να γίνει σε for loop και να μπούν σε λίστα
-        self.selected_customer_id = customers_data[0][0]    # ορισμός ID πελάτη
-        self.selected_customer = customers_data[0][1]       # ορισμός πελάτη
+        self.selected_customer_id = customers_data[0][0]  # ορισμός ID πελάτη
+        self.selected_customer = customers_data[0][1]  # ορισμός πελάτη
 
         self.customer_name.set(value=customers_data[0][1])
         self.company_name_entry.configure(textvariable=self.customer_name)
@@ -2648,7 +2655,8 @@ class Toplevel1:
             selected_customer_id = c.fetchall()
             con.close()
             # Αυτή είναι συνάρτηση του αρχείου edi_service_windows
-            create_edit_service_window(root, selected_service_id, selected_copier, selected_customer, selected_customer_id[0][0])
+            create_edit_service_window(root, selected_service_id, selected_copier, selected_customer,
+                                       selected_customer_id[0][0])
 
             # ==============================  Notebook style  =============
             self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#69ab3a")])
@@ -2663,7 +2671,8 @@ class Toplevel1:
                 cursor.close()
                 con.close()
                 # self.top.wm_state('iconic')
-                create_edit_service_window(root, selected_service_id, selected_copier, self.selected_customer, self.selected_customer_id)
+                create_edit_service_window(root, selected_service_id, selected_copier, self.selected_customer,
+                                           self.selected_customer_id)
                 # ==============================  Notebook style  =============
                 self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#69ab3a")])
                 self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
@@ -2796,7 +2805,8 @@ class Toplevel1:
             cu.execute("SELECT Σημειώσεις FROM " + self.customer_table + " WHERE ID =?", (self.selected_customer_id,))
             old_notes = cu.fetchall()
             new_data_to_log = str(old_notes[0][0]) + "\n" + today + "*********** Απενεργοποιήση πελάτη *********** "
-            cu.execute("UPDATE " + self.customer_table + " SET Σημειώσεις = ? WHERE  ID=?", (new_data_to_log, self.selected_customer_id))
+            cu.execute("UPDATE " + self.customer_table + " SET Σημειώσεις = ? WHERE  ID=?",
+                       (new_data_to_log, self.selected_customer_id))
             con.commit()
             cu.close()
             con.close()
@@ -2876,7 +2886,8 @@ class Toplevel1:
                     self.post_code_entry.get(), self.place_entry.get(), self.phone_entry.get(), self.mobile_entry.get(),
                     self.fax_entry.get(), self.email_entry.get(), self.page_package_entry.get(),
                     self.package_cost_entry.get() + " €" if " €" not in self.package_cost_entry.get() else
-                    self.package_cost_entry.get(), self.customer_notes_scrolledtext.get("1.0", "end-1c"), 1, self.selected_customer_id]  # 1 είναι η κατάσταση
+                    self.package_cost_entry.get(), self.customer_notes_scrolledtext.get("1.0", "end-1c"), 1,
+                    self.selected_customer_id]  # 1 είναι η κατάσταση
 
         up_conn = sqlite3.connect(dbase)
         up_cursor = up_conn.cursor()
@@ -2887,7 +2898,8 @@ class Toplevel1:
         try:
             up_cursor.execute(sql, tuple(new_data), )
         except sqlite3.IntegrityError:
-            messagebox.showerror("Σφάλμα!", f'Το όνομα {self.company_name_entry.get()} υπάρχει παρακαλώ διαλέξτε διαφορετικό')
+            messagebox.showerror("Σφάλμα!",
+                                 f'Το όνομα {self.company_name_entry.get()} υπάρχει παρακαλώ διαλέξτε διαφορετικό')
             self.top.focus()
             return
 
@@ -2911,7 +2923,8 @@ class Toplevel1:
             if head not in not_needed_header:
                 headers.append(head + " = ?")
         culumns = ", ".join(headers)
-        new_data = [self.machine_company_entry.get(), self.serial_entry.get(), self.start_entry.get(), self.start_counter_entry.get(),
+        new_data = [self.machine_company_entry.get(), self.serial_entry.get(), self.start_entry.get(),
+                    self.start_counter_entry.get(),
                     self.selected_customer_id, self.copier_notes_scrolledtext.get("1.0", "end-1c"), 1,
                     # 1 => ενεργό φωτοτυπικό
                     self.selected_copier_id]
@@ -2929,8 +2942,7 @@ class Toplevel1:
 
     # Αντίγραφα ασφαλείας Service Book
     def backup(self):
-        messagebox.showinfo("Προσοχή!", 'Μήν κλείσετε το παράθυρο μέχρει να εμφανιστεί μήνυμα ολοκλήρωσεις διαδικασίας'
-                                        ' αντιγράφου ασφαλείας')
+
 
         def progress(status, remainig, total):
             print(f"{status} Αντιγράφηκαν {total - remainig} απο {total} σελίδες...")
@@ -2940,7 +2952,19 @@ class Toplevel1:
 
             back_dir = "backups" + "/" + today + "/"
 
-            backup_file = os.path.join(back_dir, os.path.basename(dbase[:-3]) + " " + now + ".db")
+            # backup_file = os.path.join(back_dir, os.path.basename(dbase[:-3]) + " " + now + ".db")
+            options = {}
+            options['defaultextension'] = ".db"
+            options['filetypes'] = [('*', '.db')]
+            options['title'] = "Αποθήκευση Service Book"
+            options['initialfile'] = f'Service Book {today}.db'
+            backup_file = filedialog.asksaveasfile(mode='w', **options)
+            if not backup_file:
+                self.top.focus()
+                return
+            messagebox.showwarning("Προσοχή!",
+                                'Μήν κλείσετε το παράθυρο ἕως ὅτου να εμφανιστεί μήνυμα ολοκλήρωσεις διαδικασίας'
+                                ' αντιγράφου ασφαλείας')
             # print("============BACKUP FILE===========Line 542=\n", backup_file, "\n")
             if not os.path.exists(back_dir):
                 os.makedirs(back_dir)
@@ -2951,37 +2975,36 @@ class Toplevel1:
             print("===========Υπάρχουσα βάση===========Line 744\n ", dbase, "\n")
 
             # Δημιουργία νέας βάσης και αντίγραφο ασφαλείας
-            back_conn = sqlite3.connect(backup_file)
+            back_conn = sqlite3.connect(backup_file.name)
             with back_conn:
                 conn.backup(back_conn, pages=10, progress=progress)
                 back_conn.close()
                 text = "Η βάση αντιγράφηκε :  "
-                result = text + os.path.realpath(backup_file)
+                result = text + os.path.realpath(backup_file.name)
                 # print("=====Αποτέλεσμα ====Line 558\n", result)
                 # Ειναι ενοχλητικο να εμφανιζει καθε φορα μηνυμα οτι εγινε backup
                 messagebox.showinfo('Αποτέλεσμα αντιγράφου ασφαλείας', result)
 
         except FileNotFoundError as file_error:
             messagebox.showwarning("Σφάλμα...", "{}".format(file_error))
-            print(f"File {__name__} Error Line 2440", file_error)
+            print(f"File {__name__} Error Line 2985", file_error)
 
         except sqlite3.Error as error:
-            if not os.path.exists(backup_file):
+            if not os.path.exists(backup_file.name):
                 result = "Σφάλμα κατα την αντιγραφή : ", error
                 messagebox.showwarning("Σφάλμα...", "{}".format(result))
         finally:
             try:
                 if back_conn:
                     back_conn.close()
-                    print("Δημιουργία αντιγράφου ασφαλείας στο αρχείο  ", backup_file, " ολοκληρώθηκε")
+                    print("Δημιουργία αντιγράφου ασφαλείας στο αρχείο  ", backup_file.name, " ολοκληρώθηκε")
             except UnboundLocalError as error:
-                print(f"Η σύνδεση με {backup_file} δεν έγινε ποτέ Line 2452 {error}")
-                messagebox.showerror("Σφάλμα", f"Η σύνδεση με {backup_file} δεν έγινε ποτέ  {error}")
+                print(f"Η σύνδεση με {backup_file.name} δεν έγινε ποτέ Line 2452 {error}")
+                messagebox.showerror("Σφάλμα", f"Η σύνδεση με {backup_file.name} δεν έγινε ποτέ  {error}")
 
     # Αντίγραφα ασφαλείας spare_parts_db
     def backup_repository(self):
-        messagebox.showinfo("Προσοχή!", 'Μήν κλείσετε το παράθυρο μέχρει να εμφανιστεί μήνυμα ολοκλήρωσεις διαδικασίας'
-                                        ' αντιγράφου ασφαλείας')
+
         def progress(status, remainig, total):
             print(f"{status} Αντιγράφηκαν {total - remainig} απο {total} σελίδες...")
 
@@ -2990,7 +3013,19 @@ class Toplevel1:
 
             back_dir = "backups" + "/" + today + "/"
 
-            backup_file = os.path.join(back_dir, os.path.basename(spare_parts_db[:-3]) + " " + now + ".db")
+            # backup_file = os.path.join(back_dir, os.path.basename(spare_parts_db[:-3]) + " " + now + ".db")
+            options = {}
+            options['defaultextension'] = ".db"
+            options['filetypes'] = [('*', '.db')]
+            options['title'] = "Αποθήκευση αποθήκης"
+            options['initialfile'] = f'Αποθήκη {today}.db'
+            backup_file = filedialog.asksaveasfile(mode='w', **options)
+            if not backup_file:
+                self.top.focus()
+                return
+            messagebox.showwarning("Προσοχή!",
+                                'Μήν κλείσετε το παράθυρο ἕως ὅτου να εμφανιστεί μήνυμα ολοκλήρωσεις διαδικασίας'
+                                ' αντιγράφου ασφαλείας')
             # print("============BACKUP FILE===========Line 542=\n", backup_file, "\n")
             if not os.path.exists(back_dir):
                 os.makedirs(back_dir)
@@ -3001,12 +3036,12 @@ class Toplevel1:
             print("===========Υπάρχουσα βάση===========Line 744\n ", spare_parts_db, "\n")
 
             # Δημιουργία νέας βάσης και αντίγραφο ασφαλείας
-            back_conn = sqlite3.connect(backup_file)
+            back_conn = sqlite3.connect(backup_file.name)
             with back_conn:
                 conn.backup(back_conn, pages=10, progress=progress)
                 back_conn.close()
                 text = "Η βάση αντιγράφηκε :  "
-                result = text + os.path.realpath(backup_file)
+                result = text + os.path.realpath(backup_file.name)
                 # print("=====Αποτέλεσμα ====Line 558\n", result)
                 # Ειναι ενοχλητικο να εμφανιζει καθε φορα μηνυμα οτι εγινε backup
                 messagebox.showinfo('Αποτέλεσμα αντιγράφου ασφαλείας', result)
@@ -3016,23 +3051,69 @@ class Toplevel1:
             print(f"File {__name__} Error Line 2440", file_error)
 
         except sqlite3.Error as error:
-            if not os.path.exists(backup_file):
+            if not os.path.exists(backup_file.name):
                 result = "Σφάλμα κατα την αντιγραφή : ", error
                 messagebox.showwarning("Σφάλμα...", "{}".format(result))
         finally:
             try:
                 if back_conn:
                     back_conn.close()
-                    print("Δημιουργία αντιγράφου ασφαλείας στο αρχείο  ", backup_file, " ολοκληρώθηκε")
+                    print("Δημιουργία αντιγράφου ασφαλείας στο αρχείο  ", backup_file.name, " ολοκληρώθηκε")
             except UnboundLocalError as error:
-                print(f"Η σύνδεση με {backup_file} δεν έγινε ποτέ Line 2452 {error}")
-                messagebox.showerror("Σφάλμα", f"Η σύνδεση με {backup_file} δεν έγινε ποτέ  {error}")
+                print(f"Η σύνδεση με {backup_file.name} δεν έγινε ποτέ Line 2452 {error}")
+                messagebox.showerror("Σφάλμα", f"Η σύνδεση με {backup_file.name} δεν έγινε ποτέ  {error}")
+
+    # Αποθήκη σε Excel
+    def to_excel(self):
+        con = sqlite3.connect(spare_parts_db)
+        c = con.cursor()
+        c.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;")
+        tables_name = c.fetchall()
+
+        c.close()
+        con.close()
+        not_used_tables = ["AA_ΠΕΛΑΤΕΣ", "sqlite_master", "sqlite_sequence", "sqlite_temp_master", "Images"]
+        needed_tables = []
+        data_frames = []
+        for table in tables_name:
+            if table[0] not in not_used_tables:
+                needed_tables.append(table[0])
+                data_frames.append(table[0])
+
+        options = {}
+        options['defaultextension'] = ".xlsx"
+        options['filetypes'] = [('Excel', '.xlsx')]
+        options['title'] = "Αποθήκευση αποθήκης"
+        options['initialfile'] = f'Αποθήκη {today}.xlsx'
+        save_file = filedialog.asksaveasfile(mode='w', **options)
+        if save_file is None:  # ask saveasfile return `None` if dialog closed with "cancel".
+            self.top.focus()
+            return
+
+        # new_exc = xlsxwriter.Workbook(save_file.name)
+        # Create a Pandas Excel writer using XlsxWriter as the engine.
+        writer = pd.ExcelWriter(save_file.name, engine="xlsxwriter")
+
+        con = sqlite3.connect(spare_parts_db)
+
+        for table in needed_tables:
+            sql = "SELECT * FROM " + table
+            df = pd.read_sql_query(sql, con)
+
+            df.to_excel(writer, sheet_name=table, index=False)
+        writer.save()
+        writer.close()
+        save_file.close()
+        con.close()
+        os.startfile(save_file.name)
+        self.top.focus()
 
     def set_email_settings(self):
         email = email_settings.run_email_settings(self.top)
 
     def set_data_settings(self):
         data_settings.run_data_settings(self.top)
+
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):
@@ -3069,10 +3150,10 @@ class AutoScroll(object):
         # Copy geometry methods of master  (taken from ScrolledText.py)
         if py3:
             methods = tk.Pack.__dict__.keys() | tk.Grid.__dict__.keys() \
-                  | tk.Place.__dict__.keys()
+                      | tk.Place.__dict__.keys()
         else:
             methods = tk.Pack.__dict__.keys() + tk.Grid.__dict__.keys() \
-                  + tk.Place.__dict__.keys()
+                      + tk.Place.__dict__.keys()
 
         for meth in methods:
             if meth[0] != '_' and meth not in ('config', 'configure'):
@@ -3081,6 +3162,7 @@ class AutoScroll(object):
     @staticmethod
     def _autoscroll(sbar):
         '''Hide and show scrollbar as needed.'''
+
         def wrapped(first, last):
             first, last = float(first), float(last)
             if first <= 0 and last >= 1:
@@ -3088,6 +3170,7 @@ class AutoScroll(object):
             else:
                 sbar.grid()
             sbar.set(first, last)
+
         return wrapped
 
     def __str__(self):
@@ -3097,17 +3180,20 @@ class AutoScroll(object):
 def _create_container(func):
     '''Creates a ttk Frame with a given master, and use this new frame to
     place the scrollbars and the widget.'''
+
     def wrapped(cls, master, **kw):
         container = ttk.Frame(master)
         container.bind('<Enter>', lambda e: _bound_to_mousewheel(e, container))
         container.bind('<Leave>', lambda e: _unbound_to_mousewheel(e, container))
         return func(cls, container, **kw)
+
     return wrapped
 
 
 class ScrolledTreeView(AutoScroll, ttk.Treeview):
     '''A standard ttk Treeview widget with scrollbars that will
     automatically show/hide as needed.'''
+
     @_create_container
     def __init__(self, master, **kw):
         ttk.Treeview.__init__(self, master, **kw)
@@ -3115,6 +3201,8 @@ class ScrolledTreeView(AutoScroll, ttk.Treeview):
 
 
 import platform
+
+
 def _bound_to_mousewheel(event, widget):
     child = widget.winfo_children()[0]
     if platform.system() == 'Windows' or platform.system() == 'Darwin':
@@ -3126,6 +3214,7 @@ def _bound_to_mousewheel(event, widget):
         child.bind_all('<Shift-Button-4>', lambda e: _on_shiftmouse(e, child))
         child.bind_all('<Shift-Button-5>', lambda e: _on_shiftmouse(e, child))
 
+
 def _unbound_to_mousewheel(event, widget):
     if platform.system() == 'Windows' or platform.system() == 'Darwin':
         widget.unbind_all('<MouseWheel>')
@@ -3136,32 +3225,30 @@ def _unbound_to_mousewheel(event, widget):
         widget.unbind_all('<Shift-Button-4>')
         widget.unbind_all('<Shift-Button-5>')
 
+
 def _on_mousewheel(event, widget):
     if platform.system() == 'Windows':
-        widget.yview_scroll(-1*int(event.delta/120),'units')
+        widget.yview_scroll(-1 * int(event.delta / 120), 'units')
     elif platform.system() == 'Darwin':
-        widget.yview_scroll(-1*int(event.delta),'units')
+        widget.yview_scroll(-1 * int(event.delta), 'units')
     else:
         if event.num == 4:
             widget.yview_scroll(-1, 'units')
         elif event.num == 5:
             widget.yview_scroll(1, 'units')
 
+
 def _on_shiftmouse(event, widget):
     if platform.system() == 'Windows':
-        widget.xview_scroll(-1*int(event.delta/120), 'units')
+        widget.xview_scroll(-1 * int(event.delta / 120), 'units')
     elif platform.system() == 'Darwin':
-        widget.xview_scroll(-1*int(event.delta), 'units')
+        widget.xview_scroll(-1 * int(event.delta), 'units')
     else:
         if event.num == 4:
             widget.xview_scroll(-1, 'units')
         elif event.num == 5:
             widget.xview_scroll(1, 'units')
 
+
 if __name__ == '__main__':
     vp_start_gui()
-
-
-
-
-

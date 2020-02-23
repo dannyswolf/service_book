@@ -6,22 +6,23 @@
 #    Dec 16, 2019 11:26:05 PM EET  platform: Windows NT
 import os
 import shutil
-import sys
 import sqlite3
+import subprocess
+import sys
 import time
 from tkinter import StringVar, filedialog, messagebox, PhotoImage
+
+import pyscreenshot as ImageGrab
+from tkcalendar import DateEntry
+from xhtml2pdf import pisa
+
+import add_spare_parts
 import edit_service_window_support
 import image_viewer
-import add_spare_parts
 import insert_spare_parts
-from tkcalendar import DateEntry
-
 import mail
 from settings import dbase, spare_parts_db, root_logger, today  # settings
-import pyscreenshot as ImageGrab
-from PIL import Image
-import subprocess
-from xhtml2pdf import pisa
+
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
@@ -809,7 +810,8 @@ class edit_service_window():
 
         if not os.path.exists(prints_dir):
             os.makedirs(prints_dir)
-        outputFilename = f"{prints_dir}/Service_Book{self.selected_customer}.pdf"
+        # outputFilename = f"{prints_dir}/Service_Book{self.selected_customer}.pdf"
+        outputFilename = f"{prints_dir}/Service_Book_" + f"{self.selected_customer}".replace(" ", "_") + ".pdf"
 
         # Utility function
         def convertHtmlToPdf(sourceHtml, outputFilename):

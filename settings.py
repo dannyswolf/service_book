@@ -8,12 +8,8 @@ import sqlite3
 import sys
 
 user = getpass.getuser()
-# if user == "dannys":
-#    mlshop = 0
-#else:
-#    mlshop = 1
 
-mlshop = 1
+mlshop = 0
 
 
 if mlshop:
@@ -55,11 +51,9 @@ def check_if_demo():
 
             version = 0  # Its Not Demo
             return version
-
         else:
             version = 1  # Its  Demo
             return version
-
     else:
         version = 1  # Its  Demo
         return version
@@ -69,10 +63,10 @@ demo = check_if_demo()
 
 if demo:
 
-    service_book_version = "V 1.8.4 Demo"
+    service_book_version = "V 1.8.6 Demo"
 else:
 
-    service_book_version = "V 1.8.4"
+    service_book_version = "V 1.8.6"
 
 
 today = datetime.datetime.today().strftime("%d %m %Y")
