@@ -14,6 +14,8 @@ todo uniq (στα πεδία των πινακων στην βαση) στους
 1) todo Στο treeview των φωτοτυπικών δίπλα να βάλω treeview υπολογιστών
 2) todo open pdf files on webdriver
 
+V1.8.7 Sort Calendar treeview with dates fix empty spaces on serials  ----------------------28/2/2020
+
 V1.8.6 Changes thins when no customer on dbase ---------------------- -- -------------------22/2/2020
 can't add spare parts from αποθήκη
 can't add files
@@ -496,8 +498,8 @@ def show_info():
 class Toplevel1:
 
     def __init__(self, top=None):
-        '''This class configures and populates the toplevel window.
-           top is the toplevel containing window.'''
+        """This class configures and populates the toplevel window.
+           top is the toplevel containing window."""
 
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
         _fgcolor = '#000000'  # X11 color: 'black'
@@ -1800,6 +1802,12 @@ class Toplevel1:
             self.repository_treeview.insert("", "end", values=item)
 
     def check_table(self, name, index, mode):
+        """
+
+        :param mode:
+        :param index:
+        :type name: object
+        """
         self.add_table_entry_warning.place_forget()
         current_table = self.repository_table
 
@@ -1832,7 +1840,7 @@ class Toplevel1:
         all_serials = []
         con = sqlite3.connect(dbase)
         c = con.cursor()
-        c.execute("SELECT Serial FROM Φωτοτυπικά WHERE Κατάσταση = 1;")
+        c.execute("SELECT Serial FROM Φωτοτυπικά")
         serials = c.fetchall()
         c.execute("SELECT Serial FROM Φωτοτυπικά WHERE ID = ?", (current_copier_id,))
         current_serial = c.fetchall()
@@ -1856,9 +1864,9 @@ class Toplevel1:
         all_names = []
         con = sqlite3.connect(dbase)
         c = con.cursor()
-        c.execute("SELECT Επωνυμία_Επιχείρησης FROM Πελάτες WHERE Κατάσταση = 1;")
+        c.execute("SELECT Επωνυμία_Επιχείρησης FROM Πελάτες")
         customers_names = c.fetchall()
-        c.execute("SELECT Επωνυμία_Επιχείρησης FROM Πελάτες WHERE Κατάσταση = 1 AND ID=?", (self.selected_customer_id,))
+        c.execute("SELECT Επωνυμία_Επιχείρησης FROM Πελάτες WHERE ID=?", (self.selected_customer_id,))
         current_customer = c.fetchall()
         con.close()
 
@@ -1927,9 +1935,10 @@ class Toplevel1:
         c = con.cursor()
         c.execute("SELECT * FROM Calendar WHERE ΔΤΕ =?", (self.search_dte_entry.get(),))
         data_from_calendar = c.fetchall()
+        sorted_data_from_calendar = sorted(data_from_calendar, key=lambda x: datetime.strptime(x[1], "%d/%m/%Y"))
         try:
-            if self.search_dte_entry.get() in data_from_calendar[0]:
-                for task in data_from_calendar:
+            if self.search_dte_entry.get() in sorted_data_from_calendar[0]:
+                for task in sorted_data_from_calendar:
                     self.calendar_treeview.insert("", "end", values=task)
         except IndexError:  # Όταν δεν βρήσκει στο calendar ψάχνει  στο service και αν βρει να σε παει στο search_error
             c.execute("SELECT * FROM Service WHERE ΔΤΕ =?", (self.search_dte_entry.get(),))
@@ -1954,8 +1963,8 @@ class Toplevel1:
         data = c.fetchall()
         c.close()
         con.close()
-
-        for task in data:
+        sorted_data = sorted(data, key=lambda x: datetime.strptime(x[1], "%d/%m/%Y"))
+        for task in sorted_data:
             self.calendar_treeview.insert("", "end", values=task)
 
     def set_task_notifier(self, selected_copier_id):
@@ -2020,7 +2029,8 @@ class Toplevel1:
         cursor.execute("SELECT * FROM Calendar WHERE Ημ_Ολοκλ =? AND Κατάσταση = 0", (formated_date,))
         fetch = cursor.fetchall()  # Δεδομένα απο Service
         conn.close()
-        for item in fetch:
+        sorted_fetch = sorted(fetch, key=lambda x: datetime.strptime(x[1], "%d/%m/%Y"))
+        for item in sorted_fetch:
             self.calendar_treeview.insert("", "end", values=item)
 
     def get_calendar(self, event=None):
@@ -2052,8 +2062,8 @@ class Toplevel1:
                 platos = 100
             self.calendar_treeview.heading(head, text=head, anchor="center")
             self.calendar_treeview.column(head, width=platos, anchor="center")
-
-        for d in data:
+        sorted_data = sorted(data, key=lambda x: datetime.strptime(x[1], "%d/%m/%Y"))
+        for d in sorted_data:
             self.calendar_treeview.insert("", "end", values=d)
 
     def add_scheduled_tasks(self):
@@ -2073,7 +2083,9 @@ class Toplevel1:
         cursor.execute("SELECT * FROM Calendar WHERE Ημερομηνία =? AND Κατάσταση = 1", (formated_date,))
         fetch = cursor.fetchall()  # Δεδομένα απο Service
         conn.close()
-        for item in fetch:
+
+        sorted_fetch = sorted(fetch, key=lambda x: datetime.strptime(x[1], "%d/%m/%Y"))
+        for item in sorted_fetch:
             self.calendar_treeview.insert("", "end", values=item)
 
     def view_service_from_spare_parts(self, event):
@@ -2133,7 +2145,8 @@ class Toplevel1:
         cursor.execute("SELECT * FROM Calendar WHERE " + search_headers, operators)
         fetch = cursor.fetchall()  # Δεδομένα απο Calendar
         conn.close()
-        for item in fetch:
+        sorted_fetch = sorted(fetch, key=lambda x: datetime.strptime(x[1], "%d/%m/%Y"))
+        for item in sorted_fetch:
             self.calendar_treeview.insert("", "end", values=item)
         self.search_tasks_data.set(value="")
 

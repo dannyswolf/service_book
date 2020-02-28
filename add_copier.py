@@ -433,9 +433,9 @@ class add_copier_window:
             self.top.focus()
             return
         try:
-            data = [self.company_combobox.get() + " " + self.model_combobox.get(), self.serial.get(), self.start.get(),
-                    self.start_counter.get(), customer_id[0][0], self.notes_scrolledtext.get('1.0', 'end-1c'),
-                    1]  # Το 1 είναι ενεργό φωτοτυπικό 0 ανενεργό
+            data = [self.company_combobox.get() + " " + self.model_combobox.get(), self.serial.get().replace(" ", "_"),
+                    self.start.get(), self.start_counter.get(), customer_id[0][0],
+                    self.notes_scrolledtext.get('1.0', 'end-1c'), 1]  # Το 1 είναι ενεργό φωτοτυπικό 0 ανενεργό
         except IndexError as error:  # βγάζει error το customer_id[0][0] αν δεν επιλεξουμε πελάτη
             messagebox.showwarning("Προσοχή", "Παρακαλώ \n4.Επιλέξτε πελάτη")
             self.top.focus()
@@ -461,14 +461,14 @@ class add_copier_window:
         all_serials = []
         con = sqlite3.connect(dbase)
         c = con.cursor()
-        c.execute("SELECT Serial FROM Φωτοτυπικά WHERE Κατάσταση = 1;")
+        c.execute("SELECT Serial FROM Φωτοτυπικά;")
         serials = c.fetchall()
         con.close()
 
         for serial in serials:
-            all_serials.append(serial[0])
+            all_serials.append(serial[0].replace(" ", "_"))
 
-        if self.serial_entry.get() in all_serials:
+        if self.serial_entry.get().replace(" ", "_") in all_serials:
             self.serial_entry.configure(foreground="red")
             # self.serial_entry.place(relx=0.27, rely=0.248, height=30, relwidth=0.593)
             self.serial_warning.place(relx=0.885, rely=0.248, relheight=0.060, relwidth=0.060)
