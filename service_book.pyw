@@ -10,9 +10,12 @@
 Ενεργοποιήση προγράμματος με hash.md5 στον πίνακα sqlite_sequence πεδίο demo και key
 todo προβολή όλων των εικόνων
 todo uniq (στα πεδία των πινακων στην βαση) στους κωδικους και part_nr serial ονοματεπωνυμο τηλ
-
+todo ************************** update database with new columns ******************************
+todo  **********************on tables Ανταλλακτικά  Calendar_ID *******************************
+todo ***********************On table Service_images Calendar_ID *******************************
 1) todo Στο treeview των φωτοτυπικών δίπλα να βάλω treeview υπολογιστών
 2) todo open pdf files on webdriver
+3) todo fix bug with files when there is no Service ID
 
 V1.8.7 Sort Calendar treeview with dates fix empty spaces on serials  ----------------------28/2/2020
 
