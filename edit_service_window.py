@@ -651,10 +651,14 @@ class edit_service_window():
     def check_if_files_exists(self):
         con = sqlite3.connect(dbase)
         cursor = con.cursor()
-        cursor.execute("SELECT * FROM Service_images WHERE Service_ID =?", (self.selected_service_id,))
+        try:
+            cursor.execute("SELECT * FROM Service_images WHERE Service_ID =?", (self.selected_service_id,))
+        except sqlite3.OperationalError as error:
+            print(__name__, "ERROR", error)
+            self.show_files_btn.place_forget()
         images = cursor.fetchall()
         self.len_images = len(images)
-        self.show_files_btn.configure(text=f'Προβολή {self.len_images}\nαρχείων')
+        self.show_files_btn.configure(text=f'Προβολή {self.len_images}\n αρχείων')
         cursor.close()
         con.close()
         if self.files:

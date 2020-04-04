@@ -796,12 +796,20 @@ class edit_task_window:
 
     # Ελεγχος αν υπάρχουν αρχεία για προβολή
     def check_if_files_exists(self):
+        if self.service_id is None or self.service_id == "" or self.service_id == '0' or self.service_id == 0:
+            self.show_files_btn.place_forget()
+            self.add_files_btn.place_forget()
+            return
         con = sqlite3.connect(dbase)
         cursor = con.cursor()
-        cursor.execute("SELECT * FROM Service_images WHERE Service_id =?", (self.service_id,))
+        try:
+            cursor.execute("SELECT * FROM Service_images WHERE Service_id =?", (self.service_id,))
+        except sqlite3.OperationalError as error:
+            print(__name__, "ERROR ", error)
+            self.show_files_btn.place_forget()
         images = cursor.fetchall()
         self.len_images = len(images)
-        self.show_files_btn.configure(text=f'Προβολή {self.len_images}\nαρχείων')
+        self.show_files_btn.configure(text=f'Προβολή {self.len_images}\n αρχείων')
         cursor.close()
         con.close()
         if self.files:
@@ -817,7 +825,8 @@ class edit_task_window:
 
     # Προβολή αρχείων
     def show_files(self):
-
+        if self.service_id is None or self.service_id == "" or self.service_id == '0' or self.service_id == 0:
+            messagebox.showwarning('Προσοχή', 'Δεν μπορείτε να δείτε τα αρχεία αν δεν πατήσετε Αποθήκευση')
         image_viewer.create_Toplevel1(w, self.service_id)
 
     # Προσθήκη αρχείων
@@ -826,6 +835,9 @@ class edit_task_window:
         if not self.customer_id:
             messagebox.showerror("Σφάλμα", f"Ο πελάτης {self.customer_entry.get()} δεν υπάρχει στο σύστημα \n "
                                            "Δεν μπορείτε να προσθέσετε αρχεία")
+            return
+        if self.service_id is None or self.service_id == "" or self.service_id == '0' or self.service_id == 0:
+            messagebox.showerror("Σφάλμα", "Δεν μπορείτε να προσθέσετε αρχεία")
             return
 
         self.files = filedialog.askopenfilenames(initialdir=os.getcwd(), title="Επιλογή αρχείων για προσθήκη",
@@ -901,11 +913,12 @@ class edit_task_window:
 
     # Προσθήκη ανταλλακτικών
     def add_spare_parts(self):
-
-        if not self.customer_id:
+        # Αν δεν υπάρχει πελάτης στην βάση
+        if self.customer_id is None or self.customer_id == "" or self.customer_id == '0' or self.customer_id == 0 or self.customer_id == ' ':
             messagebox.showerror("Σφάλμα", f"Ο πελάτης {self.customer_entry.get()} δεν υπάρχει στο σύστημα \n "
                                            "Δεν μπορείτε να προσθέσετε ανταλλακτικά απο αποθήκη")
             return
+
         if spare_parts_db:
 
             add_spare_parts.create_Toplevel1(self.top, self.service_id, self.customer_id, self.copiers_entry.get(),
@@ -1446,7 +1459,7 @@ class edit_task_window:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM Calendar WHERE ID =?", (self.selected_calendar_id,))
         data = cursor.fetchall()
-        print("data", data)
+        #print("data", data)
         # todo
         # Τα στοιχεία του πελάτη να τα πάρουμε απο τον πίνακα του πελάτη γιατί μπορεί να τα αλλάξουμε
         # cursor.execute("SELECT Επωνυμία_Επιχείρησης, Τηλέφωνο FROM Πελάτες WHERE ID=?", ,))
@@ -1639,6 +1652,7 @@ class edit_task_window:
         try:
             customer_id = data[0][0]
         except IndexError:  # Οταν επιλέγουμε ολοκληρωμένες εργασίες κατω απο το ημερολόγιο που ανοιγει το ποντίκι
+
             return           # επιλέγει στοιχείο απο την λίστα του calendar treeview που σηνήθως είναι αδεια
                            # ποιο πολύ συμβαινει στο Linux
 

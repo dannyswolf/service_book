@@ -174,7 +174,7 @@ class add_task_window:
         self.selected_customer = selected_customer  # Επιλεγμένος πελάτης απο το service_book_colors
         self.selected_customer_id = selected_customer_id
         self.mobile = ""
-        self.service_id = get_service_id()
+        self.service_id = ''
         self.customer_id = ""
         self.copiers = []  # Τα φωτοτυπικά του επιλεγμένου πελάτη
         self.selected_copier = ""  # το επιλεγμένο φωτοτυπικό
@@ -493,7 +493,7 @@ class add_task_window:
 
             self.selected_copier = data[0][1] + "  Σειριακός : " + self.selected_serial
         except IndexError:  # Αν εισάγουμε μηχάνημα μόνο όνομα και όχι serial nr
-            self.copier_id = 0
+            self.copier_id = 2
             self.selected_copier = self.copiers_combobox.get() + "  Σειριακός : " + self.selected_serial
         con.close()
 
@@ -643,14 +643,17 @@ class add_task_window:
             self.copiers.append("   Σειριακός: ".join(copier))
 
         if not self.copiers_combobox.get() in self.copiers:
-            self.copier_id = "0"
+            self.copier_id = 2
 
         # "", "", ==>> Actions, Ημερομηνία ολοκήροσης, ΔΤΕ, Μετρητής και Επώμενο service
-
-        if self.copier_id == "0":
+        self.service_id = get_service_id()
+        # Αν το μηχάνημα δεν ειναι στην βάση να ρωτάει
+        if self.copier_id == 2:
             self.service_id = "0"
-            answer = messagebox.askquestion("Προσοχή!", f'Το {self.copiers_combobox.get()} δεν είναι στην βάση!\nΔεν θα'
-                                                        f' δημιουργηθεί ιστορικό συντήρησης.\n'
+            answer = messagebox.askquestion("Προσοχή!", f'Το {self.copiers_combobox.get()} δεν είναι στην βάση!\n'
+                                                        f'1. Δεν θα δημιουργηθεί ιστορικό συντήρησης.\n'
+                                                        '2. Δεν θα αποθηκευτούν εικόνες και αρχεία.\n'
+                                                        '3. Δεν θα μπορείτε να προσθέσεται ανταλλακτικά.\n'
                                                         f'Θέλεται να συνεχίσεται;')
             if answer != "yes":
                 self.top.focus()
@@ -665,8 +668,8 @@ class add_task_window:
         cursor.execute(sql_insert, tuple(data))
         conn.commit()
         conn.close()
-
-        if self.copier_id == "0":
+        # Αν το μηχάνημα δεν ειναι στην βάση  να μήν κάνει service
+        if self.copier_id == 2:  # self.copier_id == 2 --> Σε πελάτη λιανικής
             self.top.destroy()
             return
         # Δημιουργία columns για το Service

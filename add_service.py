@@ -672,13 +672,14 @@ class add_service_window():
     def add_spare_parts(self):
 
         if spare_parts_db:
-            add_spare_parts.create_Toplevel1(self.top, self.service_id, self.customer_id, self.copier)
+            # o Ειναι το Calendar_ID αφου εισάγουμε απευθειας service με το add_service δλδ δεν έχουμε κληση Calendar_ID
+            add_spare_parts.create_Toplevel1(self.top, self.service_id, self.customer_id, self.copier, 0)
         else:
-            insert_spare_parts.create_insert_spare_parts_window(self.top, self.service_id, self.customer_id, self.copier)
+            insert_spare_parts.create_insert_spare_parts_window(self.top, self.service_id, self.customer_id,
+                                                                self.copier, 0)
 
     def insert_spare_part_outside_of_repository(self):
-        insert_spare_parts.create_insert_spare_parts_window(self.top, self.service_id, self.customer_id,
-                                                            self.copier)
+        insert_spare_parts.create_insert_spare_parts_window(self.top, self.service_id, self.customer_id, self.copier, 0)
 
     def check_before_close_windows(self):
         con = sqlite3.connect(dbase)

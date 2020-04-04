@@ -35,38 +35,41 @@ def check_if_demo():
     c.execute("SELECT seq from sqlite_sequence WHERE name ='demo'")
     data = c.fetchall()
     con.close()
-    if data[0][0] == 0:
-        con = sqlite3.connect(dbase)
-        c = con.cursor()
-        c.execute("SELECT seq from sqlite_sequence WHERE name ='key'")
-        key_data = c.fetchall()
-        c.execute("SELECT seq from sqlite_sequence WHERE name ='customer_email'")
-        email_data = c.fetchall()
-        con.close()
-        key = key_data[0][0]
-        email = email_data[0][0]
-        email_key = hashlib.md5(email.encode())
+    try:
+        if data[0][0] == 0:
+            con = sqlite3.connect(dbase)
+            c = con.cursor()
+            c.execute("SELECT seq from sqlite_sequence WHERE name ='key'")
+            key_data = c.fetchall()
+            c.execute("SELECT seq from sqlite_sequence WHERE name ='customer_email'")
+            email_data = c.fetchall()
+            con.close()
+            key = key_data[0][0]
+            email = email_data[0][0]
+            email_key = hashlib.md5(email.encode())
 
-        if key != "" and email != "" and key == email_key.hexdigest():
+            if key != "" and email != "" and key == email_key.hexdigest():
 
-            version = 0  # Its Not Demo
-            return version
+                version = 0  # Its Not Demo
+                return version
+            else:
+                version = 1  # Its  Demo
+                return version
         else:
             version = 1  # Its  Demo
             return version
-    else:
-        version = 1  # Its  Demo
-        return version
+    except IndexError:  # list index out of range Δεν υπάρχει το demo στην βάση
+        return 1  # Its  Demo
 
 
 demo = check_if_demo()
 
 if demo:
 
-    service_book_version = "V 1.8.7 Demo"
+    service_book_version = "V 1.8.8 Demo"
 else:
 
-    service_book_version = "V 1.8.7"
+    service_book_version = "V 1.8.8"
 
 
 today = datetime.datetime.today().strftime("%d %m %Y")
@@ -90,3 +93,4 @@ handler.setFormatter(formatter)  # Pass handler as a parameter, not assign
 root_logger.addHandler(handler)
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
+

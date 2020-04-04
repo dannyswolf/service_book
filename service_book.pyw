@@ -10,12 +10,12 @@
 Ενεργοποιήση προγράμματος με hash.md5 στον πίνακα sqlite_sequence πεδίο demo και key
 todo προβολή όλων των εικόνων
 todo uniq (στα πεδία των πινακων στην βαση) στους κωδικους και part_nr serial ονοματεπωνυμο τηλ
-todo ************************** update database with new columns ******************************
-todo  **********************on tables Ανταλλακτικά  Calendar_ID *******************************
-todo ***********************On table Service_images Calendar_ID *******************************
 1) todo Στο treeview των φωτοτυπικών δίπλα να βάλω treeview υπολογιστών
 2) todo open pdf files on webdriver
-3) todo fix bug with files when there is no Service ID
+
+
+V1.8.8 Fixed open pdf files in linux with spaces   ----------------------5/4/2020
+todo fix bug with files when there is no Service ID -----------------Done
 
 V1.8.7 Sort Calendar treeview with dates fix empty spaces on serials  ----------------------28/2/2020
 
@@ -2455,7 +2455,6 @@ class Toplevel1:
             return
         self.selected_customer = customers_data[0][1]
 
-
         # Ανάκτηση φωτοτυπικών απο τον επιλεγμένο πελάτη
         # τα φωτοτυπικά είναι το τελευταίο πεδίο του πίνακα πελάτη
         # Το κάθε φωτοτυπικό ανηκει σε έναν μόνον πελάτη ==> Πελάτη_ID
@@ -2981,7 +2980,6 @@ class Toplevel1:
     # Αντίγραφα ασφαλείας Service Book
     def backup(self):
 
-
         def progress(status, remainig, total):
             print(f"{status} Αντιγράφηκαν {total - remainig} απο {total} σελίδες...")
 
@@ -3001,8 +2999,8 @@ class Toplevel1:
                 self.top.focus()
                 return
             messagebox.showwarning("Προσοχή!",
-                                'Μήν κλείσετε το παράθυρο ἕως ὅτου να εμφανιστεί μήνυμα ολοκλήρωσεις διαδικασίας'
-                                ' αντιγράφου ασφαλείας')
+                                   'Μήν κλείσετε το παράθυρο ἕως ὅτου να εμφανιστεί μήνυμα ολοκλήρωσεις διαδικασίας'
+                                   ' αντιγράφου ασφαλείας')
             # print("============BACKUP FILE===========Line 542=\n", backup_file, "\n")
             if not os.path.exists(back_dir):
                 os.makedirs(back_dir)
@@ -3062,8 +3060,8 @@ class Toplevel1:
                 self.top.focus()
                 return
             messagebox.showwarning("Προσοχή!",
-                                'Μήν κλείσετε το παράθυρο ἕως ὅτου να εμφανιστεί μήνυμα ολοκλήρωσεις διαδικασίας'
-                                ' αντιγράφου ασφαλείας')
+                                   'Μήν κλείσετε το παράθυρο ἕως ὅτου να εμφανιστεί μήνυμα ολοκλήρωσεις διαδικασίας'
+                                   ' αντιγράφου ασφαλείας')
             # print("============BACKUP FILE===========Line 542=\n", backup_file, "\n")
             if not os.path.exists(back_dir):
                 os.makedirs(back_dir)

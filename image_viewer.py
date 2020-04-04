@@ -43,8 +43,9 @@ def create_Toplevel1(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
     global w, w_win, rt, selected_service_ID, images_path
     selected_service_ID = args[0]
+    global images_path
     # Δημιουργία φακέλου για τις εικόνες
-    images_path = "Service images/Service_ID_" + str(selected_service_ID) + "/"
+    images_path = "Service_images/Service_ID_" + str(selected_service_ID) + "/"
     if not os.path.exists(images_path):
         os.makedirs(images_path)
     rt = root
@@ -66,7 +67,7 @@ def get_images_from_db():
     # images[num][4] ==> Η εικόνα σε sqlite3.Binary
     # images[num][2 ] =>> Ονομα αρχείου
     for num, i in enumerate(images):
-        with open(images_path + images[num][1] + images[num][2], 'wb') as image_file:
+        with open((images_path + images[num][1] + images[num][2]).replace(" ", "_"), 'wb') as image_file:
             image_file.write(images[num][4])
     images = os.listdir(images_path)
 
@@ -162,7 +163,10 @@ class Toplevel1:
 
         else:
             if sys.platform == "linux":
-                os.system("okular " + str(self.images_path + self.filenames[self.index]))
+
+                file_to_open = str(os.path.abspath(os.path.join(self.images_path + self.filenames[self.index]))).replace(" ", '\\ ')
+                # file_to_open = os.path.join(self.images_path + self.filenames[self.index])
+                os.system(f'okular {file_to_open}')
             else:
                 subprocess.Popen(self.images_path + self.filenames[self.index], shell=True)
 
@@ -291,7 +295,8 @@ class Toplevel1:
                 self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index] +
                                                      "  Μέγεθος: " + self.image_size)
                 if sys.platform == "linux":
-                    os.system("okular " + str([self.images_path + self.filenames[self.index]]))
+                    file_to_open = str(os.path.abspath(os.path.join(self.images_path + self.filenames[self.index]))).replace(" ", '\\ ')
+                    os.system(f"okular {file_to_open}")
                 else:
                     subprocess.Popen([self.images_path + self.filenames[self.index]], shell=True)
 
@@ -349,7 +354,8 @@ class Toplevel1:
                 self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index] +
                                                      "  Μέγεθος: " + self.image_size)
                 if sys.platform == "linux":
-                    os.system("okular " + str([self.images_path + self.filenames[self.index]]))
+                    file_to_open = str(os.path.abspath(os.path.join(self.images_path + self.filenames[self.index]))).replace(" ", '\\ ')
+                    os.system(f"okular {file_to_open}")
                 else:
                     subprocess.Popen([self.images_path + self.filenames[self.index]], shell=True)
 
