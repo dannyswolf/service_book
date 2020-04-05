@@ -153,7 +153,7 @@ class add_service_window():
         top.bind('<Escape>', self.quit)
 
         self.files = ""
-        self.service_id = self.get_service_id()
+        self.service_id = ""
         self.customer_id = ""
         self.copier = ""
         self.customer = StringVar()
@@ -456,7 +456,6 @@ class add_service_window():
     def quit(self, event):
         self.check_before_close_windows()
 
-
     def add_to_service_data(self, column):
         # self.purpose_list, self.actions_list
         # self.purpose_combobox.get(), self.actions_combobox.get()
@@ -630,7 +629,7 @@ class add_service_window():
                 size /= 1024.0
 
             return size
-
+        self.service_id = self.get_service_id()
         # Εισαγωγη αρχείων
         for img in self.files:
 
@@ -670,8 +669,12 @@ class add_service_window():
 
     # Προσθήκη ανταλλακτικών
     def add_spare_parts(self):
-
+        if self.service_id == "":
+            messagebox.showinfo("Προσοχή", "Δεν μπορείτε να εισάγετε ανταλλακτικά πριν αποθηκεύσετε")
+            self.top.focus()
+            return
         if spare_parts_db:
+
             # o Ειναι το Calendar_ID αφου εισάγουμε απευθειας service με το add_service δλδ δεν έχουμε κληση Calendar_ID
             add_spare_parts.create_Toplevel1(self.top, self.service_id, self.customer_id, self.copier, 0)
         else:
@@ -679,9 +682,15 @@ class add_service_window():
                                                                 self.copier, 0)
 
     def insert_spare_part_outside_of_repository(self):
+        if self.service_id == "":
+            messagebox.showinfo("Προσοχή", "Δεν μπορείτε να εισάγετε ανταλλακτικά πριν αποθηκεύσετε")
+            self.top.focus()
+            return
         insert_spare_parts.create_insert_spare_parts_window(self.top, self.service_id, self.customer_id, self.copier, 0)
 
     def check_before_close_windows(self):
+        if self.service_id == "":
+            self.top.destroy()
         con = sqlite3.connect(dbase)
         c = con.cursor()
         c.execute("SELECT * FROM Ανταλλακτικά WHERE Service_ID = ?", (self.service_id,))

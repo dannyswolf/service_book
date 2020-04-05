@@ -299,7 +299,7 @@ class add_copier_window:
         columns = ", ".join(headers)
         values = []
         for head in headers:
-            if head == "ID":
+            if head == "ID" or head == "id":
                 values.append("Null")
             else:
                 values.append("?")

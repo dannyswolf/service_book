@@ -9,7 +9,7 @@ import sys
 
 user = getpass.getuser()
 
-mlshop = 1
+mlshop = 0
 
 
 if mlshop:
@@ -26,7 +26,7 @@ if mlshop:
 
 else:
     spare_parts_db = "ΑΠΟΘΗΚΗ.db"
-    dbase = "Service_book.db"  # Local Dbase
+    dbase = "/home/dannys/docker_debian/db.sqlite3"  # Local Dbase
 
 
 def check_if_demo():
@@ -36,7 +36,7 @@ def check_if_demo():
     data = c.fetchall()
     con.close()
     try:
-        if data[0][0] == 0:
+        if data[0][0] == 0 or data[0][0] == "0":
             con = sqlite3.connect(dbase)
             c = con.cursor()
             c.execute("SELECT seq from sqlite_sequence WHERE name ='key'")
@@ -63,7 +63,7 @@ def check_if_demo():
 
 
 demo = check_if_demo()
-
+#demo = 0
 if demo:
 
     service_book_version = "V 1.8.8 Demo"
