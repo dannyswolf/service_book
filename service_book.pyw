@@ -13,6 +13,8 @@ todo uniq (στα πεδία των πινακων στην βαση) στους
 1) todo Στο treeview των φωτοτυπικών δίπλα να βάλω treeview υπολογιστών
 2) todo open pdf files on webdriver
 
+V1.8.8 Fixed Μεταφορά φωτοτυπικού   ----------------------16/4/2020
+
 
 V1.8.8 Fixed open pdf files in linux with spaces   ----------------------5/4/2020
 todo fix bug with files when there is no Service ID -----------------Done

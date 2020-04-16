@@ -351,7 +351,7 @@ class add_copier_window:
         old_customer_id = old_customer_id[0][0]
 
         # Εμφάνιση φωτοτυπικών σύμφονα με το customer_id
-        cursor.execute("SELECT * FROM Φωτοτυπικά WHERE Πελάτη_ID = ? AND Κατάσταση = 1 ", (old_customer_id,))
+        cursor.execute("SELECT Εταιρεία, Serial FROM Φωτοτυπικά WHERE Πελάτη_ID = ? AND Κατάσταση = 1 ", (old_customer_id,))
         copiers = cursor.fetchall()
         for copier in copiers:
             self.copiers.append(copier)
@@ -413,7 +413,7 @@ class add_copier_window:
         culumns = ", ".join(headers)
         values = []
         for head in headers:
-            if head == "ID":
+            if head == "ID" or head == 'id' or head == 'Id':
                 values.append("Null")
             else:
                 values.append("?")
