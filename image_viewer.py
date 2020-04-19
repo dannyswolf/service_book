@@ -164,11 +164,15 @@ class Toplevel1:
         else:
             if sys.platform == "linux":
 
-                file_to_open = str(os.path.abspath(os.path.join(self.images_path + self.filenames[self.index]))).replace(" ", '\\ ')
+                file_to_open = str(os.path.abspath(os.path.join(self.images_path +
+                                                                self.filenames[self.index]))).replace(" ", '\\ ')
                 # file_to_open = os.path.join(self.images_path + self.filenames[self.index])
                 os.system(f'okular {file_to_open}')
             else:
-                subprocess.Popen(self.images_path + self.filenames[self.index], shell=True)
+                file_to_open = str(os.path.abspath(os.path.join(self.images_path +
+                                                                self.filenames[self.index])))
+
+                subprocess.Popen(file_to_open, shell=True)
 
         # Αποθύκευση
         self.save_btn = tk.Button(top)
@@ -213,11 +217,12 @@ class Toplevel1:
 
     def get_size_of_files(self):
         # Μέγεθος αρχείου
-        self.image = self.filenames[self.index][:-4]
+        self.image = self.filenames[self.index][:-4].replace("_", " ")
         con = sqlite3.connect(dbase)
         c = con.cursor()
         c.execute("SELECT File_size FROM Service_images WHERE Filename =?", (self.image,))
         size = c.fetchall()
+
         con.close()
         try:
             self.image_size = convert_bytes(float(size[0][0]))
@@ -237,7 +242,8 @@ class Toplevel1:
                      ('All Files', '*.*')]
 
             im = PIL.Image.open(self.images_path + self.filenames[self.index])
-            file = filedialog.asksaveasfile(mode='wb', filetypes=files, defaultextension=files)
+            file = filedialog.asksaveasfile(mode='wb', initialfile=self.filenames[self.index],
+                                            filetypes=files, defaultextension=files)
             if file:
                 im.save(file)
             self.top.focus()
@@ -248,7 +254,8 @@ class Toplevel1:
             # pdf_file => το αρχείο για save
             pdf_file = self.images_path + self.filenames[self.index]
             files = [('Pdf', '*.pdf*')]
-            file = filedialog.asksaveasfile(mode='wb', filetypes=files, defaultextension=files)
+            file = filedialog.asksaveasfile(mode='wb', initialfile=self.filenames[self.index],
+                                            filetypes=files, defaultextension=files)
             # get binary from pdf file
             with open(pdf_file, "rb") as pdf_reader:  # opening for [r]eading as [b]inary
                 data = pdf_reader.read()
