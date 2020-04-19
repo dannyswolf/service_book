@@ -26,7 +26,7 @@ if mlshop:
 
 else:
     spare_parts_db = "ΑΠΟΘΗΚΗ.db"
-    dbase = "/home/dannys/docker_debian/db.sqlite3"  # Local Dbase
+    dbase = "Service_book.db"  # Local Dbase
 
 
 def check_if_demo():

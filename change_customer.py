@@ -435,8 +435,6 @@ class add_copier_window:
         cursor = con.cursor()
         cursor.execute("SELECT Σημειώσεις FROM Φωτοτυπικά WHERE ID=?", (copier_id,))
         old_notes = cursor.fetchall()
-
-
         data_for_copiers_notes = old_notes[0][0] + "\n" + today + " Μεταφορά απο " + str(
             old_customer) + " στο(ν) " + new_customer_name + " " + notes
         cursor.execute("UPDATE Φωτοτυπικά SET  Σημειώσεις =? WHERE ID =?", (data_for_copiers_notes, copier_id))

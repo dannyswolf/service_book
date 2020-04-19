@@ -2441,6 +2441,7 @@ class Toplevel1:
 
         # το selected_item είναι το ID του πελάτη
         selected_item = (self.customers_treeview.set(self.customers_treeview.selection(), '#1'))
+        # print("selected_item", selected_item)
         self.selected_customer_id = selected_item
         customers_conn = sqlite3.connect(dbase)
         customers_cursor = customers_conn.cursor()
@@ -2449,6 +2450,7 @@ class Toplevel1:
                                  (selected_item,))
 
         customers_data = customers_cursor.fetchall()
+        # print("customers_data", customers_data)
         # Οριζμός πελάτη
 
         if not customers_data:
