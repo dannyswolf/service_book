@@ -658,6 +658,10 @@ class add_task_window:
             if answer != "yes":
                 self.top.focus()
                 return
+        # Αν ο πελάτης δεν είναι στην βάση να το ορίσουμε ότι είναι σαν πελάτης λιανικής
+        if self.customer_id == "":
+            self.customer_id = 3
+
         data = [self.start_date.get(), self.customer_combobox.get(), self.copiers_combobox.get(),
                 self.purpose_combobox.get(), "", self.technician_entry.get(), "", self.urgent.get(),
                 self.phone_var.get(), self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, "",

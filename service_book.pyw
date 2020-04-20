@@ -13,6 +13,10 @@ todo uniq (στα πεδία των πινακων στην βαση) στους
 1) todo Στο treeview των φωτοτυπικών δίπλα να βάλω treeview υπολογιστών
 2) todo open pdf files on webdriver
 
+V1.8.9 Fix Customer Id = 3  to add_task when there is no Customer -----------20/4/2020
+
+V1.8.8 Fix windows Open files -----------19/4/2020
+
 V1.8.8 Fixed Μεταφορά φωτοτυπικού   ----------------------16/4/2020
 
 

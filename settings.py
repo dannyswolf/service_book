@@ -26,7 +26,7 @@ if mlshop:
 
 else:
     spare_parts_db = "ΑΠΟΘΗΚΗ.db"
-    dbase = "Service_book.db"  # Local Dbase
+    dbase = "Service_book_copy.db"  # Local Dbase
 
 
 def check_if_demo():
@@ -66,10 +66,10 @@ demo = check_if_demo()
 #demo = 0
 if demo:
 
-    service_book_version = "V 1.8.8 Demo"
+    service_book_version = "V 1.8.9 Demo"
 else:
 
-    service_book_version = "V 1.8.8"
+    service_book_version = "V 1.8.9"
 
 
 today = datetime.datetime.today().strftime("%d %m %Y")
