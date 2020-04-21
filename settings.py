@@ -9,7 +9,7 @@ import sys
 
 user = getpass.getuser()
 
-mlshop = 0
+mlshop = 1
 
 
 if mlshop:
@@ -24,9 +24,9 @@ if mlshop:
         spare_parts_db = "\\\\192.168.1.200\\Public\\DROPBOX\\ΕΓΓΡΑΦΑ\\2.  ΑΠΟΘΗΚΗ\\3. ΚΑΙΝΟΥΡΙΑ_ΑΠΟΘΗΚΗ.db"
 
 
-else:
+else:  # VPN
     spare_parts_db = "ΑΠΟΘΗΚΗ.db"
-    dbase = "Service_book_copy.db"  # Local Dbase
+    dbase = "\\\\10.8.0.1\\Public\\DROPBOX\\ΕΓΓΡΑΦΑ\\6.  ΒΙΒΛΙΟ SERVICE\\Service_book.db"  # Local Dbase
 
 
 def check_if_demo():

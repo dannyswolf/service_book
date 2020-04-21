@@ -413,14 +413,16 @@ class add_copier_window:
         conn = sqlite3.connect(dbase)
         cursor = conn.cursor()
         cursor.execute("SELECT ID FROM Πελάτες WHERE Επωνυμία_Επιχείρησης =?", (self.customer_combobox.get(),))
+
         customer_id = cursor.fetchall()
+
         # Δημιουργία culumns για τα φωτοτυπικά
         cursor.execute("SELECT * FROM Φωτοτυπικά")
         headers = list(map(lambda x: x[0], cursor.description))
         culumns = ", ".join(headers)
         values = []
         for head in headers:
-            if head == "ID":
+            if head == "ID" or head == "id" or head == "Id":
                 values.append("Null")
             else:
                 values.append("?")
@@ -436,6 +438,7 @@ class add_copier_window:
             data = [self.company_combobox.get() + " " + self.model_combobox.get(), self.serial.get().replace(" ", "_"),
                     self.start.get(), self.start_counter.get(), customer_id[0][0],
                     self.notes_scrolledtext.get('1.0', 'end-1c'), 1]  # Το 1 είναι ενεργό φωτοτυπικό 0 ανενεργό
+
         except IndexError as error:  # βγάζει error το customer_id[0][0] αν δεν επιλεξουμε πελάτη
             messagebox.showwarning("Προσοχή", "Παρακαλώ \n4.Επιλέξτε πελάτη")
             self.top.focus()
