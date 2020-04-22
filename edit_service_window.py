@@ -21,7 +21,7 @@ import edit_service_window_support
 import image_viewer
 import insert_spare_parts
 import mail
-from settings import dbase, spare_parts_db, root_logger, today  # settings
+from settings import dbase, spare_parts_db, root_logger, today, db_path  # settings
 
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
 sys.stderr.write = root_logger.error
@@ -196,6 +196,7 @@ class edit_service_window():
 
         self.purpose_list, self.actions_list = get_service_data()
         self.files = []
+        self.files_path = os.path.join(db_path, "Service_images/" + str(self.selected_service_id) + "/")
         self.len_images = 0
         self.culumns = None
 
@@ -572,7 +573,6 @@ class edit_service_window():
         self.notes_scrolledtext.configure(selectforeground="black")
         self.notes_scrolledtext.configure(wrap="none")
 
-
         self.Label2 = tk.Label(top)
         self.Label2.place(relx=0.025, rely=0.021, height=31, relwidth=0.938)
         self.Label2.configure(background="#006291")
@@ -649,18 +649,9 @@ class edit_service_window():
 
     # Ελεγχος αν υπάρχουν αρχεία για προβολή
     def check_if_files_exists(self):
-        con = sqlite3.connect(dbase)
-        cursor = con.cursor()
-        try:
-            cursor.execute("SELECT * FROM Service_images WHERE Service_ID =?", (self.selected_service_id,))
-        except sqlite3.OperationalError as error:
-            print(__name__, "ERROR", error)
-            self.show_files_btn.place_forget()
-        images = cursor.fetchall()
+        images = os.listdir(self.files_path)
         self.len_images = len(images)
         self.show_files_btn.configure(text=f'Προβολή {self.len_images}\n αρχείων')
-        cursor.close()
-        con.close()
         if self.files:
             self.show_files_btn.place(relx=0.600, rely=0.750, height=50, relwidth=0.300)
             self.show_files_btn.configure(text=f'{len(self.files)}\n Αρχεία για προσθήκη')
@@ -934,7 +925,7 @@ class edit_service_window():
     def add_files(self):
 
         self.files = filedialog.askopenfilenames(initialdir=os.getcwd(), title="Επιλογή αρχείων για προσθήκη",
-                                                 filetypes=[("Υπ. αρχεία", "*.jpg *.png *.pdf")])
+                                                 filetypes=[("Υπ. αρχεία", "*.jpg *.jpeg *.png *.pdf")])
 
         if self.files == "":  # αν ο χρήστης επιλεξει ακυρο
             self.top.focus()
@@ -947,31 +938,10 @@ class edit_service_window():
     def add_files_to_db(self):
         if self.files == "":
             return
-        con = sqlite3.connect(dbase)
-        cu = con.cursor()
-
-        def convert_bytes(size):
-            for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
-                if size < 1024.0:
-                    return "%3.1f %s" % (size, x)
-                size /= 1024.0
-
-            return size
 
         # Εισαγωγη αρχείων
         for img in self.files:
-            base = os.path.basename(img)
-            filename, ext = os.path.splitext(base)
-            with open(img, 'rb') as f:
-                file = f.read()  # Εισαγωγη αρχείων
-                # file_size = convert_bytes(len(file))  # Καλύτερα σε bytes για ευκολή ταξινόμηση
-                file_size = len(file)  # μεγεθος σε bytes
-            cu.execute("INSERT INTO Service_images(Service_ID, Filename, Type, File_size, File, Copier_ID)"
-                       "VALUES(?,?,?,?,?,?)", (self.selected_service_id, filename, ext, file_size, sqlite3.Binary(file),
-                                              self.copier_id))
-
-        con.commit()
-        con.close()
+            shutil.copy(img, self.files_path, follow_symlinks=False)
         # messagebox.showinfo("Info", f"Οι εικόνες προστέθηκαν επιτυχώς")
         self.top.focus()
 

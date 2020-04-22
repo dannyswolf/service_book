@@ -7,16 +7,13 @@
 
 import os
 import subprocess
-
 import PIL.Image
 from PIL import ImageTk
-import sqlite3
 import tkinter as tk
 from tkinter import messagebox, filedialog
 import image_viewer_support
-import shutil  # για διαγραφη των φακέλων με τις εικόνες
 import sys
-from settings import dbase, root_logger  # settings
+from settings import root_logger, db_path  # settings
 
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
 sys.stderr.write = root_logger.error
@@ -43,35 +40,13 @@ def create_Toplevel1(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
     global w, w_win, rt, selected_service_ID, images_path
     selected_service_ID = args[0]
-    global images_path
-    # Δημιουργία φακέλου για τις εικόνες
-    images_path = "Service_images/Service_ID_" + str(selected_service_ID) + "/"
-    if not os.path.exists(images_path):
-        os.makedirs(images_path)
+    images_path = os.path.join(db_path, "Service_images/" + str(selected_service_ID) + "/")
     rt = root
     w = tk.Toplevel(root)
     top = Toplevel1(w)
     image_viewer_support.init(w, top, *args, **kwargs)
     return (w, top)
 
-
-def get_images_from_db():
-    con = sqlite3.connect(dbase)
-    cursor = con.cursor()
-    cursor.execute("SELECT * FROM Service_images WHERE Service_ID =?", (selected_service_ID,))
-    images = cursor.fetchall()
-    cursor.close()
-    con.close()
-
-    # Δημιουργεία εικόνων
-    # images[num][4] ==> Η εικόνα σε sqlite3.Binary
-    # images[num][2 ] =>> Ονομα αρχείου
-    for num, i in enumerate(images):
-        with open((images_path + images[num][1] + images[num][2]).replace(" ", "_"), 'wb') as image_file:
-            image_file.write(images[num][4])
-    images = os.listdir(images_path)
-
-    return images
 
 
 def convert_bytes(size):
@@ -102,11 +77,15 @@ class Toplevel1:
 
         self.selected_image = ""  # Εικόνα που προβάλεται PIL instance
         self.selected_service_ID = selected_service_ID
-        self.images = get_images_from_db()
+        self.images = os.listdir(images_path)
         self.image = ""  # Ονομα αρχείου που προβάλεται "icon_resized.jpg"  "icon.png"
         self.image_size = ""  # Μέγεθος αρχείου
+
+        # Δημιουργία φακέλου για τις εικόνες
         self.images_path = images_path
-        self.filenames = os.listdir(self.images_path)
+        self.filenames = []
+        for file in os.listdir(self.images_path):
+            self.filenames.append(os.path.join(self.images_path, file))
 
         self.index = 0
         self.new_size = (800, 600)
@@ -118,7 +97,6 @@ class Toplevel1:
         top.title("Εικόνες")
         top.configure(background="#f6f6ee")
         top.bind('<Escape>', self.quit)
-        top.protocol("WM_DELETE_WINDOW", self.del_files)
         top.focus()
 
         self.previous_btn = tk.Button(top)
@@ -152,7 +130,14 @@ class Toplevel1:
         self.image_label.configure(background="#006291")
         self.image_label.configure(disabledforeground="#a3a3a3")
         self.image_label.configure(text="")
-        file = self.images_path + self.filenames[0]
+
+        self.image_name_label = tk.Label(top)
+        self.image_name_label.place(relx=0.046, rely=0.910, height=30, relwidth=0.800)
+        self.image_name_label.configure(background="#006291")
+        self.image_name_label.configure(foreground="white")
+        self.image_name_label.configure(disabledforeground="#a3a3a3")
+
+        file = self.filenames[0]
         if file[-3:] != "pdf":
             self.image = self.filenames[0][:-4]
             self.selected_image = PIL.Image.open(file)
@@ -160,17 +145,18 @@ class Toplevel1:
             photo = ImageTk.PhotoImage(image)
             self.image_label.configure(image=photo)
             self.image_label.image = photo
+            size = os.path.getsize(file)
+            self.image_size = convert_bytes(float(size))
 
+            self.image_name_label.configure(text=f"Αρχείο : {self.image}  Μέγεθος: {self.image_size}")
         else:
             if sys.platform == "linux":
 
-                file_to_open = str(os.path.abspath(os.path.join(self.images_path +
-                                                                self.filenames[self.index]))).replace(" ", '\\ ')
+                file_to_open = str(self.filenames[self.index]).replace(" ", '\\ ')
                 # file_to_open = os.path.join(self.images_path + self.filenames[self.index])
                 os.system(f'okular {file_to_open}')
             else:
-                file_to_open = str(os.path.abspath(os.path.join(self.images_path +
-                                                                self.filenames[self.index])))
+                file_to_open = str(self.filenames[self.index])
 
                 subprocess.Popen(file_to_open, shell=True)
 
@@ -202,47 +188,22 @@ class Toplevel1:
         self.del_btn.configure(text='''Διαγραφή''')
         self.del_btn.configure(command=self.del_from_db)
 
-        self.image_name_label = tk.Label(top)
-        self.image_name_label.place(relx=0.046, rely=0.910, height=30, relwidth=0.800)
-        self.image_name_label.configure(background="#006291")
-        self.image_name_label.configure(foreground="white")
-        self.image_name_label.configure(disabledforeground="#a3a3a3")
-
-        self.get_size_of_files()
-
     def quit(self, event=None):
-        self.del_files()
         rt.focus()
         self.top.destroy()
 
-    def get_size_of_files(self):
-        # Μέγεθος αρχείου
-        self.image = self.filenames[self.index][:-4].replace("_", " ")
-        con = sqlite3.connect(dbase)
-        c = con.cursor()
-        c.execute("SELECT File_size FROM Service_images WHERE Filename =?", (self.image,))
-        size = c.fetchall()
-
-        con.close()
-        try:
-            self.image_size = convert_bytes(float(size[0][0]))
-        except IndexError:
-            self.image_size = convert_bytes(float(size[0]))
-
-        self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index] +
-                                             "  Μέγεθος: " + self.image_size)
-
     # Αποθήκευση επιλεγμένης εικόνας
     def save_img(self, ):
-        ext = self.filenames[self.index][-4:]
-
+        # ext = self.filenames[self.index][-4:]
+        file_name, ext = os.path.splitext(self.filenames[self.index])
+        file_name = os.path.basename(f'{file_name}')
         if ext != ".pdf":
 
             files = [('Εικόνα', ext),
                      ('All Files', '*.*')]
 
-            im = PIL.Image.open(self.images_path + self.filenames[self.index])
-            file = filedialog.asksaveasfile(mode='wb', initialfile=self.filenames[self.index],
+            im = PIL.Image.open(self.filenames[self.index])
+            file = filedialog.asksaveasfile(mode='wb', initialfile=f'{file_name}{ext}',
                                             filetypes=files, defaultextension=files)
             if file:
                 im.save(file)
@@ -252,12 +213,14 @@ class Toplevel1:
             # self.selected_image.show()
         else:
             # pdf_file => το αρχείο για save
-            pdf_file = self.images_path + self.filenames[self.index]
+            # pdf_file = self.filenames[self.index]
+            file_name, ext = os.path.splitext(self.filenames[self.index])
+            file_name = os.path.basename(f'{file_name}')
             files = [('Pdf', '*.pdf*')]
-            file = filedialog.asksaveasfile(mode='wb', initialfile=self.filenames[self.index],
+            file = filedialog.asksaveasfile(mode='wb', initialfile=f'{file_name}{ext}',
                                             filetypes=files, defaultextension=files)
             # get binary from pdf file
-            with open(pdf_file, "rb") as pdf_reader:  # opening for [r]eading as [b]inary
+            with open(self.filenames[self.index], "rb") as pdf_reader:  # opening for [r]eading as [b]inary
                 data = pdf_reader.read()
             # file.name =>> αρχείο που επέλεξε ο χρήστης
             with open(file.name, 'wb') as new_pdf_file:  # Εγραφή στο αρχείο
@@ -269,43 +232,30 @@ class Toplevel1:
         self.index = self.index + 1
 
         try:
-            file_ext = self.filenames[self.index][-3:]
+            file_name, file_ext = os.path.splitext(self.filenames[self.index])
+            # file_ext = self.filenames[self.index][-3:]
 
-            if file_ext != "pdf":  # Αν δεν είναι pdf
-                self.selected_image = PIL.Image.open(self.images_path + self.filenames[self.index])
+            if file_ext != ".pdf":  # Αν δεν είναι pdf
+                self.selected_image = PIL.Image.open(self.filenames[self.index])
                 self.image = self.filenames[self.index][:-4]
-                # Μέγεθος αρχείου
-                con = sqlite3.connect(dbase)
-                c = con.cursor()
-                c.execute("SELECT File_size FROM Service_images WHERE Filename =?", (self.image,))
-                size = c.fetchall()
-                print("self.image", self.image, size)
-                con.close()
-                self.image_size = convert_bytes(float(size[0][0]))
-                self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index] +
-                                                     "  Μέγεθος: " + self.image_size)
+
+                size = os.path.getsize(self.filenames[self.index])
+                self.image_size = convert_bytes(float(size))
+                self.image_name_label.configure(text=f"Αρχείο : {file_name}  Μέγεθος: {self.image_size}")
 
             else:  # Αν είναι pdf
                 self.selected_image = PIL.Image.open("icons/pdf.png")
-
                 self.image = self.filenames[self.index][:-4]
+                size = os.path.getsize(self.filenames[self.index])
+                self.image_size = convert_bytes(float(size))
 
-                # Μέγεθος αρχείου
-                con = sqlite3.connect(dbase)
-                c = con.cursor()
-                c.execute("SELECT File_size FROM Service_images WHERE Filename =?", (self.image,))
-                size = c.fetchall()
-                print("self.image", self.image, size)
-                con.close()
-                self.image_size = convert_bytes(float(size[0][0]))
+                self.image_name_label.configure(text=f"Αρχείο : {file_name}  Μέγεθος: {self.image_size}")
 
-                self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index] +
-                                                     "  Μέγεθος: " + self.image_size)
                 if sys.platform == "linux":
-                    file_to_open = str(os.path.abspath(os.path.join(self.images_path + self.filenames[self.index]))).replace(" ", '\\ ')
+                    file_to_open = str(self.filenames[self.index]).replace(" ", '\\ ')
                     os.system(f"okular {file_to_open}")
                 else:
-                    subprocess.Popen([self.images_path + self.filenames[self.index]], shell=True)
+                    subprocess.Popen([self.filenames[self.index]], shell=True)
 
         except FileNotFoundError:
             messagebox.showinfo("Προσοχή", "Το αρχείο δεν βρέθηκε")
@@ -327,48 +277,34 @@ class Toplevel1:
             else:
                 raise IndexError
 
-            file_ext = self.filenames[self.index][-3:]
+            file_name, file_ext = os.path.splitext(self.filenames[self.index])
+            self.image = file_name
+            if file_ext != ".pdf":
+                self.selected_image = PIL.Image.open(self.filenames[self.index])
 
-            if file_ext != "pdf":
-                self.selected_image = PIL.Image.open(self.images_path + self.filenames[self.index])
-                self.image = self.filenames[self.index][:-4]
+                size = os.path.getsize(self.filenames[self.index])
+                self.image_size = convert_bytes(float(size))
 
-                # Μέγεθος αρχείου
-                con = sqlite3.connect(dbase)
-                c = con.cursor()
-                c.execute("SELECT File_size FROM Service_images WHERE Filename =?", (self.image,))
-                size = c.fetchall()
-                print("self.image", self.image, size)
-                con.close()
-                self.image_size = convert_bytes(float(size[0][0]))
-
-                self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index] +
-                                                     "  Μέγεθος: " + self.image_size)
+                self.image_name_label.configure(text=f"Αρχείο : {file_name} Μέγεθος: {self.image_size}")
 
             else:
                 self.selected_image = PIL.Image.open("icons/pdf.png")
-                self.image = self.filenames[self.index][:-4]
 
-                # Μέγεθος αρχείου
-                con = sqlite3.connect(dbase)
-                c = con.cursor()
-                c.execute("SELECT File_size FROM Service_images WHERE Filename =?", (self.image,))
-                size = c.fetchall()
-                print("self.image", self.image, size)
-                con.close()
-                self.image_size = convert_bytes(float(size[0][0]))
+                size = os.path.getsize(self.filenames[self.index])
+                self.image_size = convert_bytes(float(size))
 
-                self.image_name_label.configure(text="Αρχείο : " + self.filenames[self.index] +
-                                                     "  Μέγεθος: " + self.image_size)
+                self.image_name_label.configure(text=f"Αρχείο : {file_name} Μέγεθος: {self.image_size}")
+
                 if sys.platform == "linux":
-                    file_to_open = str(os.path.abspath(os.path.join(self.images_path + self.filenames[self.index]))).replace(" ", '\\ ')
+                    file_to_open = str(self.filenames[self.index]).replace(" ", '\\ ')
                     os.system(f"okular {file_to_open}")
                 else:
-                    subprocess.Popen([self.images_path + self.filenames[self.index]], shell=True)
-
+                    subprocess.Popen([self.filenames[self.index]], shell=True)
 
         except FileNotFoundError:
             messagebox.showinfo("Προσοχή", "Το αρχείο δεν βρέθηκε")
+            self.top.focus()
+            return
         except IndexError:
             messagebox.showinfo("Προσοχή", " Δεν υπάρχουν αλλα αρχεία για προβολή")
             self.index += 1
@@ -380,28 +316,15 @@ class Toplevel1:
         self.image_label.configure(image=photo)
         self.image_label.image = photo
 
-    # Διαγραφή αρχείων μετά το κλείσημο του παραθύρου
-    def del_files(self):
-        shutil.rmtree(self.images_path, ignore_errors=True)
-        rt.focus()
-        self.top.destroy()
-
     # Διαγραφή αρχείου απο την βαση
     def del_from_db(self):
-        con = sqlite3.connect(dbase)
-        cur = con.cursor()
-        cur.execute("DELETE FROM Service_images WHERE Filename =?", (self.image,))
-        con.commit()
-        cur.close()
-        con.close()
-        messagebox.showinfo("Προσοχή", f"Το {self.image} διαγράφηκε")
-
-        os.remove(self.images_path + self.filenames[self.index])
-
+        os.remove(self.filenames[self.index])
+        messagebox.showinfo("Προσοχή", f"Το {self.filenames[self.index]} διαγράφηκε")
         self.filenames.remove(self.filenames[self.index])
         self.top.focus()
         self.show_next()
         return
+
 
 if __name__ == '__main__':
     vp_start_gui()

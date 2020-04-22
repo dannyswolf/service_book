@@ -22,7 +22,7 @@ import add_spare_parts
 import image_viewer
 import insert_spare_parts
 import mail
-from settings import dbase, spare_parts_db, root_logger, demo, today  # settings
+from settings import dbase, spare_parts_db, root_logger, demo, today, db_path  # settings
 
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
 sys.stderr.write = root_logger.error
@@ -69,6 +69,7 @@ def vp_start_gui():
     top = edit_task_window(root)
     add_copier_support.init(root, top)
     root.mainloop()
+
 
 # Να πάρουμε Φωτοτυπικά και πελάτη
 def get_copiers_data():
@@ -232,6 +233,7 @@ class edit_task_window:
         self.selected_serial = ""
         self.copier_id = ""
         self.files = ""
+        self.files_path = ""
         self.urgent = StringVar()
 
         self.columns = None
@@ -550,15 +552,12 @@ class edit_task_window:
         self.send_mail_btn.configure(image=self.send_mail_btn_img1)
         self.send_mail_btn.configure(command=self.send_mail)
 
-
-
         self.print_btn = tk.Button(top)
         self.print_btn.place(relx=0.845, rely=0.932, relheight=0.055, relwidth=0.070)
         # self.print_btn.configure(background="#6b6b6b")
         self.print_btn_img = PhotoImage(file="icons/print.png")
         self.print_btn.configure(image=self.print_btn_img)
         self.print_btn.configure(command=self.print_to_pdf)
-
 
         self.TSeparator1 = ttk.Separator(self.service_frame)
         self.TSeparator1.place(relx=0.025, rely=0.700, relwidth=0.938)
@@ -800,18 +799,14 @@ class edit_task_window:
             self.show_files_btn.place_forget()
             self.add_files_btn.place_forget()
             return
-        con = sqlite3.connect(dbase)
-        cursor = con.cursor()
+        images = None
         try:
-            cursor.execute("SELECT * FROM Service_images WHERE Service_id =?", (self.service_id,))
-        except sqlite3.OperationalError as error:
-            print(__name__, "ERROR ", error)
+            images = os.listdir(self.files_path)
+            self.len_images = len(images)
+            self.show_files_btn.configure(text=f'Προβολή {self.len_images}\n αρχείων')
+        except FileNotFoundError as error:  # Δεν υπάρχουν αρχεία
             self.show_files_btn.place_forget()
-        images = cursor.fetchall()
-        self.len_images = len(images)
-        self.show_files_btn.configure(text=f'Προβολή {self.len_images}\n αρχείων')
-        cursor.close()
-        con.close()
+
         if self.files:
             self.show_files_btn.place(relx=0.575, rely=0.700, height=50, relwidth=0.380)
             self.show_files_btn.configure(text=f'{len(self.files)}\n Αρχεία για προσθήκη')
@@ -841,7 +836,7 @@ class edit_task_window:
             return
 
         self.files = filedialog.askopenfilenames(initialdir=os.getcwd(), title="Επιλογή αρχείων για προσθήκη",
-                                                     filetypes=[("Υπ. αρχεία", "*.jpg *.png *.pdf")])
+                                                     filetypes=[("Υπ. αρχεία", "*.jpg *.jpeg *.png *.pdf")])
 
         if self.files == "":  # αν ο χρήστης επιλεξει ακυρο
             self.top.focus()
@@ -1507,6 +1502,8 @@ class edit_task_window:
         self.dte_entry.configure(textvariable=dte)
         service_id = StringVar(w, value=data[0][13])
         self.service_id = service_id.get()
+
+        self.files_path = os.path.join(db_path, "Service_images/" + str(self.service_id) + "/")
         counter_entry = StringVar(w, value=data[0][14])
         self.counter_entry.configure(textvariable=counter_entry)
         next_service = StringVar(w, value=data[0][15])
@@ -1527,32 +1524,12 @@ class edit_task_window:
         if self.files == "":
             return
 
-        con = sqlite3.connect(dbase)
-        cu = con.cursor()
-
-        def convert_bytes(size):
-            for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
-                if size < 1024.0:
-                    return "%3.1f %s" % (size, x)
-                size /= 1024.0
-
-            return size
-
         # Εισαγωγη αρχείων
+        # self.files_path = os.path.join(db_path, "Service_images/" + str(self.service_id) + "/")
         for img in self.files:
-            base = os.path.basename(img)
-            filename, ext = os.path.splitext(base)
-            with open(img, 'rb') as f:
-                file = f.read()  # Εισαγωγη αρχείων
-                # file_size = convert_bytes(len(file))  # Καλύτερα σε bytes για ευκολή ταξινόμηση
-                file_size = len(file)  # μεγεθος σε bytes
-
-                cu.execute("INSERT INTO Service_images(Service_ID, Filename, Type, File_size, File, Copier_ID)"
-                           "VALUES(?,?,?,?,?,?)", (self.service_id, filename, ext, file_size, sqlite3.Binary(file),
-                                                   self.copier_id))
-
-        con.commit()
-        con.close()
+            if not os.path.exists(self.files_path):
+                os.makedirs(self.files_path)
+            shutil.copy(img, self.files_path, follow_symlinks=False)
 
     def add_to_db(self,):
         edited_columns = []
@@ -1586,7 +1563,7 @@ class edit_task_window:
         culumns = ", ".join(headers)
         values = []
         for head in headers:
-            if head == "ID":
+            if head == "ID" or head == "Id" or head == "id":
                 values.append("Null")
             else:
                 values.append("?")
@@ -1599,10 +1576,14 @@ class edit_task_window:
                 self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, self.dte_entry.get(),
                 self.service_id, self.counter_entry.get(), self.next_service_entry.get(), self.customer_id,
                 self.price_entry.get(), 0 if self.completed_var.get() else 1, self.selected_calendar_id]
+        try:
+            cursor.execute("UPDATE Calendar  SET " + edited_columns + " WHERE ID=? ", (tuple(data,)))
+        except sqlite3.ProgrammingError as error:
+            messagebox.showinfo("Σφάλμα ", f"{error}")
 
-        cursor.execute("UPDATE Calendar  SET " + edited_columns + " WHERE ID=? ", (tuple(data,)))
-        conn.commit()
-        conn.close()
+        finally:
+            conn.commit()
+            conn.close()
 
         # Δημιουργία culumns για το Service
         conn = sqlite3.connect(dbase)
