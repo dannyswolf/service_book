@@ -13,6 +13,8 @@ todo uniq (στα πεδία των πινακων στην βαση) στους
 1) todo Στο treeview των φωτοτυπικών δίπλα να βάλω treeview υπολογιστών
 2) todo open pdf files on webdriver
 
+V1.9.0 Αδειασμα πεδίου αναζήτησεις στα μηχανήματα  ---- 23/04/2020
+
 V1.9.0 File Separation From Db   ---- 22/04/2020
 
 V1.8.9 Fix add_copier if head == "ID" or head == "id" or head == "Id":   ---- 21/04/2020
@@ -2830,6 +2832,10 @@ class Toplevel1:
         except AttributeError as error:  # στην πρώτη εκκινηση δεν τα εχει φτιάξει και πετάει error
             pass
         self.selected_copier_id = ""
+
+        # Αδειασμα πεδίου αναζήτησεις
+        self.search_copier_data = StringVar()
+        self.copier_search_entry.configure(textvariable=self.search_copier_data)
 
         return
 
