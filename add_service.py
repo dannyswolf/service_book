@@ -65,6 +65,7 @@ root = None
 
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
+
     global val, w, root
     root = tk.Tk()
     add_service_window_support.set_Tk_var()
@@ -184,23 +185,6 @@ class add_service_window():
         self.date_label.configure(relief="groove")
         self.date_label.configure(text='''Ημερομηνία''')
 
-        # Εισαγωγή ανταλλακτικών εκτός αποθήκης
-        self.insert_spare_parts_btn = tk.Button(top)
-        self.insert_spare_parts_btn.place(relx=0.650, rely=0.150, height=50, relwidth=0.280)
-        self.insert_spare_parts_btn.configure(activebackground="#ececec")
-        self.insert_spare_parts_btn.configure(activeforeground="#000000")
-        self.insert_spare_parts_btn.configure(background="#3268a8")
-        self.insert_spare_parts_btn.configure(disabledforeground="#a3a3a3")
-        self.insert_spare_parts_btn.configure(foreground="#ffffff")
-        self.insert_spare_parts_btn.configure(highlightbackground="#d9d9d9")
-        self.insert_spare_parts_btn.configure(highlightcolor="black")
-        self.insert_spare_parts_btn.configure(pady="0")
-        self.insert_spare_parts_btn.configure(text='''    Προσθήκη\n    ανταλλακτικών\nεκτός αποθήκης''')
-        self.insert_spare_parts_btn.configure(command=self.insert_spare_part_outside_of_repository)
-        self.insert_spare_parts_btn_img = PhotoImage(file="icons/add_spare_parts.png")
-        self.insert_spare_parts_btn.configure(image=self.insert_spare_parts_btn_img)
-        self.insert_spare_parts_btn.configure(compound="left")
-
         self.date_entry = DateEntry(top, width=12, year=self.year, month=self.month, day=self.day,
                                     background='gray20', selectmode='day', foreground='white', borderwidth=5,
                                     locale="el_GR", font=("Calibri", 10, 'bold'), date_pattern='dd/mm/yyyy')
@@ -241,23 +225,6 @@ class add_service_window():
         self.actions_combobox.configure(values=self.actions_list)
         # self.actions_combobox.configure(textvariable=edit_service_window_support.combobox)
         self.actions_combobox.configure(takefocus="")
-
-        # Ανταλλακτικά
-        self.add_spare_parts_btn = tk.Button(top)
-        self.add_spare_parts_btn.place(relx=0.650, rely=0.240, height=50, relwidth=0.280)
-        self.add_spare_parts_btn.configure(activebackground="#ececec")
-        self.add_spare_parts_btn.configure(activeforeground="#000000")
-        self.add_spare_parts_btn.configure(background="green")
-        self.add_spare_parts_btn.configure(disabledforeground="#a3a3a3")
-        self.add_spare_parts_btn.configure(foreground="#ffffff")
-        self.add_spare_parts_btn.configure(highlightbackground="#d9d9d9")
-        self.add_spare_parts_btn.configure(highlightcolor="black")
-        self.add_spare_parts_btn.configure(pady="0")
-        self.add_spare_parts_btn.configure(text='''    Προσθήκη\n    ανταλλακτικών\nαπο αποθήκη''')
-        self.add_spare_parts_btn.configure(command=self.add_spare_parts)
-        self.add_spare_parts_btn_img = PhotoImage(file="icons/add_spare_parts.png")
-        self.add_spare_parts_btn.configure(image=self.add_spare_parts_btn_img)
-        self.add_spare_parts_btn.configure(compound="left")
 
         # Δελτίο Τεχνικής Εξυπηρέτησης
         self.dte_label = tk.Label(top)
@@ -320,23 +287,6 @@ class add_service_window():
         self.notes_label.configure(relief="groove")
         self.notes_label.configure(text='''Σημειώσεις''')
 
-        # Προσθήκη αρχείων
-        self.add_files_btn = tk.Button(top)
-        self.add_files_btn.place(relx=0.650, rely=0.520, height=41, relwidth=0.250)
-        self.add_files_btn.configure(activebackground="#ececec")
-        self.add_files_btn.configure(activeforeground="#000000")
-        self.add_files_btn.configure(background="green")
-        self.add_files_btn.configure(disabledforeground="#a3a3a3")
-        self.add_files_btn.configure(foreground="#ffffff")
-        self.add_files_btn.configure(highlightbackground="#d9d9d9")
-        self.add_files_btn.configure(highlightcolor="black")
-        self.add_files_btn.configure(pady="0")
-        self.add_files_btn.configure(text='''Προσθήκη αρχείων''')
-        self.add_files_btn.configure(command=self.add_files)
-        self.add_files_btn_img = PhotoImage(file="icons/add_files.png")
-        self.add_files_btn.configure(image=self.add_files_btn_img)
-        self.add_files_btn.configure(compound="left")
-
         self.counter_label = tk.Label(top)
         self.counter_label.place(relx=0.025, rely=0.210, height=31, relwidth=0.260)
         self.counter_label.configure(activebackground="#f9f9f9")
@@ -390,7 +340,6 @@ class add_service_window():
 
         self.TSeparator1 = ttk.Separator(top)
         self.TSeparator1.place(relx=0.025, rely=0.620, relwidth=0.938)
-
 
         self.counter_entry = tk.Entry(top)
         self.counter_entry.place(relx=0.29, rely=0.210, height=30, relwidth=0.331)
@@ -511,9 +460,9 @@ class add_service_window():
         try:
             self.customer_id = selected_copier_data[0][5]
         except IndexError as error:
-            root.focus()
-            self.top.destroy()
             messagebox.showwarning("Σφάλμα", f"{error},\nΠαρακαλώ επιλέξτε μηχάνημα")
+            rt.focus()
+            self.top.destroy()
             return
         conn = sqlite3.connect(dbase)
         cursor = conn.cursor()
@@ -558,7 +507,6 @@ class add_service_window():
 
         # Προσθήκη αλλαγών στην βαση δεδομένων
         def add_to_db():
-            self.add_files_to_db()
             edited_culumns = ",".join(self.culumns)
             values_var = []
             for head in self.culumns:
@@ -570,7 +518,7 @@ class add_service_window():
 
             data_to_add = [self.date_entry.get(), self.purpose_combobox.get(), self.actions_combobox.get(),
                            self.technician_entry.get(), self.notes_scrolledtext.get("1.0", "end-1c"), counter.get(),
-                           next_service.get(), self.selected_copier_id, dte.get(), self.price_entry.get()]
+                           next_service.get(), self.selected_copier_id, dte.get(), self.price_entry.get(), ""]
             add_conn = sqlite3.connect(dbase)
             add_cursor = add_conn.cursor()
             # ΒΑΖΟΥΜΕ ΤΟ ΠΡΩΤΟ NULL ΓΙΑ ΝΑ ΠΆΡΕΙ ΜΟΝΟ ΤΟΥ ΤΟ ID = PRIMARY KEY
@@ -602,91 +550,6 @@ class add_service_window():
         self.save_btn.configure(pady="2")
         self.save_btn.configure(text="Αποθήκευση")
         self.save_btn.configure(command=add_to_db)
-
-    # Προσθήκη αρχείων
-    def add_files(self):
-
-        self.files = filedialog.askopenfilenames(initialdir=os.getcwd(), title="Επιλογή αρχείων για προσθήκη",
-                                                 filetypes=[("Υπ. αρχεία", "*.jpg *.png *.pdf")])
-
-        if self.files == "":  # αν ο χρήστης επιλεξει ακυρο
-            self.top.focus()
-            return
-
-        self.top.focus()
-
-    # Προσθήκη αρχείων στην βάση
-    def add_files_to_db(self):
-        if self.files == "":
-            return
-        con = sqlite3.connect(dbase)
-        cu = con.cursor()
-
-        def convert_bytes(size):
-            for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
-                if size < 1024.0:
-                    return "%3.1f %s" % (size, x)
-                size /= 1024.0
-
-            return size
-        self.service_id = self.get_service_id()
-        # Εισαγωγη αρχείων
-        for img in self.files:
-
-            base = os.path.basename(img)
-            filename, ext = os.path.splitext(base)
-            with open(img, 'rb') as f:
-                file = f.read()  # Εισαγωγη αρχείων
-                # file_size = convert_bytes(len(file))  # Καλύτερα σε bytes για ευκολή ταξινόμηση
-                file_size = len(file)  # μεγεθος σε bytes
-                print("file_size", file_size)
-                cu.execute("INSERT INTO Service_images(Service_ID, Filename, Type, File_size, File, Copier_ID)"
-                           "VALUES(?,?,?,?,?,?)", (self.service_id, filename, ext, file_size, sqlite3.Binary(file),
-                                                   self.selected_copier_id))
-
-        con.commit()
-        con.close()
-        messagebox.showinfo("Info", f"Οι εικόνες προστέθηκαν επιτυχώς")
-        self.top.focus()
-
-    def get_service_id(self):
-        con = sqlite3.connect(dbase)
-        cu = con.cursor()
-        # Να πάρουμε πρώτα το τελευταίο ID απο τον πίνακα sqlite_sequence το πεδία Service
-        # για να προσθέσουμε τις εικόνες στο νέο service
-        # νεο service_ID == τελευταίο ID απο τον πίνακα Service +1
-        cu.execute("SELECT * FROM sqlite_sequence")
-        names = cu.fetchall()
-
-        for name in names:
-            if name[0] == "Service":
-                services_ID = name[1]
-
-                new_service_id = int(services_ID) + 1
-                cu.close()
-                con.close()
-                return new_service_id
-
-    # Προσθήκη ανταλλακτικών
-    def add_spare_parts(self):
-        if self.service_id == "":
-            messagebox.showinfo("Προσοχή", "Δεν μπορείτε να εισάγετε ανταλλακτικά πριν αποθηκεύσετε")
-            self.top.focus()
-            return
-        if spare_parts_db:
-
-            # o Ειναι το Calendar_ID αφου εισάγουμε απευθειας service με το add_service δλδ δεν έχουμε κληση Calendar_ID
-            add_spare_parts.create_Toplevel1(self.top, self.service_id, self.customer_id, self.copier, 0)
-        else:
-            insert_spare_parts.create_insert_spare_parts_window(self.top, self.service_id, self.customer_id,
-                                                                self.copier, 0)
-
-    def insert_spare_part_outside_of_repository(self):
-        if self.service_id == "":
-            messagebox.showinfo("Προσοχή", "Δεν μπορείτε να εισάγετε ανταλλακτικά πριν αποθηκεύσετε")
-            self.top.focus()
-            return
-        insert_spare_parts.create_insert_spare_parts_window(self.top, self.service_id, self.customer_id, self.copier, 0)
 
     def check_before_close_windows(self):
         if self.service_id == "":

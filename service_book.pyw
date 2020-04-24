@@ -13,6 +13,8 @@ todo uniq (στα πεδία των πινακων στην βαση) στους
 1) todo Στο treeview των φωτοτυπικών δίπλα να βάλω treeview υπολογιστών
 2) todo open pdf files on webdriver
 
+V1.9.1 Ready for Django with separated files    ---- 24/04/2020
+
 V1.9.0 Αδειασμα πεδίου αναζήτησεις στα μηχανήματα  ---- 23/04/2020
 
 V1.9.0 File Separation From Db   ---- 22/04/2020
@@ -2058,7 +2060,7 @@ class Toplevel1:
         data = c.fetchall()
         con.close()
         no_need_heads = ['Τηλέφωνο', 'Σημειώσεις', 'Copier_ID', 'ΔΤΕ', 'Service_ID', 'Μετρητής', 'Επ_Service',
-                         'Customer_ID', 'Κατάσταση']
+                         'Customer_ID', 'Κατάσταση', 'file']
         needed_heads = [head for head in self.tasks_headers if head not in no_need_heads]
         self.calendar_treeview["columns"] = [head for head in self.tasks_headers if head not in no_need_heads]
 

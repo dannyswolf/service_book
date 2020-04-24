@@ -665,7 +665,7 @@ class add_task_window:
         data = [self.start_date.get(), self.customer_combobox.get(), self.copiers_combobox.get(),
                 self.purpose_combobox.get(), "", self.technician_entry.get(), "", self.urgent.get(),
                 self.phone_var.get(), self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, "",
-                self.service_id, "", "", self.customer_id, "", 1]
+                self.service_id, "", "", self.customer_id, "", 1, ""]  # Το τελευταίο ""  είναι για το column 'file'
 
         sql_insert = "INSERT INTO Calendar (" + columns + ")" + "VALUES(" + values + ");"
 
@@ -706,7 +706,7 @@ class add_task_window:
         # )
         # self.copier_id = self.get_copier_id()
         data = [self.start_date.get(), self.purpose_combobox.get(), "", self.technician_entry.get(),
-                self.notes_scrolledtext.get('1.0', 'end-1c'), "", "", self.copier_id, "", ""]
+                self.notes_scrolledtext.get('1.0', 'end-1c'), "", "", self.copier_id, "", "", ""]
         sql_insert = "INSERT INTO Service (" + columns + ")" + "VALUES(" + values + ");"
 
         cursor.execute(sql_insert, tuple(data))
@@ -720,11 +720,8 @@ class add_task_window:
     # Print to pdf
     def print_to_pdf(self):
         # Define your data
-        if sys.platform == "win32":
-            prints_dir = f'/prints/{today}'.replace(" ", "_")
 
-        elif sys.platform == "linux":
-            prints_dir = f'prints/{today}'.replace(" ", "_")
+        prints_dir = f'prints/{today}'.replace(" ", "_")
 
         if not os.path.exists(prints_dir):
             os.makedirs(prints_dir)

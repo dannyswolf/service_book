@@ -1461,8 +1461,11 @@ class edit_task_window:
         # customer_data = cursor.fetchall()
         cursor.close()
         conn.close()
-
-        date = StringVar(self.service_frame, value=data[0][1])
+        try:
+            date = StringVar(self.service_frame, value=data[0][1])
+        except IndexError as error:  # IndexError: list index out of range
+            print("error", __file__, "Line 1467", error)
+            print("data", data)
         self.start_date.set_date(date=date.get())
         # self.start_date_entry.configure(textvariable=date)
         self.customer = StringVar(w, value=data[0][2])
@@ -1511,7 +1514,7 @@ class edit_task_window:
         price = StringVar(w, value=data[0][17])
         self.price_entry.configure(textvariable=price)
         # data[0][-1] == κατάσταση
-        if not data[0][-1]:  # αν η κατάσταση δεν είναι 1 ==>  δλδ δεν ολοκληρόθηκε
+        if not data[0][-2]:  # αν η κατάσταση δεν είναι 1 ==>  δλδ δεν ολοκληρόθηκε
             self.completed_Checkbutton1.configure(bg="green")
             self.completed_Checkbutton1.configure(text=' Ναι')
             self.completed_Checkbutton1.select()
@@ -1528,7 +1531,7 @@ class edit_task_window:
         # self.files_path = os.path.join(db_path, "Service_images/" + str(self.service_id) + "/")
         for img in self.files:
             if not os.path.exists(self.files_path):
-                os.makedirs(self.files_path)
+                os.makedirs(self.files_path, exist_ok=True)
             shutil.copy(img, self.files_path, follow_symlinks=False)
 
     def add_to_db(self,):
@@ -1575,12 +1578,13 @@ class edit_task_window:
                 self.compl_date_entry.get(), self.urgent, self.phone_entry.get(),
                 self.notes_scrolledtext.get('1.0', 'end-1c'), self.copier_id, self.dte_entry.get(),
                 self.service_id, self.counter_entry.get(), self.next_service_entry.get(), self.customer_id,
-                self.price_entry.get(), 0 if self.completed_var.get() else 1, self.selected_calendar_id]
+                self.price_entry.get(), 0 if self.completed_var.get() else 1, "", self.selected_calendar_id]
         try:
             cursor.execute("UPDATE Calendar  SET " + edited_columns + " WHERE ID=? ", (tuple(data,)))
         except sqlite3.ProgrammingError as error:
             messagebox.showinfo("Σφάλμα ", f"{error}")
-
+            conn.close()
+            return
         finally:
             conn.commit()
             conn.close()
@@ -1612,7 +1616,7 @@ class edit_task_window:
         # )
         data = [self.compl_date_entry.get(), self.purpose_combobox.get(), self.actions_combobox.get(),
                 self.technician_entry.get(), self.notes_scrolledtext.get('1.0', 'end-1c'), self.counter_entry.get(),
-                self.next_service_entry.get(), self.copier_id, self.dte_entry.get(), self.price_entry.get(),
+                self.next_service_entry.get(), self.copier_id, self.dte_entry.get(), self.price_entry.get(), "",
                 self.service_id]
 
         cursor.execute("UPDATE Service  SET " + edited_columns + " WHERE ID=? ", (tuple(data)))

@@ -649,15 +649,20 @@ class edit_service_window():
 
     # Ελεγχος αν υπάρχουν αρχεία για προβολή
     def check_if_files_exists(self):
-        images = os.listdir(self.files_path)
-        self.len_images = len(images)
-        self.show_files_btn.configure(text=f'Προβολή {self.len_images}\n αρχείων')
+
+        try:
+            images = os.listdir(self.files_path)
+            self.len_images = len(images)
+            self.show_files_btn.configure(text=f'Προβολή {self.len_images}\n αρχείων')
+        except FileNotFoundError as error:
+            self.show_files_btn.place_forget()
+
         if self.files:
             self.show_files_btn.place(relx=0.600, rely=0.750, height=50, relwidth=0.300)
             self.show_files_btn.configure(text=f'{len(self.files)}\n Αρχεία για προσθήκη')
             self.show_files_btn.configure(command=self.show_files_to_add)
-        elif not images:  # αδεια λιστα δλδ δεν υπάρχουν αρχεια και απενεργοποιουμε το κουμπί προβολή αρχείων
-            self.show_files_btn.place_forget()
+        # elif not images:  # αδεια λιστα δλδ δεν υπάρχουν αρχεια και απενεργοποιουμε το κουμπί προβολή αρχείων
+        #     self.show_files_btn.place_forget()
 
     def show_files_to_add(self):
         messagebox.showwarning('Προσοχή', 'Δεν μπορείτε να δείτε τα αρχεία αν δεν πατήσετε Αποθήκευση')
@@ -748,7 +753,7 @@ class edit_service_window():
             edited_culumns = ",".join(edited_culumns)
             data_to_add = [self.date_entry.get(), self.purpose_combobox.get(), self.actions_combobox.get(),
                            self.technician_entry.get(), self.notes_scrolledtext.get("1.0", "end-1c"), counter.get(),
-                           next_service.get(), self.copier_id, dte.get(), self.price_entry.get(),
+                           next_service.get(), self.copier_id, dte.get(), self.price_entry.get(), "",
                            self.selected_service_id]
 
             add_conn = sqlite3.connect(dbase)
@@ -941,6 +946,8 @@ class edit_service_window():
 
         # Εισαγωγη αρχείων
         for img in self.files:
+            if not os.path.exists(self.files_path):
+                os.makedirs(self.files_path, exist_ok=True)
             shutil.copy(img, self.files_path, follow_symlinks=False)
         # messagebox.showinfo("Info", f"Οι εικόνες προστέθηκαν επιτυχώς")
         self.top.focus()
