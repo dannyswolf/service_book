@@ -13,6 +13,8 @@ todo uniq (στα πεδία των πινακων στην βαση) στους
 1) todo Στο treeview των φωτοτυπικών δίπλα να βάλω treeview υπολογιστών
 2) todo open pdf files on webdriver
 
+V1.9.2 Fixed  print when create Task     ---- 06/05/2020
+
 V1.9.1 Fixed Task view    ---- 01/05/2020
 
 V1.9.1 Ready for Django with separated files    ---- 24/04/2020

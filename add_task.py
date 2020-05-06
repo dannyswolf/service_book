@@ -728,6 +728,7 @@ class add_task_window:
         # outputFilename = f"{prints_dir}/Service_Book{self.customer_combobox.get()}.pdf"
         outputFilename = f"{prints_dir}/Service_Book_" + f"{self.customer_combobox.get()}".replace(" ", "_") + ".pdf"
 
+
         # Utility function
         def convertHtmlToPdf(sourceHtml, outputFilename):
             # open output file for writing (truncated binary)
@@ -922,7 +923,10 @@ class add_task_window:
             os.system("okular " + outputFilename)
 
         else:
-            subprocess.Popen(outputFilename, shell=True)
+            file_to_open = os.path.abspath(outputFilename)
+
+
+            subprocess.Popen(file_to_open, shell=True)
         self.printed = 1
 
     def get_screen_shot(self):

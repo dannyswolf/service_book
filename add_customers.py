@@ -509,7 +509,7 @@ class Toplevel1:
             customers_culumns)  # Πρέπει να τα χωρίσουμε με , για συνταξη της sql και το κάνουμε str το join επιστεφη string
         values = []  # values ειναι τα ? ? ?
         for culumn in customers_culumns:
-            if culumn == "ID":
+            if culumn == "ID" or culumn == "Id" or culumn == "id":
                 values.append("null")  # Στο πρώτο πού ειναι το ID πρέπει να βάλουμε null γιατι ειναι key auto increment
             else:
                 values.append("?")  # Διαφορετικά προσθέτουμε ?
