@@ -13,6 +13,9 @@ todo uniq (στα πεδία των πινακων στην βαση) στους
 1) todo Στο treeview των φωτοτυπικών δίπλα να βάλω treeview υπολογιστών
 2) todo open pdf files on webdriver
 
+
+V1.9.3 Fixed searching ΔΤΕ etc      ---- 19/05/2020
+
 V1.9.2 Fixed  print when create Task     ---- 06/05/2020
 
 V1.9.1 Fixed Task view    ---- 01/05/2020
@@ -1951,29 +1954,54 @@ class Toplevel1:
 
     # Αναζήτηση ΔΤΕ
     def search_dte(self, event=None):
-        self.calendar_treeview.delete(*self.calendar_treeview.get_children())
+
+        self.service_treeview.delete(*self.service_treeview.get_children())
+
         con = sqlite3.connect(dbase)
         c = con.cursor()
-        c.execute("SELECT * FROM Calendar WHERE ΔΤΕ =?", (self.search_dte_entry.get(),))
-        data_from_calendar = c.fetchall()
-        sorted_data_from_calendar = sorted(data_from_calendar, key=lambda x: datetime.strptime(x[1], "%d/%m/%Y"))
-        try:
-            if self.search_dte_entry.get() in sorted_data_from_calendar[0]:
-                for task in sorted_data_from_calendar:
-                    self.calendar_treeview.insert("", "end", values=task)
-        except IndexError:  # Όταν δεν βρήσκει στο calendar ψάχνει  στο service και αν βρει να σε παει στο search_error
-            c.execute("SELECT * FROM Service WHERE ΔΤΕ =?", (self.search_dte_entry.get(),))
-            data_from_service = c.fetchall()
-            try:
-                if self.search_dte_entry.get() in data_from_service[0]:
-                    self.search_error(event, 1)
-                    self.notebook.select(tab_id=3)
-            except IndexError:  # Δεν βρισκει και εδώ
-                pass
-        c.close()
-        con.close()
-        empty_var = StringVar(value="")
-        self.search_dte_entry.configure(textvariable=empty_var)
+        c.execute("SELECT * FROM Service WHERE ΔΤΕ =?", (self.search_dte_entry.get(),))
+        data_from_service = c.fetchall()
+        if data_from_service:
+            self.notebook.select(tab_id=3)
+            self.service_headers= ['ID', "Ημερομηνία", "Σκοπός_Επίσκεψης", "Ενέργειες", "Τεχνικός", 'Σημειώσεις',
+                               'Μετρητής', 'Επ_Service', "Copier_ID", "ΔΤΕ", "Price"]
+            columns = []
+            for head in self.service_headers:
+                columns.append(head)
+            self.service_treeview["columns"] = [head for head in columns]
+            for head in self.service_headers:
+                if head == "ID":
+                    platos = 1
+                elif head == "Ημερομηνία":
+                    platos = 100
+                elif head == "Τεχνικός":
+                    platos = 100
+                elif head == "Σκοπός_Επίσκεψης":
+                    platos = 220
+                elif head == "Ενέργειες":
+                    platos = 180
+                elif head == "Σημειώσεις":
+                    platos = 275
+                elif head == "Μετρητής":
+                    platos = 80
+                elif head == "Επ_Service":
+                    platos = 110
+                elif head == "ΔΤΕ":
+                    platos = 70
+                else:
+                    platos = 50
+                self.service_treeview.heading(head, text=head, anchor="center")
+                self.service_treeview.column(head, width=platos, anchor="center")
+            sorted_fetch = sorted(data_from_service, key=lambda x: datetime.strptime(x[1], "%d/%m/%Y"))
+            for item in sorted_fetch:
+                self.service_treeview.insert("", "end", values=item)
+            c.close()
+            con.close()
+            empty_var = StringVar(value="")
+            self.search_dte_entry.configure(textvariable=empty_var)
+            self.service_treeview.bind("<<TreeviewSelect>>", self.edit_service)
+            return
+        return
 
     def search_tasks_of_selected_copier(self):
 
@@ -2207,6 +2235,7 @@ class Toplevel1:
         cusror = conn.cursor()
         cusror.execute("SELECT * FROM Service WHERE " + search_headers, operators)
         fetch = cusror.fetchall()  # Δεδομένα απο Service
+
         conn.close()
         columns = []
         for head in self.service_headers:
@@ -2237,10 +2266,11 @@ class Toplevel1:
             self.service_treeview.heading(head, text=head, anchor="center")
             self.service_treeview.column(head, width=platos, anchor="center")
         sorted_fetch = sorted(fetch, key=lambda x: datetime.strptime(x[1], "%d/%m/%Y"))
-        # item[-2] ==> Copier_ID στον πίνακα Service
+
+        # item[-4] ==> Copier_ID στον πίνακα Service
         for item in sorted_fetch:
 
-            if item[-2] == self.selected_copier_id:
+            if item[-4] == self.selected_copier_id:
                 self.service_treeview.insert("", "end", values=item)
 
     # Προβολή ισορικού μεταφοράς φωτοτυπικών
@@ -2286,9 +2316,9 @@ class Toplevel1:
             customers_id = []
             customers = []
             for n in range(len(fetch)):
-                copiers_id.append(fetch[n][-3])
+                copiers_id.append(fetch[n][-4])
 
-                search_cursor.execute("SELECT Εταιρεία FROM Φωτοτυπικά WHERE ID=?", (fetch[n][-3],))
+                search_cursor.execute("SELECT Εταιρεία FROM Φωτοτυπικά WHERE ID=?", (fetch[n][-4],))
 
                 copiers.append(search_cursor.fetchall())  # Πέρνουμε το Φωτοτυπικό
 
@@ -2703,7 +2733,31 @@ class Toplevel1:
             return
 
         selected_service_id = (self.service_treeview.set(self.service_treeview.selection(), "#1"))
-        if heading == "Μηχάνημα":  # Όταν είναι απο την αναζήτηση σφαλμάτων
+        if heading == "Σκοπός_Επίσκεψης":  # Όταν είναι απο την αναζήτηση ΔΤΕ
+            selected_copier_id = (self.service_treeview.set(self.service_treeview.selection(), "#9"))
+            con = sqlite3.connect(dbase)
+            c = con.cursor()
+
+            c.execute("SELECT Πελάτη_ID FROM Φωτοτυπικά WHERE ID =?", (selected_copier_id,))
+            selected_customer_id = c.fetchall()
+
+            c.execute("SELECT Επωνυμία_Επιχείρησης FROM Πελάτες WHERE ID =?", (selected_customer_id[0][0],))
+            selected_customer = c.fetchall()
+
+            c.execute("SELECT Εταιρεία FROM Φωτοτυπικά WHERE ID =?", (selected_copier_id,))
+            selected_copier = c.fetchall()
+
+            con.close()
+            # Αυτή είναι συνάρτηση του αρχείου edi_service_windows
+            create_edit_service_window(root, selected_service_id, selected_copier, selected_customer,
+                                       selected_customer_id[0][0])
+
+            # ==============================  Notebook style  =============
+            self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#69ab3a")])
+            self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
+            return
+
+        elif heading == "Μηχάνημα":  # Όταν είναι απο την αναζήτηση σφαλμάτων
             selected_copier = (self.service_treeview.set(self.service_treeview.selection(), "#3"))
             selected_customer = (self.service_treeview.set(self.service_treeview.selection(), "#4"))
             con = sqlite3.connect(dbase)
@@ -2718,6 +2772,7 @@ class Toplevel1:
             # ==============================  Notebook style  =============
             self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#69ab3a")])
             self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
+            return
         else:
             if self.selected_copier_id:  # Αν ο χρήστης έχει επιλέξει φωτοτυπικό για να δεί το ιστορικό
                 con = sqlite3.connect(dbase)

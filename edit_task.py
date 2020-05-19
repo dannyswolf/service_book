@@ -55,9 +55,9 @@ def get_service_data():
     conn.close()
     for n in range(len(service_data)):
         if service_data[n][1] != "" and service_data[n][1] is not None:
-            purpose_list.append(service_data[n][1])                        # Σκοπός
+            purpose_list.append(service_data[n][1])  # Σκοπός
         if service_data[n][2] != "" and service_data[n][2] is not None:
-            actions_list.append(service_data[n][2])                        # Ενέργειες
+            actions_list.append(service_data[n][2])  # Ενέργειες
     return sorted(purpose_list), sorted(actions_list)
 
 
@@ -173,6 +173,7 @@ class AutoScroll(object):
     def __str__(self):
         return str(self.master)
 
+
 def _create_container(func):
     '''Creates a ttk Frame with a given master, and use this new frame to
     place the scrollbars and the widget.'''
@@ -185,9 +186,11 @@ def _create_container(func):
 
     return wrapped
 
+
 class ScrolledTreeView(AutoScroll, ttk.Treeview):
     '''A standard ttk Treeview widget with scrollbars that will
     automatically show/hide as needed.'''
+
     @_create_container
     def __init__(self, master, **kw):
         ttk.Treeview.__init__(self, master, **kw)
@@ -469,8 +472,8 @@ class edit_task_window:
         self.compl_date_label.configure(text='''Ημερομ. Ολοκλ''')
 
         self.compl_date_entry = DateEntry(self.service_frame, width=12, year=self.year, month=self.month, day=self.day,
-                                    background='gray20', selectmode='day', foreground='white', borderwidth=5,
-                                    locale="el_GR", font=("Calibri", 10, 'bold'), date_pattern='dd/mm/yyyy')
+                                          background='gray20', selectmode='day', foreground='white', borderwidth=5,
+                                          locale="el_GR", font=("Calibri", 10, 'bold'), date_pattern='dd/mm/yyyy')
         self.compl_date_entry.place(relx=0.27, rely=0.555, relheight=0.048, relwidth=0.593)
 
         self.completed_label = tk.Label(self.service_frame)
@@ -836,7 +839,7 @@ class edit_task_window:
             return
 
         self.files = filedialog.askopenfilenames(initialdir=os.getcwd(), title="Επιλογή αρχείων για προσθήκη",
-                                                     filetypes=[("Υπ. αρχεία", "*.jpg *.jpeg *.png *.pdf")])
+                                                 filetypes=[("Υπ. αρχεία", "*.jpg *.jpeg *.png *.pdf")])
 
         if self.files == "":  # αν ο χρήστης επιλεξει ακυρο
             self.top.focus()
@@ -973,13 +976,13 @@ class edit_task_window:
             c.execute("SELECT ΤΙΜΗ FROM " + part_table + " WHERE ΚΩΔΙΚΟΣ =?", (selected_part_code,))
             price = c.fetchall()
             price = price[0][0]
-            total = float(new_pieces) * float(price[:-1].replace(",", "."))   # για να μήν πάρει το €
+            total = float(new_pieces) * float(price[:-1].replace(",", "."))  # για να μήν πάρει το €
             str_total = str("{:0.2f}".format(total)) + " €"
             c.execute("UPDATE " + part_table + " SET ΣΥΝΟΛΟ =? WHERE ΚΩΔΙΚΟΣ =?",
                       (str_total, selected_part_code))
             con.commit()
         except Exception as error:
-            if error == sqlite3.OperationalError: # όταν δεν έχει τιμή
+            if error == sqlite3.OperationalError:  # όταν δεν έχει τιμή
                 pass
             elif error == UnboundLocalError:
                 pass  # δεν υπάρχει στην αποθήκη
@@ -997,6 +1000,7 @@ class edit_task_window:
     # Print to pdf
     def print_to_pdf(self):
         # Define your data
+        prints_dir = None
         if sys.platform == "win32":
             prints_dir = f'/prints/{today}'.replace(" ", "_")
 
@@ -1022,6 +1026,7 @@ class edit_task_window:
             # return True on success and False on errors
             return pisaStatus.err
             # Αν γράψουμε νέο φωτοτυπικό και όχι απο την λίστα
+
         if not self.selected_copier:
             self.selected_copier = self.copiers_entry.get()
         added_spare_parts = []
@@ -1045,12 +1050,10 @@ class edit_task_window:
                 self.copier_id, self.compl_date_entry.get(), self.completed_var.get(), self.customer_id,
                 self.service_id]
 
-
         names = ["Ημερομηνία", "Πελάτης", "Μηχάνημα", "Σκοπός", "Τεχνικός", "Επίγων", "Τηλέφωνο", "Σημειώσεις"]
 
         images = ['icons/date.png', 'icons/customer.png', 'icons/phone.png', 'icons/copier.png',
-                      'icons/purpose.png',
-                      'icons/technician.png', 'icons/urgent.png', 'icons/notes.png']
+                  'icons/purpose.png', 'icons/technician.png', 'icons/urgent.png', 'icons/notes.png']
         if sys.platform == "linux":
             font = """{
                 font-family: DejaVuSans;
@@ -1256,7 +1259,8 @@ class edit_task_window:
             height = self.top.winfo_y() + self.top.winfo_height() + 10
             # part of the screen
 
-        im = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height), childprocess=False)  # X1,Y1,X2,Y2
+        im = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height),
+                            childprocess=False)  # X1,Y1,X2,Y2
 
         im.save(f"{screen_dir}/screen_shot0.png")
         self.notebook.select(tab_id=1)
@@ -1268,7 +1272,8 @@ class edit_task_window:
             if sys.platform == "linux":
                 im2 = ImageGrab.grab(bbox=(self.top.winfo_x(), self.top.winfo_y(), width, height), childprocess=False)
             else:
-                im2 = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height), childprocess=False)  # X1,Y1,X2,Y2
+                im2 = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height),
+                                     childprocess=False)  # X1,Y1,X2,Y2
             im2.save(f"{screen_dir}/screen_shot1.png")
 
         data = [self.customer_entry.get(), self.selected_copier, f"{screen_dir}/screen_shot0.png",
@@ -1297,7 +1302,8 @@ class edit_task_window:
             height = self.top.winfo_y() + self.top.winfo_height() + 10
             # part of the screen
 
-        im = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height), childprocess=False)  # X1,Y1,X2,Y2
+        im = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height),
+                            childprocess=False)  # X1,Y1,X2,Y2
 
         im.save(f"{screen_dir}/screen_shot0.png")
         self.notebook.select(tab_id=1)
@@ -1310,7 +1316,8 @@ class edit_task_window:
             if sys.platform == "linux":
                 im2 = ImageGrab.grab(bbox=(self.top.winfo_x(), self.top.winfo_y(), width, height), childprocess=False)
             else:
-                im2 = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height), childprocess=False)  # X1,Y1,X2,Y2
+                im2 = ImageGrab.grab(bbox=(self.top.winfo_x() + 7, self.top.winfo_y(), width, height),
+                                     childprocess=False)  # X1,Y1,X2,Y2
             im2.save(f"{screen_dir}/screen_shot1.png")
 
         self.top.focus()
@@ -1340,6 +1347,7 @@ class edit_task_window:
             # return True on success and False on errors
             return pisaStatus.err
             # Αν γράψουμε νέο φωτοτυπικό και όχι απο την λίστα
+
         if sys.platform == "linux":
             src = "icons/"
             src_images = "prints/"
@@ -1435,10 +1443,12 @@ class edit_task_window:
             added_spare_parts.append(self.spare_parts_treeview.item(child)["values"][2:4])
         # spare_parts = self.spare_parts_treeview.get_children("")
         data = [self.start_date.get(), self.customer_entry.get(), self.selected_copier, self.purpose_combobox.get(),
-                self.technician_entry.get(), self.actions_combobox.get(), self.counter_entry.get(), self.next_service_entry.get(),
+                self.technician_entry.get(), self.actions_combobox.get(), self.counter_entry.get(),
+                self.next_service_entry.get(),
                 self.files, added_spare_parts, self.urgent, self.phone_entry.get(),
                 self.notes_scrolledtext.get('1.0', 'end-1c'), self.dte_entry.get(),
-                self.copier_id, self.compl_date_entry.get(), self.completed_var.get(), self.customer_id, self.service_id]
+                self.copier_id, self.compl_date_entry.get(), self.completed_var.get(), self.customer_id,
+                self.service_id]
 
         mail.send_mail(self.top, data)
 
@@ -1454,19 +1464,21 @@ class edit_task_window:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM Calendar WHERE ID =?", (self.selected_calendar_id,))
         data = cursor.fetchall()
-        #print("data", data)
+        # print("data", data)
         # todo
         # Τα στοιχεία του πελάτη να τα πάρουμε απο τον πίνακα του πελάτη γιατί μπορεί να τα αλλάξουμε
         # cursor.execute("SELECT Επωνυμία_Επιχείρησης, Τηλέφωνο FROM Πελάτες WHERE ID=?", ,))
         # customer_data = cursor.fetchall()
         cursor.close()
         conn.close()
+
         try:
             date = StringVar(self.service_frame, value=data[0][1])
+            self.start_date.set_date(date=date.get())
         except IndexError as error:  # IndexError: list index out of range
             print("error", __file__, "Line 1467", error)
             print("data", data)
-        self.start_date.set_date(date=date.get())
+
         # self.start_date_entry.configure(textvariable=date)
         self.customer = StringVar(w, value=data[0][2])
         self.customer_entry.configure(textvariable=self.customer)
@@ -1534,7 +1546,7 @@ class edit_task_window:
                 os.makedirs(self.files_path, exist_ok=True)
             shutil.copy(img, self.files_path, follow_symlinks=False)
 
-    def add_to_db(self,):
+    def add_to_db(self, ):
         edited_columns = []
         for column in self.columns:
             if column != "ID":
@@ -1580,7 +1592,7 @@ class edit_task_window:
                 self.service_id, self.counter_entry.get(), self.next_service_entry.get(), self.customer_id,
                 self.price_entry.get(), 0 if self.completed_var.get() else 1, "", self.selected_calendar_id]
         try:
-            cursor.execute("UPDATE Calendar  SET " + edited_columns + " WHERE ID=? ", (tuple(data,)))
+            cursor.execute("UPDATE Calendar  SET " + edited_columns + " WHERE ID=? ", (tuple(data, )))
         except sqlite3.ProgrammingError as error:
             messagebox.showinfo("Σφάλμα ", f"{error}")
             conn.close()
@@ -1638,8 +1650,8 @@ class edit_task_window:
             customer_id = data[0][0]
         except IndexError:  # Οταν επιλέγουμε ολοκληρωμένες εργασίες κατω απο το ημερολόγιο που ανοιγει το ποντίκι
 
-            return           # επιλέγει στοιχείο απο την λίστα του calendar treeview που σηνήθως είναι αδεια
-                           # ποιο πολύ συμβαινει στο Linux
+            return  # επιλέγει στοιχείο απο την λίστα του calendar treeview που σηνήθως είναι αδεια
+            # ποιο πολύ συμβαινει στο Linux
 
         return customer_id
 
@@ -1663,7 +1675,6 @@ class edit_task_window:
         c.execute("DELETE FROM Calendar WHERE ID=?", (self.selected_calendar_id,))
         con.commit()
         c.execute("DELETE FROM Service WHERE ID=?", (self.service_id,))
-        c.execute("DELETE FROM Service_images WHERE Service_ID=?", (self.service_id,))
         con.commit()
         c.close()
         con.close()
@@ -1675,6 +1686,7 @@ class edit_task_window:
     def quit(self, event):
         rt.focus()
         self.top.destroy()
+
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):

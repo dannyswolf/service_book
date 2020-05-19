@@ -26,7 +26,7 @@ if mlshop:
 
 else:  # VPN
     spare_parts_db = "ΑΠΟΘΗΚΗ.db"
-    # dbase = "\\\\10.8.0.1\\Public\\DROPBOX\\ΕΓΓΡΑΦΑ\\6.  ΒΙΒΛΙΟ SERVICE\\Service_book.db"  # # VPN
+    # dbase = "\\\\10.8.0.1\\Public\\DROPBOX\\ΕΓΓΡΑΦΑ\\6.  ΒΙΒΛΙΟ SERVICE\\Service_book.db"  #  VPN Windows
     dbase = "Service_book.db"  # Local Dbase
 
 db_path = os.path.dirname(os.path.realpath(dbase))
@@ -69,10 +69,10 @@ demo = check_if_demo()
 #demo = 0
 if demo:
 
-    service_book_version = "V 1.9.1 Demo"
+    service_book_version = "V 1.9.3 Demo"
 else:
 
-    service_book_version = "V 1.9.1"
+    service_book_version = "V 1.9.3"
 
 
 today = datetime.datetime.today().strftime("%d %m %Y")
