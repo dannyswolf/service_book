@@ -14,6 +14,8 @@ todo uniq (στα πεδία των πινακων στην βαση) στους
 2) todo open pdf files on webdriver
 
 
+V1.9.4 Fixed add spareparts to service windows      ---- 22/05/2020
+
 V1.9.3 Fixed searching ΔΤΕ etc      ---- 19/05/2020
 
 V1.9.2 Fixed  print when create Task     ---- 06/05/2020
@@ -2749,7 +2751,7 @@ class Toplevel1:
 
             con.close()
             # Αυτή είναι συνάρτηση του αρχείου edi_service_windows
-            create_edit_service_window(root, selected_service_id, selected_copier, selected_customer,
+            create_edit_service_window(root, selected_service_id, selected_copier[0][0], selected_customer[0][0],
                                        selected_customer_id[0][0])
 
             # ==============================  Notebook style  =============
