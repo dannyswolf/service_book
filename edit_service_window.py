@@ -1083,9 +1083,10 @@ class edit_service_window():
             return
         con = sqlite3.connect(dbase)
         c = con.cursor()
+
         c.execute("DELETE FROM Service WHERE ID=?", (self.selected_service_id,))
         con.commit()
-        c.execute("DELETE FROM Service_images WHERE Service_ID=?", (self.selected_service_id,))
+        c.execute("DELETE FROM Calendar WHERE Service_ID=?", (self.selected_service_id,))
         con.commit()
         c.close()
         con.close()

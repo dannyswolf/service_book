@@ -10,9 +10,9 @@
 Ενεργοποιήση προγράμματος με hash.md5 στον πίνακα sqlite_sequence πεδίο demo και key
 todo προβολή όλων των εικόνων
 todo uniq (στα πεδία των πινακων στην βαση) στους κωδικους και part_nr serial ονοματεπωνυμο τηλ
-1) todo Στο treeview των φωτοτυπικών δίπλα να βάλω treeview υπολογιστών
-2) todo open pdf files on webdriver
 
+
+V1.9.5 Με διαγραφή Εργασία αυτοματα διαγραφή και κλήσης      ---- 01/06/2020
 
 V1.9.4 Fixed add spareparts to service windows      ---- 22/05/2020
 
