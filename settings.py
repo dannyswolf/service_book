@@ -9,24 +9,24 @@ import sys
 
 user = getpass.getuser()
 
-mlshop = 0
+mlshop = 1
 
 
 if mlshop:
     if sys.platform == "linux":
         # ML Shop dbases Linux
-        dbase = "/home/dannys/qnap/DROPBOX/ΕΓΓΡΑΦΑ/6.  ΒΙΒΛΙΟ SERVICE/Service_book.db"
-        spare_parts_db = "/home/dannys/qnap/DROPBOX/ΕΓΓΡΑΦΑ/2.  ΑΠΟΘΗΚΗ/3. ΚΑΙΝΟΥΡΙΑ_ΑΠΟΘΗΚΗ.db"
+        dbase = "/home/dannys/qnap/GOOGLE-DRIVE/ΕΓΓΡΑΦΑ/6.  ΒΙΒΛΙΟ SERVICE/Service_book.db"
+        spare_parts_db = "/home/dannys/qnap/GOOGLE-DRIVE/ΕΓΓΡΑΦΑ/2.  ΑΠΟΘΗΚΗ/3. ΚΑΙΝΟΥΡΙΑ_ΑΠΟΘΗΚΗ.db"
     else:
 
         # ML Shop dbases
-        dbase = "\\\\192.168.1.200\\Public\\DROPBOX\\ΕΓΓΡΑΦΑ\\6.  ΒΙΒΛΙΟ SERVICE\\Service_book.db"
-        spare_parts_db = "\\\\192.168.1.200\\Public\\DROPBOX\\ΕΓΓΡΑΦΑ\\2.  ΑΠΟΘΗΚΗ\\3. ΚΑΙΝΟΥΡΙΑ_ΑΠΟΘΗΚΗ.db"
+        dbase = "\\\\192.168.1.200\\Public\\GOOGLE-DRIVE\\ΕΓΓΡΑΦΑ\\6.  ΒΙΒΛΙΟ SERVICE\\Service_book.db"
+        spare_parts_db = "\\\\192.168.1.200\\Public\\GOOGLE-DRIVE\\ΕΓΓΡΑΦΑ\\2.  ΑΠΟΘΗΚΗ\\3. ΚΑΙΝΟΥΡΙΑ_ΑΠΟΘΗΚΗ.db"
 
-
-else:  # VPN
+ # VPN
+else:
     spare_parts_db = "ΑΠΟΘΗΚΗ.db"
-    # dbase = "\\\\10.8.0.1\\Public\\DROPBOX\\ΕΓΓΡΑΦΑ\\6.  ΒΙΒΛΙΟ SERVICE\\Service_book.db"  #  VPN Windows
+    # dbase = "\\\\10.8.0.1\\Public\\GOOGLE-DRIVE\\ΕΓΓΡΑΦΑ\\6.  ΒΙΒΛΙΟ SERVICE\\Service_book.db"  #  VPN Windows
     dbase = "Service_book.db"  # Local Dbase
 
 db_path = os.path.dirname(os.path.realpath(dbase))
@@ -69,10 +69,10 @@ demo = check_if_demo()
 #demo = 0
 if demo:
 
-    service_book_version = "V 1.9.4 Demo"
+    service_book_version = "V 1.9.6 Demo"
 else:
 
-    service_book_version = "V 1.9.4"
+    service_book_version = "V 1.9.6"
 
 
 today = datetime.datetime.today().strftime("%d %m %Y")

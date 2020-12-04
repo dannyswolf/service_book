@@ -11,6 +11,7 @@
 todo προβολή όλων των εικόνων
 todo uniq (στα πεδία των πινακων στην βαση) στους κωδικους και part_nr serial ονοματεπωνυμο τηλ
 
+V1.9.6  Αλλαγή Διαδρομής βάσης απο Dropbox σε GOOGLE-DRIVE
 
 V1.9.5 Με διαγραφή Εργασία αυτοματα διαγραφή και κλήσης      ---- 01/06/2020
 
@@ -1692,7 +1693,7 @@ class Toplevel1:
 
                 c.execute("INSERT INTO sqlite_sequence(name, seq)VALUES(?,?)", (table_to_add, 0))
         except sqlite3.OperationalError as error:
-            messagebox.showerror("Σφάλμα!", f"{error}")
+            messagebox.showerror("Σφάλμα!", "Παρακαλώ δηλώστε όνομα κατηγορίας")
             con.close()
             return
         con.commit()
