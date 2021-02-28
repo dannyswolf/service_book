@@ -377,7 +377,7 @@ class Toplevel1:
         # Μετά το for item in items_to_add:
         self.get_spare_parts()
         self.top.focus()
-        not_needed_keys = ["ID", "id", 'Id', 'ΕΤΑΙΡΕΙΑ', 'ΠΟΙΟΤΗΤΑ', 'ΑΝΑΛΩΣΙΜΟ', 'ΤΙΜΗ', 'ΣΥΝΟΛΟ', 'ΣΕΛΙΔΕΣ', 'ΠΕΛΑΤΕΣ']
+        not_needed_keys = ["ID", "id", 'Id', 'ΕΤΑΙΡΕΙΑ', 'ΚΩΔΙΚΟΙ', 'ΠΟΙΟΤΗΤΑ', 'ΑΝΑΛΩΣΙΜΟ', 'ΤΙΜΗ', 'ΣΥΝΟΛΟ', 'ΣΕΛΙΔΕΣ', 'ΠΕΛΑΤΕΣ']
         added_codes = []
         service_con = sqlite3.connect(dbase)
         service_cursor = service_con.cursor()
