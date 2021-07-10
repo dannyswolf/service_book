@@ -96,7 +96,7 @@ class add_copier_window:
         top.minsize(120, 1)
         top.maxsize(2604, 2881)
         top.resizable(1, 1)
-        top.title("Προσθήκη Ανταλλακτικού")
+        top.title("Προσθήκη Ανταλλακτικού 2")
         top.configure(background="#f6f6ee")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")

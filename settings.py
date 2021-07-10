@@ -9,7 +9,7 @@ import sys
 
 user = getpass.getuser()
 
-mlshop = 1
+mlshop = 0
 
 
 if mlshop:
@@ -69,10 +69,10 @@ demo = check_if_demo()
 #demo = 0
 if demo:
 
-    service_book_version = "V 1.9.7 Demo"
+    service_book_version = "V 1.9.8 Demo"
 else:
 
-    service_book_version = "V 1.9.7"
+    service_book_version = "V 1.9.8"
 
 
 today = datetime.datetime.today().strftime("%d %m %Y")

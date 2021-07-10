@@ -211,6 +211,7 @@ class add_task_window:
         self.Label2.configure(relief="groove")
         self.Label2.configure(text='''Προσθήκη εγρασίας''')
 
+        # Ημερομηνία
         self.date_label = tk.Label(top)
         self.date_label.place(relx=0.025, rely=0.095, height=31, relwidth=0.230)
         self.date_label.configure(activebackground="#f9f9f9")
@@ -223,13 +224,13 @@ class add_task_window:
         self.date_label.configure(highlightcolor="black")
         self.date_label.configure(relief="groove")
         self.date_label.configure(text='''Ημερομηνία''')
-
         self.start_date = DateEntry(top, width=12, year=self.year, month=self.month, day=self.day,
                                     background='gray20', selectmode='day', foreground='white', borderwidth=5,
                                     locale="el_GR",
                                     font=("Calibri", 10, 'bold'), date_pattern='dd/mm/yyyy')
         self.start_date.place(relx=0.27, rely=0.095, height=31, relwidth=0.593)
 
+        # Πελάτης
         self.customer_label = tk.Label(top)
         self.customer_label.place(relx=0.025, rely=0.172, height=29, relwidth=0.230)
         self.customer_label.configure(activebackground="#f9f9f9")
@@ -250,20 +251,8 @@ class add_task_window:
         self.customer_combobox.configure(takefocus="")
         self.customer_combobox.bind("<<ComboboxSelected>>", self.get_copier)
         # self.customer_combobox.configure(state="readonly")
-        self.add_customer_btn1 = tk.Button(top)
-        self.add_customer_btn1.place(relx=0.875, rely=0.172, height=29, relwidth=0.060)
-        self.add_customer_btn1.configure(background="#006291")
-        self.add_customer_btn1_img1 = PhotoImage(file="icons/add_customer.png")
-        self.add_customer_btn1.configure(image=self.add_customer_btn1_img1)
-        self.add_customer_btn1.configure(command=self.add_customer)
-        # Ανανέωση μετα απο Προσθήκη πελάτη
-        self.refresh_customers_btn = tk.Button(top)
-        self.refresh_customers_btn.place(relx=0.940, rely=0.172, height=30, relwidth=0.050)
-        self.refresh_customers_btn.configure(background="#0685c4")
-        self.refresh_customers_btn_img = PhotoImage(file="icons/refresh.png")
-        self.refresh_customers_btn.configure(image=self.refresh_customers_btn_img)
-        self.refresh_customers_btn.configure(command=self.get_copiers_data)
 
+        # Τηλέφωνο
         self.phone_label = tk.Label(top)
         self.phone_label.place(relx=0.025, rely=0.248, height=31, relwidth=0.230)
         self.phone_label.configure(activebackground="#f9f9f9")
@@ -286,6 +275,7 @@ class add_task_window:
         self.phone_entry.configure(foreground="#000000")
         self.phone_entry.configure(insertbackground="black")
 
+        # Μηχάνημα
         self.customer_copiers_label = tk.Label(top)
         self.customer_copiers_label.place(relx=0.025, rely=0.324, height=31, relwidth=0.230)
         self.customer_copiers_label.configure(activebackground="#f9f9f9")
@@ -304,20 +294,8 @@ class add_task_window:
         self.copiers_combobox.set(value=self.copier_stringvar.get())
         self.copiers_combobox.configure(takefocus="")
         self.copiers_combobox.bind('<<ComboboxSelected>>', self.get_copier_id)
-        self.add_copier_btn1 = tk.Button(top)
-        self.add_copier_btn1.place(relx=0.875, rely=0.324, height=29, relwidth=0.060)
-        self.add_copier_btn1.configure(background="#006291")
-        self.add_copier_btn1_img1 = PhotoImage(file="icons/insert_machine.png")
-        self.add_copier_btn1.configure(image=self.add_copier_btn1_img1)
-        self.add_copier_btn1.configure(command=self.add_copier)
-        # Ανανέωση μετα απο Προσθήκη Φωτοτυπικού
-        self.refresh_task_btn = tk.Button(top)
-        self.refresh_task_btn.place(relx=0.940, rely=0.324, height=30, relwidth=0.050)
-        self.refresh_task_btn.configure(background="#0685c4")
-        self.refresh_task_img = PhotoImage(file="icons/refresh.png")
-        self.refresh_task_btn.configure(image=self.refresh_task_img)
-        self.refresh_task_btn.configure(command=self.get_copier)
 
+        # Σκοπός επίσκεψης
         self.purpose_label = tk.Label(top)
         self.purpose_label.place(relx=0.025, rely=0.400, height=31, relwidth=0.230)
         self.purpose_label.configure(activebackground="#f9f9f9")
@@ -333,15 +311,10 @@ class add_task_window:
         self.purpose_combobox = ttk.Combobox(top)
         self.purpose_combobox.place(relx=0.27, rely=0.400, relheight=0.057, relwidth=0.593)
         self.purpose_combobox.configure(values=self.purpose_list)
-        # self.purpose_combobox.configure(textvariable=edit_service_window_support.combobox)
         self.purpose_combobox.configure(takefocus="")
-        self.add_to_service_data_btn1 = tk.Button(top)
-        self.add_to_service_data_btn1.place(relx=0.880, rely=0.400, height=29, relwidth=0.060)
-        self.add_to_service_data_btn1.configure(background="#006291")
-        self.add_to_service_data_img1 = PhotoImage(file="icons/add_to_service_data1.png")
-        self.add_to_service_data_btn1.configure(image=self.add_to_service_data_img1)
-        self.add_to_service_data_btn1.configure(command=lambda: (self.add_to_service_data("Σκοπός")))
+        # self.purpose_combobox.configure(textvariable=edit_service_window_support.combobox)
 
+        # Τεχνικός
         self.technician_label = tk.Label(top)
         self.technician_label.place(relx=0.025, rely=0.480, height=31, relwidth=0.230)
         self.technician_label.configure(activebackground="#f9f9f9")
@@ -364,13 +337,7 @@ class add_task_window:
         self.technician_entry.configure(foreground="#000000")
         self.technician_entry.configure(insertbackground="black")
 
-        self.print_btn = tk.Button(top)
-        self.print_btn.place(relx=0.890, rely=0.930, relheight=0.060, relwidth=0.070)
-        # self.print_btn.configure(background="#6b6b6b")
-        self.print_btn_img = PhotoImage(file="icons/print.png")
-        self.print_btn.configure(image=self.print_btn_img)
-        self.print_btn.configure(command=self.print_to_pdf)
-
+        # Επείγων
         self.urgent_label = tk.Label(top)
         self.urgent_label.place(relx=0.025, rely=0.553, height=31, relwidth=0.230)
         self.urgent_label.configure(activebackground="#f9f9f9")
@@ -393,20 +360,7 @@ class add_task_window:
         self.urgent_entry.configure(foreground="#000000")
         self.urgent_entry.configure(insertbackground="black")
 
-        self.send_mail_screen_shot_btn = tk.Button(top)
-        self.send_mail_screen_shot_btn.place(relx=0.720, rely=0.930, relheight=0.060, relwidth=0.140)
-        # self.send_mail_btn.configure(background="#6b6b6b")
-        self.send_mail_screen_shot_btn_img1 = PhotoImage(file="icons/send_screen_shot.png")
-        self.send_mail_screen_shot_btn.configure(image=self.send_mail_screen_shot_btn_img1)
-        self.send_mail_screen_shot_btn.configure(command=self.send_mail_screen_shot)
-
-        self.send_mail_btn = tk.Button(top)
-        self.send_mail_btn.place(relx=0.620, rely=0.930, relheight=0.060, relwidth=0.070)
-        # self.send_mail_btn.configure(background="#6b6b6b")
-        self.send_mail_btn_img1 = PhotoImage(file="icons/send_mail.png")
-        self.send_mail_btn.configure(image=self.send_mail_btn_img1)
-        self.send_mail_btn.configure(command=self.send_mail)
-
+        # Σημειώσεις
         self.notes_label = tk.Label(top)
         self.notes_label.place(relx=0.025, rely=0.633, height=31, relwidth=0.940)
         self.notes_label.configure(activebackground="#f9f9f9")
@@ -419,7 +373,6 @@ class add_task_window:
         self.notes_label.configure(highlightcolor="black")
         self.notes_label.configure(relief="groove")
         self.notes_label.configure(text='''Σημειώσεις''')
-
         self.notes = StringVar()
         self.notes_scrolledtext = ScrolledText(top)
         self.notes_scrolledtext.place(relx=0.025, rely=0.690, relheight=0.23, relwidth=0.941)
@@ -434,6 +387,64 @@ class add_task_window:
         self.notes_scrolledtext.configure(selectbackground="#c4c4c4")
         self.notes_scrolledtext.configure(selectforeground="black")
         self.notes_scrolledtext.configure(wrap="none")
+
+        self.add_customer_btn1 = tk.Button(top)
+        self.add_customer_btn1.place(relx=0.875, rely=0.172, height=29, relwidth=0.060)
+        self.add_customer_btn1.configure(background="#006291")
+        self.add_customer_btn1_img1 = PhotoImage(file="icons/add_customer.png")
+        self.add_customer_btn1.configure(image=self.add_customer_btn1_img1)
+        self.add_customer_btn1.configure(command=self.add_customer)
+        # Ανανέωση μετα απο Προσθήκη πελάτη
+        self.refresh_customers_btn = tk.Button(top)
+        self.refresh_customers_btn.place(relx=0.940, rely=0.172, height=30, relwidth=0.050)
+        self.refresh_customers_btn.configure(background="#0685c4")
+        self.refresh_customers_btn_img = PhotoImage(file="icons/refresh.png")
+        self.refresh_customers_btn.configure(image=self.refresh_customers_btn_img)
+        self.refresh_customers_btn.configure(command=self.get_copiers_data)
+
+        self.add_copier_btn1 = tk.Button(top)
+        self.add_copier_btn1.place(relx=0.875, rely=0.324, height=29, relwidth=0.060)
+        self.add_copier_btn1.configure(background="#006291")
+        self.add_copier_btn1_img1 = PhotoImage(file="icons/insert_machine.png")
+        self.add_copier_btn1.configure(image=self.add_copier_btn1_img1)
+        self.add_copier_btn1.configure(command=self.add_copier)
+        # Ανανέωση μετα απο Προσθήκη Φωτοτυπικού
+        self.refresh_task_btn = tk.Button(top)
+        self.refresh_task_btn.place(relx=0.940, rely=0.324, height=30, relwidth=0.050)
+        self.refresh_task_btn.configure(background="#0685c4")
+        self.refresh_task_img = PhotoImage(file="icons/refresh.png")
+        self.refresh_task_btn.configure(image=self.refresh_task_img)
+        self.refresh_task_btn.configure(command=self.get_copier)
+
+        self.add_to_service_data_btn1 = tk.Button(top)
+        self.add_to_service_data_btn1.place(relx=0.880, rely=0.400, height=29, relwidth=0.060)
+        self.add_to_service_data_btn1.configure(background="#006291")
+        self.add_to_service_data_img1 = PhotoImage(file="icons/add_to_service_data1.png")
+        self.add_to_service_data_btn1.configure(image=self.add_to_service_data_img1)
+        self.add_to_service_data_btn1.configure(command=lambda: (self.add_to_service_data("Σκοπός")))
+
+        self.print_btn = tk.Button(top)
+        self.print_btn.place(relx=0.890, rely=0.930, relheight=0.060, relwidth=0.070)
+        # self.print_btn.configure(background="#6b6b6b")
+        self.print_btn_img = PhotoImage(file="icons/print.png")
+        self.print_btn.configure(image=self.print_btn_img)
+        self.print_btn.configure(command=self.print_to_pdf)
+
+        self.send_mail_screen_shot_btn = tk.Button(top)
+        self.send_mail_screen_shot_btn.place(relx=0.720, rely=0.930, relheight=0.060, relwidth=0.140)
+        # self.send_mail_btn.configure(background="#6b6b6b")
+        self.send_mail_screen_shot_btn_img1 = PhotoImage(file="icons/send_screen_shot.png")
+        self.send_mail_screen_shot_btn.configure(image=self.send_mail_screen_shot_btn_img1)
+        self.send_mail_screen_shot_btn.configure(command=self.send_mail_screen_shot)
+
+        self.send_mail_btn = tk.Button(top)
+        self.send_mail_btn.place(relx=0.620, rely=0.930, relheight=0.060, relwidth=0.070)
+        # self.send_mail_btn.configure(background="#6b6b6b")
+        self.send_mail_btn_img1 = PhotoImage(file="icons/send_mail.png")
+        self.send_mail_btn.configure(image=self.send_mail_btn_img1)
+        self.send_mail_btn.configure(command=self.send_mail)
+
+
 
         # get screen shot
         self.print = tk.Button(top)

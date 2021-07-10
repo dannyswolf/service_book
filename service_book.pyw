@@ -11,6 +11,8 @@
 todo προβολή όλων των εικόνων
 todo uniq (στα πεδία των πινακων στην βαση) στους κωδικους και part_nr serial ονοματεπωνυμο τηλ
 
+V1.9.8  Διόρθωση της σειρας αν μετακινουμαστε με tab και αρχεία ανα έτος    10/07/2021
+
 V1.9.7  FIX add ΜΕΛΑΝΟΤΑΙΝΙΕΣ στα Ανταλλακτικά
 
 V1.9.6  Αλλαγή Διαδρομής βάσης απο Dropbox σε GOOGLE-DRIVE
@@ -576,10 +578,8 @@ class Toplevel1:
         top.minsize(120, 1)
         top.maxsize(3604, 3881)
         top.resizable(1, 1)
-        if demo:
-            top.title("Βιβλίο Επισκευών " + service_book_version)
-        else:
-            top.title("Βιβλίο Επισκευών " + service_book_version)
+
+        top.title("Βιβλίο Επισκευών " + service_book_version)
         top.configure(background="#bfc2b6")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")

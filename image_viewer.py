@@ -40,7 +40,8 @@ def create_Toplevel1(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
     global w, w_win, rt, selected_service_ID, images_path
     selected_service_ID = args[0]
-    images_path = os.path.join(db_path, "Service_images/" + str(selected_service_ID) + "/")
+    # images_path = os.path.join(db_path, "Service_images/" + str(selected_service_ID) + "/")
+    images_path = args[1]
     rt = root
     w = tk.Toplevel(root)
     top = Toplevel1(w)

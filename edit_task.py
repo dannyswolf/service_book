@@ -237,6 +237,7 @@ class edit_task_window:
         self.copier_id = ""
         self.files = ""
         self.files_path = ""
+        self.files_path_year = None
         self.urgent = StringVar()
 
         self.columns = None
@@ -825,7 +826,7 @@ class edit_task_window:
     def show_files(self):
         if self.service_id is None or self.service_id == "" or self.service_id == '0' or self.service_id == 0:
             messagebox.showwarning('Προσοχή', 'Δεν μπορείτε να δείτε τα αρχεία αν δεν πατήσετε Αποθήκευση')
-        image_viewer.create_Toplevel1(w, self.service_id)
+        image_viewer.create_Toplevel1(w, self.service_id, self.files_path)
 
     # Προσθήκη αρχείων
     def add_files(self):
@@ -1475,8 +1476,10 @@ class edit_task_window:
         try:
             date = StringVar(self.service_frame, value=data[0][1])
             self.start_date.set_date(date=date.get())
+            full_date = date.get()
+            self.files_path_year = full_date[6:]
         except IndexError as error:  # IndexError: list index out of range
-            print("error", __file__, "Line 1467", error)
+            print("error", __file__, "Line 1479", error)
             print("data", data)
 
         # self.start_date_entry.configure(textvariable=date)
@@ -1518,7 +1521,7 @@ class edit_task_window:
         service_id = StringVar(w, value=data[0][13])
         self.service_id = service_id.get()
 
-        self.files_path = os.path.join(db_path, "Service_images/" + str(self.service_id) + "/")
+        self.files_path = os.path.join(db_path, f"Service_images/{self.files_path_year}/" + str(self.service_id) + "/")
         counter_entry = StringVar(w, value=data[0][14])
         self.counter_entry.configure(textvariable=counter_entry)
         next_service = StringVar(w, value=data[0][15])
@@ -1541,6 +1544,7 @@ class edit_task_window:
 
         # Εισαγωγη αρχείων
         # self.files_path = os.path.join(db_path, "Service_images/" + str(self.service_id) + "/")
+        self.files_path = os.path.join(db_path, f"Service_images/{self.files_path_year}/{self.service_id}/")
         for img in self.files:
             if not os.path.exists(self.files_path):
                 os.makedirs(self.files_path, exist_ok=True)

@@ -193,10 +193,10 @@ class edit_service_window():
         self.customer_id = selected_customer_id
         self.selected_copier = selected_copier
         self.selected_customer = selected_customer
-
+        self.year = None
         self.purpose_list, self.actions_list = get_service_data()
         self.files = []
-        self.files_path = os.path.join(db_path, "Service_images/" + str(self.selected_service_id) + "/")
+        self.files_path = None
         self.len_images = 0
         self.culumns = None
 
@@ -291,6 +291,7 @@ class edit_service_window():
                                     foreground='white', borderwidth=5, locale="el_GR", font=("Calibri", 10, 'bold'),
                                     date_pattern='dd/mm/yyyy')
         self.date_entry.place(relx=0.37, rely=0.030, height=25, relwidth=0.331)
+
 
         # Εισαγωγή ανταλλακτικών εκτός αποθήκης
         self.insert_spare_parts_btn = tk.Button(self.service_frame)
@@ -649,7 +650,7 @@ class edit_service_window():
 
     # Ελεγχος αν υπάρχουν αρχεία για προβολή
     def check_if_files_exists(self):
-
+        self.files_path = os.path.join(db_path, f"Service_images/{self.year}/" + str(self.selected_service_id) + "/")
         try:
             images = os.listdir(self.files_path)
             self.len_images = len(images)
@@ -670,7 +671,7 @@ class edit_service_window():
 
     # Προβολή αρχείων
     def show_files(self):
-        image_viewer.create_Toplevel1(w, self.selected_service_id)
+        image_viewer.create_Toplevel1(w, self.selected_service_id, self.files_path)
 
     def send_mail_screen_shot(self):
         screen_dir = f"prints/screen_shot"
@@ -725,6 +726,8 @@ class edit_service_window():
         edit_conn.close()
         # w ==>> το global root
         date = StringVar(w, value=data[0][1])
+        full_date = date.get()
+        self.year = full_date[6:]  # Να πάρουμε μόνο το έτος
 
         self.date_entry.set_date(date.get())
         purpose_combobox = StringVar(w, value=data[0][2])
@@ -941,6 +944,7 @@ class edit_service_window():
         self.top.focus()
 
     def add_files_to_db(self):
+
         if self.files == "":
             return
 
