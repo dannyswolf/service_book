@@ -240,7 +240,7 @@ class add_copier_window:
         self.add_files_btn_img = tk.PhotoImage(file="icons/add_files.png")
         self.add_files_btn.configure(image=self.add_files_btn_img)
         self.add_files_btn.configure(compound="left")
-
+        self.add_files_btn.place_forget()  # Να μήν εφμφανίζετε γιατι τα βάζει τα αρχεία σαν blob στην βάση
         # Αρχεία
         self.show_files_btn = tk.Button(top)
         # self.show_files_btn.place(relx=0.420, rely=0.410, height=50, relwidth=0.350)
@@ -345,6 +345,7 @@ class add_copier_window:
         if self.files:
             self.show_files_btn.place(relx=0.420, rely=0.410, height=50, relwidth=0.350)
             self.show_files_btn.configure(command=self.show_files)
+            self.show_files_btn.place_forget()  # Να μήν εφμφανίζετε γιατι τα βάζει τα αρχεία σαν blob στην βάση
         elif not images:  # αδεια λιστα δλδ δεν υπάρχουν αρχεια και απενεργοποιουμε το κουμπί προβολή αρχείων
             self.show_files_btn.place_forget()
 

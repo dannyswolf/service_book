@@ -8,8 +8,17 @@
 """
 
 Ενεργοποιήση προγράμματος με hash.md5 στον πίνακα sqlite_sequence πεδίο demo και key
+
 todo προβολή όλων των εικόνων
 todo uniq (στα πεδία των πινακων στην βαση) στους κωδικους και part_nr serial ονοματεπωνυμο τηλ
+
+todo στην διαχηρηση αποθήκης τα αρχεία τα βάζει ακόμα στην βαση δεδομένων πρεπει να το αλλάξω
+     να τα βάζει στο DB_PATH/Spare_parts/ΠΙΝΑΚΑΣ/ID_ΠΡΟΙΟΝΤΟΣ δες V 1.9.9
+
+
+V 1.9.9 Αρχείο add_spare_parts_to_repository γραμμή 243, 350 αποκρυψη κουμπι
+        Αρχείο edit_spare_parts_to_repository γραμμή 251, 270, 441, 442,  αποκρυψη κουμπι
+
 
 V1.9.8  Διόρθωση της σειρας αν μετακινουμαστε με tab και αρχεία ανα έτος    10/07/2021
 
@@ -405,6 +414,8 @@ from reportlab.graphics.shapes import Drawing, Rect, Line
 from reportlab.graphics.barcode import getCodes, getCodeNames, createBarcodeDrawing, createBarcodeImageInMemory
 from reportlab.pdfbase import _fontdata_enc_winansi
 from reportlab.pdfbase import _fontdata_enc_macroman
+import babel.numbers
+
 
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info

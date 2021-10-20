@@ -16,7 +16,7 @@ from tkinter import messagebox, filedialog
 import image_viewer_support
 import shutil  # για διαγραφη των φακέλων με τις εικόνες
 import sys
-from settings import dbase, root_logger, spare_parts_db
+from settings import dbase, root_logger, spare_parts_db, SPARE_PARTS_ROOT
 
 
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE------------------
@@ -44,7 +44,9 @@ dbase = None
 def create_Toplevel1(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
     global w, w_win, rt, selected_service_ID, images_path, dbase
+
     selected_service_ID = args[0]
+
     # Δημιουργία φακέλου για τις εικόνες
     images_path = "images/" + str(selected_service_ID) + "/"
     dbase = args[1]
@@ -54,6 +56,7 @@ def create_Toplevel1(root, *args, **kwargs):
     w = tk.Toplevel(root)
     top = Toplevel1(w)
     image_viewer_support.init(w, top, *args, **kwargs)
+
     return (w, top)
 
 

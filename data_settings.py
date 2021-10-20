@@ -362,7 +362,6 @@ class SetDataSettings:
             messagebox.showinfo("Info", f"Τα στοιχεία προστέθηκαν επιτυχώς")
             self.root.focus()
 
-
     def quit(self, event):
         self.root.destroy()
 

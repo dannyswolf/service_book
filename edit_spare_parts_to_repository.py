@@ -248,6 +248,7 @@ class add_copier_window:
         self.add_files_btn_img = tk.PhotoImage(file="icons/add_files.png")
         self.add_files_btn.configure(image=self.add_files_btn_img)
         self.add_files_btn.configure(compound="left")
+        self.add_files_btn.place_forget()  # Να μήν εφμφανίζετε γιατι τα βάζει τα αρχεία σαν blob στην βάση
 
         # Αρχεία
         self.show_files_btn = tk.Button(top)
@@ -266,6 +267,7 @@ class add_copier_window:
         self.show_files_btn_img = tk.PhotoImage(file="icons/view_files.png")
         self.show_files_btn.configure(image=self.show_files_btn_img)
         self.show_files_btn.configure(compound="left")
+        self.show_files_btn.place_forget()  # Να μήν εφμφανίζετε γιατι τα βάζει τα αρχεία σαν blob στην βάση
 
         self.TSeparator1 = ttk.Separator(top)
         self.TSeparator1.place(relx=0.025, rely=0.553, relwidth=0.938)
@@ -342,7 +344,7 @@ class add_copier_window:
         self.Label2.configure(relief="groove")
         self.Label2.configure(text=f'''Εισαγωγή ανταλλακτικού {self.table}''')
         self.get_data()
-        self.check_if_files_exists()
+        # self.check_if_files_exists() # Να μήν τρέχει γιατι τα βγάζει τα αρχεία σαν blob απο την βάση
 
     # Ελεγχος αν υπάρχουν αρχεία για προβολή
     def check_if_files_exists(self):
@@ -359,8 +361,66 @@ class add_copier_window:
         if self.files:
             self.show_files_btn.place(relx=0.420, rely=0.410, height=50, relwidth=0.350)
             self.show_files_btn.configure(command=self.show_files)
+            self.show_files_btn.place_forget()  # Να μήν εφμφανίζετε γιατι τα βάζει τα αρχεία σαν blob στην βάση
         elif not images:  # αδεια λιστα δλδ δεν υπάρχουν αρχεια και απενεργοποιουμε το κουμπί προβολή αρχείων
             self.show_files_btn.place_forget()
+        # self.images_path = os.path.join(SPARE_PARTS_ROOT, f"{self.selected_table.__tablename__}", f"{self.selected_id}")
+        # files =
+        # try:
+        #
+        #     if self.files[0]:  # αν δεν υπάρχει βγαζει IndexError:  δλδ δεν υπάρχει αχρείο
+        #         self.file_index = 0  # Ορισμός οτι βλέπουμε το πρώτο αρχείο
+        #         self.file = os.path.join(self.images_path, self.files[0])
+        #         if pathlib.Path(self.file).suffix != ".pdf":
+        #             pixmap = QtGui.QPixmap(os.path.join(self.images_path, self.files[0]))
+        #             resized_pixmap = pixmap.scaled(500, 500, QtCore.Qt.KeepAspectRatio)
+        #             self.image_label.setPixmap(resized_pixmap)
+        #             self.image_label.setScaledContents(True)
+        #             self.image_label.show()
+        #             self.open_pdf_file_btn.hide()  # Απόκρηψη ανοιγμα αρχείου pdf αφου δεν ειναι pdf
+        #             self.save_file_btn.show()  # Εμφάνηση αποθήκευσης αρχείου αφου δεν ειναι pdf
+        #         else:  # "icons/pdf.png"
+        #             self.save_file_btn.hide()  # Απόκρηψη αποθήκευσης αρχείου αφου ειναι pdf
+        #             pixmap = QtGui.QPixmap("icons/pdf.png")
+        #             resized_pixmap = pixmap.scaled(200, 200, QtCore.Qt.KeepAspectRatio)
+        #             self.image_label.setPixmap(resized_pixmap)
+        #             self.image_label.setScaledContents(True)
+        #             self.image_label.show()
+        #             self.open_pdf_file_btn.clicked.connect(self.open_pdf)
+        #             self.open_pdf_file_btn.show()
+        #
+        #     if len(self.files) == 1:  # αν υπάρχει μόνο ένα αρχείο
+        #         self.file = os.path.join(self.images_path, self.files[0])
+        #         # απόκρηψη κουμπιών
+        #         self.next_btn.hide()
+        #         self.previous_btn.hide()
+        #         if pathlib.Path(self.file).suffix != ".pdf":
+        #             self.open_pdf_file_btn.hide()  # Απόκρηψη ανοιγμα αρχείου pdf αφου δεν ειναι pdf
+        #             self.save_file_btn.show()  # Εμφάνηση αποθήκευσης αρχείου αφου δεν ειναι pdf
+        #         else:
+        #             self.open_pdf_file_btn.clicked.connect(self.open_pdf)
+        #             self.save_file_btn.hide()  # Απόκρηψη αποθήκευσης αρχείου αφου ειναι pdf
+        #             self.open_pdf_file_btn.show()
+        #
+        #         self.delete_file_btn.show()
+        #     if len(self.files) > 1:
+        #         self.file = os.path.join(self.images_path, self.files[0])
+        #         self.next_btn.show()
+        #         self.previous_btn.show()
+        #         # self.save_file_btn.show()
+        #         self.delete_file_btn.show()
+        # except (IndexError, TypeError):  # αν δεν υπάρχει κανένα αρχείο
+        #     # NoneType οταν ξεκοιναει απο το store.py το self.files = None
+        #     # απόκρηψη κουμπιών
+        #     self.image_label.hide()
+        #     self.next_btn.hide()
+        #     self.previous_btn.hide()
+        #     self.save_file_btn.hide()
+        #     self.delete_file_btn.hide()
+        #     self.open_pdf_file_btn.hide()
+
+
+
 
     # Προβολή αρχείων
     def show_files(self):
@@ -378,7 +438,8 @@ class add_copier_window:
         else:
             self.add_files_to_db()
             self.show_files_btn.configure(text=f'{len(self.files)} Αρχεία για προσθήκη')
-            self.check_if_files_exists()
+            self.show_files_btn.place_forget()  # Να μήν εφμφανίζετε γιατι βγάζει τα αρχεία σαν blob απο την βάση
+            # self.check_if_files_exists()  # Να μήν τρέχει γιατι τα βγάζει τα αρχεία σαν blob απο την βάση
 
     # Προσθήκη αρχείων στην βάση
     def add_files_to_db(self):

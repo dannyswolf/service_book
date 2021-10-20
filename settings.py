@@ -31,6 +31,8 @@ else:
 
 db_path = os.path.dirname(os.path.realpath(dbase))
 
+BASE_DIR = os.path.dirname(os.path.abspath(dbase))
+SPARE_PARTS_ROOT = os.path.join(BASE_DIR, "SpareParts_images/")
 
 def check_if_demo():
     con = sqlite3.connect(dbase)
