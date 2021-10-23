@@ -9,7 +9,7 @@ import sys
 
 user = getpass.getuser()
 
-mlshop = 0
+mlshop = 1
 
 
 if mlshop:
@@ -23,16 +23,18 @@ if mlshop:
         dbase = "\\\\192.168.1.200\\Public\\GOOGLE-DRIVE\\ΕΓΓΡΑΦΑ\\6.  ΒΙΒΛΙΟ SERVICE\\Service_book.db"
         spare_parts_db = "\\\\192.168.1.200\\Public\\GOOGLE-DRIVE\\ΕΓΓΡΑΦΑ\\2.  ΑΠΟΘΗΚΗ\\3. ΚΑΙΝΟΥΡΙΑ_ΑΠΟΘΗΚΗ.db"
 
- # VPN
-else:
-    spare_parts_db = "ΑΠΟΘΗΚΗ.db"
-    # dbase = "\\\\10.8.0.1\\Public\\GOOGLE-DRIVE\\ΕΓΓΡΑΦΑ\\6.  ΒΙΒΛΙΟ SERVICE\\Service_book.db"  #  VPN Windows
-    dbase = "Service_book.db"  # Local Dbase
+
+else:  # VPN
+    spare_parts_db = "\\\\10.8.0.1\\Public\\GOOGLE-DRIVE\\ΕΓΓΡΑΦΑ\\2.  ΑΠΟΘΗΚΗ\\3. ΚΑΙΝΟΥΡΙΑ_ΑΠΟΘΗΚΗ.db"  #  VPN Windows
+    # spare_parts_db = "ΑΠΟΘΗΚΗ.db"  # Local Dbase
+    dbase = "\\\\10.8.0.1\\Public\\GOOGLE-DRIVE\\ΕΓΓΡΑΦΑ\\6.  ΒΙΒΛΙΟ SERVICE\\Service_book.db"  #  VPN Windows
+    # dbase = "Service_book.db"  # Local Dbase
 
 db_path = os.path.dirname(os.path.realpath(dbase))
 
 BASE_DIR = os.path.dirname(os.path.abspath(dbase))
 SPARE_PARTS_ROOT = os.path.join(BASE_DIR, "SpareParts_images/")
+
 
 def check_if_demo():
     con = sqlite3.connect(dbase)
@@ -71,10 +73,10 @@ demo = check_if_demo()
 #demo = 0
 if demo:
 
-    service_book_version = "V 1.9.9 Demo"
+    service_book_version = "V 2.0.0 Demo"
 else:
 
-    service_book_version = "V 1.9.9"
+    service_book_version = "V 2.0.0"
 
 
 today = datetime.datetime.today().strftime("%d %m %Y")

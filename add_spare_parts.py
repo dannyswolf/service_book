@@ -12,7 +12,6 @@ import sqlite3
 import copiers_log_support
 from settings import dbase, spare_parts_db, root_logger  # settings
 
-
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
@@ -24,9 +23,11 @@ except ImportError:
 
 try:
     import ttk
+
     py3 = False
 except ImportError:
     import tkinter.ttk as ttk
+
     py3 = True
 
 
@@ -45,13 +46,15 @@ def get_tables():
 
     return companies
 
+
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
     global val, w, root
     root = tk.Tk()
-    top = Toplevel1 (root)
+    top = Toplevel1(root)
     copiers_log_support.init(root, top)
     root.mainloop()
+
 
 w = None
 service_id = ""
@@ -65,46 +68,47 @@ def create_Toplevel1(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
     global w, w_win, rt, service_id, customer_id, copier_name, calendar_id
     service_id = args[0]  # Το Service_ID απο το add_service.py, edit_service_windows, edit_task.py
-    customer_id = args[1]   # Το customer_id απο το add_service.py, edit_service_windows, edit_task.py
+    customer_id = args[1]  # Το customer_id απο το add_service.py, edit_service_windows, edit_task.py
     copier_name = args[2]
     try:
         calendar_id = args[3]  # To Calendar_id απο το edit_task.py
     except IndexError:  # Οταν τρέχουμε το add_spare_parts οχι απο το edit_task
         pass
     rt = root
-    w = tk.Toplevel (root)
-    top = Toplevel1 (w)
+    w = tk.Toplevel(root)
+    top = Toplevel1(w)
     copiers_log_support.init(w, top, *args, **kwargs)
     return (w, top)
+
 
 def destroy_Toplevel1():
     global w
     w.destroy()
     w = None
 
+
 class Toplevel1:
     def __init__(self, top=None):
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
 
-
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
         _fgcolor = '#000000'  # X11 color: 'black'
-        _compcolor = '#d9d9d9' # X11 color: 'gray85'
-        _ana1color = '#d9d9d9' # X11 color: 'gray85'
-        _ana2color = '#ececec' # Closest X11 color: 'gray92'
-        font11 = "-family Calibri -size 12 -weight bold -slant roman "  \
-            "-underline 1 -overstrike 0"
-        font9 = "-family Calibri -size 10 -weight bold -slant roman "  \
-            "-underline 0 -overstrike 0"
+        _compcolor = '#d9d9d9'  # X11 color: 'gray85'
+        _ana1color = '#d9d9d9'  # X11 color: 'gray85'
+        _ana2color = '#ececec'  # Closest X11 color: 'gray92'
+        font11 = "-family Calibri -size 12 -weight bold -slant roman " \
+                 "-underline 1 -overstrike 0"
+        font9 = "-family Calibri -size 10 -weight bold -slant roman " \
+                "-underline 0 -overstrike 0"
         self.style = ttk.Style()
         if sys.platform == "win32":
             self.style.theme_use('clam')
-        self.style.configure('.',background=_bgcolor)
-        self.style.configure('.',foreground=_fgcolor)
-        self.style.configure('.',font="TkDefaultFont")
-        self.style.map('.',background=
-            [('selected', _compcolor), ('active',_ana2color)])
+        self.style.configure('.', background=_bgcolor)
+        self.style.configure('.', foreground=_fgcolor)
+        self.style.configure('.', font="TkDefaultFont")
+        self.style.map('.', background=
+        [('selected', _compcolor), ('active', _ana2color)])
         # ==============================  Notebook style  =============
         self.style.map('TNotebook.Tab', background=[('selected', "#6b6b6b"), ('active', "#69ab3a")])
         self.style.map('TNotebook.Tab', foreground=[('selected', "white"), ('active', "white")])
@@ -122,7 +126,7 @@ class Toplevel1:
 
         self.companies = get_tables()
         self.headers = []
-        self.selected_company = ""
+        self.selected_company = ""  # Επιλεγμένος πίνακας προιοντος
         self.service_ID = service_id
         self.customer_id = customer_id
         self.calendar_id = calendar_id
@@ -280,7 +284,7 @@ class Toplevel1:
             return
         items_to_add = []
         for item in selected_items:
-            info = self.spare_parts_treeview.set(item)
+            info = self.spare_parts_treeview.set(item)  # info ειναι Dictionary
             items_to_add.append(info)
         service_con = sqlite3.connect(dbase)
         service_cursor = service_con.cursor()
@@ -304,7 +308,7 @@ class Toplevel1:
 
         added_codes = []
         for item in items_to_add:
-            for key, value in item.items():   # Dictionary
+            for key, value in item.items():  # Dictionary
                 if key == "ΚΩΔΙΚΟΣ":  #
                     added_codes.append(value)
                 # όταν το value  πάρει την τιμή του κωδικού πχ 6207 και ο κωδικός αυτός υπάρχει στα Service_ID
@@ -313,7 +317,7 @@ class Toplevel1:
                     # print("value", value)
 
                     answer = messagebox.askyesno("Προσοχή!", f"Ο κωδικός  {value}, υπάρχει στο ιστορικό αυτό "
-                                                              f"θέλετε να το ξανα προσθέσετε;")
+                                                             f"θέλετε να το ξανα προσθέσετε;")
 
                     # Προσθήκη +1 στα τεμάχια
                     if answer:
@@ -361,7 +365,7 @@ class Toplevel1:
                         except sqlite3.OperationalError:
                             pass
                         print("line 361"
-                            f" Οι κωδικοί {added_codes} αφερέθηκαν απο την αποθήκη {self.selected_company} με επιτυχία ")
+                              f" Οι κωδικοί {added_codes} αφερέθηκαν απο την αποθήκη {self.selected_company} με επιτυχία ")
                         c.close()
                         con.close()
                         # messagebox.showinfo("Πληροφορία", f"O κωδικός {value} προστέθηκε ")
@@ -377,16 +381,22 @@ class Toplevel1:
         # Μετά το for item in items_to_add:
         self.get_spare_parts()
         self.top.focus()
-        not_needed_keys = ["ID", "id", 'Id', 'ΕΤΑΙΡΕΙΑ', 'ΚΩΔΙΚΟΙ', 'ΠΟΙΟΤΗΤΑ', 'ΑΝΑΛΩΣΙΜΟ', 'ΤΙΜΗ', 'ΣΥΝΟΛΟ', 'ΣΕΛΙΔΕΣ', 'ΠΕΛΑΤΕΣ']
+        not_needed_keys = ["ID", "id", 'Id', 'ΕΤΑΙΡΕΙΑ', 'ΚΩΔΙΚΟΙ', 'ΠΟΙΟΤΗΤΑ', 'ΑΝΑΛΩΣΙΜΟ', 'ΤΙΜΗ', 'ΣΥΝΟΛΟ',
+                           'ΣΕΛΙΔΕΣ', 'ΠΕΛΑΤΕΣ']
         added_codes = []
         service_con = sqlite3.connect(dbase)
         service_cursor = service_con.cursor()
+        # Επωνημία πελάτη
+        if self.customer_id:
+            service_cursor.execute("SELECT Επωνυμία_Επιχείρησης FROM Πελάτες  WHERE ID =?", (self.customer_id,))
+            customer_name = service_cursor.fetchall()[0][0]
+
         for item in items_to_add:
             values = []  # values είναι πόσα ? να έχει ανάλογα τα culumn ==> keys
-            keys = []    # ID , parts_nr, Περιγραφή , Τεμάχια etc...
-            data = []    # Δεδομένα
-            for key, value in item.items():   # Dictionary
-                if value in used_parts:   # όταν το value  πάρει την τιμή του κωδικού πχ 6207
+            keys = []  # ID , parts_nr, Περιγραφή , Τεμάχια etc...
+            data = []  # Δεδομένα
+            for key, value in item.items():  # Dictionary
+                if value in used_parts:  # όταν το value  πάρει την τιμή του κωδικού πχ 6207
                     # και ο κωδικός αυτός υπάρχει στα Service_ID
                     # τότε να σταματήσει γιατί τρεχει το ποιο πανω loop (line 269) οταν ο κωδικός υπάρχει
                     # todo να μήν φτάνει εδώ αλλά να σταματάει στο στο line 269
@@ -400,7 +410,6 @@ class Toplevel1:
                     elif key == "ΤΕΜΑΧΙΑ":
                         data.append('1')
                         values.append('?')
-
                     else:
                         data.append(value)
                         values.append('?')
@@ -417,7 +426,6 @@ class Toplevel1:
             data.append(self.service_ID)
             data.append(self.customer_id)
             data.append(self.calendar_id)
-            print("keys", keys)
             sql = ("INSERT INTO Ανταλλακτικά(" + ",".join(keys) + " )VALUES( " + values + " )")
             service_cursor.execute(sql, data)
             service_con.commit()
@@ -440,6 +448,22 @@ class Toplevel1:
                 new_pieces = int(old_pieces[0][0]) - 1
             except ValueError:  # όταν τα τεμάχια δεν έιναι αριθμός αλλα έχουμε γραμματα
                 new_pieces = old_pieces[0][0]
+            # ----------------- Προσθήκη πελάτη στο προιόν -------------------------#
+            # Πρώτα πέρνουμε τους υπάρχον πελάτες απο το προιόν
+            try:
+                c.execute("SELECT ΠΕΛΑΤΕΣ FROM " + self.selected_company + " WHERE ΚΩΔΙΚΟΣ =?", (code,))
+                customers = c.fetchall()[0]
+                customers = customers[0]
+                # Προσθήκη πελάτη αν δεν υπάρχει αν υπάρχει δεν πειραζει κάτι τους αφηνει ως εχει
+                if customer_name not in customers:
+                    customers = customers + customer_name +","
+                    c.execute("UPDATE " + self.selected_company + " SET ΠΕΛΑΤΕΣ =? WHERE ΚΩΔΙΚΟΣ =?", (customers, code))
+                    print(f"Πελάτης {customer_name} προστέθηκε στον κωδικό {code} του πίνακα {self.selected_company}")
+            except sqlite3.OperationalError as error:  # Οταν ο πίνακας δεν εχει πεδίο Πελάτες
+                pass
+
+            # except sqlite3.InterfaceError:  # Error binding parameter 0 - probably unsupported type.
+            #     pass                        # Οταν ειναι λάθος το customers
             c.execute("UPDATE " + self.selected_company + " SET ΤΕΜΑΧΙΑ =? WHERE ΚΩΔΙΚΟΣ =?", (new_pieces, code))
             con.commit()
             try:
@@ -476,7 +500,7 @@ class AutoScroll(object):
             pass
         hsb = ttk.Scrollbar(master, orient='horizontal', command=self.xview)
 
-        #self.configure(yscrollcommand=_autoscroll(vsb),
+        # self.configure(yscrollcommand=_autoscroll(vsb),
         #    xscrollcommand=_autoscroll(hsb))
         try:
             self.configure(yscrollcommand=self._autoscroll(vsb))
@@ -497,10 +521,10 @@ class AutoScroll(object):
         # Copy geometry methods of master  (taken from ScrolledText.py)
         if py3:
             methods = tk.Pack.__dict__.keys() | tk.Grid.__dict__.keys() \
-                  | tk.Place.__dict__.keys()
+                      | tk.Place.__dict__.keys()
         else:
             methods = tk.Pack.__dict__.keys() + tk.Grid.__dict__.keys() \
-                  + tk.Place.__dict__.keys()
+                      + tk.Place.__dict__.keys()
 
         for meth in methods:
             if meth[0] != '_' and meth not in ('config', 'configure'):
@@ -509,6 +533,7 @@ class AutoScroll(object):
     @staticmethod
     def _autoscroll(sbar):
         '''Hide and show scrollbar as needed.'''
+
         def wrapped(first, last):
             first, last = float(first), float(last)
             if first <= 0 and last >= 1:
@@ -516,30 +541,39 @@ class AutoScroll(object):
             else:
                 sbar.grid()
             sbar.set(first, last)
+
         return wrapped
 
     def __str__(self):
         return str(self.master)
 
+
 def _create_container(func):
     '''Creates a ttk Frame with a given master, and use this new frame to
     place the scrollbars and the widget.'''
+
     def wrapped(cls, master, **kw):
         container = ttk.Frame(master)
         container.bind('<Enter>', lambda e: _bound_to_mousewheel(e, container))
         container.bind('<Leave>', lambda e: _unbound_to_mousewheel(e, container))
         return func(cls, container, **kw)
+
     return wrapped
+
 
 class ScrolledTreeView(AutoScroll, ttk.Treeview):
     '''A standard ttk Treeview widget with scrollbars that will
     automatically show/hide as needed.'''
+
     @_create_container
     def __init__(self, master, **kw):
         ttk.Treeview.__init__(self, master, **kw)
         AutoScroll.__init__(self, master)
 
+
 import platform
+
+
 def _bound_to_mousewheel(event, widget):
     child = widget.winfo_children()[0]
     if platform.system() == 'Windows' or platform.system() == 'Darwin':
@@ -551,6 +585,7 @@ def _bound_to_mousewheel(event, widget):
         child.bind_all('<Shift-Button-4>', lambda e: _on_shiftmouse(e, child))
         child.bind_all('<Shift-Button-5>', lambda e: _on_shiftmouse(e, child))
 
+
 def _unbound_to_mousewheel(event, widget):
     if platform.system() == 'Windows' or platform.system() == 'Darwin':
         widget.unbind_all('<MouseWheel>')
@@ -561,22 +596,24 @@ def _unbound_to_mousewheel(event, widget):
         widget.unbind_all('<Shift-Button-4>')
         widget.unbind_all('<Shift-Button-5>')
 
+
 def _on_mousewheel(event, widget):
     if platform.system() == 'Windows':
-        widget.yview_scroll(-1*int(event.delta/120),'units')
+        widget.yview_scroll(-1 * int(event.delta / 120), 'units')
     elif platform.system() == 'Darwin':
-        widget.yview_scroll(-1*int(event.delta),'units')
+        widget.yview_scroll(-1 * int(event.delta), 'units')
     else:
         if event.num == 4:
             widget.yview_scroll(-1, 'units')
         elif event.num == 5:
             widget.yview_scroll(1, 'units')
 
+
 def _on_shiftmouse(event, widget):
     if platform.system() == 'Windows':
-        widget.xview_scroll(-1*int(event.delta/120), 'units')
+        widget.xview_scroll(-1 * int(event.delta / 120), 'units')
     elif platform.system() == 'Darwin':
-        widget.xview_scroll(-1*int(event.delta), 'units')
+        widget.xview_scroll(-1 * int(event.delta), 'units')
     else:
         if event.num == 4:
             widget.xview_scroll(-1, 'units')
@@ -586,8 +623,3 @@ def _on_shiftmouse(event, widget):
 
 if __name__ == '__main__':
     vp_start_gui()
-
-
-
-
-
