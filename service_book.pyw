@@ -415,6 +415,7 @@ from reportlab.graphics.barcode import getCodes, getCodeNames, createBarcodeDraw
 from reportlab.pdfbase import _fontdata_enc_winansi
 from reportlab.pdfbase import _fontdata_enc_macroman
 import babel.numbers
+import xlsxwriter
 
 
 sys.stderr.write = root_logger.error
@@ -527,12 +528,14 @@ def destroy_Toplevel1():
 def show_info():
     messagebox.showinfo("Πληροφορίες", f""" 
         Αuthor     : "Jordanis Ntini"
-        Copyright  : "Copyright © 2020"
         Credits    : ['Athanasia Tzampazi']
         Version    : '{service_book_version}'
         Maintainer : "Jordanis Ntini"
         Email      : "ntinisiordanis@gmail.com"
-        Status     : 'Development' 
+        Status     : 'Development'
+        Language   : 'https://www.python.org/'
+        Gui        : 'https://docs.python.org/3/library/tk.html'
+        License    : 'GPL-3.0'
        
     """)
 
