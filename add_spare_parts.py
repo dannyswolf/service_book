@@ -11,6 +11,7 @@ from tkinter import PhotoImage, StringVar, messagebox
 import sqlite3
 import copiers_log_support
 from settings import dbase, spare_parts_db, root_logger  # settings
+import platform
 
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
 sys.stderr.write = root_logger.error
@@ -456,7 +457,10 @@ class Toplevel1:
                 customers = customers[0]
                 # Προσθήκη πελάτη αν δεν υπάρχει αν υπάρχει δεν πειραζει κάτι τους αφηνει ως εχει
                 if customer_name not in customers:
-                    customers = customers + customer_name +","
+                    if customers[-1] != ",":
+                        customers = customers + ", "
+                    customers = customers + customer_name +", "
+                    print("Final Customers", customers)
                     c.execute("UPDATE " + self.selected_company + " SET ΠΕΛΑΤΕΣ =? WHERE ΚΩΔΙΚΟΣ =?", (customers, code))
                     print(f"Πελάτης {customer_name} προστέθηκε στον κωδικό {code} του πίνακα {self.selected_company}")
             except sqlite3.OperationalError as error:  # Οταν ο πίνακας δεν εχει πεδίο Πελάτες
@@ -569,9 +573,6 @@ class ScrolledTreeView(AutoScroll, ttk.Treeview):
     def __init__(self, master, **kw):
         ttk.Treeview.__init__(self, master, **kw)
         AutoScroll.__init__(self, master)
-
-
-import platform
 
 
 def _bound_to_mousewheel(event, widget):

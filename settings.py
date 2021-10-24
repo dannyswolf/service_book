@@ -26,7 +26,7 @@ if mlshop:
 
 else:  # VPN
     spare_parts_db = "\\\\10.8.0.1\\Public\\GOOGLE-DRIVE\\ΕΓΓΡΑΦΑ\\2.  ΑΠΟΘΗΚΗ\\3. ΚΑΙΝΟΥΡΙΑ_ΑΠΟΘΗΚΗ.db"  #  VPN Windows
-    # spare_parts_db = "ΑΠΟΘΗΚΗ.db"  # Local Dbase
+    #spare_parts_db = "ΑΠΟΘΗΚΗ.db"  # Local Dbase
     dbase = "\\\\10.8.0.1\\Public\\GOOGLE-DRIVE\\ΕΓΓΡΑΦΑ\\6.  ΒΙΒΛΙΟ SERVICE\\Service_book.db"  #  VPN Windows
     # dbase = "Service_book.db"  # Local Dbase
 

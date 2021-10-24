@@ -12,6 +12,7 @@ import sqlite3
 from settings import dbase, root_logger, spare_parts_db  # settings
 import os
 import view_images_from_repository
+import platform
 # -------------ΔΗΜΗΟΥΡΓΕΙΑ LOG FILE  ------------------
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
@@ -409,7 +410,6 @@ class add_copier_window:
         self.top.focus()
         self.check_if_files_exists()
 
-
     # Ελεγχος αν το serial  υπάρχει
     def check_code(self, name, index, mode):
         self.code_entry_warning.place_forget()
@@ -544,9 +544,6 @@ class ScrolledText(AutoScroll, tk.Text):
     def __init__(self, master, **kw):
         tk.Text.__init__(self, master, **kw)
         AutoScroll.__init__(self, master)
-
-
-import platform
 
 
 def _bound_to_mousewheel(event, widget):
