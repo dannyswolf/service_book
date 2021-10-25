@@ -456,11 +456,14 @@ class Toplevel1:
                 customers = c.fetchall()[0]
                 customers = customers[0]
                 # Προσθήκη πελάτη αν δεν υπάρχει αν υπάρχει δεν πειραζει κάτι τους αφηνει ως εχει
+
                 if customer_name not in customers:
-                    if customers[-1] != ",":
-                        customers = customers + ", "
+                    try:
+                        if customers[-1] != ",":
+                            customers = customers + ", "
+                    except IndexError:  # Οταν δεν υπάρχει πελάτης το customers = ""
+                        pass
                     customers = customers + customer_name +", "
-                    print("Final Customers", customers)
                     c.execute("UPDATE " + self.selected_company + " SET ΠΕΛΑΤΕΣ =? WHERE ΚΩΔΙΚΟΣ =?", (customers, code))
                     print(f"Πελάτης {customer_name} προστέθηκε στον κωδικό {code} του πίνακα {self.selected_company}")
             except sqlite3.OperationalError as error:  # Οταν ο πίνακας δεν εχει πεδίο Πελάτες
