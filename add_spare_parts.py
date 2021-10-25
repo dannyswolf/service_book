@@ -460,10 +460,11 @@ class Toplevel1:
                 if customer_name not in customers:
                     try:
                         if customers[-1] != ",":
-                            customers = customers + ", "
+                            customers = customers + ","
                     except IndexError:  # Οταν δεν υπάρχει πελάτης το customers = ""
-                        pass
-                    customers = customers + customer_name +", "
+                        print(f"Δεν υπάρχει πελάτης στον Πίνακα {self.selected_company} με κωδικό {code}")
+
+                    customers = customers + " " + customer_name +","
                     c.execute("UPDATE " + self.selected_company + " SET ΠΕΛΑΤΕΣ =? WHERE ΚΩΔΙΚΟΣ =?", (customers, code))
                     print(f"Πελάτης {customer_name} προστέθηκε στον κωδικό {code} του πίνακα {self.selected_company}")
             except sqlite3.OperationalError as error:  # Οταν ο πίνακας δεν εχει πεδίο Πελάτες
